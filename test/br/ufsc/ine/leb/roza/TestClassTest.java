@@ -1,0 +1,27 @@
+package br.ufsc.ine.leb.roza;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.util.Arrays;
+
+import org.junit.jupiter.api.Test;
+
+public class TestClassTest {
+
+	@Test
+	void create() throws Exception {
+		TestMethod exampleTestMethod = new TestMethod("example");
+		TestClass exampleTestClass = new TestClass("ExampleTest", Arrays.asList(exampleTestMethod));
+		assertEquals("ExampleTest", exampleTestClass.getName());
+		assertEquals(1, exampleTestClass.getTestMethods().size());
+		assertEquals("example", exampleTestClass.getTestMethods().get(0).getName());
+	}
+
+	@Test
+	void withoutTestMethods() throws Exception {
+		assertThrows(NoTestMethodException.class, () -> {
+			new TestClass("ExampleTest", Arrays.asList());
+		});
+	}
+
+}
