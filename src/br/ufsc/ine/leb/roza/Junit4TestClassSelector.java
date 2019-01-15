@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import com.github.javaparser.JavaParser;
@@ -20,19 +21,33 @@ public class Junit4TestClassSelector implements TestClassSelector {
 			CompilationUnit compilationUnit = JavaParser.parse(file.getContent());
 			Optional<ClassOrInterfaceDeclaration> parsedTestClass = compilationUnit.findFirst(ClassOrInterfaceDeclaration.class);
 			String name = parsedTestClass.get().getNameAsString();
+			List<SetupMethod> setupMethods = new LinkedList<>();
 			List<TestMethod> testMethods = new LinkedList<>();
 			List<MethodDeclaration> parsedMethods = parsedTestClass.get().findAll(MethodDeclaration.class);
 			parsedMethods.forEach((parsedMethod) -> {
-				Boolean hasTestAnnotation = parsedMethod.getAnnotationByClass(Test.class).isPresent();
-				if (hasTestAnnotation) {
-					TestMethod testMethod = new TestMethod(parsedMethod.getNameAsString());
-					testMethods.add(testMethod);
-				}
+				extractSetupMethod(setupMethods, parsedMethod);
+				extractTestMethod(testMethods, parsedMethod);
 			});
-			TestClass testClass = new TestClass(name, testMethods);
+			TestClass testClass = new TestClass(name, setupMethods, testMethods);
 			testClasses.add(testClass);
 		});
 		return testClasses;
+	}
+
+	private void extractTestMethod(List<TestMethod> testMethods, MethodDeclaration parsedMethod) {
+		Boolean hasTestAnnotation = parsedMethod.getAnnotationByClass(Test.class).isPresent();
+		if (hasTestAnnotation) {
+			TestMethod testMethod = new TestMethod(parsedMethod.getNameAsString());
+			testMethods.add(testMethod);
+		}
+	}
+
+	private void extractSetupMethod(List<SetupMethod> setupMethods, MethodDeclaration parsedMethod) {
+		Boolean hasBeforeAnnotation = parsedMethod.getAnnotationByClass(Before.class).isPresent();
+		if (hasBeforeAnnotation) {
+			SetupMethod setupMethod = new SetupMethod(parsedMethod.getNameAsString());
+			setupMethods.add(setupMethod);
+		}
 	}
 
 }
