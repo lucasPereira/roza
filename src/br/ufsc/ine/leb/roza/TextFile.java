@@ -18,8 +18,4 @@ public class TextFile {
 		return content;
 	}
 
-	public Boolean hasExtension(String extension) {
-		return name.toLowerCase().endsWith(String.format(".%s", extension.toLowerCase()));
-	}
-
 }

@@ -6,6 +6,8 @@ import java.util.Arrays;
 
 import org.junit.jupiter.api.Test;
 
+import br.ufsc.ine.leb.roza.exceptions.NoTestMethodException;
+
 public class TestClassTest {
 
 	@Test

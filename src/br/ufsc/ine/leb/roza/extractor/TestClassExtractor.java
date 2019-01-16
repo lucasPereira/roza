@@ -7,6 +7,6 @@ import br.ufsc.ine.leb.roza.TextFile;
 
 public interface TestClassExtractor {
 
-	public List<TestClass> select(List<TextFile> files);
+	List<TestClass> extract(List<TextFile> files);
 
 }

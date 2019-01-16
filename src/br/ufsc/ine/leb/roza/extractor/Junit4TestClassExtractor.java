@@ -20,7 +20,7 @@ import br.ufsc.ine.leb.roza.TextFile;
 public class Junit4TestClassExtractor implements TestClassExtractor {
 
 	@Override
-	public List<TestClass> select(List<TextFile> files) {
+	public List<TestClass> extract(List<TextFile> files) {
 		List<TestClass> testClasses = new LinkedList<>();
 		files.forEach((file) -> {
 			CompilationUnit compilationUnit = JavaParser.parse(file.getContent());
@@ -33,8 +33,10 @@ public class Junit4TestClassExtractor implements TestClassExtractor {
 				extractSetupMethod(setupMethods, parsedMethod);
 				extractTestMethod(testMethods, parsedMethod);
 			});
-			TestClass testClass = new TestClass(name, setupMethods, testMethods);
-			testClasses.add(testClass);
+			if (testMethods.size() > 0) {
+				TestClass testClass = new TestClass(name, setupMethods, testMethods);
+				testClasses.add(testClass);
+			}
 		});
 		return testClasses;
 	}

@@ -2,6 +2,8 @@ package br.ufsc.ine.leb.roza;
 
 import java.util.List;
 
+import br.ufsc.ine.leb.roza.exceptions.NoTestMethodException;
+
 public class TestClass {
 
 	private String name;

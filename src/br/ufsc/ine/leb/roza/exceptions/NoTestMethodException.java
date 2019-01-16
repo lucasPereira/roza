@@ -1,4 +1,4 @@
-package br.ufsc.ine.leb.roza;
+package br.ufsc.ine.leb.roza.exceptions;
 
 public class NoTestMethodException extends RuntimeException {
 
