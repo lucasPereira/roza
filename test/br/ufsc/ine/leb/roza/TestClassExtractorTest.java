@@ -8,9 +8,9 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class TestClassSelectorTest {
+public class TestClassExtractorTest {
 
-	private TestClassSelector selector;
+	private TestClassExtractor extractor;
 	private TextFile exampleTest1DotJava;
 	private TextFile exampleTest2DotJava;
 	private TextFile exampleTest3DotJava;
@@ -18,7 +18,7 @@ public class TestClassSelectorTest {
 
 	@BeforeEach
 	void setup() {
-		selector = new Junit4TestClassSelector();
+		extractor = new Junit4TestClassExtractor();
 		exampleTest1DotJava = new TextFile("ExampleTest1.java", "public class ExampleTest1 { @Test public void example() { assertEquals(0, 0); } }");
 		exampleTest2DotJava = new TextFile("ExampleTest2.java", "public class ExampleTest2 { public void example1() { System.out.println(0); } @Test public void example2() { assertEquals(0, 0); } }") {};
 		exampleTest3DotJava = new TextFile("ExampleTest3.java", "public class ExampleTest3 { @Test public void example1() { assertEquals(1, 1); } @Test public void example2() { assertEquals(2, 2); } }") {};
@@ -27,12 +27,12 @@ public class TestClassSelectorTest {
 
 	@Test
 	void withoutFiles() throws Exception {
-		assertEquals(0, selector.select(Arrays.asList()).size());
+		assertEquals(0, extractor.select(Arrays.asList()).size());
 	}
 
 	@Test
 	void oneTestMethod() throws Exception {
-		List<TestClass> selection = selector.select(Arrays.asList(exampleTest1DotJava));
+		List<TestClass> selection = extractor.select(Arrays.asList(exampleTest1DotJava));
 		assertEquals(1, selection.size());
 		assertEquals("ExampleTest1", selection.get(0).getName());
 		assertEquals(1, selection.get(0).getTestMethods().size());
@@ -41,7 +41,7 @@ public class TestClassSelectorTest {
 
 	@Test
 	void oneTestMethodOneMethod() throws Exception {
-		List<TestClass> selection = selector.select(Arrays.asList(exampleTest2DotJava));
+		List<TestClass> selection = extractor.select(Arrays.asList(exampleTest2DotJava));
 		assertEquals(1, selection.size());
 		assertEquals("ExampleTest2", selection.get(0).getName());
 		assertEquals(1, selection.get(0).getTestMethods().size());
@@ -50,7 +50,7 @@ public class TestClassSelectorTest {
 
 	@Test
 	void twoTestMethods() throws Exception {
-		List<TestClass> selection = selector.select(Arrays.asList(exampleTest3DotJava));
+		List<TestClass> selection = extractor.select(Arrays.asList(exampleTest3DotJava));
 		assertEquals(1, selection.size());
 		assertEquals("ExampleTest3", selection.get(0).getName());
 		assertEquals(2, selection.get(0).getTestMethods().size());
@@ -60,7 +60,7 @@ public class TestClassSelectorTest {
 
 	@Test
 	void oneSetupMethodOneTestMethod() throws Exception {
-		List<TestClass> selection = selector.select(Arrays.asList(exampleTest4DotJava));
+		List<TestClass> selection = extractor.select(Arrays.asList(exampleTest4DotJava));
 		assertEquals(1, selection.size());
 		assertEquals("ExampleTest4", selection.get(0).getName());
 		assertEquals(1, selection.get(0).getSetupMethods().size());

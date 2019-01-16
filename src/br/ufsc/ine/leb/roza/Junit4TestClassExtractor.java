@@ -12,7 +12,7 @@ import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 
-public class Junit4TestClassSelector implements TestClassSelector {
+public class Junit4TestClassExtractor implements TestClassExtractor {
 
 	@Override
 	public List<TestClass> select(List<TextFile> files) {
