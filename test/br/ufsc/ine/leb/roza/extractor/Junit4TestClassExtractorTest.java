@@ -1,4 +1,4 @@
-package br.ufsc.ine.leb.roza;
+package br.ufsc.ine.leb.roza.extractor;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -8,7 +8,12 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class TestClassExtractorTest {
+import br.ufsc.ine.leb.roza.TestClass;
+import br.ufsc.ine.leb.roza.TextFile;
+import br.ufsc.ine.leb.roza.extractor.Junit4TestClassExtractor;
+import br.ufsc.ine.leb.roza.extractor.TestClassExtractor;
+
+public class Junit4TestClassExtractorTest {
 
 	private TestClassExtractor extractor;
 	private TextFile exampleTest1DotJava;

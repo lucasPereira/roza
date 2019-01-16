@@ -1,4 +1,4 @@
-package br.ufsc.ine.leb.roza;
+package br.ufsc.ine.leb.roza.extractor;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -11,6 +11,11 @@ import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
+
+import br.ufsc.ine.leb.roza.SetupMethod;
+import br.ufsc.ine.leb.roza.TestClass;
+import br.ufsc.ine.leb.roza.TestMethod;
+import br.ufsc.ine.leb.roza.TextFile;
 
 public class Junit4TestClassExtractor implements TestClassExtractor {
 
