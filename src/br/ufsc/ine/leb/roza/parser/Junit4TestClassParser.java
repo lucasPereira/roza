@@ -1,4 +1,4 @@
-package br.ufsc.ine.leb.roza.extractor;
+package br.ufsc.ine.leb.roza.parser;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -11,16 +11,18 @@ import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.ast.stmt.ExpressionStmt;
 
 import br.ufsc.ine.leb.roza.SetupMethod;
+import br.ufsc.ine.leb.roza.Statement;
 import br.ufsc.ine.leb.roza.TestClass;
 import br.ufsc.ine.leb.roza.TestMethod;
 import br.ufsc.ine.leb.roza.TextFile;
 
-public class Junit4TestClassExtractor implements TestClassExtractor {
+public class Junit4TestClassParser implements TestClassParser {
 
 	@Override
-	public List<TestClass> extract(List<TextFile> files) {
+	public List<TestClass> parse(List<TextFile> files) {
 		List<TestClass> testClasses = new LinkedList<>();
 		files.forEach((file) -> {
 			CompilationUnit compilationUnit = JavaParser.parse(file.getContent());
@@ -44,7 +46,8 @@ public class Junit4TestClassExtractor implements TestClassExtractor {
 	private void extractTestMethod(List<TestMethod> testMethods, MethodDeclaration parsedMethod) {
 		Boolean hasTestAnnotation = parsedMethod.getAnnotationByClass(Test.class).isPresent();
 		if (hasTestAnnotation) {
-			TestMethod testMethod = new TestMethod(parsedMethod.getNameAsString());
+			List<Statement> statements = extractStatements(parsedMethod);
+			TestMethod testMethod = new TestMethod(parsedMethod.getNameAsString(), statements);
 			testMethods.add(testMethod);
 		}
 	}
@@ -52,9 +55,19 @@ public class Junit4TestClassExtractor implements TestClassExtractor {
 	private void extractSetupMethod(List<SetupMethod> setupMethods, MethodDeclaration parsedMethod) {
 		Boolean hasBeforeAnnotation = parsedMethod.getAnnotationByClass(Before.class).isPresent();
 		if (hasBeforeAnnotation) {
-			SetupMethod setupMethod = new SetupMethod(parsedMethod.getNameAsString());
+			List<Statement> statements = extractStatements(parsedMethod);
+			SetupMethod setupMethod = new SetupMethod(parsedMethod.getNameAsString(), statements);
 			setupMethods.add(setupMethod);
 		}
+	}
+
+	private List<Statement> extractStatements(MethodDeclaration parsedMethod) {
+		List<Statement> statements = new LinkedList<>();
+		List<ExpressionStmt> parsedStatements = parsedMethod.findAll(ExpressionStmt.class);
+		parsedStatements.forEach((parsedStatedment) -> {
+			statements.add(new Statement(parsedStatedment.toString()));
+		});
+		return statements;
 	}
 
 }

@@ -1,6 +1,7 @@
 package br.ufsc.ine.leb.roza;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.Arrays;
 
@@ -11,8 +12,8 @@ import br.ufsc.ine.leb.roza.exceptions.NoTestMethodException;
 public class TestClassTest {
 
 	@Test
-	void create() throws Exception {
-		TestMethod exampleTestMethod = new TestMethod("example");
+	void withOneTestMethod() throws Exception {
+		TestMethod exampleTestMethod = new TestMethod("example", Arrays.asList());
 		TestClass exampleTestClass = new TestClass("ExampleTest", Arrays.asList(), Arrays.asList(exampleTestMethod));
 		assertEquals("ExampleTest", exampleTestClass.getName());
 		assertEquals(0, exampleTestClass.getSetupMethods().size());
@@ -21,9 +22,9 @@ public class TestClassTest {
 	}
 
 	@Test
-	void withOneSetupMethod() throws Exception {
-		SetupMethod exampleSetupMethod = new SetupMethod("setup");
-		TestMethod exampleTestMethod = new TestMethod("example");
+	void withOneTestMethodAndOneSetupMethod() throws Exception {
+		SetupMethod exampleSetupMethod = new SetupMethod("setup", Arrays.asList());
+		TestMethod exampleTestMethod = new TestMethod("example", Arrays.asList());
 		TestClass exampleTestClass = new TestClass("ExampleTest", Arrays.asList(exampleSetupMethod), Arrays.asList(exampleTestMethod));
 		assertEquals("ExampleTest", exampleTestClass.getName());
 		assertEquals(1, exampleTestClass.getSetupMethods().size());
