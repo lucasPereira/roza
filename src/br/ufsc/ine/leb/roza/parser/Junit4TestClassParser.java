@@ -11,7 +11,7 @@ import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
-import com.github.javaparser.ast.stmt.ExpressionStmt;
+import com.github.javaparser.printer.PrettyPrinterConfiguration;
 
 import br.ufsc.ine.leb.roza.SetupMethod;
 import br.ufsc.ine.leb.roza.Statement;
@@ -63,9 +63,11 @@ public class Junit4TestClassParser implements TestClassParser {
 
 	private List<Statement> extractStatements(MethodDeclaration parsedMethod) {
 		List<Statement> statements = new LinkedList<>();
-		List<ExpressionStmt> parsedStatements = parsedMethod.findAll(ExpressionStmt.class);
-		parsedStatements.forEach((parsedStatedment) -> {
-			statements.add(new Statement(parsedStatedment.toString()));
+		parsedMethod.getBody().get().getChildNodes().forEach((node) -> {
+			PrettyPrinterConfiguration configuration = new PrettyPrinterConfiguration();
+			configuration.setEndOfLineCharacter(" ");
+			configuration.setIndentSize(0);
+			statements.add(new Statement(node.toString(configuration)));
 		});
 		return statements;
 	}
