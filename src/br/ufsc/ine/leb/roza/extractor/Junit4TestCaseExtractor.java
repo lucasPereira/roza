@@ -1,5 +1,6 @@
 package br.ufsc.ine.leb.roza.extractor;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -39,7 +40,8 @@ public class Junit4TestCaseExtractor implements TestCaseExtractor {
 			if (expression.isMethodCallExpr()) {
 				MethodCallExpr methodCallExpression = expression.asMethodCallExpr();
 				SimpleName name = methodCallExpression.getName();
-				return name.asString().equals("assertEquals");
+				List<String> assertions = Arrays.asList("assertArrayEquals", "assertEquals", "assertFalse", "assertNotNull", "assertNotSame", "assertNull", "assertSame", "assertThat", "assertTrue");
+				return assertions.contains(name.asString());
 			}
 		}
 		return false;
