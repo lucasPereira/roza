@@ -1,8 +1,13 @@
 package br.ufsc.ine.leb.roza.extractor;
 
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+
+import com.github.javaparser.JavaParser;
+import com.github.javaparser.ast.expr.Expression;
+import com.github.javaparser.ast.expr.MethodCallExpr;
+import com.github.javaparser.ast.expr.SimpleName;
+import com.github.javaparser.ast.stmt.ExpressionStmt;
 
 import br.ufsc.ine.leb.roza.Statement;
 import br.ufsc.ine.leb.roza.TestCase;
@@ -18,15 +23,25 @@ public class Junit4TestCaseExtractor implements TestCaseExtractor {
 		List<Statement> fixtures = new LinkedList<>();
 		List<Statement> assertions = new LinkedList<>();
 		statements.forEach((statement) -> {
-			List<Statement> bucket = (statementIsAssertion(statement)) ? assertions : fixtures;
+			List<Statement> bucket = statementIsAssertion(statement) ? assertions : fixtures;
 			bucket.add(statement);
 		});
-		TestCase testCase = new TestCase(name, Arrays.asList(), assertions);
+		TestCase testCase = new TestCase(name, fixtures, assertions);
 		testCases.add(testCase);
 		return testCases;
 	}
 
 	private Boolean statementIsAssertion(Statement statement) {
+		com.github.javaparser.ast.stmt.Statement parsedStatement = JavaParser.parseStatement(statement.getText());
+		if (parsedStatement.isExpressionStmt()) {
+			ExpressionStmt parsedExpression = parsedStatement.asExpressionStmt();
+			Expression expression = parsedExpression.getExpression();
+			if (expression.isMethodCallExpr()) {
+				MethodCallExpr methodCallExpression = expression.asMethodCallExpr();
+				SimpleName name = methodCallExpression.getName();
+				return name.asString().equals("assertEquals");
+			}
+		}
 		return false;
 	}
 

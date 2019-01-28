@@ -15,7 +15,7 @@ import br.ufsc.ine.leb.roza.parser.TestClassParser;
 
 public class Junit4TestClassParserTest {
 
-	private TestClassParser extractor;
+	private TestClassParser parser;
 	private TextFile oneMethod;
 	private TextFile oneTestMethod;
 	private TextFile oneTestMethodOneMethod;
@@ -24,7 +24,7 @@ public class Junit4TestClassParserTest {
 
 	@BeforeEach
 	void setup() {
-		extractor = new Junit4TestClassParser();
+		parser = new Junit4TestClassParser();
 		oneMethod = new TextFile("OneMethod.java", "public class OneMethod { public void example() { System.out.println(0); } }");
 		oneTestMethod = new TextFile("OneTestMethod.java", "public class OneTestMethod { @Test public void example() { assertEquals(0, 0); } }");
 		oneTestMethodOneMethod = new TextFile("OneTestMethodOneMethod.java", "public class OneTestMethodOneMethod { public void example1() { System.out.println(0); } @Test public void example2() { assertEquals(2, 2); } }") {};
@@ -34,14 +34,15 @@ public class Junit4TestClassParserTest {
 
 	@Test
 	void withoutFiles() throws Exception {
-		assertEquals(0, extractor.parse(Arrays.asList()).size());
+		assertEquals(0, parser.parse(Arrays.asList()).size());
 	}
 
 	@Test
 	void oneTestMethod() throws Exception {
-		List<TestClass> testClasses = extractor.parse(Arrays.asList(oneTestMethod));
+		List<TestClass> testClasses = parser.parse(Arrays.asList(oneTestMethod));
 		assertEquals(1, testClasses.size());
 		assertEquals("OneTestMethod", testClasses.get(0).getName());
+		assertEquals(0, testClasses.get(0).getSetupMethods().size());
 		assertEquals(1, testClasses.get(0).getTestMethods().size());
 		assertEquals("example", testClasses.get(0).getTestMethods().get(0).getName());
 		assertEquals(1, testClasses.get(0).getTestMethods().get(0).getStatements().size());
@@ -50,9 +51,10 @@ public class Junit4TestClassParserTest {
 
 	@Test
 	void oneTestMethodOneMethod() throws Exception {
-		List<TestClass> testClasses = extractor.parse(Arrays.asList(oneTestMethodOneMethod));
+		List<TestClass> testClasses = parser.parse(Arrays.asList(oneTestMethodOneMethod));
 		assertEquals(1, testClasses.size());
 		assertEquals("OneTestMethodOneMethod", testClasses.get(0).getName());
+		assertEquals(0, testClasses.get(0).getSetupMethods().size());
 		assertEquals(1, testClasses.get(0).getTestMethods().size());
 		assertEquals("example2", testClasses.get(0).getTestMethods().get(0).getName());
 		assertEquals(1, testClasses.get(0).getTestMethods().get(0).getStatements().size());
@@ -61,9 +63,10 @@ public class Junit4TestClassParserTest {
 
 	@Test
 	void twoTestMethods() throws Exception {
-		List<TestClass> testClasses = extractor.parse(Arrays.asList(twoTestMethods));
+		List<TestClass> testClasses = parser.parse(Arrays.asList(twoTestMethods));
 		assertEquals(1, testClasses.size());
 		assertEquals("TwoTestMethods", testClasses.get(0).getName());
+		assertEquals(0, testClasses.get(0).getSetupMethods().size());
 		assertEquals(2, testClasses.get(0).getTestMethods().size());
 		assertEquals("example1", testClasses.get(0).getTestMethods().get(0).getName());
 		assertEquals(1, testClasses.get(0).getTestMethods().get(0).getStatements().size());
@@ -75,14 +78,16 @@ public class Junit4TestClassParserTest {
 
 	@Test
 	void oneSetupMethodOneTestMethod() throws Exception {
-		List<TestClass> testClasses = extractor.parse(Arrays.asList(oneSetupMethodTestMethodOne));
+		List<TestClass> testClasses = parser.parse(Arrays.asList(oneSetupMethodTestMethodOne));
 		assertEquals(1, testClasses.size());
 		assertEquals("OneSetupMethodTestMethodOne", testClasses.get(0).getName());
+
 		assertEquals(1, testClasses.get(0).getSetupMethods().size());
 		assertEquals("setup", testClasses.get(0).getSetupMethods().get(0).getName());
 		assertEquals(2, testClasses.get(0).getSetupMethods().get(0).getStatements().size());
 		assertEquals("System.out.println(0);", testClasses.get(0).getSetupMethods().get(0).getStatements().get(0).getText());
 		assertEquals("System.out.println(1);", testClasses.get(0).getSetupMethods().get(0).getStatements().get(1).getText());
+
 		assertEquals(1, testClasses.get(0).getTestMethods().size());
 		assertEquals("example", testClasses.get(0).getTestMethods().get(0).getName());
 		assertEquals(2, testClasses.get(0).getTestMethods().get(0).getStatements().size());
@@ -92,19 +97,34 @@ public class Junit4TestClassParserTest {
 
 	@Test
 	void oneMethod() throws Exception {
-		List<TestClass> testClasses = extractor.parse(Arrays.asList(oneMethod));
+		List<TestClass> testClasses = parser.parse(Arrays.asList(oneMethod));
 		assertEquals(0, testClasses.size());
 	}
 
 	@Test
 	void oneJavaClassOneTestClass() throws Exception {
-		List<TestClass> testClasses = extractor.parse(Arrays.asList(oneMethod, oneTestMethod));
+		List<TestClass> testClasses = parser.parse(Arrays.asList(oneMethod, oneTestMethod));
 		assertEquals(1, testClasses.size());
 		assertEquals("OneTestMethod", testClasses.get(0).getName());
+		assertEquals(0, testClasses.get(0).getSetupMethods().size());
 		assertEquals(1, testClasses.get(0).getTestMethods().size());
 		assertEquals("example", testClasses.get(0).getTestMethods().get(0).getName());
 		assertEquals(1, testClasses.get(0).getTestMethods().get(0).getStatements().size());
 		assertEquals("assertEquals(0, 0);", testClasses.get(0).getTestMethods().get(0).getStatements().get(0).getText());
+	}
+
+	@Test
+	void oneTestMethodWithWhile() throws Exception {
+		TextFile oneTestMethoWithWhile = new TextFile("OneTestMethodWithWhile.java", "public class OneTestMethodWithWhile { @Test public void example() { while (1 == 0) { System.out.println(0); } assertEquals(0, 0); } }");
+		List<TestClass> testClasses = parser.parse(Arrays.asList(oneTestMethoWithWhile));
+		assertEquals(1, testClasses.size());
+		assertEquals("OneTestMethodWithWhile", testClasses.get(0).getName());
+		assertEquals(0, testClasses.get(0).getSetupMethods().size());
+		assertEquals(1, testClasses.get(0).getTestMethods().size());
+		assertEquals("example", testClasses.get(0).getTestMethods().get(0).getName());
+		assertEquals(2, testClasses.get(0).getTestMethods().get(0).getStatements().size());
+		assertEquals("while (1 == 0) { System.out.println(0); }", testClasses.get(0).getTestMethods().get(0).getStatements().get(0).getText());
+		assertEquals("assertEquals(0, 0);", testClasses.get(0).getTestMethods().get(0).getStatements().get(1).getText());
 	}
 
 }
