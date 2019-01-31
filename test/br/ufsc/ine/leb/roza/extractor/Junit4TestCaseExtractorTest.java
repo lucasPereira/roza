@@ -139,6 +139,18 @@ public class Junit4TestCaseExtractorTest {
 
 	@Test
 	void complex() throws Exception {
+		Statement classASetup1Fixture1 = new Statement("sut('A', 'S', 1, 'F', 1);");
+		Statement classASetup1Fixture2 = new Statement("sut('A', 'S', 1, 'F', 2);");
+		Statement classASetup1Assert1 = new Statement("sut('A', 'S', 1, 'A', 1);");
+		Statement classASetup1Assert2 = new Statement("sut('A', 'S', 1, 'A', 2);");
+		Statement classATest1Fixture1 = new Statement("sut('A', 'T', 1, 'F', 1);");
+		Statement classATest1Fixture2 = new Statement("sut('A', 'T', 1, 'F', 2);");
+		Statement classATest1Assert1 = new Statement("sut('A', 'T', 1, 'A', 1);");
+		Statement classATest1Assert2 = new Statement("sut('A', 'T', 1, 'A', 2);");
+		Statement classASetup2Fixture1 = new Statement("sut('A', 'S', 2, 'F', 1);");
+		Statement classATest2Asssert1 = new Statement("sut('A', 'T', 2, 'A', 1);");
+		Statement classBSetup1Fixture1 = new Statement("sut('B', 'S', 1, 'F', 1);");
+		Statement classBTest1Asssert1 = new Statement("sut('B', 'T', 1, 'A', 1);");
 		fail();
 	}
 
