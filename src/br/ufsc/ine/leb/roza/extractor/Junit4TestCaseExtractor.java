@@ -13,27 +13,41 @@ import com.github.javaparser.ast.stmt.ExpressionStmt;
 import br.ufsc.ine.leb.roza.Statement;
 import br.ufsc.ine.leb.roza.TestCase;
 import br.ufsc.ine.leb.roza.TestClass;
+import br.ufsc.ine.leb.roza.TestMethod;
 
 public class Junit4TestCaseExtractor implements TestCaseExtractor {
 
 	@Override
 	public List<TestCase> extract(List<TestClass> testClasses) {
 		List<TestCase> testCases = new LinkedList<>();
-		String name = testClasses.get(0).getTestMethods().get(0).getName();
-		List<Statement> statements = new LinkedList<Statement>();
-		testClasses.get(0).getSetupMethods().forEach((setupMethod) -> {
-			statements.addAll(setupMethod.getStatements());
+		testClasses.forEach((testClass) -> {
+			testClass.getTestMethods().forEach((testMethod) -> {
+				extractTestCase(testCases, testClass, testMethod);
+			});
 		});
-		statements.addAll(testClasses.get(0).getTestMethods().get(0).getStatements());
+		return testCases;
+	}
+
+	private void extractTestCase(List<TestCase> testCases, TestClass testClass, TestMethod testMethod) {
+		String name = testMethod.getName();
 		List<Statement> fixtures = new LinkedList<>();
 		List<Statement> assertions = new LinkedList<>();
+		List<Statement> statements = extractStatements(testClass, testMethod);
 		statements.forEach((statement) -> {
 			List<Statement> bucket = statementIsAssertion(statement) ? assertions : fixtures;
 			bucket.add(statement);
 		});
 		TestCase testCase = new TestCase(name, fixtures, assertions);
 		testCases.add(testCase);
-		return testCases;
+	}
+
+	private List<Statement> extractStatements(TestClass testClass, TestMethod testMethod) {
+		List<Statement> statements = new LinkedList<Statement>();
+		testClass.getSetupMethods().forEach((setupMethod) -> {
+			statements.addAll(setupMethod.getStatements());
+		});
+		statements.addAll(testMethod.getStatements());
+		return statements;
 	}
 
 	private Boolean statementIsAssertion(Statement statement) {
