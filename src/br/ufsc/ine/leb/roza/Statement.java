@@ -17,4 +17,13 @@ public class Statement {
 		return getText();
 	}
 
+	@Override
+	public boolean equals(Object object) {
+		if (object instanceof Statement) {
+			Statement other = (Statement) object;
+			return getText().equals(other.getText());
+		}
+		return super.equals(object);
+	}
+
 }

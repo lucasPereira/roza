@@ -1,5 +1,6 @@
 package br.ufsc.ine.leb.roza.parser;
 
+import static org.junit.Assert.fail;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Arrays;
@@ -93,6 +94,11 @@ public class Junit4TestClassParserTest {
 		assertEquals(2, testClasses.get(0).getTestMethods().get(0).getStatements().size());
 		assertEquals("assertEquals(0, 0);", testClasses.get(0).getTestMethods().get(0).getStatements().get(0).getText());
 		assertEquals("assertEquals(1, 1);", testClasses.get(0).getTestMethods().get(0).getStatements().get(1).getText());
+	}
+
+	@Test
+	void oneFieldOneSetupMethodOneTestMethod() throws Exception {
+		fail();
 	}
 
 	@Test
