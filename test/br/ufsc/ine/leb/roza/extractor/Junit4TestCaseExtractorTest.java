@@ -1,7 +1,6 @@
 package br.ufsc.ine.leb.roza.extractor;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 import java.util.Arrays;
 import java.util.List;
@@ -139,19 +138,61 @@ public class Junit4TestCaseExtractorTest {
 
 	@Test
 	void complex() throws Exception {
-		Statement classASetup1Fixture1 = new Statement("sut('A', 'S', 1, 'F', 1);");
-		Statement classASetup1Fixture2 = new Statement("sut('A', 'S', 1, 'F', 2);");
-		Statement classASetup1Assert1 = new Statement("sut('A', 'S', 1, 'A', 1);");
-		Statement classASetup1Assert2 = new Statement("sut('A', 'S', 1, 'A', 2);");
-		Statement classATest1Fixture1 = new Statement("sut('A', 'T', 1, 'F', 1);");
-		Statement classATest1Fixture2 = new Statement("sut('A', 'T', 1, 'F', 2);");
-		Statement classATest1Assert1 = new Statement("sut('A', 'T', 1, 'A', 1);");
-		Statement classATest1Assert2 = new Statement("sut('A', 'T', 1, 'A', 2);");
-		Statement classASetup2Fixture1 = new Statement("sut('A', 'S', 2, 'F', 1);");
-		Statement classATest2Asssert1 = new Statement("sut('A', 'T', 2, 'A', 1);");
-		Statement classBSetup1Fixture1 = new Statement("sut('B', 'S', 1, 'F', 1);");
-		Statement classBTest1Asssert1 = new Statement("sut('B', 'T', 1, 'A', 1);");
-		fail();
+		Statement classASetup1Fixture1 = new Statement("sut(1);");
+		Statement classASetup1Fixture2 = new Statement("sut(2);");
+		Statement classATest1Fixture3 = new Statement("sut(3);");
+		Statement classATest1Fixture4 = new Statement("sut(4);");
+		Statement classASetup2Fixture5 = new Statement("sut(5);");
+		Statement classBSetup3Fixture6 = new Statement("sut(6);");
+		Statement classASetup1Assert1 = new Statement("assertEquals(1, 1);");
+		Statement classASetup1Assert2 = new Statement("assertEquals(2, 2);");
+		Statement classATest1Assert3 = new Statement("assertEquals(3, 3);");
+		Statement classATest1Assert4 = new Statement("assertEquals(4, 4);");
+		Statement classATest2Assert5 = new Statement("assertEquals(5, 5);");
+		Statement classBTest3Assert6 = new Statement("assertEquals(6, 6);");
+		SetupMethod classASetup1 = new SetupMethod("setup1", Arrays.asList(classASetup1Fixture1, classASetup1Fixture2, classASetup1Assert1, classASetup1Assert2));
+		SetupMethod classASetup2 = new SetupMethod("setup2", Arrays.asList(classASetup2Fixture5));
+		SetupMethod classBSetup3 = new SetupMethod("setup3", Arrays.asList(classBSetup3Fixture6));
+		TestMethod classATest1 = new TestMethod("test1", Arrays.asList(classATest1Fixture3, classATest1Fixture4, classATest1Assert3, classATest1Assert4));
+		TestMethod classATest2 = new TestMethod("test2", Arrays.asList(classATest2Assert5));
+		TestMethod classBTest3 = new TestMethod("test3", Arrays.asList(classBTest3Assert6));
+		TestClass classA = new TestClass("A", Arrays.asList(classASetup1, classASetup2), Arrays.asList(classATest1, classATest2));
+		TestClass classB = new TestClass("B", Arrays.asList(classBSetup3), Arrays.asList(classBTest3));
+
+		List<TestCase> testCases = extractor.extract(Arrays.asList(classA, classB));
+		assertEquals(3, testCases.size());
+
+		TestCase firstTestCase = testCases.get(0);
+		assertEquals("test1", firstTestCase.getName());
+		assertEquals(5, firstTestCase.getFixtures().size());
+		assertEquals(classASetup1Fixture1, firstTestCase.getFixtures().get(0));
+		assertEquals(classASetup1Fixture2, firstTestCase.getFixtures().get(1));
+		assertEquals(classASetup2Fixture5, firstTestCase.getFixtures().get(2));
+		assertEquals(classATest1Fixture3, firstTestCase.getFixtures().get(3));
+		assertEquals(classATest1Fixture4, firstTestCase.getFixtures().get(4));
+		assertEquals(4, firstTestCase.getAsserts().size());
+		assertEquals(classASetup1Assert1, firstTestCase.getAsserts().get(0));
+		assertEquals(classASetup1Assert2, firstTestCase.getAsserts().get(1));
+		assertEquals(classATest1Assert3, firstTestCase.getAsserts().get(2));
+		assertEquals(classATest1Assert4, firstTestCase.getAsserts().get(3));
+
+		TestCase secondTestCase = testCases.get(1);
+		assertEquals("test2", secondTestCase.getName());
+		assertEquals(3, secondTestCase.getFixtures().size());
+		assertEquals(classASetup1Fixture1, secondTestCase.getFixtures().get(0));
+		assertEquals(classASetup1Fixture2, secondTestCase.getFixtures().get(1));
+		assertEquals(classASetup2Fixture5, secondTestCase.getFixtures().get(2));
+		assertEquals(3, secondTestCase.getAsserts().size());
+		assertEquals(classASetup1Assert1, secondTestCase.getAsserts().get(0));
+		assertEquals(classASetup1Assert2, secondTestCase.getAsserts().get(1));
+		assertEquals(classATest2Assert5, secondTestCase.getAsserts().get(2));
+
+		TestCase thirdTestCase = testCases.get(2);
+		assertEquals("test3", thirdTestCase.getName());
+		assertEquals(1, thirdTestCase.getFixtures().size());
+		assertEquals(classBSetup3Fixture6, thirdTestCase.getFixtures().get(0));
+		assertEquals(1, thirdTestCase.getAsserts().size());
+		assertEquals(classBTest3Assert6, thirdTestCase.getAsserts().get(0));
 	}
 
 	@Test
