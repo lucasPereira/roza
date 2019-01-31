@@ -3,13 +3,14 @@ package br.ufsc.ine.leb.roza.extractor;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 import com.github.javaparser.JavaParser;
-import com.github.javaparser.ast.expr.Expression;
+import com.github.javaparser.ast.expr.AssignExpr;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.SimpleName;
-import com.github.javaparser.ast.stmt.ExpressionStmt;
 
+import br.ufsc.ine.leb.roza.Field;
 import br.ufsc.ine.leb.roza.Statement;
 import br.ufsc.ine.leb.roza.TestCase;
 import br.ufsc.ine.leb.roza.TestClass;
@@ -44,23 +45,31 @@ public class Junit4TestCaseExtractor implements TestCaseExtractor {
 	private List<Statement> extractStatements(TestClass testClass, TestMethod testMethod) {
 		List<Statement> statements = new LinkedList<Statement>();
 		testClass.getSetupMethods().forEach((setupMethod) -> {
-			statements.addAll(setupMethod.getStatements());
+			setupMethod.getStatements().forEach((statement) -> {
+				Statement addedStatement = statement;
+				Optional<AssignExpr> assign = JavaParser.parseStatement(statement.getText()).toExpressionStmt().get().getExpression().toAssignExpr();
+				if (assign.isPresent()) {
+					AssignExpr assignExpression = assign.get();
+					for (Field field : testClass.getFields()) {
+						if (assignExpression.getTarget().toString().equals(field.getName())) {
+							addedStatement = new Statement(String.format("%s %s", field.getType(), statement.getText()));
+						}
+					}
+				}
+				statements.add(addedStatement);
+			});
 		});
 		statements.addAll(testMethod.getStatements());
 		return statements;
 	}
 
 	private Boolean statementIsAssertion(Statement statement) {
-		com.github.javaparser.ast.stmt.Statement parsedStatement = JavaParser.parseStatement(statement.getText());
-		if (parsedStatement.isExpressionStmt()) {
-			ExpressionStmt parsedExpression = parsedStatement.asExpressionStmt();
-			Expression expression = parsedExpression.getExpression();
-			if (expression.isMethodCallExpr()) {
-				MethodCallExpr methodCallExpression = expression.asMethodCallExpr();
-				SimpleName name = methodCallExpression.getName();
-				List<String> assertions = Arrays.asList("assertArrayEquals", "assertEquals", "assertFalse", "assertNotNull", "assertNotSame", "assertNull", "assertSame", "assertThat", "assertTrue");
-				return assertions.contains(name.asString());
-			}
+		Optional<MethodCallExpr> methodCall = JavaParser.parseStatement(statement.getText()).toExpressionStmt().get().getExpression().toMethodCallExpr();
+		if (methodCall.isPresent()) {
+			MethodCallExpr methodCallExpression = methodCall.get();
+			SimpleName name = methodCallExpression.getName();
+			List<String> assertions = Arrays.asList("assertArrayEquals", "assertEquals", "assertFalse", "assertNotNull", "assertNotSame", "assertNull", "assertSame", "assertThat", "assertTrue");
+			return assertions.contains(name.asString());
 		}
 		return false;
 	}

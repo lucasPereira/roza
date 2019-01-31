@@ -1,5 +1,6 @@
 package br.ufsc.ine.leb.roza.parser;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -36,7 +37,7 @@ public class Junit4TestClassParser implements TestClassParser {
 				extractTestMethod(testMethods, parsedMethod);
 			});
 			if (testMethods.size() > 0) {
-				TestClass testClass = new TestClass(name, setupMethods, testMethods);
+				TestClass testClass = new TestClass(name, Arrays.asList(), setupMethods, testMethods);
 				testClasses.add(testClass);
 			}
 		});
