@@ -20,7 +20,11 @@ public class Junit4TestCaseExtractor implements TestCaseExtractor {
 	public List<TestCase> extract(List<TestClass> testClasses) {
 		List<TestCase> testCases = new LinkedList<>();
 		String name = testClasses.get(0).getTestMethods().get(0).getName();
-		List<Statement> statements = testClasses.get(0).getTestMethods().get(0).getStatements();
+		List<Statement> statements = new LinkedList<Statement>();
+		testClasses.get(0).getSetupMethods().forEach((setupMethod) -> {
+			statements.addAll(setupMethod.getStatements());
+		});
+		statements.addAll(testClasses.get(0).getTestMethods().get(0).getStatements());
 		List<Statement> fixtures = new LinkedList<>();
 		List<Statement> assertions = new LinkedList<>();
 		statements.forEach((statement) -> {
