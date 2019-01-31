@@ -10,6 +10,7 @@ public class StatementTest {
 	void create() throws Exception {
 		Statement statement = new Statement("assertEquals(0, 0);");
 		assertEquals("assertEquals(0, 0);", statement.getText());
+		assertEquals("assertEquals(0, 0);", statement.toString());
 	}
 
 }
