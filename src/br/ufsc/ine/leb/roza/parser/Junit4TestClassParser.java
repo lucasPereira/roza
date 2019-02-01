@@ -1,6 +1,5 @@
 package br.ufsc.ine.leb.roza.parser;
 
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -11,9 +10,11 @@ import org.junit.Test;
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
+import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.printer.PrettyPrinterConfiguration;
 
+import br.ufsc.ine.leb.roza.Field;
 import br.ufsc.ine.leb.roza.SetupMethod;
 import br.ufsc.ine.leb.roza.Statement;
 import br.ufsc.ine.leb.roza.TestClass;
@@ -29,6 +30,7 @@ public class Junit4TestClassParser implements TestClassParser {
 			CompilationUnit compilationUnit = JavaParser.parse(file.getContent());
 			Optional<ClassOrInterfaceDeclaration> parsedTestClass = compilationUnit.findFirst(ClassOrInterfaceDeclaration.class);
 			String name = parsedTestClass.get().getNameAsString();
+			List<Field> fields = extractFields(parsedTestClass);
 			List<SetupMethod> setupMethods = new LinkedList<>();
 			List<TestMethod> testMethods = new LinkedList<>();
 			List<MethodDeclaration> parsedMethods = parsedTestClass.get().findAll(MethodDeclaration.class);
@@ -37,11 +39,23 @@ public class Junit4TestClassParser implements TestClassParser {
 				extractTestMethod(testMethods, parsedMethod);
 			});
 			if (testMethods.size() > 0) {
-				TestClass testClass = new TestClass(name, Arrays.asList(), setupMethods, testMethods);
+				TestClass testClass = new TestClass(name, fields, setupMethods, testMethods);
 				testClasses.add(testClass);
 			}
 		});
 		return testClasses;
+	}
+
+	private List<Field> extractFields(Optional<ClassOrInterfaceDeclaration> parsedTestClass) {
+		List<Field> fields = new LinkedList<>();
+		parsedTestClass.get().findAll(FieldDeclaration.class).forEach((parsedField) -> {
+			String type = parsedField.getElementType().asString();
+			parsedField.getVariables().forEach((parsedVariable) -> {
+				String filedName = parsedVariable.getName().asString();
+				fields.add(new Field(type, filedName));
+			});
+		});
+		return fields;
 	}
 
 	private void extractTestMethod(List<TestMethod> testMethods, MethodDeclaration parsedMethod) {

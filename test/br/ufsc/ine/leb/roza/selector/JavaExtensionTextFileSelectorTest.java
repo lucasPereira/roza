@@ -51,5 +51,5 @@ public class JavaExtensionTextFileSelectorTest {
 		assertEquals(1, textFiles.size());
 		assertEquals(exampleDotJava, textFiles.get(0));
 	}
-	
+
 }
