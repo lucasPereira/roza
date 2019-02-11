@@ -43,7 +43,7 @@ public class RecursiveTextFileLoader implements TextFileLoader {
 			byte[] bytes = Files.readAllBytes(child.toPath());
 			return new String(bytes);
 		} catch (IOException excecao) {
-			return "";
+			throw new RuntimeException(excecao);
 		}
 	}
 
