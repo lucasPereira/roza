@@ -34,10 +34,10 @@ public class RecursiveTextFileLoaderTest {
 	void content() throws Exception {
 		List<TextFile> files = loader.load();
 		assertEquals(6, files.size());
-		assertEquals("\u0000", files.get(0).getContent());
+		assertEquals("Example.bin\n", files.get(0).getContent());
 		assertEquals("public class Example {}\n", files.get(1).getContent());
 		assertEquals("Example\n", files.get(2).getContent());
-		assertEquals("\0", files.get(3).getContent());
+		assertEquals("ExampleChild.bin\n", files.get(3).getContent());
 		assertEquals("package childs;\n\npublic class ExampleChild {}\n", files.get(4).getContent());
 		assertEquals("ExampleChild\n", files.get(5).getContent());
 	}
