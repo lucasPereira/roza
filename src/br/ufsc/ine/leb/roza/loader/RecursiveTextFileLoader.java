@@ -1,50 +1,37 @@
 package br.ufsc.ine.leb.roza.loader;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
 import br.ufsc.ine.leb.roza.TextFile;
+import br.ufsc.ine.leb.roza.utils.FileUtils;
+import br.ufsc.ine.leb.roza.utils.FolderUtils;
 
 public class RecursiveTextFileLoader implements TextFileLoader {
 
-	private String baseFolder;
+	private FileUtils fileUtils;
+	private FolderUtils folderUtils;
 
 	public RecursiveTextFileLoader(String baseFolder) {
-		this.baseFolder = baseFolder;
+		fileUtils = new FileUtils();
+		folderUtils = new FolderUtils(baseFolder);
 	}
 
 	@Override
 	public List<TextFile> load() {
-		List<TextFile> files = new LinkedList<>();
-		File base = new File(baseFolder);
-		load(base, files);
-		Collections.sort(files, new TextFileComparator());
-		return files;
-	}
-
-	private void load(File base, List<TextFile> files) {
-		for (File child : base.listFiles()) {
-			if (child.isDirectory()) {
-				load(child, files);
-			} else if (child.isFile()) {
-				String content = read(child);
-				files.add(new TextFile(child.getName(), content));
-			}
+		List<TextFile> textFiles = new LinkedList<>();
+		List<File> files = folderUtils.listFilesRecursively();
+		for (File file : files) {
+			String name = file.getName();
+			String content = fileUtils.readContetAsString(file);
+			TextFile textFile = new TextFile(name, content);
+			textFiles.add(textFile);
 		}
-	}
-
-	private String read(File child) {
-		try {
-			byte[] bytes = Files.readAllBytes(child.toPath());
-			return new String(bytes);
-		} catch (IOException excecao) {
-			throw new RuntimeException(excecao);
-		}
+		Collections.sort(textFiles, new TextFileComparator());
+		return textFiles;
 	}
 
 	private class TextFileComparator implements Comparator<TextFile> {

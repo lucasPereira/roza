@@ -13,7 +13,7 @@ import br.ufsc.ine.leb.roza.TestCase;
 import br.ufsc.ine.leb.roza.TextFile;
 import br.ufsc.ine.leb.roza.loader.RecursiveTextFileLoader;
 import br.ufsc.ine.leb.roza.loader.TextFileLoader;
-import br.ufsc.ine.leb.roza.utils.FileUtils;
+import br.ufsc.ine.leb.roza.utils.FolderUtils;
 
 public class OneTestCasePerClassTestCaseMaterializerTest {
 
@@ -24,7 +24,7 @@ public class OneTestCasePerClassTestCaseMaterializerTest {
 	void setup() {
 		materializer = new OneTestCasePerClassTestCaseMaterializer("test-resources/materializer");
 		loader = new RecursiveTextFileLoader("test-resources/materializer");
-		new FileUtils().createEmptyFolder("test-resources/materializer");
+		new FolderUtils("test-resources/materializer").createEmptyFolder();
 	}
 
 	@Test
