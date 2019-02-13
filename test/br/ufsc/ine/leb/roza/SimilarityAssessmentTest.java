@@ -8,7 +8,7 @@ import java.util.Arrays;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import br.ufsc.ine.leb.roza.exceptions.InvalidEvaluationValueException;
+import br.ufsc.ine.leb.roza.exceptions.InvalidSimilarityScoreException;
 
 public class SimilarityAssessmentTest {
 
@@ -22,31 +22,31 @@ public class SimilarityAssessmentTest {
 	}
 
 	@Test
-	void evaluationZero() throws Exception {
-		SimilarityAssessment evaluation = new SimilarityAssessment(testCaseA, testCaseB, BigDecimal.ZERO);
-		assertEquals(BigDecimal.ZERO, evaluation.getEvaluation());
-		assertEquals(testCaseA, evaluation.getSource());
-		assertEquals(testCaseB, evaluation.getTarget());
+	void minimumScore() throws Exception {
+		SimilarityAssessment assessment = new SimilarityAssessment(testCaseA, testCaseB, BigDecimal.ZERO);
+		assertEquals(BigDecimal.ZERO, assessment.getScore());
+		assertEquals(testCaseA, assessment.getSource());
+		assertEquals(testCaseB, assessment.getTarget());
 	}
 
 	@Test
-	void evaluationOne() throws Exception {
-		SimilarityAssessment evaluation = new SimilarityAssessment(testCaseA, testCaseB, BigDecimal.ONE);
-		assertEquals(BigDecimal.ONE, evaluation.getEvaluation());
-		assertEquals(testCaseA, evaluation.getSource());
-		assertEquals(testCaseB, evaluation.getTarget());
+	void maximumScore() throws Exception {
+		SimilarityAssessment assessment = new SimilarityAssessment(testCaseA, testCaseB, BigDecimal.ONE);
+		assertEquals(BigDecimal.ONE, assessment.getScore());
+		assertEquals(testCaseA, assessment.getSource());
+		assertEquals(testCaseB, assessment.getTarget());
 	}
 
 	@Test
-	void evaluationLessThanZero() throws Exception {
-		assertThrows(InvalidEvaluationValueException.class, () -> {
+	void scoreLessThanZero() throws Exception {
+		assertThrows(InvalidSimilarityScoreException.class, () -> {
 			new SimilarityAssessment(testCaseA, testCaseB, new BigDecimal(-0.5));
 		});
 	}
 
 	@Test
-	void evaluationGreaterThanOne() throws Exception {
-		assertThrows(InvalidEvaluationValueException.class, () -> {
+	void scoreGreaterThanOne() throws Exception {
+		assertThrows(InvalidSimilarityScoreException.class, () -> {
 			new SimilarityAssessment(testCaseA, testCaseB, new BigDecimal(1.5));
 		});
 	}
