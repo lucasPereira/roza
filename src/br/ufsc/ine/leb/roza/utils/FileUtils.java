@@ -15,4 +15,8 @@ public class FileUtils {
 		}
 	}
 
+	public String readContetAsString(String path) {
+		return readContetAsString(new File(path));
+	}
+
 }

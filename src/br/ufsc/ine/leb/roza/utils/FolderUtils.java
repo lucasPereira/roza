@@ -60,7 +60,7 @@ public class FolderUtils {
 		return selectedFiles;
 	}
 
-	public void writeContetAsString(String path, String content) {
+	public File writeContetAsString(String path, String content) {
 		try {
 			File file = new File(baseFolder, path);
 			file.createNewFile();
@@ -68,6 +68,7 @@ public class FolderUtils {
 			writer = new FileWriter(file);
 			writer.write(content);
 			writer.close();
+			return file;
 		} catch (IOException excecao) {
 			throw new RuntimeException(excecao);
 		}

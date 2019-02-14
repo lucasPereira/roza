@@ -1,5 +1,7 @@
 package br.ufsc.ine.leb.roza.materializer;
 
+import java.io.File;
+import java.util.LinkedList;
 import java.util.List;
 
 import com.github.javaparser.JavaParser;
@@ -11,6 +13,7 @@ import com.github.javaparser.printer.PrettyPrinterConfiguration;
 import com.github.javaparser.printer.PrettyPrinterConfiguration.IndentType;
 
 import br.ufsc.ine.leb.roza.TestCase;
+import br.ufsc.ine.leb.roza.TestCaseMaterialization;
 import br.ufsc.ine.leb.roza.utils.FolderUtils;
 
 public class OneTestCasePerClassTestCaseMaterializer implements TestCaseMaterializer {
@@ -24,7 +27,8 @@ public class OneTestCasePerClassTestCaseMaterializer implements TestCaseMaterial
 	}
 
 	@Override
-	public void materialize(List<TestCase> tests) {
+	public List<TestCaseMaterialization> materialize(List<TestCase> tests) {
+		List<TestCaseMaterialization> materializations = new LinkedList<>();
 		tests.forEach((testCase) -> {
 			String className = createClassName(testCase.getName());
 			String classFileName = createClassFileName(className);
@@ -42,9 +46,11 @@ public class OneTestCasePerClassTestCaseMaterializer implements TestCaseMaterial
 			PrettyPrinterConfiguration configuration = new PrettyPrinterConfiguration();
 			configuration.setIndentType(IndentType.TABS);
 			configuration.setIndentSize(1);
-			foldereUtils.writeContetAsString(classFileName, javaUnit.toString(configuration));
-
+			File file = foldereUtils.writeContetAsString(classFileName, javaUnit.toString(configuration));
+			TestCaseMaterialization materialization = new TestCaseMaterialization(file, testCase);
+			materializations.add(materialization);
 		});
+		return materializations;
 	}
 
 	private String createClassFileName(String className) {

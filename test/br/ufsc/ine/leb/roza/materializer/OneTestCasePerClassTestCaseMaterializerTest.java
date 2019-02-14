@@ -10,21 +10,20 @@ import org.junit.jupiter.api.Test;
 
 import br.ufsc.ine.leb.roza.Statement;
 import br.ufsc.ine.leb.roza.TestCase;
-import br.ufsc.ine.leb.roza.TextFile;
-import br.ufsc.ine.leb.roza.loader.RecursiveTextFileLoader;
-import br.ufsc.ine.leb.roza.loader.TextFileLoader;
+import br.ufsc.ine.leb.roza.TestCaseMaterialization;
+import br.ufsc.ine.leb.roza.utils.FileUtils;
 import br.ufsc.ine.leb.roza.utils.FolderUtils;
 
 public class OneTestCasePerClassTestCaseMaterializerTest {
 
 	private TestCaseMaterializer materializer;
-	private TextFileLoader loader;
+	private FileUtils fileUtils;
 
 	@BeforeEach
 	void setup() {
-		materializer = new OneTestCasePerClassTestCaseMaterializer("test-resources/materializer");
-		loader = new RecursiveTextFileLoader("test-resources/materializer");
 		new FolderUtils("test-resources/materializer").createEmptyFolder();
+		fileUtils = new FileUtils();
+		materializer = new OneTestCasePerClassTestCaseMaterializer("test-resources/materializer");
 	}
 
 	@Test
@@ -32,8 +31,7 @@ public class OneTestCasePerClassTestCaseMaterializerTest {
 		Statement fixtureStatement = new Statement("sut(0);");
 		Statement assertStatement = new Statement("assertEquals(0, 0);");
 		TestCase testCase = new TestCase("example", Arrays.asList(fixtureStatement), Arrays.asList(assertStatement));
-		materializer.materialize(Arrays.asList(testCase));
-		List<TextFile> files = loader.load();
+		List<TestCaseMaterialization> materializations = materializer.materialize(Arrays.asList(testCase));
 
 		StringBuilder generatedClass = new StringBuilder();
 		generatedClass.append("public class TestClass1ExampleTest {\n\n");
@@ -44,9 +42,11 @@ public class OneTestCasePerClassTestCaseMaterializerTest {
 		generatedClass.append("\t}\n");
 		generatedClass.append("}\n");
 
-		assertEquals(1, files.size());
-		assertEquals("TestClass1ExampleTest.java", files.get(0).getName());
-		assertEquals(generatedClass.toString(), files.get(0).getContent());
+		assertEquals(1, materializations.size());
+		assertEquals(testCase, materializations.get(0).getTestCase());
+		assertEquals("TestClass1ExampleTest.java", materializations.get(0).getFileName());
+		assertEquals("test-resources/materializer/TestClass1ExampleTest.java", materializations.get(0).getFilePath());
+		assertEquals(generatedClass.toString(), fileUtils.readContetAsString(materializations.get(0).getFilePath()));
 	}
 
 	@Test
@@ -57,8 +57,7 @@ public class OneTestCasePerClassTestCaseMaterializerTest {
 		Statement fixtureStatement2 = new Statement("sut(2);");
 		Statement assertStatement2 = new Statement("assertEquals(2, 2);");
 		TestCase testCase2 = new TestCase("example2", Arrays.asList(fixtureStatement2), Arrays.asList(assertStatement2));
-		materializer.materialize(Arrays.asList(testCase1, testCase2));
-		List<TextFile> files = loader.load();
+		List<TestCaseMaterialization> materializations = materializer.materialize(Arrays.asList(testCase1, testCase2));
 
 		StringBuilder generatedClass1 = new StringBuilder();
 		generatedClass1.append("public class TestClass1Example1Test {\n\n");
@@ -78,11 +77,15 @@ public class OneTestCasePerClassTestCaseMaterializerTest {
 		generatedClass2.append("\t}\n");
 		generatedClass2.append("}\n");
 
-		assertEquals(2, files.size());
-		assertEquals("TestClass1Example1Test.java", files.get(0).getName());
-		assertEquals("TestClass2Example2Test.java", files.get(1).getName());
-		assertEquals(generatedClass1.toString(), files.get(0).getContent());
-		assertEquals(generatedClass2.toString(), files.get(1).getContent());
+		assertEquals(2, materializations.size());
+		assertEquals(testCase1, materializations.get(0).getTestCase());
+		assertEquals(testCase2, materializations.get(1).getTestCase());
+		assertEquals("TestClass1Example1Test.java", materializations.get(0).getFileName());
+		assertEquals("TestClass2Example2Test.java", materializations.get(1).getFileName());
+		assertEquals("test-resources/materializer/TestClass1Example1Test.java", materializations.get(0).getFilePath());
+		assertEquals("test-resources/materializer/TestClass2Example2Test.java", materializations.get(1).getFilePath());
+		assertEquals(generatedClass1.toString(), fileUtils.readContetAsString(materializations.get(0).getFilePath()));
+		assertEquals(generatedClass2.toString(), fileUtils.readContetAsString(materializations.get(1).getFilePath()));
 	}
 
 	@Test
@@ -93,8 +96,7 @@ public class OneTestCasePerClassTestCaseMaterializerTest {
 		Statement fixtureStatement2 = new Statement("sut(2);");
 		Statement assertStatement2 = new Statement("assertEquals(2, 2);");
 		TestCase testCase2 = new TestCase("example", Arrays.asList(fixtureStatement2), Arrays.asList(assertStatement2));
-		materializer.materialize(Arrays.asList(testCase1, testCase2));
-		List<TextFile> files = loader.load();
+		List<TestCaseMaterialization> materializations = materializer.materialize(Arrays.asList(testCase1, testCase2));
 
 		StringBuilder generatedClass1 = new StringBuilder();
 		generatedClass1.append("public class TestClass1ExampleTest {\n\n");
@@ -114,11 +116,15 @@ public class OneTestCasePerClassTestCaseMaterializerTest {
 		generatedClass2.append("\t}\n");
 		generatedClass2.append("}\n");
 
-		assertEquals(2, files.size());
-		assertEquals("TestClass1ExampleTest.java", files.get(0).getName());
-		assertEquals("TestClass2ExampleTest.java", files.get(1).getName());
-		assertEquals(generatedClass1.toString(), files.get(0).getContent());
-		assertEquals(generatedClass2.toString(), files.get(1).getContent());
+		assertEquals(2, materializations.size());
+		assertEquals(testCase1, materializations.get(0).getTestCase());
+		assertEquals(testCase2, materializations.get(1).getTestCase());
+		assertEquals("TestClass1ExampleTest.java", materializations.get(0).getFileName());
+		assertEquals("TestClass2ExampleTest.java", materializations.get(1).getFileName());
+		assertEquals("test-resources/materializer/TestClass1ExampleTest.java", materializations.get(0).getFilePath());
+		assertEquals("test-resources/materializer/TestClass2ExampleTest.java", materializations.get(1).getFilePath());
+		assertEquals(generatedClass1.toString(), fileUtils.readContetAsString(materializations.get(0).getFilePath()));
+		assertEquals(generatedClass2.toString(), fileUtils.readContetAsString(materializations.get(1).getFilePath()));
 	}
 
 }
