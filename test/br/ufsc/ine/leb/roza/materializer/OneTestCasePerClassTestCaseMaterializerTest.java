@@ -21,9 +21,9 @@ public class OneTestCasePerClassTestCaseMaterializerTest {
 
 	@BeforeEach
 	void setup() {
-		new FolderUtils("test-resources/materializer").createEmptyFolder();
+		new FolderUtils("execution/materializer").createEmptyFolder();
 		fileUtils = new FileUtils();
-		materializer = new OneTestCasePerClassTestCaseMaterializer("test-resources/materializer");
+		materializer = new OneTestCasePerClassTestCaseMaterializer("execution/materializer");
 	}
 
 	@Test
@@ -45,7 +45,7 @@ public class OneTestCasePerClassTestCaseMaterializerTest {
 		assertEquals(1, materializations.size());
 		assertEquals(testCase, materializations.get(0).getTestCase());
 		assertEquals("TestClass1ExampleTest.java", materializations.get(0).getFileName());
-		assertEquals("test-resources/materializer/TestClass1ExampleTest.java", materializations.get(0).getFilePath());
+		assertEquals("execution/materializer/TestClass1ExampleTest.java", materializations.get(0).getFilePath());
 		assertEquals(generatedClass.toString(), fileUtils.readContetAsString(materializations.get(0).getFilePath()));
 	}
 
@@ -82,8 +82,8 @@ public class OneTestCasePerClassTestCaseMaterializerTest {
 		assertEquals(testCase2, materializations.get(1).getTestCase());
 		assertEquals("TestClass1Example1Test.java", materializations.get(0).getFileName());
 		assertEquals("TestClass2Example2Test.java", materializations.get(1).getFileName());
-		assertEquals("test-resources/materializer/TestClass1Example1Test.java", materializations.get(0).getFilePath());
-		assertEquals("test-resources/materializer/TestClass2Example2Test.java", materializations.get(1).getFilePath());
+		assertEquals("execution/materializer/TestClass1Example1Test.java", materializations.get(0).getFilePath());
+		assertEquals("execution/materializer/TestClass2Example2Test.java", materializations.get(1).getFilePath());
 		assertEquals(generatedClass1.toString(), fileUtils.readContetAsString(materializations.get(0).getFilePath()));
 		assertEquals(generatedClass2.toString(), fileUtils.readContetAsString(materializations.get(1).getFilePath()));
 	}
@@ -121,8 +121,8 @@ public class OneTestCasePerClassTestCaseMaterializerTest {
 		assertEquals(testCase2, materializations.get(1).getTestCase());
 		assertEquals("TestClass1ExampleTest.java", materializations.get(0).getFileName());
 		assertEquals("TestClass2ExampleTest.java", materializations.get(1).getFileName());
-		assertEquals("test-resources/materializer/TestClass1ExampleTest.java", materializations.get(0).getFilePath());
-		assertEquals("test-resources/materializer/TestClass2ExampleTest.java", materializations.get(1).getFilePath());
+		assertEquals("execution/materializer/TestClass1ExampleTest.java", materializations.get(0).getFilePath());
+		assertEquals("execution/materializer/TestClass2ExampleTest.java", materializations.get(1).getFilePath());
 		assertEquals(generatedClass1.toString(), fileUtils.readContetAsString(materializations.get(0).getFilePath()));
 		assertEquals(generatedClass2.toString(), fileUtils.readContetAsString(materializations.get(1).getFilePath()));
 	}
