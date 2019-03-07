@@ -1,0 +1,58 @@
+#!/bin/sh
+
+SRC_DIR="../../execution/materializer"
+
+FILE_PATTERN='*.java'
+
+DECKARD_DIR="aplicacao"
+
+MIN_TOKENS='10'
+
+STRIDE='2'
+
+SIMILARITY='0.5'
+
+VECTOR_DIR="../../execution/measurer/vectors"
+
+CLUSTER_DIR="../../execution/measurer/cluster"
+
+TIME_DIR="../../execution/measurer/times"
+
+VGEN_EXEC="$DECKARD_DIR/src"
+
+VGEN_EXEC="$VGEN_EXEC/main/jvecgen"
+
+GROUPING_EXEC="$DECKARD_DIR/src/vgen/vgrouping/runvectorsort"
+
+CLUSTER_EXEC="$DECKARD_DIR/src/lsh/bin/enumBuckets"
+
+QUERY_EXEC="$DECKARD_DIR/src/lsh/bin/queryBuckets"
+
+POSTPRO_EXEC="$DECKARD_DIR/scripts/clonedetect/post_process_groupfile"
+
+SRC2HTM_EXEC=source-highlight
+
+SRC2HTM_OPTS=--line-number-ref
+
+MAX_PROCS=8
+
+GROUPING_S='30'
+
+export DECKARD_DIR
+export FILE_PATTERN
+export VECTOR_DIR
+export TIME_DIR
+export CLUSTER_DIR
+export VGEN_EXEC
+export GROUPING_EXEC
+export CLUSTER_EXEC
+export POSTPRO_EXEC
+export SRC2HTM_EXEC
+export SRC2HTM_OPTS
+export MIN_TOKENS
+export STRIDE
+export SIMILARITY
+export GROUPING_S
+export GROUPING_D
+export GROUPING_C
+export MAX_PROCS
