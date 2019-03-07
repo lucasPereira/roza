@@ -19,9 +19,9 @@ public class JplagSimilarityMeasurerTest {
 
 	@BeforeEach
 	void setup() {
-		new FolderUtils("test-resources/materializer").createEmptyFolder();
-		new FolderUtils("test-resources/similarity").createEmptyFolder();
-		measurer = new JplagSimilarityMeasurer("test-resources/materializer", "test-resources/similarity");
+		new FolderUtils("execution/materializer").createEmptyFolder();
+		new FolderUtils("execution/measurer").createEmptyFolder();
+		measurer = new JplagSimilarityMeasurer("execution/materializer", "execution/measurer");
 	}
 
 	@Test
