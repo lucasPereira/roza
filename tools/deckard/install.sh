@@ -3,5 +3,5 @@
 sudo apt-get install -y bison
 sudo apt-get install -y flex
 
-cd aplicacao/src/main
+cd tool/src/main
 ./build.sh
