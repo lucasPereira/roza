@@ -4,7 +4,7 @@ SRC_DIR="../../execution/materializer"
 
 FILE_PATTERN='*.java'
 
-DECKARD_DIR="aplicacao"
+DECKARD_DIR="tool"
 
 MIN_TOKENS='10'
 
