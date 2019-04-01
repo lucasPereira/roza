@@ -5,43 +5,45 @@ import java.math.BigDecimal;
 import java.util.LinkedList;
 import java.util.List;
 
+import br.ufsc.ine.leb.roza.MaterializationReport;
 import br.ufsc.ine.leb.roza.SimilarityAssessment;
 import br.ufsc.ine.leb.roza.SimilarityReport;
 import br.ufsc.ine.leb.roza.TestCase;
-import br.ufsc.ine.leb.roza.materializer.OneTestCasePerClassTestCaseMaterializer;
-import br.ufsc.ine.leb.roza.materializer.TestCaseMaterializer;
+import br.ufsc.ine.leb.roza.TestCaseMaterialization;
 
 public class SimianSimilarityMeasurer implements SimilarityMeasurer {
 
-	private TestCaseMaterializer materializer;
-	private String generatedSourceFolder;
 	private String resultsFolder;
 
-	public SimianSimilarityMeasurer(String generatedSourceFolder, String resultsFolder) {
-		this.generatedSourceFolder = generatedSourceFolder;
+	public SimianSimilarityMeasurer(String resultsFolder) {
 		this.resultsFolder = resultsFolder;
-		materializer = new OneTestCasePerClassTestCaseMaterializer(generatedSourceFolder);
 	}
 
 	@Override
-	public SimilarityReport measure(List<TestCase> testCases) {
-		materializer.materialize(testCases);
-		run();
+	public SimilarityReport measure(MaterializationReport materializationReport) {
+		List<TestCaseMaterialization> materializations = materializationReport.getMaterializations();
+		run(materializations);
 		List<SimilarityAssessment> assessments = new LinkedList<>();
-		for (TestCase testCase : testCases) {
-			SimilarityAssessment assessment = new SimilarityAssessment(testCase, testCase, BigDecimal.ONE);
+		for (TestCaseMaterialization materialization : materializations) {
+			TestCase source = materialization.getTestCase();
+			TestCase target = materialization.getTestCase();
+			SimilarityAssessment assessment = new SimilarityAssessment(source, target, BigDecimal.ONE);
 			assessments.add(assessment);
 		}
 		return new SimilarityReport(assessments);
 	}
 
-	private void run() {
+	private void run(List<TestCaseMaterialization> materializations) {
 		try {
+			StringBuilder files = new StringBuilder();
+			for (TestCaseMaterialization materialization : materializations) {
+				files.append(materialization.getFilePath());
+				files.append(" ");
+			}
 			ProcessBuilder builder = new ProcessBuilder();
 			String tool = "tools/simian/tool/simian-2.5.10.jar";
-			String files = new File(generatedSourceFolder, "*.java").getAbsolutePath();
 			File report = new File(resultsFolder, "report.xml");
-			builder.command("java", "-jar", tool, "-formatter=xml", "-threshold=2", "-language=java", files);
+			builder.command("java", "-jar", tool, "-formatter=xml", "-threshold=2", "-language=java", files.toString());
 			builder.redirectOutput(report);
 			Process process = builder.start();
 			process.waitFor();

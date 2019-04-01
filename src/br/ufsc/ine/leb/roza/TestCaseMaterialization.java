@@ -20,6 +20,10 @@ public class TestCaseMaterialization {
 		return file.getPath();
 	}
 
+	public String getFolder() {
+		return file.getParent();
+	}
+
 	public TestCase getTestCase() {
 		return testCase;
 	}

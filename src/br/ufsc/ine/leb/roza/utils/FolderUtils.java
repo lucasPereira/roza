@@ -74,4 +74,8 @@ public class FolderUtils {
 		}
 	}
 
+	public String getBaseFolder() {
+		return baseFolder;
+	}
+
 }

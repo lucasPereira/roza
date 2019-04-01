@@ -13,49 +13,45 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import br.ufsc.ine.leb.roza.MaterializationReport;
 import br.ufsc.ine.leb.roza.SimilarityAssessment;
 import br.ufsc.ine.leb.roza.SimilarityReport;
 import br.ufsc.ine.leb.roza.TestCase;
 import br.ufsc.ine.leb.roza.TestCaseMaterialization;
-import br.ufsc.ine.leb.roza.materializer.OneTestCasePerClassTestCaseMaterializer;
-import br.ufsc.ine.leb.roza.materializer.TestCaseMaterializer;
 import jplag.ExitException;
 import jplag.Program;
 import jplag.options.CommandLineOptions;
 
 public class JplagSimilarityMeasurer implements SimilarityMeasurer {
 
-	private String gerenatedSourceFolder;
 	private String resultsFolder;
-	private TestCaseMaterializer materializer;
 
-	public JplagSimilarityMeasurer(String generatedSourceFolder, String resultsFolder) {
-		this.gerenatedSourceFolder = generatedSourceFolder;
+	public JplagSimilarityMeasurer(String resultsFolder) {
 		this.resultsFolder = resultsFolder;
-		materializer = new OneTestCasePerClassTestCaseMaterializer(generatedSourceFolder);
 	}
 
 	@Override
-	public SimilarityReport measure(List<TestCase> testCases) {
+	public SimilarityReport measure(MaterializationReport materializationReport) {
 		Map<TestCase, Map<TestCase, BigDecimal>> scores = new HashMap<>();
-		List<TestCaseMaterialization> materializations = materializer.materialize(testCases);
-		if (testCases.size() > 1) {
-			runJplag();
-			Map<TestCase, Map<TestCase, BigDecimal>> jplagScores = parserJplagReport(materializations);
-			scores.putAll(jplagScores);
+		List<TestCaseMaterialization> materializations = materializationReport.getMaterializations();
+		if (materializations.size() > 1) {
+			run(materializationReport);
+			scores = parseReport(materializations);
 		}
 		List<SimilarityAssessment> assesssments = new LinkedList<>();
-		for (TestCase source : testCases) {
-			for (TestCase target : testCases) {
-				BigDecimal score = evaluateScore(scores, source, target);
-				SimilarityAssessment assessment = new SimilarityAssessment(source, target, score);
+		for (TestCaseMaterialization source : materializations) {
+			for (TestCaseMaterialization target : materializations) {
+				TestCase sourceTestCase = source.getTestCase();
+				TestCase targetTestCase = target.getTestCase();
+				BigDecimal score = evaluateScore(scores, sourceTestCase, targetTestCase);
+				SimilarityAssessment assessment = new SimilarityAssessment(sourceTestCase, targetTestCase, score);
 				assesssments.add(assessment);
 			}
 		}
 		return new SimilarityReport(assesssments);
 	}
 
-	private Map<TestCase, Map<TestCase, BigDecimal>> parserJplagReport(List<TestCaseMaterialization> materializations) {
+	private Map<TestCase, Map<TestCase, BigDecimal>> parseReport(List<TestCaseMaterialization> materializations) {
 		try {
 			Map<String, TestCase> testCases = new HashMap<>();
 			Map<TestCase, Map<TestCase, BigDecimal>> scores = new HashMap<>();
@@ -99,10 +95,11 @@ public class JplagSimilarityMeasurer implements SimilarityMeasurer {
 		}
 	}
 
-	private void runJplag() {
+	private void run(MaterializationReport materializationReport) {
+		String sourceFolder = materializationReport.getBaseFolder();
 		try {
 			String logFile = new File(resultsFolder, "log.txt").getAbsolutePath();
-			String[] arguments = { "-l", "java17", "-vlpd", "-t", "5", "-m", "0%", "-s", gerenatedSourceFolder, "-r", resultsFolder, "-o", logFile };
+			String[] arguments = { "-l", "java17", "-vlpd", "-t", "5", "-m", "0%", "-s", sourceFolder, "-r", resultsFolder, "-o", logFile };
 			CommandLineOptions options = new CommandLineOptions(arguments, null);
 			Program program = new Program(options);
 			program.run();

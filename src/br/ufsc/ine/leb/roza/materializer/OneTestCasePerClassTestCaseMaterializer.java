@@ -12,6 +12,7 @@ import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.printer.PrettyPrinterConfiguration;
 import com.github.javaparser.printer.PrettyPrinterConfiguration.IndentType;
 
+import br.ufsc.ine.leb.roza.MaterializationReport;
 import br.ufsc.ine.leb.roza.TestCase;
 import br.ufsc.ine.leb.roza.TestCaseMaterialization;
 import br.ufsc.ine.leb.roza.utils.FolderUtils;
@@ -22,12 +23,12 @@ public class OneTestCasePerClassTestCaseMaterializer implements TestCaseMaterial
 	private FolderUtils foldereUtils;
 
 	public OneTestCasePerClassTestCaseMaterializer(String baseFolder) {
-		foldereUtils = new FolderUtils(baseFolder);
 		counter = 1;
+		foldereUtils = new FolderUtils(baseFolder);
 	}
 
 	@Override
-	public List<TestCaseMaterialization> materialize(List<TestCase> tests) {
+	public MaterializationReport materialize(List<TestCase> tests) {
 		List<TestCaseMaterialization> materializations = new LinkedList<>();
 		tests.forEach((testCase) -> {
 			String className = createClassName(testCase.getName());
@@ -50,7 +51,7 @@ public class OneTestCasePerClassTestCaseMaterializer implements TestCaseMaterial
 			TestCaseMaterialization materialization = new TestCaseMaterialization(file, testCase);
 			materializations.add(materialization);
 		});
-		return materializations;
+		return new MaterializationReport(foldereUtils.getBaseFolder(), materializations);
 	}
 
 	private String createClassFileName(String className) {
