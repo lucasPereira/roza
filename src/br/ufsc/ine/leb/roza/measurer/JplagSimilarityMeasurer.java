@@ -18,9 +18,7 @@ import br.ufsc.ine.leb.roza.SimilarityAssessment;
 import br.ufsc.ine.leb.roza.SimilarityReport;
 import br.ufsc.ine.leb.roza.TestCase;
 import br.ufsc.ine.leb.roza.TestCaseMaterialization;
-import jplag.ExitException;
-import jplag.Program;
-import jplag.options.CommandLineOptions;
+import br.ufsc.ine.leb.roza.utils.ProcessUtils;
 
 public class JplagSimilarityMeasurer implements SimilarityMeasurer {
 
@@ -96,16 +94,12 @@ public class JplagSimilarityMeasurer implements SimilarityMeasurer {
 	}
 
 	private void run(MaterializationReport materializationReport) {
+		ProcessUtils processUtils = new ProcessUtils(true, true);
+		String tool = "tools/jplag/tool/jplag-2.11.9.jar";
+		String sensitivity = "5";
 		String sourceFolder = materializationReport.getBaseFolder();
-		try {
-			String logFile = new File(resultsFolder, "log.txt").getAbsolutePath();
-			String[] arguments = { "-l", "java17", "-vlpd", "-t", "5", "-m", "0%", "-s", sourceFolder, "-r", resultsFolder, "-o", logFile };
-			CommandLineOptions options = new CommandLineOptions(arguments, null);
-			Program program = new Program(options);
-			program.run();
-		} catch (ExitException excecao) {
-			throw new RuntimeException(excecao);
-		}
+		String logFile = new File(resultsFolder, "log.txt").getPath();
+		processUtils.execute("java", "-jar", tool, "-vlpd", "-l", "java17", "-m", "0%", "-t", sensitivity, "-s", sourceFolder, "-r", resultsFolder, "-o", logFile);
 	}
 
 }

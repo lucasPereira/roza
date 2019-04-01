@@ -10,6 +10,7 @@ import br.ufsc.ine.leb.roza.SimilarityAssessment;
 import br.ufsc.ine.leb.roza.SimilarityReport;
 import br.ufsc.ine.leb.roza.TestCase;
 import br.ufsc.ine.leb.roza.TestCaseMaterialization;
+import br.ufsc.ine.leb.roza.utils.ProcessUtils;
 
 public class SimianSimilarityMeasurer implements SimilarityMeasurer {
 
@@ -34,20 +35,21 @@ public class SimianSimilarityMeasurer implements SimilarityMeasurer {
 	}
 
 	private void run(List<TestCaseMaterialization> materializations) {
-		try {
-			StringBuilder files = new StringBuilder();
-			for (TestCaseMaterialization materialization : materializations) {
-				files.append(materialization.getFilePath());
-				files.append(" ");
-			}
-			ProcessBuilder builder = new ProcessBuilder();
-			String tool = "tools/simian/tool/simian-2.5.10.jar";
-			File report = new File(resultsFolder, "report.xml");
-			builder.command("java", "-jar", tool, "-formatter=xml", "-threshold=2", "-language=java", files.toString());
-			builder.redirectOutput(report);
-			Process process = builder.start();
-			process.waitFor();
-		} catch (Exception exception) {}
+		ProcessUtils processUtils = new ProcessUtils(true, false);
+		String tool = "tools/simian/tool/simian-2.5.10.jar";
+		String threshold = "-threshold=2";
+		String sourceFiles = getSourceFiles(materializations).toString();
+		File fileReport = new File(resultsFolder, "report.xml");
+		processUtils.execute(fileReport, "java", "-jar", tool, "-formatter=xml", threshold, "-language=java", sourceFiles);
+	}
+
+	private StringBuilder getSourceFiles(List<TestCaseMaterialization> materializations) {
+		StringBuilder files = new StringBuilder();
+		for (TestCaseMaterialization materialization : materializations) {
+			files.append(materialization.getFilePath());
+			files.append(" ");
+		}
+		return files;
 	}
 
 }
