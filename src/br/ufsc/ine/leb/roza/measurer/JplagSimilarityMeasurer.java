@@ -94,7 +94,7 @@ public class JplagSimilarityMeasurer implements SimilarityMeasurer {
 	}
 
 	private void run(MaterializationReport materializationReport) {
-		ProcessUtils processUtils = new ProcessUtils(true, true);
+		ProcessUtils processUtils = new ProcessUtils(true, true, true);
 		String tool = "tools/jplag/tool/jplag-2.11.9.jar";
 		String sensitivity = "5";
 		String sourceFolder = materializationReport.getBaseFolder();

@@ -8,11 +8,13 @@ import java.io.InputStreamReader;
 
 public class ProcessUtils {
 
-	private Boolean exceptionOnError;
+	private Boolean failOnException;
+	private Boolean failOnExitError;
 	private Boolean quiet;
 
-	public ProcessUtils(Boolean failOnError, Boolean quiet) {
-		this.exceptionOnError = failOnError;
+	public ProcessUtils(Boolean failOnError, Boolean failOnExitError, Boolean quiet) {
+		this.failOnException = failOnError;
+		this.failOnExitError = failOnExitError;
 		this.quiet = quiet;
 	}
 
@@ -37,14 +39,14 @@ public class ProcessUtils {
 			process.waitFor();
 			exitValue = process.exitValue();
 			if (!quiet) {
+				System.out.println(exitValue);
 				ler(process.getInputStream());
 				ler(process.getErrorStream());
-				System.out.println(exitValue);
 			}
 		} catch (Exception exception) {
 			exceptionToThrow = exception;
 		}
-		if (exceptionOnError && (exceptionToThrow != null || exitValue != 0)) {
+		if ((failOnException && exceptionToThrow != null) || (failOnExitError && exitValue != 0)) {
 			throw new RuntimeException(exceptionToThrow);
 		}
 	}
