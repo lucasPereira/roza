@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 import br.ufsc.ine.leb.roza.MaterializationReport;
 import br.ufsc.ine.leb.roza.Statement;
 import br.ufsc.ine.leb.roza.TestCase;
-import br.ufsc.ine.leb.roza.TestCaseMaterialization;
+import br.ufsc.ine.leb.roza.TestMaterialization;
 import br.ufsc.ine.leb.roza.utils.FileUtils;
 import br.ufsc.ine.leb.roza.utils.FolderUtils;
 
@@ -33,7 +33,7 @@ public class OneTestCasePerClassTestCaseMaterializerTest {
 		Statement assertStatement = new Statement("assertEquals(0, 0);");
 		TestCase testCase = new TestCase("example", Arrays.asList(fixtureStatement), Arrays.asList(assertStatement));
 		MaterializationReport<TestCase> report = materializer.materialize(Arrays.asList(testCase));
-		List<TestCaseMaterialization<TestCase>> materializations = report.getMaterializations();
+		List<TestMaterialization<TestCase>> materializations = report.getMaterializations();
 
 		StringBuilder generatedClass = new StringBuilder();
 		generatedClass.append("public class TestClass1ExampleTest {\n\n");
@@ -46,22 +46,24 @@ public class OneTestCasePerClassTestCaseMaterializerTest {
 
 		assertEquals("execution/materializer", report.getBaseFolder());
 		assertEquals(1, materializations.size());
-		assertEquals(testCase, materializations.get(0).getTestCase());
+		assertEquals(testCase, materializations.get(0).getTestBlock());
 		assertEquals("TestClass1ExampleTest.java", materializations.get(0).getFileName());
 		assertEquals("execution/materializer/TestClass1ExampleTest.java", materializations.get(0).getFilePath());
 		assertEquals(generatedClass.toString(), fileUtils.readContetAsString(materializations.get(0).getFilePath()));
 	}
 
 	@Test
-	void twoTetCases() throws Exception {
+	void twoTestsCases() throws Exception {
 		Statement fixtureStatement1 = new Statement("sut(1);");
 		Statement assertStatement1 = new Statement("assertEquals(1, 1);");
-		TestCase testCase1 = new TestCase("example1", Arrays.asList(fixtureStatement1), Arrays.asList(assertStatement1));
+		TestCase testCase1 = new TestCase("example1", Arrays.asList(fixtureStatement1),
+				Arrays.asList(assertStatement1));
 		Statement fixtureStatement2 = new Statement("sut(2);");
 		Statement assertStatement2 = new Statement("assertEquals(2, 2);");
-		TestCase testCase2 = new TestCase("example2", Arrays.asList(fixtureStatement2), Arrays.asList(assertStatement2));
+		TestCase testCase2 = new TestCase("example2", Arrays.asList(fixtureStatement2),
+				Arrays.asList(assertStatement2));
 		MaterializationReport<TestCase> report = materializer.materialize(Arrays.asList(testCase1, testCase2));
-		List<TestCaseMaterialization<TestCase>> materializations = report.getMaterializations();
+		List<TestMaterialization<TestCase>> materializations = report.getMaterializations();
 
 		StringBuilder generatedClass1 = new StringBuilder();
 		generatedClass1.append("public class TestClass1Example1Test {\n\n");
@@ -83,8 +85,8 @@ public class OneTestCasePerClassTestCaseMaterializerTest {
 
 		assertEquals("execution/materializer", report.getBaseFolder());
 		assertEquals(2, materializations.size());
-		assertEquals(testCase1, materializations.get(0).getTestCase());
-		assertEquals(testCase2, materializations.get(1).getTestCase());
+		assertEquals(testCase1, materializations.get(0).getTestBlock());
+		assertEquals(testCase2, materializations.get(1).getTestBlock());
 		assertEquals("TestClass1Example1Test.java", materializations.get(0).getFileName());
 		assertEquals("TestClass2Example2Test.java", materializations.get(1).getFileName());
 		assertEquals("execution/materializer/TestClass1Example1Test.java", materializations.get(0).getFilePath());
@@ -94,7 +96,7 @@ public class OneTestCasePerClassTestCaseMaterializerTest {
 	}
 
 	@Test
-	void twoTetCasesWithTheSameName() throws Exception {
+	void twoTestsCasesWithTheSameName() throws Exception {
 		Statement fixtureStatement1 = new Statement("sut(1);");
 		Statement assertStatement1 = new Statement("assertEquals(1, 1);");
 		TestCase testCase1 = new TestCase("example", Arrays.asList(fixtureStatement1), Arrays.asList(assertStatement1));
@@ -102,7 +104,7 @@ public class OneTestCasePerClassTestCaseMaterializerTest {
 		Statement assertStatement2 = new Statement("assertEquals(2, 2);");
 		TestCase testCase2 = new TestCase("example", Arrays.asList(fixtureStatement2), Arrays.asList(assertStatement2));
 		MaterializationReport<TestCase> report = materializer.materialize(Arrays.asList(testCase1, testCase2));
-		List<TestCaseMaterialization<TestCase>> materializations = report.getMaterializations();
+		List<TestMaterialization<TestCase>> materializations = report.getMaterializations();
 
 		StringBuilder generatedClass1 = new StringBuilder();
 		generatedClass1.append("public class TestClass1ExampleTest {\n\n");
@@ -124,8 +126,8 @@ public class OneTestCasePerClassTestCaseMaterializerTest {
 
 		assertEquals("execution/materializer", report.getBaseFolder());
 		assertEquals(2, materializations.size());
-		assertEquals(testCase1, materializations.get(0).getTestCase());
-		assertEquals(testCase2, materializations.get(1).getTestCase());
+		assertEquals(testCase1, materializations.get(0).getTestBlock());
+		assertEquals(testCase2, materializations.get(1).getTestBlock());
 		assertEquals("TestClass1ExampleTest.java", materializations.get(0).getFileName());
 		assertEquals("TestClass2ExampleTest.java", materializations.get(1).getFileName());
 		assertEquals("execution/materializer/TestClass1ExampleTest.java", materializations.get(0).getFilePath());

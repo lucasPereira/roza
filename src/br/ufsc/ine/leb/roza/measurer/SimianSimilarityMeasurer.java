@@ -17,7 +17,7 @@ import br.ufsc.ine.leb.roza.MaterializationReport;
 import br.ufsc.ine.leb.roza.SimilarityAssessment;
 import br.ufsc.ine.leb.roza.SimilarityReport;
 import br.ufsc.ine.leb.roza.TestCase;
-import br.ufsc.ine.leb.roza.TestCaseMaterialization;
+import br.ufsc.ine.leb.roza.TestMaterialization;
 import br.ufsc.ine.leb.roza.utils.ProcessUtils;
 
 public class SimianSimilarityMeasurer implements SimilarityMeasurer<TestCase> {
@@ -29,32 +29,33 @@ public class SimianSimilarityMeasurer implements SimilarityMeasurer<TestCase> {
 	}
 
 	@Override
-	public SimilarityReport measure(MaterializationReport<TestCase> materializationReport) {
-		List<TestCaseMaterialization<TestCase>> materializations = materializationReport.getMaterializations();
+	public SimilarityReport<TestCase> measure(MaterializationReport<TestCase> materializationReport) {
+		List<TestMaterialization<TestCase>> materializations = materializationReport.getMaterializations();
 		if (materializations.size() > 1) {
 			File fileReport = new File(resultsFolder, "report.xml");
 			run(materializationReport, fileReport);
 			parseReport(materializationReport, fileReport);
 		}
-		List<SimilarityAssessment> assessments = new LinkedList<>();
-		for (TestCaseMaterialization<TestCase> materializationSource : materializations) {
-			TestCase source = materializationSource.getTestCase();
-			for (TestCaseMaterialization<TestCase> materializationTarget : materializations) {
-				TestCase target = materializationTarget.getTestCase();
-				SimilarityAssessment assessment = new SimilarityAssessment(source, target, BigDecimal.ONE);
+		List<SimilarityAssessment<TestCase>> assessments = new LinkedList<>();
+		for (TestMaterialization<TestCase> materializationSource : materializations) {
+			TestCase source = materializationSource.getTestBlock();
+			for (TestMaterialization<TestCase> materializationTarget : materializations) {
+				TestCase target = materializationTarget.getTestBlock();
+				SimilarityAssessment<TestCase> assessment = new SimilarityAssessment<TestCase>(source, target,
+						BigDecimal.ONE);
 				assessments.add(assessment);
 			}
 		}
-		return new SimilarityReport(assessments);
+		return new SimilarityReport<TestCase>(assessments);
 	}
 
 	private void parseReport(MaterializationReport<TestCase> materializationReport, File fileReport) {
-		List<TestCaseMaterialization<TestCase>> materializations = materializationReport.getMaterializations();
+		List<TestMaterialization<TestCase>> materializations = materializationReport.getMaterializations();
 		Map<String, TestCase> testCases = new HashMap<>();
 		Map<TestCase, Map<TestCase, BigDecimal>> scores = new HashMap<>();
-		for (TestCaseMaterialization<TestCase> materialization : materializations) {
-			testCases.put(materialization.getFileName(), materialization.getTestCase());
-			scores.put(materialization.getTestCase(), new HashMap<>());
+		for (TestMaterialization<TestCase> materialization : materializations) {
+			testCases.put(materialization.getFileName(), materialization.getTestBlock());
+			scores.put(materialization.getTestBlock(), new HashMap<>());
 		}
 		try {
 			Document document = Jsoup.parse(fileReport, "utf-8");

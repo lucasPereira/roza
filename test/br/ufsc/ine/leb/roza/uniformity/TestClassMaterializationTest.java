@@ -7,7 +7,7 @@ import java.util.Arrays;
 
 import org.junit.jupiter.api.Test;
 
-import br.ufsc.ine.leb.roza.TestCaseMaterialization;
+import br.ufsc.ine.leb.roza.TestMaterialization;
 import br.ufsc.ine.leb.roza.TestClass;
 import br.ufsc.ine.leb.roza.TestMethod;
 
@@ -17,12 +17,12 @@ public class TestClassMaterializationTest {
 	void create() throws Exception {
 		TestMethod testMethod = new TestMethod("test", Arrays.asList());
 		TestClass testClass = new TestClass("ExampleTest", Arrays.asList(), Arrays.asList(), Arrays.asList(testMethod));
-		TestCaseMaterialization<TestClass> materialization = new TestCaseMaterialization<>(
+		TestMaterialization<TestClass> materialization = new TestMaterialization<>(
 				new File("generated/ExampleTest.java"), testClass);
 		assertEquals("ExampleTest.java", materialization.getFileName());
 		assertEquals("generated/ExampleTest.java", materialization.getFilePath());
 		assertEquals("generated", materialization.getFolder());
-		assertEquals(testClass, materialization.getTestCase());
+		assertEquals(testClass, materialization.getTestBlock());
 	}
 
 }

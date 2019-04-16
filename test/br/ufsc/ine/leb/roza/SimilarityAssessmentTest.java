@@ -23,7 +23,7 @@ public class SimilarityAssessmentTest {
 
 	@Test
 	void minimumScore() throws Exception {
-		SimilarityAssessment assessment = new SimilarityAssessment(testCaseA, testCaseB, BigDecimal.ZERO);
+		SimilarityAssessment<TestCase> assessment = new SimilarityAssessment<TestCase>(testCaseA, testCaseB, BigDecimal.ZERO);
 		assertEquals(BigDecimal.ZERO, assessment.getScore());
 		assertEquals(testCaseA, assessment.getSource());
 		assertEquals(testCaseB, assessment.getTarget());
@@ -31,7 +31,7 @@ public class SimilarityAssessmentTest {
 
 	@Test
 	void maximumScore() throws Exception {
-		SimilarityAssessment assessment = new SimilarityAssessment(testCaseA, testCaseB, BigDecimal.ONE);
+		SimilarityAssessment<TestCase> assessment = new SimilarityAssessment<TestCase>(testCaseA, testCaseB, BigDecimal.ONE);
 		assertEquals(BigDecimal.ONE, assessment.getScore());
 		assertEquals(testCaseA, assessment.getSource());
 		assertEquals(testCaseB, assessment.getTarget());
@@ -40,14 +40,14 @@ public class SimilarityAssessmentTest {
 	@Test
 	void scoreLessThanZero() throws Exception {
 		assertThrows(InvalidSimilarityScoreException.class, () -> {
-			new SimilarityAssessment(testCaseA, testCaseB, new BigDecimal(-0.5));
+			new SimilarityAssessment<TestCase>(testCaseA, testCaseB, new BigDecimal(-0.5));
 		});
 	}
 
 	@Test
 	void scoreGreaterThanOne() throws Exception {
 		assertThrows(InvalidSimilarityScoreException.class, () -> {
-			new SimilarityAssessment(testCaseA, testCaseB, new BigDecimal(1.5));
+			new SimilarityAssessment<TestCase>(testCaseA, testCaseB, new BigDecimal(1.5));
 		});
 	}
 

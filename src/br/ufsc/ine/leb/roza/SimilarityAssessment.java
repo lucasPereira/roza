@@ -4,13 +4,13 @@ import java.math.BigDecimal;
 
 import br.ufsc.ine.leb.roza.exceptions.InvalidSimilarityScoreException;
 
-public class SimilarityAssessment {
+public class SimilarityAssessment<T> {
 
-	private TestCase source;
-	private TestCase target;
+	private T source;
+	private T target;
 	private BigDecimal score;
 
-	public SimilarityAssessment(TestCase source, TestCase target, BigDecimal score) {
+	public SimilarityAssessment(T source, T target, BigDecimal score) {
 		this.source = source;
 		this.target = target;
 		this.score = score;
@@ -29,11 +29,11 @@ public class SimilarityAssessment {
 		return score;
 	}
 
-	public TestCase getSource() {
+	public T getSource() {
 		return source;
 	}
 
-	public TestCase getTarget() {
+	public T getTarget() {
 		return target;
 	}
 

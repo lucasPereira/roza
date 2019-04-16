@@ -16,7 +16,7 @@ import br.ufsc.ine.leb.roza.TestCase;
 import br.ufsc.ine.leb.roza.TestClass;
 import br.ufsc.ine.leb.roza.TestMethod;
 
-public class Junit4TestCaseExtractor implements TestCaseExtractor {
+public class Junit4TestCaseExtractor implements TestExtractor<TestCase> {
 
 	@Override
 	public List<TestCase> extract(List<TestClass> testClasses) {

@@ -31,8 +31,9 @@ public class SimianSimilarityMeasurerTest {
 
 	@Test
 	void zeroTestCases() throws Exception {
-		MaterializationReport<TestCase> materializationReport = new MaterializationReport<>("execution/materializer", Arrays.asList());
-		SimilarityReport report = measurer.measure(materializationReport);
+		MaterializationReport<TestCase> materializationReport = new MaterializationReport<>("execution/materializer",
+				Arrays.asList());
+		SimilarityReport<TestCase> report = measurer.measure(materializationReport);
 		assertEquals(0, report.getAssessments().size());
 	}
 
@@ -42,7 +43,7 @@ public class SimianSimilarityMeasurerTest {
 		Statement assertion = new Statement("assertEquals(0, 0);");
 		TestCase testCase = new TestCase("test", Arrays.asList(fixture), Arrays.asList(assertion));
 		MaterializationReport<TestCase> materializationReport = materializer.materialize(Arrays.asList(testCase));
-		SimilarityReport report = measurer.measure(materializationReport);
+		SimilarityReport<TestCase> report = measurer.measure(materializationReport);
 
 		assertEquals(1, report.getAssessments().size());
 		assertEquals(BigDecimal.ONE, report.getAssessments().get(0).getScore());
@@ -56,8 +57,9 @@ public class SimianSimilarityMeasurerTest {
 		Statement assertion = new Statement("assertEquals(0, 0);");
 		TestCase testCaseA = new TestCase("test", Arrays.asList(fixture), Arrays.asList(assertion));
 		TestCase testCaseB = new TestCase("test", Arrays.asList(fixture), Arrays.asList(assertion));
-		MaterializationReport<TestCase> materializationReport = materializer.materialize(Arrays.asList(testCaseA, testCaseB));
-		SimilarityReport report = measurer.measure(materializationReport);
+		MaterializationReport<TestCase> materializationReport = materializer
+				.materialize(Arrays.asList(testCaseA, testCaseB));
+		SimilarityReport<TestCase> report = measurer.measure(materializationReport);
 
 		assertEquals(4, report.getAssessments().size());
 		assertEquals(BigDecimal.ONE, report.getAssessments().get(0).getScore());
@@ -80,8 +82,9 @@ public class SimianSimilarityMeasurerTest {
 		Statement assertion = new Statement("assertEquals(0, 0);");
 		TestCase testCaseA = new TestCase("testA", Arrays.asList(fixture), Arrays.asList());
 		TestCase testCaseB = new TestCase("testB", Arrays.asList(fixture), Arrays.asList(assertion));
-		MaterializationReport<TestCase> materializationReport = materializer.materialize(Arrays.asList(testCaseA, testCaseB));
-		SimilarityReport report = measurer.measure(materializationReport);
+		MaterializationReport<TestCase> materializationReport = materializer
+				.materialize(Arrays.asList(testCaseA, testCaseB));
+		SimilarityReport<TestCase> report = measurer.measure(materializationReport);
 
 		assertEquals(4, report.getAssessments().size());
 		assertEquals(BigDecimal.ONE, report.getAssessments().get(0).getScore());

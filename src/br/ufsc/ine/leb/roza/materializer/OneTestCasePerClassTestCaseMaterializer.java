@@ -14,7 +14,7 @@ import com.github.javaparser.printer.PrettyPrinterConfiguration.IndentType;
 
 import br.ufsc.ine.leb.roza.MaterializationReport;
 import br.ufsc.ine.leb.roza.TestCase;
-import br.ufsc.ine.leb.roza.TestCaseMaterialization;
+import br.ufsc.ine.leb.roza.TestMaterialization;
 import br.ufsc.ine.leb.roza.utils.FolderUtils;
 
 public class OneTestCasePerClassTestCaseMaterializer implements TestCaseMaterializer<TestCase> {
@@ -29,13 +29,14 @@ public class OneTestCasePerClassTestCaseMaterializer implements TestCaseMaterial
 
 	@Override
 	public MaterializationReport<TestCase> materialize(List<TestCase> tests) {
-		List<TestCaseMaterialization<TestCase>> materializations = new LinkedList<>();
+		List<TestMaterialization<TestCase>> materializations = new LinkedList<>();
 		tests.forEach((testCase) -> {
 			String className = createClassName(testCase.getName());
 			String classFileName = createClassFileName(className);
 			CompilationUnit javaUnit = new CompilationUnit();
 			ClassOrInterfaceDeclaration javaClass = javaUnit.addClass(className).setPublic(true);
-			MethodDeclaration javaMethod = javaClass.addMethod(testCase.getName()).setPublic(true).addAnnotation("Test");
+			MethodDeclaration javaMethod = javaClass.addMethod(testCase.getName()).setPublic(true)
+					.addAnnotation("Test");
 			BlockStmt javaMethodBody = new BlockStmt();
 			testCase.getFixtures().forEach((fixture) -> {
 				javaMethodBody.addStatement(JavaParser.parseStatement(fixture.getText()));
@@ -48,7 +49,7 @@ public class OneTestCasePerClassTestCaseMaterializer implements TestCaseMaterial
 			configuration.setIndentType(IndentType.TABS);
 			configuration.setIndentSize(1);
 			File file = foldereUtils.writeContetAsString(classFileName, javaUnit.toString(configuration));
-			TestCaseMaterialization<TestCase> materialization = new TestCaseMaterialization<>(file, testCase);
+			TestMaterialization<TestCase> materialization = new TestMaterialization<>(file, testCase);
 			materializations.add(materialization);
 		});
 		return new MaterializationReport<>(foldereUtils.getBaseFolder(), materializations);

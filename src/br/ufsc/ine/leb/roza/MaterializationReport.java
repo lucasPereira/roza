@@ -5,9 +5,9 @@ import java.util.List;
 public class MaterializationReport<T extends TestBlock> {
 
 	private String baseFolder;
-	private List<TestCaseMaterialization<T>> materializations;
+	private List<TestMaterialization<T>> materializations;
 
-	public MaterializationReport(String baseFolder, List<TestCaseMaterialization<T>> materializations) {
+	public MaterializationReport(String baseFolder, List<TestMaterialization<T>> materializations) {
 		this.baseFolder = baseFolder;
 		this.materializations = materializations;
 	}
@@ -16,7 +16,7 @@ public class MaterializationReport<T extends TestBlock> {
 		return baseFolder;
 	}
 
-	public List<TestCaseMaterialization<T>> getMaterializations() {
+	public List<TestMaterialization<T>> getMaterializations() {
 		return materializations;
 	}
 

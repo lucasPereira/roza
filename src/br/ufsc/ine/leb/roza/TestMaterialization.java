@@ -2,12 +2,12 @@ package br.ufsc.ine.leb.roza;
 
 import java.io.File;
 
-public class TestCaseMaterialization<T extends TestBlock> {
+public class TestMaterialization<T extends TestBlock> {
 
 	private File file;
 	private T testCase;
 
-	public TestCaseMaterialization(File file, T testCase) {
+	public TestMaterialization(File file, T testCase) {
 		this.file = file;
 		this.testCase = testCase;
 	}
@@ -24,7 +24,7 @@ public class TestCaseMaterialization<T extends TestBlock> {
 		return file.getParent();
 	}
 
-	public T getTestCase() {
+	public T getTestBlock() {
 		return testCase;
 	}
 

@@ -1,4 +1,4 @@
-package br.ufsc.ine.leb.roza.extractor;
+package br.ufsc.ine.leb.roza;
 
 import static org.junit.Assert.assertEquals;
 
@@ -8,31 +8,26 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import br.ufsc.ine.leb.roza.Field;
-import br.ufsc.ine.leb.roza.SetupMethod;
-import br.ufsc.ine.leb.roza.Statement;
-import br.ufsc.ine.leb.roza.TestCase;
-import br.ufsc.ine.leb.roza.TestClass;
-import br.ufsc.ine.leb.roza.TestMethod;
+import br.ufsc.ine.leb.roza.extractor.Junit4TestFieldExtractor;
+import br.ufsc.ine.leb.roza.extractor.TestExtractor;
 
-public class Junit4TestCaseExtractorTest {
+public class Junit4TestFieldExtractorTest {
 
-	private TestExtractor<TestCase> extractor;
+	private TestExtractor<TestField> extractor;
 
 	@BeforeEach
 	void setup() {
-		extractor = new Junit4TestCaseExtractor();
+		extractor = new Junit4TestFieldExtractor();
 	}
 
 	@Test
 	void oneTestMethod() throws Exception {
 		TestMethod testMethod = new TestMethod("example", Arrays.asList());
 		TestClass testClass = new TestClass("ExampleTest", Arrays.asList(), Arrays.asList(), Arrays.asList(testMethod));
-		List<TestCase> testCases = extractor.extract(Arrays.asList(testClass));
-		assertEquals(1, testCases.size());
-		assertEquals("example", testCases.get(0).getName());
-		assertEquals(0, testCases.get(0).getFixtures().size());
-		assertEquals(0, testCases.get(0).getAsserts().size());
+		List<TestField> testFields = extractor.extract(Arrays.asList(testClass));
+		assertEquals(1, testFields.size());
+		assertEquals("ExampleTest", testFields.get(0).getTestClass().getName());
+		assertEquals(0, testFields.get(0).getFields().size());
 	}
 
 	@Test
@@ -41,11 +36,10 @@ public class Junit4TestCaseExtractorTest {
 		SetupMethod setupMethod = new SetupMethod("setup", Arrays.asList());
 		TestClass testClass = new TestClass("ExampleTest", Arrays.asList(), Arrays.asList(setupMethod),
 				Arrays.asList(testMethod));
-		List<TestCase> testCases = extractor.extract(Arrays.asList(testClass));
-		assertEquals(1, testCases.size());
-		assertEquals("example", testCases.get(0).getName());
-		assertEquals(0, testCases.get(0).getFixtures().size());
-		assertEquals(0, testCases.get(0).getAsserts().size());
+		List<TestField> testFields = extractor.extract(Arrays.asList(testClass));
+		assertEquals(1, testFields.size());
+		assertEquals("ExampleTest", testFields.get(0).getTestClass().getName());
+		assertEquals(0, testFields.get(0).getFields().size());
 	}
 
 	@Test
@@ -53,12 +47,10 @@ public class Junit4TestCaseExtractorTest {
 		Statement assertStatement = new Statement("assertEquals(0, 0);");
 		TestMethod testMethod = new TestMethod("example", Arrays.asList(assertStatement));
 		TestClass testClass = new TestClass("ExampleTest", Arrays.asList(), Arrays.asList(), Arrays.asList(testMethod));
-		List<TestCase> testCases = extractor.extract(Arrays.asList(testClass));
-		assertEquals(1, testCases.size());
-		assertEquals("example", testCases.get(0).getName());
-		assertEquals(0, testCases.get(0).getFixtures().size());
-		assertEquals(1, testCases.get(0).getAsserts().size());
-		assertEquals(assertStatement, testCases.get(0).getAsserts().get(0));
+		List<TestField> testFields = extractor.extract(Arrays.asList(testClass));
+		assertEquals(1, testFields.size());
+		assertEquals("ExampleTest", testFields.get(0).getTestClass().getName());
+		assertEquals(0, testFields.get(0).getFields().size());
 	}
 
 	@Test
@@ -69,13 +61,11 @@ public class Junit4TestCaseExtractorTest {
 		TestMethod testMethod = new TestMethod("example", Arrays.asList(assertStatement));
 		TestClass testClass = new TestClass("ExampleTest", Arrays.asList(), Arrays.asList(setupMethod),
 				Arrays.asList(testMethod));
-		List<TestCase> testCases = extractor.extract(Arrays.asList(testClass));
-		assertEquals(1, testCases.size());
-		assertEquals("example", testCases.get(0).getName());
-		assertEquals(1, testCases.get(0).getFixtures().size());
-		assertEquals(fixtureStatement, testCases.get(0).getFixtures().get(0));
-		assertEquals(1, testCases.get(0).getAsserts().size());
-		assertEquals(assertStatement, testCases.get(0).getAsserts().get(0));
+		List<TestField> testFields = extractor.extract(Arrays.asList(testClass));
+		assertEquals(1, testFields.size());
+		assertEquals("ExampleTest", testFields.get(0).getTestClass().getName());
+		assertEquals(1, testFields.get(0).getFields().size());
+		assertEquals(fixtureStatement, testFields.get(0).getFields().get(0));
 	}
 
 	@Test
@@ -86,13 +76,10 @@ public class Junit4TestCaseExtractorTest {
 		TestMethod testMethod = new TestMethod("example", Arrays.asList(assertStatement2));
 		TestClass testClass = new TestClass("ExampleTest", Arrays.asList(), Arrays.asList(setupMethod),
 				Arrays.asList(testMethod));
-		List<TestCase> testCases = extractor.extract(Arrays.asList(testClass));
-		assertEquals(1, testCases.size());
-		assertEquals("example", testCases.get(0).getName());
-		assertEquals(0, testCases.get(0).getFixtures().size());
-		assertEquals(2, testCases.get(0).getAsserts().size());
-		assertEquals(assertStatement1, testCases.get(0).getAsserts().get(0));
-		assertEquals(assertStatement2, testCases.get(0).getAsserts().get(1));
+		List<TestField> testFields = extractor.extract(Arrays.asList(testClass));
+		assertEquals(1, testFields.size());
+		assertEquals("ExampleTest", testFields.get(0).getTestClass().getName());
+		assertEquals(0, testFields.get(0).getFields().size());
 	}
 
 	@Test
@@ -100,12 +87,11 @@ public class Junit4TestCaseExtractorTest {
 		Statement fixtureStatement = new Statement("sut(0);");
 		TestMethod testMethod = new TestMethod("example", Arrays.asList(fixtureStatement));
 		TestClass testClass = new TestClass("ExampleTest", Arrays.asList(), Arrays.asList(), Arrays.asList(testMethod));
-		List<TestCase> testCases = extractor.extract(Arrays.asList(testClass));
-		assertEquals(1, testCases.size());
-		assertEquals("example", testCases.get(0).getName());
-		assertEquals(1, testCases.get(0).getFixtures().size());
-		assertEquals(fixtureStatement, testCases.get(0).getFixtures().get(0));
-		assertEquals(0, testCases.get(0).getAsserts().size());
+		List<TestField> testFields = extractor.extract(Arrays.asList(testClass));
+		assertEquals(1, testFields.size());
+		assertEquals("ExampleTest", testFields.get(0).getTestClass().getName());
+		assertEquals(1, testFields.get(0).getFields().size());
+		assertEquals(fixtureStatement, testFields.get(0).getFields().get(0));
 	}
 
 	@Test
@@ -116,13 +102,12 @@ public class Junit4TestCaseExtractorTest {
 		TestMethod testMethod = new TestMethod("example", Arrays.asList(fixtureStatement2));
 		TestClass testClass = new TestClass("ExampleTest", Arrays.asList(), Arrays.asList(setupMethod),
 				Arrays.asList(testMethod));
-		List<TestCase> testCases = extractor.extract(Arrays.asList(testClass));
-		assertEquals(1, testCases.size());
-		assertEquals("example", testCases.get(0).getName());
-		assertEquals(2, testCases.get(0).getFixtures().size());
-		assertEquals(fixtureStatement1, testCases.get(0).getFixtures().get(0));
-		assertEquals(fixtureStatement2, testCases.get(0).getFixtures().get(1));
-		assertEquals(0, testCases.get(0).getAsserts().size());
+		List<TestField> testFields = extractor.extract(Arrays.asList(testClass));
+		assertEquals(1, testFields.size());
+		assertEquals("ExampleTest", testFields.get(0).getTestClass().getName());
+		assertEquals(2, testFields.get(0).getFields().size());
+		assertEquals(fixtureStatement1, testFields.get(0).getFields().get(0));
+		assertEquals(fixtureStatement2, testFields.get(0).getFields().get(1));
 	}
 
 	@Test
@@ -133,13 +118,11 @@ public class Junit4TestCaseExtractorTest {
 		TestMethod testMethod = new TestMethod("example", Arrays.asList(fixtureStatement));
 		TestClass testClass = new TestClass("ExampleTest", Arrays.asList(), Arrays.asList(setupMethod),
 				Arrays.asList(testMethod));
-		List<TestCase> testCases = extractor.extract(Arrays.asList(testClass));
-		assertEquals(1, testCases.size());
-		assertEquals("example", testCases.get(0).getName());
-		assertEquals(1, testCases.get(0).getFixtures().size());
-		assertEquals(fixtureStatement, testCases.get(0).getFixtures().get(0));
-		assertEquals(1, testCases.get(0).getAsserts().size());
-		assertEquals(assertStatement, testCases.get(0).getAsserts().get(0));
+		List<TestField> testFields = extractor.extract(Arrays.asList(testClass));
+		assertEquals(1, testFields.size());
+		assertEquals("ExampleTest", testFields.get(0).getTestClass().getName());
+		assertEquals(1, testFields.get(0).getFields().size());
+		assertEquals(fixtureStatement, testFields.get(0).getFields().get(0));
 	}
 
 	@Test
@@ -151,17 +134,15 @@ public class Junit4TestCaseExtractorTest {
 		SetupMethod setupMethod = new SetupMethod("setup", Arrays.asList(sutInicialization));
 		Field field = new Field("Sut", "sut");
 		TestMethod testMethod = new TestMethod("test", Arrays.asList(saveStatement, assertStatement));
-		TestClass testClass = new TestClass("", Arrays.asList(field), Arrays.asList(setupMethod),
+		TestClass testClass = new TestClass("ExampleTest", Arrays.asList(field), Arrays.asList(setupMethod),
 				Arrays.asList(testMethod));
-		List<TestCase> testCases = extractor.extract(Arrays.asList(testClass));
-
-		assertEquals(1, testCases.size());
-		assertEquals("test", testCases.get(0).getName());
-		assertEquals(2, testCases.get(0).getFixtures().size());
-		assertEquals(sutDeclaretionAndInicialization, testCases.get(0).getFixtures().get(0));
-		assertEquals(saveStatement, testCases.get(0).getFixtures().get(1));
-		assertEquals(1, testCases.get(0).getAsserts().size());
-		assertEquals(assertStatement, testCases.get(0).getAsserts().get(0));
+		List<TestField> testFields = extractor.extract(Arrays.asList(testClass));
+		assertEquals(1, testFields.size());
+		assertEquals("ExampleTest", testFields.get(0).getTestClass().getName());
+		assertEquals(3, testFields.get(0).getFields().size());
+		assertEquals(sutDeclaretionAndInicialization, testFields.get(0).getFields().get(0));
+		assertEquals("Sut sut;", testFields.get(0).getFields().get(1).getText());
+		assertEquals(saveStatement, testFields.get(0).getFields().get(2));
 	}
 
 	@Test
@@ -190,40 +171,26 @@ public class Junit4TestCaseExtractorTest {
 				Arrays.asList(classATest1, classATest2));
 		TestClass classB = new TestClass("B", Arrays.asList(), Arrays.asList(classBSetup3), Arrays.asList(classBTest3));
 
-		List<TestCase> testCases = extractor.extract(Arrays.asList(classA, classB));
-		assertEquals(3, testCases.size());
+		List<TestField> testFields = extractor.extract(Arrays.asList(classA, classB));
 
-		TestCase firstTestCase = testCases.get(0);
-		assertEquals("test1", firstTestCase.getName());
-		assertEquals(5, firstTestCase.getFixtures().size());
-		assertEquals(classASetup1Fixture1, firstTestCase.getFixtures().get(0));
-		assertEquals(classASetup1Fixture2, firstTestCase.getFixtures().get(1));
-		assertEquals(classASetup2Fixture5, firstTestCase.getFixtures().get(2));
-		assertEquals(classATest1Fixture3, firstTestCase.getFixtures().get(3));
-		assertEquals(classATest1Fixture4, firstTestCase.getFixtures().get(4));
-		assertEquals(4, firstTestCase.getAsserts().size());
-		assertEquals(classASetup1Assert1, firstTestCase.getAsserts().get(0));
-		assertEquals(classASetup1Assert2, firstTestCase.getAsserts().get(1));
-		assertEquals(classATest1Assert3, firstTestCase.getAsserts().get(2));
-		assertEquals(classATest1Assert4, firstTestCase.getAsserts().get(3));
+		TestField firstTestClass = testFields.get(0);
 
-		TestCase secondTestCase = testCases.get(1);
-		assertEquals("test2", secondTestCase.getName());
-		assertEquals(3, secondTestCase.getFixtures().size());
-		assertEquals(classASetup1Fixture1, secondTestCase.getFixtures().get(0));
-		assertEquals(classASetup1Fixture2, secondTestCase.getFixtures().get(1));
-		assertEquals(classASetup2Fixture5, secondTestCase.getFixtures().get(2));
-		assertEquals(3, secondTestCase.getAsserts().size());
-		assertEquals(classASetup1Assert1, secondTestCase.getAsserts().get(0));
-		assertEquals(classASetup1Assert2, secondTestCase.getAsserts().get(1));
-		assertEquals(classATest2Assert5, secondTestCase.getAsserts().get(2));
+		TestField secondTestClass = testFields.get(1);
 
-		TestCase thirdTestCase = testCases.get(2);
-		assertEquals("test3", thirdTestCase.getName());
-		assertEquals(1, thirdTestCase.getFixtures().size());
-		assertEquals(classBSetup3Fixture6, thirdTestCase.getFixtures().get(0));
-		assertEquals(1, thirdTestCase.getAsserts().size());
-		assertEquals(classBTest3Assert6, thirdTestCase.getAsserts().get(0));
+		assertEquals(2, testFields.size());
+
+		assertEquals("A", firstTestClass.getTestClass().getName());
+		assertEquals(5, firstTestClass.getFields().size());
+		assertEquals(classASetup1Fixture1, firstTestClass.getFields().get(0));
+		assertEquals(classASetup1Fixture2, firstTestClass.getFields().get(1));
+		assertEquals(classATest1Fixture3, firstTestClass.getFields().get(2));
+		assertEquals(classATest1Fixture4, firstTestClass.getFields().get(3));
+		assertEquals(classASetup2Fixture5, firstTestClass.getFields().get(4));
+
+		assertEquals("B", secondTestClass.getTestClass().getName());
+		assertEquals(1, secondTestClass.getFields().size());
+		assertEquals(classBSetup3Fixture6, secondTestClass.getFields().get(0));
+
 	}
 
 	@Test
@@ -241,20 +208,10 @@ public class Junit4TestCaseExtractorTest {
 				notNullAssertion, notSameAssertion, nullAssertion, sameAssertion, thatAssertion, trueAssertion);
 		TestMethod testMethod = new TestMethod("example", statements);
 		TestClass testClass = new TestClass("ExampleTest", Arrays.asList(), Arrays.asList(), Arrays.asList(testMethod));
-		List<TestCase> testCases = extractor.extract(Arrays.asList(testClass));
-		assertEquals(1, testCases.size());
-		assertEquals("example", testCases.get(0).getName());
-		assertEquals(0, testCases.get(0).getFixtures().size());
-		assertEquals(9, testCases.get(0).getAsserts().size());
-		assertEquals(arrayEqualsAssertion, testCases.get(0).getAsserts().get(0));
-		assertEquals(equalsAssertion, testCases.get(0).getAsserts().get(1));
-		assertEquals(falseAssertion, testCases.get(0).getAsserts().get(2));
-		assertEquals(notNullAssertion, testCases.get(0).getAsserts().get(3));
-		assertEquals(notSameAssertion, testCases.get(0).getAsserts().get(4));
-		assertEquals(nullAssertion, testCases.get(0).getAsserts().get(5));
-		assertEquals(sameAssertion, testCases.get(0).getAsserts().get(6));
-		assertEquals(thatAssertion, testCases.get(0).getAsserts().get(7));
-		assertEquals(trueAssertion, testCases.get(0).getAsserts().get(8));
+		List<TestField> testFields = extractor.extract(Arrays.asList(testClass));
+		assertEquals(1, testFields.size());
+		assertEquals("ExampleTest", testFields.get(0).getTestClass().getName());
+		assertEquals(0, testFields.get(0).getFields().size());
 	}
 
 	@Test
@@ -272,20 +229,10 @@ public class Junit4TestCaseExtractorTest {
 				notNullAssertion, notSameAssertion, nullAssertion, sameAssertion, thatAssertion, trueAssertion);
 		TestMethod testMethod = new TestMethod("example", statements);
 		TestClass testClass = new TestClass("ExampleTest", Arrays.asList(), Arrays.asList(), Arrays.asList(testMethod));
-		List<TestCase> testCases = extractor.extract(Arrays.asList(testClass));
-		assertEquals(1, testCases.size());
-		assertEquals("example", testCases.get(0).getName());
-		assertEquals(0, testCases.get(0).getFixtures().size());
-		assertEquals(9, testCases.get(0).getAsserts().size());
-		assertEquals(arrayEqualsAssertion, testCases.get(0).getAsserts().get(0));
-		assertEquals(equalsAssertion, testCases.get(0).getAsserts().get(1));
-		assertEquals(falseAssertion, testCases.get(0).getAsserts().get(2));
-		assertEquals(notNullAssertion, testCases.get(0).getAsserts().get(3));
-		assertEquals(notSameAssertion, testCases.get(0).getAsserts().get(4));
-		assertEquals(nullAssertion, testCases.get(0).getAsserts().get(5));
-		assertEquals(sameAssertion, testCases.get(0).getAsserts().get(6));
-		assertEquals(thatAssertion, testCases.get(0).getAsserts().get(7));
-		assertEquals(trueAssertion, testCases.get(0).getAsserts().get(8));
+		List<TestField> testFields = extractor.extract(Arrays.asList(testClass));
+		assertEquals(1, testFields.size());
+		assertEquals("ExampleTest", testFields.get(0).getTestClass().getName());
+		assertEquals(0, testFields.get(0).getFields().size());
 	}
 
 }
