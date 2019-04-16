@@ -1,4 +1,4 @@
-package br.ufsc.ine.leb.roza.materializer;
+package br.ufsc.ine.leb.roza.uniformity;
 
 import java.io.File;
 import java.util.LinkedList;
@@ -13,42 +13,47 @@ import com.github.javaparser.printer.PrettyPrinterConfiguration;
 import com.github.javaparser.printer.PrettyPrinterConfiguration.IndentType;
 
 import br.ufsc.ine.leb.roza.MaterializationReport;
-import br.ufsc.ine.leb.roza.TestCase;
 import br.ufsc.ine.leb.roza.TestCaseMaterialization;
+import br.ufsc.ine.leb.roza.TestClass;
+import br.ufsc.ine.leb.roza.materializer.TestCaseMaterializer;
 import br.ufsc.ine.leb.roza.utils.FolderUtils;
 
-public class OneTestCasePerClassTestCaseMaterializer implements TestCaseMaterializer<TestCase> {
+public class ManyTestCasePerClassTestCaseMaterializer implements TestCaseMaterializer<TestClass> {
 
-	private Integer counter;
 	private FolderUtils foldereUtils;
 
-	public OneTestCasePerClassTestCaseMaterializer(String baseFolder) {
-		counter = 1;
+	public ManyTestCasePerClassTestCaseMaterializer(String baseFolder) {
 		foldereUtils = new FolderUtils(baseFolder);
 	}
 
 	@Override
-	public MaterializationReport<TestCase> materialize(List<TestCase> tests) {
-		List<TestCaseMaterialization<TestCase>> materializations = new LinkedList<>();
-		tests.forEach((testCase) -> {
-			String className = createClassName(testCase.getName());
+	public MaterializationReport<TestClass> materialize(List<TestClass> tests) {
+		List<TestCaseMaterialization<TestClass>> materializations = new LinkedList<>();
+		tests.forEach((testClass) -> {
+			String className = testClass.getName();
 			String classFileName = createClassFileName(className);
 			CompilationUnit javaUnit = new CompilationUnit();
 			ClassOrInterfaceDeclaration javaClass = javaUnit.addClass(className).setPublic(true);
-			MethodDeclaration javaMethod = javaClass.addMethod(testCase.getName()).setPublic(true).addAnnotation("Test");
+			MethodDeclaration javaMethod = javaClass.addMethod(testClass.getName()).setPublic(true)
+					.addAnnotation("Test");
+
 			BlockStmt javaMethodBody = new BlockStmt();
-			testCase.getFixtures().forEach((fixture) -> {
-				javaMethodBody.addStatement(JavaParser.parseStatement(fixture.getText()));
+			testClass.getSetupMethods().forEach((method) -> {
+				method.getStatements().forEach((statement) -> {
+					javaMethodBody.addStatement(JavaParser.parseStatement(statement.getText()));
+				});
 			});
-			testCase.getAsserts().forEach((assertion) -> {
-				javaMethodBody.addStatement(JavaParser.parseStatement(assertion.getText()));
+			testClass.getTestMethods().forEach((method) -> {
+				method.getStatements().forEach((statement) -> {
+					javaMethodBody.addStatement(JavaParser.parseStatement(statement.getText()));
+				});
 			});
 			javaMethod.setBody(javaMethodBody);
 			PrettyPrinterConfiguration configuration = new PrettyPrinterConfiguration();
 			configuration.setIndentType(IndentType.TABS);
 			configuration.setIndentSize(1);
 			File file = foldereUtils.writeContetAsString(classFileName, javaUnit.toString(configuration));
-			TestCaseMaterialization<TestCase> materialization = new TestCaseMaterialization<>(file, testCase);
+			TestCaseMaterialization<TestClass> materialization = new TestCaseMaterialization<>(file, testClass);
 			materializations.add(materialization);
 		});
 		return new MaterializationReport<>(foldereUtils.getBaseFolder(), materializations);
@@ -56,12 +61,6 @@ public class OneTestCasePerClassTestCaseMaterializer implements TestCaseMaterial
 
 	private String createClassFileName(String className) {
 		return String.format("%s.java", className);
-	}
-
-	private String createClassName(String testName) {
-		Character firstLetter = testName.charAt(0);
-		String otherLetters = testName.substring(1);
-		return String.format("TestClass%d%s%sTest", counter++, firstLetter.toString().toUpperCase(), otherLetters);
 	}
 
 }

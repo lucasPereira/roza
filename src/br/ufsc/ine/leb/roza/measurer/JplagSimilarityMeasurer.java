@@ -20,7 +20,7 @@ import br.ufsc.ine.leb.roza.TestCase;
 import br.ufsc.ine.leb.roza.TestCaseMaterialization;
 import br.ufsc.ine.leb.roza.utils.ProcessUtils;
 
-public class JplagSimilarityMeasurer implements SimilarityMeasurer {
+public class JplagSimilarityMeasurer implements SimilarityMeasurer<TestCase> {
 
 	private String resultsFolder;
 
@@ -29,16 +29,16 @@ public class JplagSimilarityMeasurer implements SimilarityMeasurer {
 	}
 
 	@Override
-	public SimilarityReport measure(MaterializationReport materializationReport) {
+	public SimilarityReport measure(MaterializationReport<TestCase> materializationReport) {
 		Map<TestCase, Map<TestCase, BigDecimal>> scores = new HashMap<>();
-		List<TestCaseMaterialization> materializations = materializationReport.getMaterializations();
+		List<TestCaseMaterialization<TestCase>> materializations = materializationReport.getMaterializations();
 		if (materializations.size() > 1) {
 			run(materializationReport);
 			scores = parseReport(materializations);
 		}
 		List<SimilarityAssessment> assesssments = new LinkedList<>();
-		for (TestCaseMaterialization source : materializations) {
-			for (TestCaseMaterialization target : materializations) {
+		for (TestCaseMaterialization<TestCase> source : materializations) {
+			for (TestCaseMaterialization<TestCase> target : materializations) {
 				TestCase sourceTestCase = source.getTestCase();
 				TestCase targetTestCase = target.getTestCase();
 				BigDecimal score = evaluateScore(scores, sourceTestCase, targetTestCase);
@@ -49,11 +49,11 @@ public class JplagSimilarityMeasurer implements SimilarityMeasurer {
 		return new SimilarityReport(assesssments);
 	}
 
-	private Map<TestCase, Map<TestCase, BigDecimal>> parseReport(List<TestCaseMaterialization> materializations) {
+	private Map<TestCase, Map<TestCase, BigDecimal>> parseReport(List<TestCaseMaterialization<TestCase>> materializations) {
 		try {
 			Map<String, TestCase> testCases = new HashMap<>();
 			Map<TestCase, Map<TestCase, BigDecimal>> scores = new HashMap<>();
-			for (TestCaseMaterialization materialization : materializations) {
+			for (TestCaseMaterialization<TestCase> materialization : materializations) {
 				testCases.put(materialization.getFileName(), materialization.getTestCase());
 				scores.put(materialization.getTestCase(), new HashMap<>());
 			}
@@ -93,7 +93,7 @@ public class JplagSimilarityMeasurer implements SimilarityMeasurer {
 		}
 	}
 
-	private void run(MaterializationReport materializationReport) {
+	private void run(MaterializationReport<TestCase> materializationReport) {
 		ProcessUtils processUtils = new ProcessUtils(true, true, true);
 		String tool = "tools/jplag/tool/jplag-2.11.9.jar";
 		String sensitivity = "5";

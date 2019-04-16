@@ -20,7 +20,7 @@ import br.ufsc.ine.leb.roza.TestCase;
 import br.ufsc.ine.leb.roza.TestCaseMaterialization;
 import br.ufsc.ine.leb.roza.utils.ProcessUtils;
 
-public class SimianSimilarityMeasurer implements SimilarityMeasurer {
+public class SimianSimilarityMeasurer implements SimilarityMeasurer<TestCase> {
 
 	private String resultsFolder;
 
@@ -29,17 +29,17 @@ public class SimianSimilarityMeasurer implements SimilarityMeasurer {
 	}
 
 	@Override
-	public SimilarityReport measure(MaterializationReport materializationReport) {
-		List<TestCaseMaterialization> materializations = materializationReport.getMaterializations();
+	public SimilarityReport measure(MaterializationReport<TestCase> materializationReport) {
+		List<TestCaseMaterialization<TestCase>> materializations = materializationReport.getMaterializations();
 		if (materializations.size() > 1) {
 			File fileReport = new File(resultsFolder, "report.xml");
 			run(materializationReport, fileReport);
 			parseReport(materializationReport, fileReport);
 		}
 		List<SimilarityAssessment> assessments = new LinkedList<>();
-		for (TestCaseMaterialization materializationSource : materializations) {
+		for (TestCaseMaterialization<TestCase> materializationSource : materializations) {
 			TestCase source = materializationSource.getTestCase();
-			for (TestCaseMaterialization materializationTarget : materializations) {
+			for (TestCaseMaterialization<TestCase> materializationTarget : materializations) {
 				TestCase target = materializationTarget.getTestCase();
 				SimilarityAssessment assessment = new SimilarityAssessment(source, target, BigDecimal.ONE);
 				assessments.add(assessment);
@@ -48,11 +48,11 @@ public class SimianSimilarityMeasurer implements SimilarityMeasurer {
 		return new SimilarityReport(assessments);
 	}
 
-	private void parseReport(MaterializationReport materializationReport, File fileReport) {
-		List<TestCaseMaterialization> materializations = materializationReport.getMaterializations();
+	private void parseReport(MaterializationReport<TestCase> materializationReport, File fileReport) {
+		List<TestCaseMaterialization<TestCase>> materializations = materializationReport.getMaterializations();
 		Map<String, TestCase> testCases = new HashMap<>();
 		Map<TestCase, Map<TestCase, BigDecimal>> scores = new HashMap<>();
-		for (TestCaseMaterialization materialization : materializations) {
+		for (TestCaseMaterialization<TestCase> materialization : materializations) {
 			testCases.put(materialization.getFileName(), materialization.getTestCase());
 			scores.put(materialization.getTestCase(), new HashMap<>());
 		}
@@ -76,12 +76,13 @@ public class SimianSimilarityMeasurer implements SimilarityMeasurer {
 
 	}
 
-	private void run(MaterializationReport materializationReport, File fileReport) {
+	private void run(MaterializationReport<TestCase> materializationReport, File fileReport) {
 		ProcessUtils processUtils = new ProcessUtils(true, false, true);
 		String tool = "tools/simian/tool/simian-2.5.10.jar";
 		String threshold = "-threshold=2";
 		String sourceFiles = new File(materializationReport.getBaseFolder(), "*.java").getPath();
-		processUtils.execute(fileReport, "java", "-jar", tool, "-formatter=xml", threshold, "-language=java", sourceFiles);
+		processUtils.execute(fileReport, "java", "-jar", tool, "-formatter=xml", threshold, "-language=java",
+				sourceFiles);
 	}
 
 }

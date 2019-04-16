@@ -2,7 +2,7 @@ package br.ufsc.ine.leb.roza;
 
 import java.util.List;
 
-public class TestCase {
+public class TestCase implements TestBlock{
 
 	private String name;
 	private List<Statement> fixtures;

@@ -4,7 +4,7 @@ import java.util.List;
 
 import br.ufsc.ine.leb.roza.exceptions.NoTestMethodException;
 
-public class TestClass {
+public class TestClass implements TestBlock{
 
 	private String name;
 	private List<SetupMethod> setupMethods;

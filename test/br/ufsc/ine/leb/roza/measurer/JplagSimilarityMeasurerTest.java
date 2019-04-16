@@ -18,8 +18,8 @@ import br.ufsc.ine.leb.roza.utils.FolderUtils;
 
 public class JplagSimilarityMeasurerTest {
 
-	private SimilarityMeasurer measurer;
-	private TestCaseMaterializer materializer;
+	private SimilarityMeasurer<TestCase> measurer;
+	private TestCaseMaterializer<TestCase> materializer;
 
 	@BeforeEach
 	void setup() {
@@ -31,7 +31,7 @@ public class JplagSimilarityMeasurerTest {
 
 	@Test
 	void zeroTestCases() throws Exception {
-		MaterializationReport materializationReport = new MaterializationReport("execution/materializer", Arrays.asList());
+		MaterializationReport<TestCase> materializationReport = new MaterializationReport<>("execution/materializer", Arrays.asList());
 		SimilarityReport report = measurer.measure(materializationReport);
 		assertEquals(0, report.getAssessments().size());
 	}
@@ -41,7 +41,7 @@ public class JplagSimilarityMeasurerTest {
 		Statement fixture = new Statement("sut(0);");
 		Statement assertion = new Statement("assertEquals(0, 0);");
 		TestCase testCase = new TestCase("test", Arrays.asList(fixture), Arrays.asList(assertion));
-		MaterializationReport materializationReport = materializer.materialize(Arrays.asList(testCase));
+		MaterializationReport<TestCase> materializationReport = materializer.materialize(Arrays.asList(testCase));
 		SimilarityReport report = measurer.measure(materializationReport);
 
 		assertEquals(1, report.getAssessments().size());
@@ -56,7 +56,7 @@ public class JplagSimilarityMeasurerTest {
 		Statement assertion = new Statement("assertEquals(0, 0);");
 		TestCase testCaseA = new TestCase("test", Arrays.asList(fixture), Arrays.asList(assertion));
 		TestCase testCaseB = new TestCase("test", Arrays.asList(fixture), Arrays.asList(assertion));
-		MaterializationReport materializationReport = materializer.materialize(Arrays.asList(testCaseA, testCaseB));
+		MaterializationReport<TestCase> materializationReport = materializer.materialize(Arrays.asList(testCaseA, testCaseB));
 		SimilarityReport report = measurer.measure(materializationReport);
 
 		assertEquals(4, report.getAssessments().size());
@@ -80,7 +80,7 @@ public class JplagSimilarityMeasurerTest {
 		Statement assertion = new Statement("assertEquals(0, 0);");
 		TestCase testCaseA = new TestCase("testA", Arrays.asList(fixture), Arrays.asList());
 		TestCase testCaseB = new TestCase("testB", Arrays.asList(fixture), Arrays.asList(assertion));
-		MaterializationReport materializationReport = materializer.materialize(Arrays.asList(testCaseA, testCaseB));
+		MaterializationReport<TestCase> materializationReport = materializer.materialize(Arrays.asList(testCaseA, testCaseB));
 		SimilarityReport report = measurer.measure(materializationReport);
 
 		assertEquals(4, report.getAssessments().size());
