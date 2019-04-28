@@ -28,7 +28,8 @@ public class Junit4TestClassParser implements TestClassParser {
 		List<TestClass> testClasses = new LinkedList<>();
 		files.forEach((file) -> {
 			CompilationUnit compilationUnit = JavaParser.parse(file.getContent());
-			Optional<ClassOrInterfaceDeclaration> parsedTestClass = compilationUnit.findFirst(ClassOrInterfaceDeclaration.class);
+			Optional<ClassOrInterfaceDeclaration> parsedTestClass = compilationUnit
+					.findFirst(ClassOrInterfaceDeclaration.class);
 			String name = parsedTestClass.get().getNameAsString();
 			List<Field> fields = extractFields(parsedTestClass);
 			List<SetupMethod> setupMethods = new LinkedList<>();
@@ -52,7 +53,7 @@ public class Junit4TestClassParser implements TestClassParser {
 			String type = parsedField.getElementType().asString();
 			parsedField.getVariables().forEach((parsedVariable) -> {
 				String filedName = parsedVariable.getName().asString();
-				fields.add(new Field(type, filedName));
+				fields.add(new Field(type, filedName, parsedField.asFieldDeclaration().toString()));
 			});
 		});
 		return fields;

@@ -1,4 +1,4 @@
-package br.ufsc.ine.leb.roza;
+package br.ufsc.ine.leb.roza.extractor;
 
 import static org.junit.Assert.assertEquals;
 
@@ -8,8 +8,12 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import br.ufsc.ine.leb.roza.extractor.Junit4TestFieldExtractor;
-import br.ufsc.ine.leb.roza.extractor.TestExtractor;
+import br.ufsc.ine.leb.roza.Field;
+import br.ufsc.ine.leb.roza.SetupMethod;
+import br.ufsc.ine.leb.roza.Statement;
+import br.ufsc.ine.leb.roza.TestClass;
+import br.ufsc.ine.leb.roza.TestField;
+import br.ufsc.ine.leb.roza.TestMethod;
 
 public class Junit4TestFieldExtractorTest {
 
@@ -132,7 +136,7 @@ public class Junit4TestFieldExtractorTest {
 		Statement saveStatement = new Statement("sut.save(0);");
 		Statement assertStatement = new Statement("assertEquals(0, sut.get(0));");
 		SetupMethod setupMethod = new SetupMethod("setup", Arrays.asList(sutInicialization));
-		Field field = new Field("Sut", "sut");
+		Field field = new Field("Sut", "sut", "Sut sut");
 		TestMethod testMethod = new TestMethod("test", Arrays.asList(saveStatement, assertStatement));
 		TestClass testClass = new TestClass("ExampleTest", Arrays.asList(field), Arrays.asList(setupMethod),
 				Arrays.asList(testMethod));

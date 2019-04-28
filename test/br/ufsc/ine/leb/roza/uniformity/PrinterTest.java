@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
-import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 
@@ -38,7 +37,7 @@ public class PrinterTest {
 
 	@Test
 	public void testName() throws Exception {
-		Field field = new Field("Sut", "sut");
+		Field field = new Field("Sut", "sut", "Sut sut");
 		Statement inicializationStatement = new Statement("sut = new Sut();");
 		Statement assertStatement = new Statement("assertEquals(0, sut.get(0));");
 		SetupMethod setupMethod = new SetupMethod("setup", Arrays.asList(inicializationStatement));
@@ -52,14 +51,6 @@ public class PrinterTest {
 		MaterializationReport<TestField> materializations = materializer.materialize(testsFields);
 		SimilarityReport<TestField> report = measurer.measure(materializations);
 		report.removeReflexiveAssessments();
-		assertEquals(BigDecimal.ONE, report.getScore());
-		assertEquals(2, report.getAssessments().size());
-		assertEquals(BigDecimal.ONE, report.getAssessments().get(0).getScore());
-		assertEquals(testsFields.get(0), report.getAssessments().get(0).getSource());
-		assertEquals(testsFields.get(1), report.getAssessments().get(0).getTarget());
-		assertEquals(BigDecimal.ONE, report.getAssessments().get(1).getScore());
-		assertEquals(testsFields.get(1), report.getAssessments().get(1).getSource());
-		assertEquals(testsFields.get(0), report.getAssessments().get(1).getTarget());
 		ByteArrayOutputStream bytes = new ByteArrayOutputStream();
 		PrintStream out = new PrintStream(bytes);
 		new Printer(report).print(out);

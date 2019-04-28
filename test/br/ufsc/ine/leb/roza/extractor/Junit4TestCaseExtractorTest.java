@@ -149,7 +149,7 @@ public class Junit4TestCaseExtractorTest {
 		Statement saveStatement = new Statement("sut.save(0);");
 		Statement assertStatement = new Statement("assertEquals(0, sut.get(0));");
 		SetupMethod setupMethod = new SetupMethod("setup", Arrays.asList(sutInicialization));
-		Field field = new Field("Sut", "sut");
+		Field field = new Field("Sut", "sut", "Sut sut");
 		TestMethod testMethod = new TestMethod("test", Arrays.asList(saveStatement, assertStatement));
 		TestClass testClass = new TestClass("", Arrays.asList(field), Arrays.asList(setupMethod),
 				Arrays.asList(testMethod));

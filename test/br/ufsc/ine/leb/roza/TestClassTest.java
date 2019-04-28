@@ -1,6 +1,7 @@
 package br.ufsc.ine.leb.roza;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.Arrays;
 
@@ -26,7 +27,8 @@ public class TestClassTest {
 	void withOneTestMethodAndOneSetupMethod() throws Exception {
 		SetupMethod setupMethod = new SetupMethod("setup", Arrays.asList());
 		TestMethod testMethod = new TestMethod("example", Arrays.asList());
-		TestClass testClass = new TestClass("ExampleTest", Arrays.asList(), Arrays.asList(setupMethod), Arrays.asList(testMethod));
+		TestClass testClass = new TestClass("ExampleTest", Arrays.asList(), Arrays.asList(setupMethod),
+				Arrays.asList(testMethod));
 
 		assertEquals("ExampleTest", testClass.getName());
 		assertEquals(0, testClass.getFields().size());
@@ -41,11 +43,11 @@ public class TestClassTest {
 		Statement inicializationStatement = new Statement("sut = new Sut();");
 		Statement saveStatement = new Statement("sut.save(0);");
 		Statement assertStatement = new Statement("assertEquals(0, sut.get(0));");
-		Field field = new Field("Sut", "sut");
+		Field field = new Field("Sut", "sut", "private Sut sut;");
 		SetupMethod setupMethod = new SetupMethod("setup", Arrays.asList(inicializationStatement));
 		TestMethod testMethod = new TestMethod("test", Arrays.asList(saveStatement, assertStatement));
-		TestClass testClass = new TestClass("ExampleTest", Arrays.asList(field), Arrays.asList(setupMethod), Arrays.asList(testMethod));
-
+		TestClass testClass = new TestClass("ExampleTest", Arrays.asList(field), Arrays.asList(setupMethod),
+				Arrays.asList(testMethod));
 		assertEquals("ExampleTest", testClass.getName());
 		assertEquals(1, testClass.getFields().size());
 		assertEquals(field, testClass.getFields().get(0));

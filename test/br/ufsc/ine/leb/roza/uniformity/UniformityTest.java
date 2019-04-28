@@ -37,7 +37,7 @@ public class UniformityTest {
 
 	@Test
 	public void sameClassWithAField() throws Exception {
-		Field field = new Field("Sut", "sut");
+		Field field = new Field("Sut", "sut","Sut sut");
 		Statement inicializationStatement = new Statement("sut = new Sut();");
 		Statement assertStatement = new Statement("assertEquals(0, sut.get(0));");
 		SetupMethod setupMethod = new SetupMethod("setup", Arrays.asList(inicializationStatement));

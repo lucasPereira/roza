@@ -63,7 +63,7 @@ public class ManyTestCasePerClassTestCaseMaterializerTest {
 		Statement assertStatement = new Statement("assertEquals(0, sut.get(0));");
 		SetupMethod setupMethod = new SetupMethod("setup", Arrays.asList());
 		TestMethod testMethod = new TestMethod("test", Arrays.asList(assertStatement));
-		Field field= new Field("Sut", "sut");
+		Field field = new Field("Sut", "sut", "Sut sut");
 		TestClass testClass = new TestClass("ExampleTest", Arrays.asList(field), Arrays.asList(setupMethod),
 				Arrays.asList(testMethod));
 
