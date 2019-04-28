@@ -43,8 +43,8 @@ public class Junit4TestFieldExtractor implements TestExtractor<TestField> {
 			});
 		});
 		Set<Statement> singles = new HashSet<>(fixtures);
-		testClass.getFields().forEach((field)->{
-				singles.add(new Statement(field.getType()+" "+ field.getName()+";" ));
+		testClass.getFields().forEach((field) -> {
+			singles.add(new Statement(field.getText()));
 		});
 		List<Statement> sorted = new ArrayList<Statement>(singles);
 		Collections.sort(sorted, new Comparator<Statement>() {
