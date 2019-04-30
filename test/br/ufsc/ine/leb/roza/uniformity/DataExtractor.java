@@ -33,9 +33,12 @@ public class DataExtractor {
 		if (parseInitializer.isObjectCreationExpr()) {
 			object = parseInitializer.asObjectCreationExpr();
 		} else if (parseInitializer.isMethodCallExpr()) {
-			MethodCallExpr object2 = parseInitializer.asMethodCallExpr();
-			object = object2;
-			//lack method(1).method(2);
+			object = parseInitializer.asMethodCallExpr();
+			((MethodCallExpr) object).findAll(MethodCallExpr.class).forEach((method) -> {
+				if (method != parseInitializer.asMethodCallExpr()) {
+					parseExpression(data, method);
+				}
+			});
 		}
 		object.getArguments().forEach((argument) -> {
 			if (argument.isObjectCreationExpr()) {

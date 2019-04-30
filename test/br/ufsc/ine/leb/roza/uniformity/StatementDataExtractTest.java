@@ -41,11 +41,13 @@ public class StatementDataExtractTest {
 
 	@Test
 	public void ofFieldWithLittleTrain() throws Exception {
-		Statement fieldDeclaration = new Statement("private Sut sut = method(\"data\").method(\"data1\").method2(3);");
+		Statement fieldDeclaration = new Statement("private Sut sut = method(\"data\").method(\"data1\").method(1);");
 		List<String> data = DataExtractor.from(fieldDeclaration);
-		assertEquals(2, data.size());
+		assertEquals(4, data.size());
 		assertEquals("\"data\"", data.get(0));
-		assertEquals("\"data1\"", data.get(0));
+		assertEquals("\"data1\"", data.get(1));
+		assertEquals("\"data\"", data.get(2));
+		assertEquals("1", data.get(3));
 	}
 
 	@Test
