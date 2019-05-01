@@ -21,7 +21,7 @@ import br.ufsc.ine.leb.roza.collections.Matrix;
 import br.ufsc.ine.leb.roza.collections.MatrixElementToKeyConverter;
 import br.ufsc.ine.leb.roza.collections.MatrixPair;
 import br.ufsc.ine.leb.roza.collections.MatrixTestCaseMaterializationIntersectorValueFactory;
-import br.ufsc.ine.leb.roza.collections.MatrixTestCaseMaterializationToStringConverter;
+import br.ufsc.ine.leb.roza.collections.MatrixTestCaseMaterializationAbsoluteFilePathToStringConverter;
 import br.ufsc.ine.leb.roza.collections.MatrixValueFactory;
 import br.ufsc.ine.leb.roza.utils.ProcessUtils;
 
@@ -36,7 +36,7 @@ public class SimianSimilarityMeasurer implements SimilarityMeasurer {
 	@Override
 	public SimilarityReport measure(MaterializationReport materializationReport) {
 		List<TestCaseMaterialization> materializations = materializationReport.getMaterializations();
-		MatrixElementToKeyConverter<TestCaseMaterialization, String> converter = new MatrixTestCaseMaterializationToStringConverter();
+		MatrixElementToKeyConverter<TestCaseMaterialization, String> converter = new MatrixTestCaseMaterializationAbsoluteFilePathToStringConverter();
 		MatrixValueFactory<TestCaseMaterialization, Intersector> factory = new MatrixTestCaseMaterializationIntersectorValueFactory();
 		Matrix<TestCaseMaterialization, String, Intersector> matrix = new Matrix<>(materializations, converter, factory);
 		if (materializations.size() > 1) {
@@ -71,7 +71,7 @@ public class SimianSimilarityMeasurer implements SimilarityMeasurer {
 					for (Integer targetBlockIndex = 0; targetBlockIndex < blocks.size(); targetBlockIndex++) {
 						Element targetBlock = blocks.get(targetBlockIndex);
 						String targetKey = targetBlock.attr("sourceFile");
-						matrix.getPair(sourceKey, targetKey).addSegment(start, end);
+						matrix.get(sourceKey, targetKey).addSegment(start, end);
 					}
 				}
 			}

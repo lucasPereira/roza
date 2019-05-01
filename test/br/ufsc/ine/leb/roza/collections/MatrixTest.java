@@ -19,7 +19,7 @@ public class MatrixTest {
 		List<TestCaseMaterialization> materializations = Arrays.asList();
 
 		MatrixValueFactory<TestCaseMaterialization, Intersector> factory = new MatrixTestCaseMaterializationIntersectorValueFactory();
-		MatrixElementToKeyConverter<TestCaseMaterialization, String> converter = new MatrixTestCaseMaterializationToStringConverter();
+		MatrixElementToKeyConverter<TestCaseMaterialization, String> converter = new MatrixTestCaseMaterializationAbsoluteFilePathToStringConverter();
 		Matrix<TestCaseMaterialization, String, Intersector> matrix = new Matrix<>(materializations, converter, factory);
 
 		assertEquals(0, matrix.getPairs().size());
@@ -32,11 +32,11 @@ public class MatrixTest {
 		List<TestCaseMaterialization> materializations = Arrays.asList(materialization);
 
 		MatrixTestCaseMaterializationIntersectorValueFactory factory = new MatrixTestCaseMaterializationIntersectorValueFactory();
-		MatrixElementToKeyConverter<TestCaseMaterialization, String> converter = new MatrixTestCaseMaterializationToStringConverter();
+		MatrixElementToKeyConverter<TestCaseMaterialization, String> converter = new MatrixTestCaseMaterializationAbsoluteFilePathToStringConverter();
 		Matrix<TestCaseMaterialization, String, Intersector> matrix = new Matrix<>(materializations, converter, factory);
 
 		assertEquals(1, matrix.getPairs().size());
-		assertEquals(BigDecimal.ONE, matrix.getPair(materialization.getAbsoluteFilePath(), materialization.getAbsoluteFilePath()).evaluate());
+		assertEquals(BigDecimal.ONE, matrix.get(materialization.getAbsoluteFilePath(), materialization.getAbsoluteFilePath()).evaluate());
 	}
 
 	@Test
@@ -48,14 +48,14 @@ public class MatrixTest {
 		List<TestCaseMaterialization> materializations = Arrays.asList(materializationA, materializationB);
 
 		MatrixTestCaseMaterializationIntersectorValueFactory factory = new MatrixTestCaseMaterializationIntersectorValueFactory();
-		MatrixElementToKeyConverter<TestCaseMaterialization, String> converter = new MatrixTestCaseMaterializationToStringConverter();
+		MatrixElementToKeyConverter<TestCaseMaterialization, String> converter = new MatrixTestCaseMaterializationAbsoluteFilePathToStringConverter();
 		Matrix<TestCaseMaterialization, String, Intersector> matrix = new Matrix<>(materializations, converter, factory);
 
 		assertEquals(4, matrix.getPairs().size());
-		assertEquals(BigDecimal.ONE, matrix.getPair(materializationA.getAbsoluteFilePath(), materializationA.getAbsoluteFilePath()).evaluate());
-		assertEquals(BigDecimal.ZERO, matrix.getPair(materializationA.getAbsoluteFilePath(), materializationB.getAbsoluteFilePath()).evaluate());
-		assertEquals(BigDecimal.ZERO, matrix.getPair(materializationB.getAbsoluteFilePath(), materializationA.getAbsoluteFilePath()).evaluate());
-		assertEquals(BigDecimal.ONE, matrix.getPair(materializationB.getAbsoluteFilePath(), materializationB.getAbsoluteFilePath()).evaluate());
+		assertEquals(BigDecimal.ONE, matrix.get(materializationA.getAbsoluteFilePath(), materializationA.getAbsoluteFilePath()).evaluate());
+		assertEquals(BigDecimal.ZERO, matrix.get(materializationA.getAbsoluteFilePath(), materializationB.getAbsoluteFilePath()).evaluate());
+		assertEquals(BigDecimal.ZERO, matrix.get(materializationB.getAbsoluteFilePath(), materializationA.getAbsoluteFilePath()).evaluate());
+		assertEquals(BigDecimal.ONE, matrix.get(materializationB.getAbsoluteFilePath(), materializationB.getAbsoluteFilePath()).evaluate());
 	}
 
 	@Test
@@ -72,17 +72,17 @@ public class MatrixTest {
 		intersectorBA.addSegment(5, 10);
 
 		MatrixTestCaseMaterializationIntersectorValueFactory factory = new MatrixTestCaseMaterializationIntersectorValueFactory();
-		MatrixElementToKeyConverter<TestCaseMaterialization, String> converter = new MatrixTestCaseMaterializationToStringConverter();
+		MatrixElementToKeyConverter<TestCaseMaterialization, String> converter = new MatrixTestCaseMaterializationAbsoluteFilePathToStringConverter();
 		Matrix<TestCaseMaterialization, String, Intersector> matrix = new Matrix<>(materializations, converter, factory);
 
-		matrix.setValue(materializationA.getAbsoluteFilePath(), materializationB.getAbsoluteFilePath(), intersectorAB);
-		matrix.setValue(materializationB.getAbsoluteFilePath(), materializationA.getAbsoluteFilePath(), intersectorBA);
+		matrix.set(materializationA.getAbsoluteFilePath(), materializationB.getAbsoluteFilePath(), intersectorAB);
+		matrix.set(materializationB.getAbsoluteFilePath(), materializationA.getAbsoluteFilePath(), intersectorBA);
 
 		assertEquals(4, matrix.getPairs().size());
-		assertEquals(BigDecimal.ONE, matrix.getPair(materializationA.getAbsoluteFilePath(), materializationA.getAbsoluteFilePath()).evaluate());
-		assertEquals(new BigDecimal("0.4"), matrix.getPair(materializationA.getAbsoluteFilePath(), materializationB.getAbsoluteFilePath()).evaluate());
-		assertEquals(new BigDecimal("0.6"), matrix.getPair(materializationB.getAbsoluteFilePath(), materializationA.getAbsoluteFilePath()).evaluate());
-		assertEquals(BigDecimal.ONE, matrix.getPair(materializationB.getAbsoluteFilePath(), materializationB.getAbsoluteFilePath()).evaluate());
+		assertEquals(BigDecimal.ONE, matrix.get(materializationA.getAbsoluteFilePath(), materializationA.getAbsoluteFilePath()).evaluate());
+		assertEquals(new BigDecimal("0.4"), matrix.get(materializationA.getAbsoluteFilePath(), materializationB.getAbsoluteFilePath()).evaluate());
+		assertEquals(new BigDecimal("0.6"), matrix.get(materializationB.getAbsoluteFilePath(), materializationA.getAbsoluteFilePath()).evaluate());
+		assertEquals(BigDecimal.ONE, matrix.get(materializationB.getAbsoluteFilePath(), materializationB.getAbsoluteFilePath()).evaluate());
 	}
 
 }

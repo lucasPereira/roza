@@ -3,10 +3,8 @@ package br.ufsc.ine.leb.roza.measurer;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -18,6 +16,13 @@ import br.ufsc.ine.leb.roza.SimilarityAssessment;
 import br.ufsc.ine.leb.roza.SimilarityReport;
 import br.ufsc.ine.leb.roza.TestCase;
 import br.ufsc.ine.leb.roza.TestCaseMaterialization;
+import br.ufsc.ine.leb.roza.collections.Matrix;
+import br.ufsc.ine.leb.roza.collections.MatrixElementToKeyConverter;
+import br.ufsc.ine.leb.roza.collections.MatrixPair;
+import br.ufsc.ine.leb.roza.collections.MatrixTestCaseMaterializationBigDecimalValueFactory;
+import br.ufsc.ine.leb.roza.collections.MatrixTestCaseMaterializationFileNameToStringConverter;
+import br.ufsc.ine.leb.roza.collections.MatrixValueFactory;
+import br.ufsc.ine.leb.roza.utils.FolderUtils;
 import br.ufsc.ine.leb.roza.utils.ProcessUtils;
 
 public class JplagSimilarityMeasurer implements SimilarityMeasurer {
@@ -30,33 +35,59 @@ public class JplagSimilarityMeasurer implements SimilarityMeasurer {
 
 	@Override
 	public SimilarityReport measure(MaterializationReport materializationReport) {
-		Map<TestCase, Map<TestCase, BigDecimal>> scores = new HashMap<>();
 		List<TestCaseMaterialization> materializations = materializationReport.getMaterializations();
+		MatrixElementToKeyConverter<TestCaseMaterialization, String> converter = new MatrixTestCaseMaterializationFileNameToStringConverter();
+		MatrixValueFactory<TestCaseMaterialization, BigDecimal> factory = new MatrixTestCaseMaterializationBigDecimalValueFactory();
+		Matrix<TestCaseMaterialization, String, BigDecimal> matrix = new Matrix<>(materializations, converter, factory);
 		if (materializations.size() > 1) {
 			run(materializationReport);
-			scores = parseReport(materializations);
+			parse(matrix, materializations);
 		}
-		List<SimilarityAssessment> assesssments = new LinkedList<>();
-		for (TestCaseMaterialization source : materializations) {
-			for (TestCaseMaterialization target : materializations) {
-				TestCase sourceTestCase = source.getTestCase();
-				TestCase targetTestCase = target.getTestCase();
-				BigDecimal score = evaluateScore(scores, sourceTestCase, targetTestCase);
-				SimilarityAssessment assessment = new SimilarityAssessment(sourceTestCase, targetTestCase, score);
-				assesssments.add(assessment);
-			}
+		List<SimilarityAssessment> assessments = new LinkedList<>();
+		for (MatrixPair<TestCaseMaterialization, BigDecimal> pair : matrix.getPairs()) {
+			TestCase source = pair.getSource().getTestCase();
+			TestCase target = pair.getTarget().getTestCase();
+			BigDecimal evaluation = pair.getValue();
+			SimilarityAssessment assessment = new SimilarityAssessment(source, target, evaluation);
+			assessments.add(assessment);
 		}
-		return new SimilarityReport(assesssments);
+		return new SimilarityReport(assessments);
 	}
 
-	private Map<TestCase, Map<TestCase, BigDecimal>> parseReport(List<TestCaseMaterialization> materializations) {
+	private void parse(Matrix<TestCaseMaterialization, String, BigDecimal> matrix, List<TestCaseMaterialization> materializations) {
 		try {
-			Map<String, TestCase> testCases = new HashMap<>();
-			Map<TestCase, Map<TestCase, BigDecimal>> scores = new HashMap<>();
-			for (TestCaseMaterialization materialization : materializations) {
-				testCases.put(materialization.getFileName(), materialization.getTestCase());
-				scores.put(materialization.getTestCase(), new HashMap<>());
+			List<File> results = new FolderUtils(resultsFolder).listFilesRecursively("match[0-9]+-top.html");
+			for (File result : results) {
+				Document document = Jsoup.parse(result, "utf-8");
+				Elements tables = document.body().getElementsByTag("table");
+				Element table = tables.get(0);
+				Elements tableBodys = table.getElementsByTag("tbody");
+				Element tableBody = tableBodys.get(0);
+				Elements rows = tableBody.getElementsByTag("tr");
+				Element row = rows.get(0);
+				Elements columns = row.getElementsByTag("th");
+				Element columnFirst = columns.get(1);
+				Element columnSecond = columns.get(2);
+				String nameFirst = columnFirst.text().split(" ")[0];
+				String nameSecond = columnSecond.text().split(" ")[0];
+				String textScoreFirst = columnFirst.text().split(" ")[1].replaceAll("[%()]", "");
+				String textScoreSecond = columnSecond.text().split(" ")[1].replaceAll("[%()]", "");
+				BigDecimal scoreFirst = new BigDecimal(textScoreFirst).divide(new BigDecimal(100));
+				BigDecimal scoreSecond = new BigDecimal(textScoreSecond).divide(new BigDecimal(100));
+				BigDecimal oneScaled = BigDecimal.ONE.setScale(1);
+				BigDecimal oneNotScaled = BigDecimal.ONE;
+				scoreFirst = scoreFirst.equals(oneScaled) ? oneNotScaled : scoreFirst;
+				scoreSecond = scoreSecond.equals(oneScaled) ? oneNotScaled : scoreSecond;
+				matrix.set(nameFirst, nameSecond, scoreFirst);
+				matrix.set(nameSecond, nameFirst, scoreSecond);
 			}
+		} catch (IOException excecao) {
+			throw new RuntimeException(excecao);
+		}
+	}
+
+	protected void parseSymmetric(Matrix<TestCaseMaterialization, String, BigDecimal> matrix, List<TestCaseMaterialization> materializations) {
+		try {
 			Document document = Jsoup.parse(new File(resultsFolder, "index.html"), "utf-8");
 			Elements tables = document.body().getElementsByTag("table");
 			Element table = tables.get(2);
@@ -71,25 +102,12 @@ public class JplagSimilarityMeasurer implements SimilarityMeasurer {
 					String targetName = target.getElementsByTag("a").get(0).text();
 					String textScore = target.getElementsByTag("font").get(0).text().replaceAll("[^0-9]", "");
 					BigDecimal score = new BigDecimal(textScore).divide(new BigDecimal(1000));
-					TestCase targetTestCase = testCases.get(targetName);
-					TestCase sourceTestCase = testCases.get(sourceName);
-					scores.get(sourceTestCase).put(targetTestCase, score);
-					scores.get(targetTestCase).put(sourceTestCase, score);
+					matrix.set(sourceName, targetName, score);
+					matrix.set(targetName, sourceName, score);
 				}
 			}
-			return scores;
 		} catch (IOException excecao) {
 			throw new RuntimeException(excecao);
-		}
-	}
-
-	private BigDecimal evaluateScore(Map<TestCase, Map<TestCase, BigDecimal>> scores, TestCase source, TestCase target) {
-		if (source.equals(target)) {
-			return BigDecimal.ONE;
-		} else if (scores.containsKey(source) && scores.get(source).containsKey(target)) {
-			return scores.get(source).get(target);
-		} else {
-			return BigDecimal.ZERO;
 		}
 	}
 

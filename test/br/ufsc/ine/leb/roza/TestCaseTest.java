@@ -13,6 +13,7 @@ public class TestCaseTest {
 		Statement fixtureStatement = new Statement("System.out.println(0);");
 		Statement assertStatement = new Statement("assertEqulas(0, 0);");
 		TestCase test = new TestCase("example", Arrays.asList(fixtureStatement), Arrays.asList(assertStatement));
+		assertNotNull(test.getId());
 		assertEquals("example", test.getName());
 		assertEquals(1, test.getFixtures().size());
 		assertEquals("System.out.println(0);", test.getFixtures().get(0).getText());

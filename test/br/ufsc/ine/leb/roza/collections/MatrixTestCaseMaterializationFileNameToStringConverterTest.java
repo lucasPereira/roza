@@ -10,14 +10,14 @@ import org.junit.jupiter.api.Test;
 import br.ufsc.ine.leb.roza.TestCase;
 import br.ufsc.ine.leb.roza.TestCaseMaterialization;
 
-public class MatrixTestCaseMaterializationToStringConverterTest {
+public class MatrixTestCaseMaterializationFileNameToStringConverterTest {
 
 	@Test
 	void testCaseMaterializationToString() throws Exception {
 		TestCase testCase = new TestCase("test", Arrays.asList(), Arrays.asList());
 		TestCaseMaterialization materialization = new TestCaseMaterialization(new File("Materialization.java"), 10, testCase);
-		MatrixElementToKeyConverter<TestCaseMaterialization, String> converter = new MatrixTestCaseMaterializationToStringConverter();
-		assertEquals(materialization.getAbsoluteFilePath(), converter.convert(materialization));
+		MatrixElementToKeyConverter<TestCaseMaterialization, String> converter = new MatrixTestCaseMaterializationFileNameToStringConverter();
+		assertEquals(materialization.getFileName(), converter.convert(materialization));
 	}
 
 }

@@ -60,6 +60,26 @@ public class FolderUtils {
 		return selectedFiles;
 	}
 
+	public List<File> listFilesRecursively(String pattern) {
+		List<File> selectedFiles = new LinkedList<>();
+		Stack<File> pending = new Stack<>();
+		File parent = new File(baseFolder);
+		pending.push(parent);
+		while (!pending.isEmpty()) {
+			File next = pending.pop();
+			if (next.isFile()) {
+				if (next.getName().matches(pattern)) {
+					selectedFiles.add(next);
+				}
+			} else if (next.isDirectory()) {
+				for (File child : next.listFiles()) {
+					pending.push(child);
+				}
+			}
+		}
+		return selectedFiles;
+	}
+
 	public File writeContetAsString(String path, String content) {
 		try {
 			File file = new File(baseFolder, path);

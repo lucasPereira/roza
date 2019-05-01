@@ -107,19 +107,20 @@ public class JplagSimilarityMeasurerTest {
 		MaterializationReport materializationReport = materializer.materialize(Arrays.asList(testCaseA, testCaseB));
 		SimilarityReport report = measurer.measure(materializationReport);
 
+		assertEquals(-1, new Integer(1).compareTo(new Integer(2)));
 		assertEquals(4, report.getAssessments().size());
 		assertEquals(BigDecimal.ONE, report.getAssessments().get(0).getScore());
 		assertEquals(testCaseA, report.getAssessments().get(0).getSource());
 		assertEquals(testCaseA, report.getAssessments().get(0).getTarget());
 		assertEquals(BigDecimal.ONE, report.getAssessments().get(1).getScore());
 		assertEquals(testCaseB, report.getAssessments().get(1).getSource());
-		assertEquals(testCaseB, report.getAssessments().get(2).getTarget());
-		assertEquals(new BigDecimal("0.666"), report.getAssessments().get(2).getScore());
-		assertEquals(testCaseA, report.getAssessments().get(2).getSource());
-		assertEquals(testCaseB, report.getAssessments().get(2).getTarget());
-		assertEquals(new BigDecimal("0.666"), report.getAssessments().get(3).getScore());
-		assertEquals(testCaseB, report.getAssessments().get(3).getSource());
-		assertEquals(testCaseA, report.getAssessments().get(3).getTarget());
+		assertEquals(testCaseB, report.getAssessments().get(1).getTarget());
+		assertEquals(new BigDecimal("0.7142857"), report.getAssessments().get(2).getScore());
+		assertEquals(testCaseB, report.getAssessments().get(2).getSource());
+		assertEquals(testCaseA, report.getAssessments().get(2).getTarget());
+		assertEquals(new BigDecimal("0.625"), report.getAssessments().get(3).getScore());
+		assertEquals(testCaseA, report.getAssessments().get(3).getSource());
+		assertEquals(testCaseB, report.getAssessments().get(3).getTarget());
 	}
 
 }
