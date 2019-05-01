@@ -1,4 +1,4 @@
-package br.ufsc.ine.leb.roza.intersector;
+package br.ufsc.ine.leb.roza.collections;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -6,6 +6,7 @@ import java.math.BigDecimal;
 
 import org.junit.jupiter.api.Test;
 
+import br.ufsc.ine.leb.roza.collections.Interval;
 import br.ufsc.ine.leb.roza.exceptions.IntervalWithoutOverlapForConcatenationException;
 import br.ufsc.ine.leb.roza.exceptions.InvalidIntervalException;
 

@@ -47,8 +47,10 @@ public class OneTestCasePerClassTestCaseMaterializer implements TestCaseMaterial
 			PrettyPrinterConfiguration configuration = new PrettyPrinterConfiguration();
 			configuration.setIndentType(IndentType.TABS);
 			configuration.setIndentSize(1);
-			File file = foldereUtils.writeContetAsString(classFileName, javaUnit.toString(configuration));
-			TestCaseMaterialization materialization = new TestCaseMaterialization(file, testCase);
+			String code = javaUnit.toString(configuration);
+			Integer length = code.split(configuration.getEndOfLineCharacter()).length;
+			File file = foldereUtils.writeContetAsString(classFileName, code);
+			TestCaseMaterialization materialization = new TestCaseMaterialization(file, length, testCase);
 			materializations.add(materialization);
 		});
 		return new MaterializationReport(foldereUtils.getBaseFolder(), materializations);

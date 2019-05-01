@@ -26,4 +26,9 @@ public class TestCase {
 		return asserts;
 	}
 
+	@Override
+	public String toString() {
+		return name;
+	}
+
 }

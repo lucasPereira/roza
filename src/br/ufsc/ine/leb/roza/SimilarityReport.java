@@ -2,6 +2,7 @@ package br.ufsc.ine.leb.roza;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class SimilarityReport {
@@ -10,6 +11,21 @@ public class SimilarityReport {
 
 	public SimilarityReport(List<SimilarityAssessment> assessments) {
 		this.assessments = new ArrayList<>(assessments);
+		order();
+	}
+
+	private void order() {
+		Collections.sort(this.assessments, new Comparator<SimilarityAssessment>() {
+
+			@Override
+			public int compare(SimilarityAssessment assessment1, SimilarityAssessment assessment2) {
+				Integer scoreComparison = -assessment1.getScore().compareTo(assessment2.getScore());
+				Integer sourceComparison = assessment1.getSource().getName().compareTo(assessment2.getSource().getName());
+				Integer targetComparison = assessment1.getTarget().getName().compareTo(assessment2.getTarget().getName());
+				return scoreComparison != 0 ? scoreComparison : (sourceComparison != 0 ? sourceComparison : targetComparison);
+			}
+
+		});
 	}
 
 	public List<SimilarityAssessment> getAssessments() {
@@ -18,7 +34,7 @@ public class SimilarityReport {
 
 	public void removeReflexiveAssessments() {
 		assessments.removeIf((assessment) -> {
-			return assessment.getSource().equals(assessment.getTarget());
+			return assessment == null || assessment.getSource().equals(assessment.getTarget());
 		});
 	}
 

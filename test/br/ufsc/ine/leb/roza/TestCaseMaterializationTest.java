@@ -12,10 +12,11 @@ public class TestCaseMaterializationTest {
 	@Test
 	void create() throws Exception {
 		TestCase testCase = new TestCase("example", Arrays.asList(), Arrays.asList());
-		TestCaseMaterialization materialization = new TestCaseMaterialization(new File("generated/Example.java"), testCase);
+		TestCaseMaterialization materialization = new TestCaseMaterialization(new File("example/Example.java"), 5, testCase);
 		assertEquals("Example.java", materialization.getFileName());
-		assertEquals("generated/Example.java", materialization.getFilePath());
-		assertEquals("generated", materialization.getFolder());
+		assertEquals(5, materialization.getLength().intValue());
+		assertEquals("example/Example.java", materialization.getFilePath());
+		assertEquals("example", materialization.getFolder());
 		assertEquals(testCase, materialization.getTestCase());
 	}
 

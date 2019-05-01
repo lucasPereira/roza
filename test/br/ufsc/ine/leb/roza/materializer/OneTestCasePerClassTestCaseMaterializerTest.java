@@ -47,6 +47,7 @@ public class OneTestCasePerClassTestCaseMaterializerTest {
 		assertEquals("execution/materializer", report.getBaseFolder());
 		assertEquals(1, materializations.size());
 		assertEquals(testCase, materializations.get(0).getTestCase());
+		assertEquals(8, materializations.get(0).getLength().intValue());
 		assertEquals("TestClass1ExampleTest.java", materializations.get(0).getFileName());
 		assertEquals("execution/materializer/TestClass1ExampleTest.java", materializations.get(0).getFilePath());
 		assertEquals(generatedClass.toString(), fileUtils.readContetAsString(materializations.get(0).getFilePath()));
@@ -83,6 +84,8 @@ public class OneTestCasePerClassTestCaseMaterializerTest {
 
 		assertEquals("execution/materializer", report.getBaseFolder());
 		assertEquals(2, materializations.size());
+		assertEquals(8, materializations.get(0).getLength().intValue());
+		assertEquals(8, materializations.get(1).getLength().intValue());
 		assertEquals(testCase1, materializations.get(0).getTestCase());
 		assertEquals(testCase2, materializations.get(1).getTestCase());
 		assertEquals("TestClass1Example1Test.java", materializations.get(0).getFileName());
@@ -124,6 +127,8 @@ public class OneTestCasePerClassTestCaseMaterializerTest {
 
 		assertEquals("execution/materializer", report.getBaseFolder());
 		assertEquals(2, materializations.size());
+		assertEquals(8, materializations.get(0).getLength().intValue());
+		assertEquals(8, materializations.get(1).getLength().intValue());
 		assertEquals(testCase1, materializations.get(0).getTestCase());
 		assertEquals(testCase2, materializations.get(1).getTestCase());
 		assertEquals("TestClass1ExampleTest.java", materializations.get(0).getFileName());

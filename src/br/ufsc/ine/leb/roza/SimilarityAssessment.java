@@ -37,4 +37,9 @@ public class SimilarityAssessment {
 		return target;
 	}
 
+	@Override
+	public String toString() {
+		return String.format("(%s, %s) : %s", source, target, score);
+	}
+
 }

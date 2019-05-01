@@ -6,9 +6,11 @@ public class TestCaseMaterialization {
 
 	private File file;
 	private TestCase testCase;
+	private Integer lenght;
 
-	public TestCaseMaterialization(File file, TestCase testCase) {
+	public TestCaseMaterialization(File file, Integer lenght, TestCase testCase) {
 		this.file = file;
+		this.lenght = lenght;
 		this.testCase = testCase;
 	}
 
@@ -20,12 +22,25 @@ public class TestCaseMaterialization {
 		return file.getPath();
 	}
 
+	public String getAbsoluteFilePath() {
+		return file.getAbsolutePath();
+	}
+
 	public String getFolder() {
 		return file.getParent();
 	}
 
 	public TestCase getTestCase() {
 		return testCase;
+	}
+
+	public Integer getLength() {
+		return lenght;
+	}
+
+	@Override
+	public String toString() {
+		return getFilePath();
 	}
 
 }
