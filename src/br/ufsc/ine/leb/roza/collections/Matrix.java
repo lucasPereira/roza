@@ -1,21 +1,16 @@
 package br.ufsc.ine.leb.roza.collections;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
 
 public class Matrix<T, K, V> {
 
 	private Map<K, T> keys;
 	private Map<T, Map<T, V>> matrix;
-	private List<T> elements;
 
 	public Matrix(List<T> elements, MatrixElementToKeyConverter<T, K> converter, MatrixValueFactory<T, V> factory) {
-		this.elements = elements;
 		matrix = new HashMap<>();
 		keys = new HashMap<>();
 		for (T source : elements) {
@@ -32,8 +27,7 @@ public class Matrix<T, K, V> {
 
 	public List<MatrixPair<T, V>> getPairs() {
 		List<MatrixPair<T, V>> pairs = new LinkedList<>();
-		Set<Entry<T, Map<T, V>>> sources = matrix.entrySet();
-		for (Map.Entry<T, Map<T, V>> entrySource : sources) {
+		for (Map.Entry<T, Map<T, V>> entrySource : matrix.entrySet()) {
 			for (Map.Entry<T, V> entryTarget : entrySource.getValue().entrySet()) {
 				MatrixPair<T, V> pair = new MatrixPair<>(entrySource.getKey(), entryTarget.getKey(), entryTarget.getValue());
 				pairs.add(pair);

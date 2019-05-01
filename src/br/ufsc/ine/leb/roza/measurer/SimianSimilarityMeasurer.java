@@ -20,8 +20,8 @@ import br.ufsc.ine.leb.roza.collections.Intersector;
 import br.ufsc.ine.leb.roza.collections.Matrix;
 import br.ufsc.ine.leb.roza.collections.MatrixElementToKeyConverter;
 import br.ufsc.ine.leb.roza.collections.MatrixPair;
-import br.ufsc.ine.leb.roza.collections.MatrixTestCaseMaterializationIntersectorValueFactory;
 import br.ufsc.ine.leb.roza.collections.MatrixTestCaseMaterializationAbsoluteFilePathToStringConverter;
+import br.ufsc.ine.leb.roza.collections.MatrixTestCaseMaterializationIntersectorValueFactory;
 import br.ufsc.ine.leb.roza.collections.MatrixValueFactory;
 import br.ufsc.ine.leb.roza.utils.ProcessUtils;
 
