@@ -1,6 +1,6 @@
-package br.ufsc.ine.leb.roza.support.matrix;
+package br.ufsc.ine.leb.roza.measurer;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.File;
 import java.math.BigDecimal;
@@ -11,23 +11,24 @@ import org.junit.jupiter.api.Test;
 
 import br.ufsc.ine.leb.roza.TestCase;
 import br.ufsc.ine.leb.roza.TestCaseMaterialization;
+import br.ufsc.ine.leb.roza.measurer.SimianMatrixValueFactory;
+import br.ufsc.ine.leb.roza.support.intersector.Intersector;
 import br.ufsc.ine.leb.roza.support.matrix.MatrixValueFactory;
-import br.ufsc.ine.leb.roza.support.matrix.TestCaseMaterializationsToBigDecimalValueFactory;
 
-public class TestCaseMaterializationsToBigDecimalValueFactoryTest {
+public class SimianMatrixValueFactoryTest {
 
-	private MatrixValueFactory<TestCaseMaterialization, BigDecimal> factory;
+	private MatrixValueFactory<TestCaseMaterialization, Intersector> factory;
 
 	@BeforeEach
 	void setup() {
-		factory = new TestCaseMaterializationsToBigDecimalValueFactory();
+		factory = new SimianMatrixValueFactory();
 	}
 
 	@Test
 	void same() throws Exception {
 		TestCase testCase = new TestCase("test", Arrays.asList(), Arrays.asList());
 		TestCaseMaterialization materialization = new TestCaseMaterialization(new File("Materialization.java"), 10, testCase);
-		assertEquals(BigDecimal.ONE, factory.create(materialization, materialization));
+		assertEquals(BigDecimal.ONE, factory.create(materialization, materialization).evaluate());
 	}
 
 	@Test
@@ -36,8 +37,8 @@ public class TestCaseMaterializationsToBigDecimalValueFactoryTest {
 		TestCase testCaseB = new TestCase("testB", Arrays.asList(), Arrays.asList());
 		TestCaseMaterialization materializationA = new TestCaseMaterialization(new File("MaterializationA.java"), 10, testCaseA);
 		TestCaseMaterialization materializationB = new TestCaseMaterialization(new File("MaterializationB.java"), 10, testCaseB);
-		assertEquals(BigDecimal.ZERO, factory.create(materializationA, materializationB));
-		assertEquals(BigDecimal.ZERO, factory.create(materializationB, materializationA));
+		assertEquals(BigDecimal.ZERO, factory.create(materializationA, materializationB).evaluate());
+		assertEquals(BigDecimal.ZERO, factory.create(materializationB, materializationA).evaluate());
 	}
 
 }

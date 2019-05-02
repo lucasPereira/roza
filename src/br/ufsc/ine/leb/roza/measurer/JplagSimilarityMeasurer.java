@@ -20,8 +20,6 @@ import br.ufsc.ine.leb.roza.support.matrix.Matrix;
 import br.ufsc.ine.leb.roza.support.matrix.MatrixElementToKeyConverter;
 import br.ufsc.ine.leb.roza.support.matrix.MatrixPair;
 import br.ufsc.ine.leb.roza.support.matrix.MatrixValueFactory;
-import br.ufsc.ine.leb.roza.support.matrix.TestCaseMaterializationFileNameToStringConverter;
-import br.ufsc.ine.leb.roza.support.matrix.TestCaseMaterializationsToBigDecimalValueFactory;
 import br.ufsc.ine.leb.roza.utils.FolderUtils;
 import br.ufsc.ine.leb.roza.utils.ProcessUtils;
 
@@ -36,8 +34,8 @@ public class JplagSimilarityMeasurer implements SimilarityMeasurer {
 	@Override
 	public SimilarityReport measure(MaterializationReport materializationReport) {
 		List<TestCaseMaterialization> materializations = materializationReport.getMaterializations();
-		MatrixElementToKeyConverter<TestCaseMaterialization, String> converter = new TestCaseMaterializationFileNameToStringConverter();
-		MatrixValueFactory<TestCaseMaterialization, BigDecimal> factory = new TestCaseMaterializationsToBigDecimalValueFactory();
+		MatrixElementToKeyConverter<TestCaseMaterialization, String> converter = new JplagMatrixElementToKeyConverter();
+		MatrixValueFactory<TestCaseMaterialization, BigDecimal> factory = new JplagMatrixValueFactory();
 		Matrix<TestCaseMaterialization, String, BigDecimal> matrix = new Matrix<>(materializations, converter, factory);
 		if (materializations.size() > 1) {
 			run(materializationReport);

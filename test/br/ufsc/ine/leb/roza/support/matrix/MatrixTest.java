@@ -11,12 +11,12 @@ import org.junit.jupiter.api.Test;
 
 import br.ufsc.ine.leb.roza.TestCase;
 import br.ufsc.ine.leb.roza.TestCaseMaterialization;
+import br.ufsc.ine.leb.roza.measurer.SimianMatrixElementToKeyConverter;
+import br.ufsc.ine.leb.roza.measurer.SimianMatrixValueFactory;
 import br.ufsc.ine.leb.roza.support.intersector.Intersector;
 import br.ufsc.ine.leb.roza.support.matrix.Matrix;
 import br.ufsc.ine.leb.roza.support.matrix.MatrixElementToKeyConverter;
 import br.ufsc.ine.leb.roza.support.matrix.MatrixValueFactory;
-import br.ufsc.ine.leb.roza.support.matrix.TestCaseMaterializationAbsoluteFilePathToStringConverter;
-import br.ufsc.ine.leb.roza.support.matrix.TestCaseMaterializationsToIntersectorValueFactory;
 
 public class MatrixTest {
 
@@ -24,8 +24,8 @@ public class MatrixTest {
 	void zeroTestCaseMaterializations() throws Exception {
 		List<TestCaseMaterialization> materializations = Arrays.asList();
 
-		MatrixValueFactory<TestCaseMaterialization, Intersector> factory = new TestCaseMaterializationsToIntersectorValueFactory();
-		MatrixElementToKeyConverter<TestCaseMaterialization, String> converter = new TestCaseMaterializationAbsoluteFilePathToStringConverter();
+		MatrixValueFactory<TestCaseMaterialization, Intersector> factory = new SimianMatrixValueFactory();
+		MatrixElementToKeyConverter<TestCaseMaterialization, String> converter = new SimianMatrixElementToKeyConverter();
 		Matrix<TestCaseMaterialization, String, Intersector> matrix = new Matrix<>(materializations, converter, factory);
 
 		assertEquals(0, matrix.getPairs().size());
@@ -37,8 +37,8 @@ public class MatrixTest {
 		TestCaseMaterialization materialization = new TestCaseMaterialization(new File("Materialization.java"), 10, testCase);
 		List<TestCaseMaterialization> materializations = Arrays.asList(materialization);
 
-		TestCaseMaterializationsToIntersectorValueFactory factory = new TestCaseMaterializationsToIntersectorValueFactory();
-		MatrixElementToKeyConverter<TestCaseMaterialization, String> converter = new TestCaseMaterializationAbsoluteFilePathToStringConverter();
+		SimianMatrixValueFactory factory = new SimianMatrixValueFactory();
+		MatrixElementToKeyConverter<TestCaseMaterialization, String> converter = new SimianMatrixElementToKeyConverter();
 		Matrix<TestCaseMaterialization, String, Intersector> matrix = new Matrix<>(materializations, converter, factory);
 
 		assertEquals(1, matrix.getPairs().size());
@@ -53,8 +53,8 @@ public class MatrixTest {
 		TestCaseMaterialization materializationB = new TestCaseMaterialization(new File("MaterializationB.java"), 10, testCaseB);
 		List<TestCaseMaterialization> materializations = Arrays.asList(materializationA, materializationB);
 
-		TestCaseMaterializationsToIntersectorValueFactory factory = new TestCaseMaterializationsToIntersectorValueFactory();
-		MatrixElementToKeyConverter<TestCaseMaterialization, String> converter = new TestCaseMaterializationAbsoluteFilePathToStringConverter();
+		SimianMatrixValueFactory factory = new SimianMatrixValueFactory();
+		MatrixElementToKeyConverter<TestCaseMaterialization, String> converter = new SimianMatrixElementToKeyConverter();
 		Matrix<TestCaseMaterialization, String, Intersector> matrix = new Matrix<>(materializations, converter, factory);
 
 		assertEquals(4, matrix.getPairs().size());
@@ -77,8 +77,8 @@ public class MatrixTest {
 		intersectorAB.addSegment(1, 4);
 		intersectorBA.addSegment(5, 10);
 
-		TestCaseMaterializationsToIntersectorValueFactory factory = new TestCaseMaterializationsToIntersectorValueFactory();
-		MatrixElementToKeyConverter<TestCaseMaterialization, String> converter = new TestCaseMaterializationAbsoluteFilePathToStringConverter();
+		SimianMatrixValueFactory factory = new SimianMatrixValueFactory();
+		MatrixElementToKeyConverter<TestCaseMaterialization, String> converter = new SimianMatrixElementToKeyConverter();
 		Matrix<TestCaseMaterialization, String, Intersector> matrix = new Matrix<>(materializations, converter, factory);
 
 		matrix.set(materializationA.getAbsoluteFilePath(), materializationB.getAbsoluteFilePath(), intersectorAB);

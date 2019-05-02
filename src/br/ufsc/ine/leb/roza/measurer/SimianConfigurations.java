@@ -1,42 +1,50 @@
 package br.ufsc.ine.leb.roza.measurer;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import br.ufsc.ine.leb.roza.support.configuration.AbstractConfigurations;
+import br.ufsc.ine.leb.roza.support.configuration.Configuration;
 import br.ufsc.ine.leb.roza.support.configuration.Configurations;
 
 public class SimianConfigurations extends AbstractConfigurations implements Configurations {
 
+	private SimianIntegerConfiguration threshold;
+
 	public SimianConfigurations() {
-		create("threshold", 6, "Matches will contain at least the specified number of lines");
-//		create("ignoreCurlyBraces", false, "Curly braces are ignored");
-//		create("ignoreIdentifiers", false, "Completely ignores all identfiers");
-//		create("ignoreStrings", false, "\"abc\" and \"def\" would both match");
-//		create("ignoreNumbers", false, "1 and 576 would both match");
-//		create("ignoreCharacters", false, "'A' and 'Z' would both match");
-//		create("ignoreLiterals", false, "'A', \"one\" and 27.8 would all match");
-//		create("ignoreVariableNames", false, "int foo = 1; and int bar = 1 would both match");
-		create("formatter", "xml", "Specifies the format in which processing results will be produced");
-		create("language", "java", "Assumes all files are in the specified language");
-//		create("failOnDuplication", false, "Causes the checker to fail the current process if duplication is detected");
-//		create("reportDuplicateText", true, "Prints the duplicate text in reports");
-//		create("ignoreBlocks", false, "Ignores all lines between specified start/end markers");
-//		create("ignoreIdentifierCase", false, "MyVariableName and myvariablename would both match");
-//		create("ignoreStringCase", false, "\"Hello, World\" and \"HELLO, WORLD\" would both match");
-//		create("ignoreCharacterCase", false, "'A' and 'a'would both match");
-//		create("ignoreSubtypeNames", false, "BufferedReader, StringReader and Reader would all match");
-//		create("ignoreModifiers", true, "public, protected, static, etc");
-//		create("balanceParentheses", true, "Ensures that expressions inside parenthesis that are split across multiple physical lines are considered as one");
-//		create("balanceSquareBrackets", true, "Ensures that expressions inside square brackets that are split across multiple physical lines are considered as one");
+		threshold = new SimianIntegerConfiguration("threshold", 6, "Matches will contain at least the specified number of lines");
 	}
 
 	@Override
-	protected String generateArgument(String name, String value) {
-		return String.format("-%s=%s", name, value);
+	public List<Configuration> getAll() {
+		List<Configuration> configurations = new LinkedList<>();
+		configurations.add(threshold);
+		configurations.add(new SimianBooleanConfiguration("ignoreCurlyBraces", true, "Curly braces are ignored"));
+		configurations.add(new SimianBooleanConfiguration("ignoreIdentifiers", false, "Completely ignores all identfiers"));
+		configurations.add(new SimianBooleanConfiguration("ignoreStrings", false, "\"abc\" and \"def\" would both match"));
+		configurations.add(new SimianBooleanConfiguration("ignoreNumbers", false, "1 and 576 would both match"));
+		configurations.add(new SimianBooleanConfiguration("ignoreCharacters", false, "'A' and 'Z' would both match"));
+		configurations.add(new SimianBooleanConfiguration("ignoreLiterals", false, "'A', \"one\" and 27.8 would all match"));
+		configurations.add(new SimianBooleanConfiguration("ignoreVariableNames", false, "int foo = 1; and int bar = 1 would both match"));
+		configurations.add(new SimianStringConfiguration("formatter", "xml", "Specifies the format in which processing results will be produced"));
+		configurations.add(new SimianStringConfiguration("language", "java", "Assumes all files are in the specified language"));
+		configurations.add(new SimianBooleanConfiguration("failOnDuplication", false, "Causes the checker to fail the current process if duplication is detected"));
+		configurations.add(new SimianBooleanConfiguration("reportDuplicateText", true, "Prints the duplicate text in reports"));
+		configurations.add(new SimianStringConfiguration("ignoreBlocks", "none", "Ignores all lines between specified start/end markers"));
+		configurations.add(new SimianBooleanConfiguration("ignoreIdentifierCase", false, "MyVariableName and myvariablename would both match"));
+		configurations.add(new SimianBooleanConfiguration("ignoreStringCase", false, "\"Hello, World\" and \"HELLO, WORLD\" would both match"));
+		configurations.add(new SimianBooleanConfiguration("ignoreCharacterCase", false, "'A' and 'a'would both match"));
+		configurations.add(new SimianBooleanConfiguration("ignoreSubtypeNames", false, "BufferedReader, StringReader and Reader would all match"));
+		configurations.add(new SimianBooleanConfiguration("ignoreModifiers", true, "public, protected, static, etc"));
+		configurations.add(new SimianBooleanConfiguration("balanceParentheses", true, "Ensures that expressions inside parenthesis that are split across multiple physical lines are considered as one"));
+		configurations.add(new SimianBooleanConfiguration("balanceSquareBrackets", true, "Ensures that expressions inside square brackets that are split across multiple physical lines are considered as one"));
+		return configurations;
 	}
 
-	public SimianConfigurations threshold(Integer threshold) {
-		throwInvalidConfigurationExceptionIfFalse(threshold != null);
-		throwInvalidConfigurationExceptionIfFalse(threshold >= 2);
-		set("threshold", threshold);
+	public SimianConfigurations threshold(Integer value) {
+		ensureThat(value != null);
+		ensureThat(value >= 2);
+		threshold.setValue(value);
 		return this;
 	}
 

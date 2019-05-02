@@ -1,9 +1,10 @@
-package br.ufsc.ine.leb.roza.support.matrix;
+package br.ufsc.ine.leb.roza.measurer;
 
 import br.ufsc.ine.leb.roza.TestCaseMaterialization;
 import br.ufsc.ine.leb.roza.support.intersector.Intersector;
+import br.ufsc.ine.leb.roza.support.matrix.MatrixValueFactory;
 
-public class TestCaseMaterializationsToIntersectorValueFactory implements MatrixValueFactory<TestCaseMaterialization, Intersector> {
+public class SimianMatrixValueFactory implements MatrixValueFactory<TestCaseMaterialization, Intersector> {
 
 	@Override
 	public Intersector create(TestCaseMaterialization source, TestCaseMaterialization target) {

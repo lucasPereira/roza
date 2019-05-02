@@ -1,4 +1,4 @@
-package br.ufsc.ine.leb.roza.support.matrix;
+package br.ufsc.ine.leb.roza.measurer;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -9,17 +9,17 @@ import org.junit.jupiter.api.Test;
 
 import br.ufsc.ine.leb.roza.TestCase;
 import br.ufsc.ine.leb.roza.TestCaseMaterialization;
+import br.ufsc.ine.leb.roza.measurer.JplagMatrixElementToKeyConverter;
 import br.ufsc.ine.leb.roza.support.matrix.MatrixElementToKeyConverter;
-import br.ufsc.ine.leb.roza.support.matrix.TestCaseMaterializationAbsoluteFilePathToStringConverter;
 
-public class TestCaseMaterializationAbsoluteFilePathToStringConverterTest {
+public class JplagElementToKeyConverterTest {
 
 	@Test
 	void testCaseMaterializationToString() throws Exception {
 		TestCase testCase = new TestCase("test", Arrays.asList(), Arrays.asList());
 		TestCaseMaterialization materialization = new TestCaseMaterialization(new File("Materialization.java"), 10, testCase);
-		MatrixElementToKeyConverter<TestCaseMaterialization, String> converter = new TestCaseMaterializationAbsoluteFilePathToStringConverter();
-		assertEquals(materialization.getAbsoluteFilePath(), converter.convert(materialization));
+		MatrixElementToKeyConverter<TestCaseMaterialization, String> converter = new JplagMatrixElementToKeyConverter();
+		assertEquals(materialization.getFileName(), converter.convert(materialization));
 	}
 
 }

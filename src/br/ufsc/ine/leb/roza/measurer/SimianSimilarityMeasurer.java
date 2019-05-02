@@ -21,8 +21,6 @@ import br.ufsc.ine.leb.roza.support.matrix.Matrix;
 import br.ufsc.ine.leb.roza.support.matrix.MatrixElementToKeyConverter;
 import br.ufsc.ine.leb.roza.support.matrix.MatrixPair;
 import br.ufsc.ine.leb.roza.support.matrix.MatrixValueFactory;
-import br.ufsc.ine.leb.roza.support.matrix.TestCaseMaterializationAbsoluteFilePathToStringConverter;
-import br.ufsc.ine.leb.roza.support.matrix.TestCaseMaterializationsToIntersectorValueFactory;
 import br.ufsc.ine.leb.roza.utils.ProcessUtils;
 
 public class SimianSimilarityMeasurer implements SimilarityMeasurer {
@@ -38,8 +36,8 @@ public class SimianSimilarityMeasurer implements SimilarityMeasurer {
 	@Override
 	public SimilarityReport measure(MaterializationReport materializationReport) {
 		List<TestCaseMaterialization> materializations = materializationReport.getMaterializations();
-		MatrixElementToKeyConverter<TestCaseMaterialization, String> converter = new TestCaseMaterializationAbsoluteFilePathToStringConverter();
-		MatrixValueFactory<TestCaseMaterialization, Intersector> factory = new TestCaseMaterializationsToIntersectorValueFactory();
+		MatrixElementToKeyConverter<TestCaseMaterialization, String> converter = new SimianMatrixElementToKeyConverter();
+		MatrixValueFactory<TestCaseMaterialization, Intersector> factory = new SimianMatrixValueFactory();
 		Matrix<TestCaseMaterialization, String, Intersector> matrix = new Matrix<>(materializations, converter, factory);
 		if (materializations.size() > 1) {
 			File fileReport = new File(resultsFolder, "report.xml");
