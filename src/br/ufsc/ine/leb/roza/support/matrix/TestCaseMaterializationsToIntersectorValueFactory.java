@@ -1,8 +1,9 @@
-package br.ufsc.ine.leb.roza.collections;
+package br.ufsc.ine.leb.roza.support.matrix;
 
 import br.ufsc.ine.leb.roza.TestCaseMaterialization;
+import br.ufsc.ine.leb.roza.support.intersector.Intersector;
 
-public class MatrixTestCaseMaterializationIntersectorValueFactory implements MatrixValueFactory<TestCaseMaterialization, Intersector> {
+public class TestCaseMaterializationsToIntersectorValueFactory implements MatrixValueFactory<TestCaseMaterialization, Intersector> {
 
 	@Override
 	public Intersector create(TestCaseMaterialization source, TestCaseMaterialization target) {

@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.List;
 
 public class ProcessUtils {
 
@@ -25,6 +26,13 @@ public class ProcessUtils {
 	}
 
 	public void execute(File redirect, String... arguments) {
+		ProcessBuilder builder = new ProcessBuilder();
+		builder.command(arguments);
+		builder.redirectOutput(redirect);
+		execute(builder);
+	}
+
+	public void execute(File redirect, List<String> arguments) {
 		ProcessBuilder builder = new ProcessBuilder();
 		builder.command(arguments);
 		builder.redirectOutput(redirect);

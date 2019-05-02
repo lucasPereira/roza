@@ -16,12 +16,12 @@ import br.ufsc.ine.leb.roza.SimilarityAssessment;
 import br.ufsc.ine.leb.roza.SimilarityReport;
 import br.ufsc.ine.leb.roza.TestCase;
 import br.ufsc.ine.leb.roza.TestCaseMaterialization;
-import br.ufsc.ine.leb.roza.collections.Matrix;
-import br.ufsc.ine.leb.roza.collections.MatrixElementToKeyConverter;
-import br.ufsc.ine.leb.roza.collections.MatrixPair;
-import br.ufsc.ine.leb.roza.collections.MatrixTestCaseMaterializationBigDecimalValueFactory;
-import br.ufsc.ine.leb.roza.collections.MatrixTestCaseMaterializationFileNameToStringConverter;
-import br.ufsc.ine.leb.roza.collections.MatrixValueFactory;
+import br.ufsc.ine.leb.roza.support.matrix.Matrix;
+import br.ufsc.ine.leb.roza.support.matrix.MatrixElementToKeyConverter;
+import br.ufsc.ine.leb.roza.support.matrix.MatrixPair;
+import br.ufsc.ine.leb.roza.support.matrix.MatrixValueFactory;
+import br.ufsc.ine.leb.roza.support.matrix.TestCaseMaterializationFileNameToStringConverter;
+import br.ufsc.ine.leb.roza.support.matrix.TestCaseMaterializationsToBigDecimalValueFactory;
 import br.ufsc.ine.leb.roza.utils.FolderUtils;
 import br.ufsc.ine.leb.roza.utils.ProcessUtils;
 
@@ -36,8 +36,8 @@ public class JplagSimilarityMeasurer implements SimilarityMeasurer {
 	@Override
 	public SimilarityReport measure(MaterializationReport materializationReport) {
 		List<TestCaseMaterialization> materializations = materializationReport.getMaterializations();
-		MatrixElementToKeyConverter<TestCaseMaterialization, String> converter = new MatrixTestCaseMaterializationFileNameToStringConverter();
-		MatrixValueFactory<TestCaseMaterialization, BigDecimal> factory = new MatrixTestCaseMaterializationBigDecimalValueFactory();
+		MatrixElementToKeyConverter<TestCaseMaterialization, String> converter = new TestCaseMaterializationFileNameToStringConverter();
+		MatrixValueFactory<TestCaseMaterialization, BigDecimal> factory = new TestCaseMaterializationsToBigDecimalValueFactory();
 		Matrix<TestCaseMaterialization, String, BigDecimal> matrix = new Matrix<>(materializations, converter, factory);
 		if (materializations.size() > 1) {
 			run(materializationReport);

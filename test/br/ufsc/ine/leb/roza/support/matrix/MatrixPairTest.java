@@ -1,4 +1,4 @@
-package br.ufsc.ine.leb.roza.collections;
+package br.ufsc.ine.leb.roza.support.matrix;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -7,6 +7,7 @@ import java.util.Arrays;
 import org.junit.jupiter.api.Test;
 
 import br.ufsc.ine.leb.roza.TestCase;
+import br.ufsc.ine.leb.roza.support.matrix.MatrixPair;
 
 public class MatrixPairTest {
 

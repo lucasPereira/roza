@@ -1,4 +1,4 @@
-package br.ufsc.ine.leb.roza.collections;
+package br.ufsc.ine.leb.roza.support.matrix;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -11,6 +11,12 @@ import org.junit.jupiter.api.Test;
 
 import br.ufsc.ine.leb.roza.TestCase;
 import br.ufsc.ine.leb.roza.TestCaseMaterialization;
+import br.ufsc.ine.leb.roza.support.intersector.Intersector;
+import br.ufsc.ine.leb.roza.support.matrix.Matrix;
+import br.ufsc.ine.leb.roza.support.matrix.MatrixElementToKeyConverter;
+import br.ufsc.ine.leb.roza.support.matrix.MatrixValueFactory;
+import br.ufsc.ine.leb.roza.support.matrix.TestCaseMaterializationAbsoluteFilePathToStringConverter;
+import br.ufsc.ine.leb.roza.support.matrix.TestCaseMaterializationsToIntersectorValueFactory;
 
 public class MatrixTest {
 
@@ -18,8 +24,8 @@ public class MatrixTest {
 	void zeroTestCaseMaterializations() throws Exception {
 		List<TestCaseMaterialization> materializations = Arrays.asList();
 
-		MatrixValueFactory<TestCaseMaterialization, Intersector> factory = new MatrixTestCaseMaterializationIntersectorValueFactory();
-		MatrixElementToKeyConverter<TestCaseMaterialization, String> converter = new MatrixTestCaseMaterializationAbsoluteFilePathToStringConverter();
+		MatrixValueFactory<TestCaseMaterialization, Intersector> factory = new TestCaseMaterializationsToIntersectorValueFactory();
+		MatrixElementToKeyConverter<TestCaseMaterialization, String> converter = new TestCaseMaterializationAbsoluteFilePathToStringConverter();
 		Matrix<TestCaseMaterialization, String, Intersector> matrix = new Matrix<>(materializations, converter, factory);
 
 		assertEquals(0, matrix.getPairs().size());
@@ -31,8 +37,8 @@ public class MatrixTest {
 		TestCaseMaterialization materialization = new TestCaseMaterialization(new File("Materialization.java"), 10, testCase);
 		List<TestCaseMaterialization> materializations = Arrays.asList(materialization);
 
-		MatrixTestCaseMaterializationIntersectorValueFactory factory = new MatrixTestCaseMaterializationIntersectorValueFactory();
-		MatrixElementToKeyConverter<TestCaseMaterialization, String> converter = new MatrixTestCaseMaterializationAbsoluteFilePathToStringConverter();
+		TestCaseMaterializationsToIntersectorValueFactory factory = new TestCaseMaterializationsToIntersectorValueFactory();
+		MatrixElementToKeyConverter<TestCaseMaterialization, String> converter = new TestCaseMaterializationAbsoluteFilePathToStringConverter();
 		Matrix<TestCaseMaterialization, String, Intersector> matrix = new Matrix<>(materializations, converter, factory);
 
 		assertEquals(1, matrix.getPairs().size());
@@ -47,8 +53,8 @@ public class MatrixTest {
 		TestCaseMaterialization materializationB = new TestCaseMaterialization(new File("MaterializationB.java"), 10, testCaseB);
 		List<TestCaseMaterialization> materializations = Arrays.asList(materializationA, materializationB);
 
-		MatrixTestCaseMaterializationIntersectorValueFactory factory = new MatrixTestCaseMaterializationIntersectorValueFactory();
-		MatrixElementToKeyConverter<TestCaseMaterialization, String> converter = new MatrixTestCaseMaterializationAbsoluteFilePathToStringConverter();
+		TestCaseMaterializationsToIntersectorValueFactory factory = new TestCaseMaterializationsToIntersectorValueFactory();
+		MatrixElementToKeyConverter<TestCaseMaterialization, String> converter = new TestCaseMaterializationAbsoluteFilePathToStringConverter();
 		Matrix<TestCaseMaterialization, String, Intersector> matrix = new Matrix<>(materializations, converter, factory);
 
 		assertEquals(4, matrix.getPairs().size());
@@ -71,8 +77,8 @@ public class MatrixTest {
 		intersectorAB.addSegment(1, 4);
 		intersectorBA.addSegment(5, 10);
 
-		MatrixTestCaseMaterializationIntersectorValueFactory factory = new MatrixTestCaseMaterializationIntersectorValueFactory();
-		MatrixElementToKeyConverter<TestCaseMaterialization, String> converter = new MatrixTestCaseMaterializationAbsoluteFilePathToStringConverter();
+		TestCaseMaterializationsToIntersectorValueFactory factory = new TestCaseMaterializationsToIntersectorValueFactory();
+		MatrixElementToKeyConverter<TestCaseMaterialization, String> converter = new TestCaseMaterializationAbsoluteFilePathToStringConverter();
 		Matrix<TestCaseMaterialization, String, Intersector> matrix = new Matrix<>(materializations, converter, factory);
 
 		matrix.set(materializationA.getAbsoluteFilePath(), materializationB.getAbsoluteFilePath(), intersectorAB);

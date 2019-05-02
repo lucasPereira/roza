@@ -1,4 +1,4 @@
-package br.ufsc.ine.leb.roza.collections;
+package br.ufsc.ine.leb.roza.support.matrix;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -9,14 +9,16 @@ import org.junit.jupiter.api.Test;
 
 import br.ufsc.ine.leb.roza.TestCase;
 import br.ufsc.ine.leb.roza.TestCaseMaterialization;
+import br.ufsc.ine.leb.roza.support.matrix.MatrixElementToKeyConverter;
+import br.ufsc.ine.leb.roza.support.matrix.TestCaseMaterializationAbsoluteFilePathToStringConverter;
 
-public class MatrixTestCaseMaterializationAbsoluteFilePathToStringConverterTest {
+public class TestCaseMaterializationAbsoluteFilePathToStringConverterTest {
 
 	@Test
 	void testCaseMaterializationToString() throws Exception {
 		TestCase testCase = new TestCase("test", Arrays.asList(), Arrays.asList());
 		TestCaseMaterialization materialization = new TestCaseMaterialization(new File("Materialization.java"), 10, testCase);
-		MatrixElementToKeyConverter<TestCaseMaterialization, String> converter = new MatrixTestCaseMaterializationAbsoluteFilePathToStringConverter();
+		MatrixElementToKeyConverter<TestCaseMaterialization, String> converter = new TestCaseMaterializationAbsoluteFilePathToStringConverter();
 		assertEquals(materialization.getAbsoluteFilePath(), converter.convert(materialization));
 	}
 

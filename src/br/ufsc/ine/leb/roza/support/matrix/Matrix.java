@@ -1,4 +1,4 @@
-package br.ufsc.ine.leb.roza.collections;
+package br.ufsc.ine.leb.roza.support.matrix;
 
 import java.util.HashMap;
 import java.util.LinkedList;

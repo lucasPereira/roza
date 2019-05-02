@@ -26,7 +26,7 @@ public class SimianSimilarityMeasurerTest {
 		new FolderUtils("execution/materializer").createEmptyFolder();
 		new FolderUtils("execution/measurer").createEmptyFolder();
 		materializer = new OneTestCasePerClassTestCaseMaterializer("execution/materializer");
-		measurer = new SimianSimilarityMeasurer("execution/measurer");
+		measurer = new SimianSimilarityMeasurer(new SimianConfigurations().threshold(2), "execution/measurer");
 	}
 
 	@Test

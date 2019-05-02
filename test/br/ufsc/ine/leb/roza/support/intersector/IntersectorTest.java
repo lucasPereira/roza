@@ -1,4 +1,4 @@
-package br.ufsc.ine.leb.roza.collections;
+package br.ufsc.ine.leb.roza.support.intersector;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -7,8 +7,8 @@ import java.math.BigDecimal;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import br.ufsc.ine.leb.roza.collections.Intersector;
-import br.ufsc.ine.leb.roza.collections.Interval;
+import br.ufsc.ine.leb.roza.support.intersector.Intersector;
+import br.ufsc.ine.leb.roza.support.intersector.Interval;
 
 public class IntersectorTest {
 

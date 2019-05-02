@@ -1,4 +1,4 @@
-package br.ufsc.ine.leb.roza.collections;
+package br.ufsc.ine.leb.roza.support.intersector;
 
 import java.math.BigDecimal;
 import java.math.MathContext;

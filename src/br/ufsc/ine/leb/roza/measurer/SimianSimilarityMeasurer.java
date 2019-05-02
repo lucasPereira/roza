@@ -16,28 +16,30 @@ import br.ufsc.ine.leb.roza.SimilarityAssessment;
 import br.ufsc.ine.leb.roza.SimilarityReport;
 import br.ufsc.ine.leb.roza.TestCase;
 import br.ufsc.ine.leb.roza.TestCaseMaterialization;
-import br.ufsc.ine.leb.roza.collections.Intersector;
-import br.ufsc.ine.leb.roza.collections.Matrix;
-import br.ufsc.ine.leb.roza.collections.MatrixElementToKeyConverter;
-import br.ufsc.ine.leb.roza.collections.MatrixPair;
-import br.ufsc.ine.leb.roza.collections.MatrixTestCaseMaterializationAbsoluteFilePathToStringConverter;
-import br.ufsc.ine.leb.roza.collections.MatrixTestCaseMaterializationIntersectorValueFactory;
-import br.ufsc.ine.leb.roza.collections.MatrixValueFactory;
+import br.ufsc.ine.leb.roza.support.intersector.Intersector;
+import br.ufsc.ine.leb.roza.support.matrix.Matrix;
+import br.ufsc.ine.leb.roza.support.matrix.MatrixElementToKeyConverter;
+import br.ufsc.ine.leb.roza.support.matrix.MatrixPair;
+import br.ufsc.ine.leb.roza.support.matrix.MatrixValueFactory;
+import br.ufsc.ine.leb.roza.support.matrix.TestCaseMaterializationAbsoluteFilePathToStringConverter;
+import br.ufsc.ine.leb.roza.support.matrix.TestCaseMaterializationsToIntersectorValueFactory;
 import br.ufsc.ine.leb.roza.utils.ProcessUtils;
 
 public class SimianSimilarityMeasurer implements SimilarityMeasurer {
 
+	private SimianConfigurations configurations;
 	private String resultsFolder;
 
-	public SimianSimilarityMeasurer(String resultsFolder) {
+	public SimianSimilarityMeasurer(SimianConfigurations configurations, String resultsFolder) {
+		this.configurations = configurations;
 		this.resultsFolder = resultsFolder;
 	}
 
 	@Override
 	public SimilarityReport measure(MaterializationReport materializationReport) {
 		List<TestCaseMaterialization> materializations = materializationReport.getMaterializations();
-		MatrixElementToKeyConverter<TestCaseMaterialization, String> converter = new MatrixTestCaseMaterializationAbsoluteFilePathToStringConverter();
-		MatrixValueFactory<TestCaseMaterialization, Intersector> factory = new MatrixTestCaseMaterializationIntersectorValueFactory();
+		MatrixElementToKeyConverter<TestCaseMaterialization, String> converter = new TestCaseMaterializationAbsoluteFilePathToStringConverter();
+		MatrixValueFactory<TestCaseMaterialization, Intersector> factory = new TestCaseMaterializationsToIntersectorValueFactory();
 		Matrix<TestCaseMaterialization, String, Intersector> matrix = new Matrix<>(materializations, converter, factory);
 		if (materializations.size() > 1) {
 			File fileReport = new File(resultsFolder, "report.xml");
@@ -82,10 +84,13 @@ public class SimianSimilarityMeasurer implements SimilarityMeasurer {
 
 	private void run(MaterializationReport materializationReport, File fileReport) {
 		ProcessUtils processUtils = new ProcessUtils(true, false, true);
-		String tool = "tools/simian/tool/simian-2.5.10.jar";
-		String threshold = "-threshold=1";
-		String sourceFiles = new File(materializationReport.getBaseFolder(), "*.java").getPath();
-		processUtils.execute(fileReport, "java", "-jar", tool, "-formatter=xml", threshold, "-language=java", sourceFiles);
+		List<String> arguments = new LinkedList<String>();
+		arguments.add("java");
+		arguments.add("-jar");
+		arguments.add("tools/simian/tool/simian-2.5.10.jar");
+		arguments.addAll(configurations.getAllAsArguments());
+		arguments.add(new File(materializationReport.getBaseFolder(), "*.java").getPath());
+		processUtils.execute(fileReport,arguments);
 	}
 
 }

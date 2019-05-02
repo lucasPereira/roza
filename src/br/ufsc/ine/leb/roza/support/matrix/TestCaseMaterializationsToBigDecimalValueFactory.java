@@ -1,10 +1,10 @@
-package br.ufsc.ine.leb.roza.collections;
+package br.ufsc.ine.leb.roza.support.matrix;
 
 import java.math.BigDecimal;
 
 import br.ufsc.ine.leb.roza.TestCaseMaterialization;
 
-public class MatrixTestCaseMaterializationBigDecimalValueFactory implements MatrixValueFactory<TestCaseMaterialization, BigDecimal> {
+public class TestCaseMaterializationsToBigDecimalValueFactory implements MatrixValueFactory<TestCaseMaterialization, BigDecimal> {
 
 	@Override
 	public BigDecimal create(TestCaseMaterialization source, TestCaseMaterialization target) {
