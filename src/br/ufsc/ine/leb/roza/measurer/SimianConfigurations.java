@@ -30,7 +30,7 @@ public class SimianConfigurations extends AbstractConfigurations implements Conf
 		configurations.add(new SimianStringConfiguration("language", "java", "Assumes all files are in the specified language"));
 		configurations.add(new SimianBooleanConfiguration("failOnDuplication", false, "Causes the checker to fail the current process if duplication is detected"));
 		configurations.add(new SimianBooleanConfiguration("reportDuplicateText", true, "Prints the duplicate text in reports"));
-		configurations.add(new SimianStringConfiguration("ignoreBlocks", "none", "Ignores all lines between specified start/end markers"));
+		configurations.add(new SimianStringConfiguration("ignoreBlocks", "0:0", "Ignores all lines between specified start/end markers"));
 		configurations.add(new SimianBooleanConfiguration("ignoreIdentifierCase", false, "MyVariableName and myvariablename would both match"));
 		configurations.add(new SimianBooleanConfiguration("ignoreStringCase", false, "\"Hello, World\" and \"HELLO, WORLD\" would both match"));
 		configurations.add(new SimianBooleanConfiguration("ignoreCharacterCase", false, "'A' and 'a'would both match"));

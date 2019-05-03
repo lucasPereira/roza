@@ -101,7 +101,7 @@ public class SimianConfigurationsTest {
 		assertEquals("-language=java", configurations.getAllAsArguments().get(9));
 		assertEquals("-failOnDuplication-", configurations.getAllAsArguments().get(10));
 		assertEquals("-reportDuplicateText+", configurations.getAllAsArguments().get(11));
-		assertEquals("-ignoreBlocks=none", configurations.getAllAsArguments().get(12));
+		assertEquals("-ignoreBlocks=0:0", configurations.getAllAsArguments().get(12));
 		assertEquals("-ignoreIdentifierCase-", configurations.getAllAsArguments().get(13));
 		assertEquals("-ignoreStringCase-", configurations.getAllAsArguments().get(14));
 		assertEquals("-ignoreCharacterCase-", configurations.getAllAsArguments().get(15));
@@ -131,7 +131,7 @@ public class SimianConfigurationsTest {
 		assertEquals("-language=java", configurations.getAllAsArguments().get(9));
 		assertEquals("-failOnDuplication-", configurations.getAllAsArguments().get(10));
 		assertEquals("-reportDuplicateText+", configurations.getAllAsArguments().get(11));
-		assertEquals("-ignoreBlocks=none", configurations.getAllAsArguments().get(12));
+		assertEquals("-ignoreBlocks=0:0", configurations.getAllAsArguments().get(12));
 		assertEquals("-ignoreIdentifierCase-", configurations.getAllAsArguments().get(13));
 		assertEquals("-ignoreStringCase-", configurations.getAllAsArguments().get(14));
 		assertEquals("-ignoreCharacterCase-", configurations.getAllAsArguments().get(15));

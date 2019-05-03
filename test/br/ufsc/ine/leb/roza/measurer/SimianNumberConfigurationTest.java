@@ -22,14 +22,14 @@ public class SimianNumberConfigurationTest {
 
 	@Test
 	void create() throws Exception {
-		assertEquals(6, configuration.getValue());
+		assertEquals(6, configuration.getValue().intValue());
 		assertEquals("-threshold=6", configuration.toArgument());
 	}
 
 	@Test
 	void change() throws Exception {
 		configuration.setValue(2);
-		assertEquals(2, configuration.getValue());
+		assertEquals(2, configuration.getValue().intValue());
 		assertEquals("-threshold=2", configuration.toArgument());
 	}
 
