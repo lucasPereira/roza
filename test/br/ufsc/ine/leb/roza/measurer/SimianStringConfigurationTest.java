@@ -2,6 +2,9 @@ package br.ufsc.ine.leb.roza.measurer;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -10,10 +13,12 @@ import br.ufsc.ine.leb.roza.measurer.SimianStringConfiguration;
 public class SimianStringConfigurationTest {
 
 	private SimianStringConfiguration configuration;
+	private List<String> arguments;
 
 	@BeforeEach
 	void setup() {
 		configuration = new SimianStringConfiguration("language", "java", "Assumes all files are in the specified language");
+		arguments = new LinkedList<>();
 	}
 
 	@Test
@@ -24,15 +29,19 @@ public class SimianStringConfigurationTest {
 
 	@Test
 	void create() throws Exception {
+		configuration.addArgument(arguments);
 		assertEquals("java", configuration.getValue());
-		assertEquals("-language=java", configuration.toArgument());
+		assertEquals(1, arguments.size());
+		assertEquals("-language=java", arguments.get(0));
 	}
 
 	@Test
 	void change() throws Exception {
 		configuration.setValue("ruby");
+		configuration.addArgument(arguments);
 		assertEquals("ruby", configuration.getValue());
-		assertEquals("-language=ruby", configuration.toArgument());
+		assertEquals(1, arguments.size());
+		assertEquals("-language=ruby", arguments.get(0));
 	}
 
 }

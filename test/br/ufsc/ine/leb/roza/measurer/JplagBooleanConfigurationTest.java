@@ -10,25 +10,25 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class SimianBooleanConfigurationTest {
+public class JplagBooleanConfigurationTest {
 
-	private SimianBooleanConfiguration configurationTrue;
-	private SimianBooleanConfiguration configurationFalse;
+	private JplagBooleanConfiguration configurationTrue;
+	private JplagBooleanConfiguration configurationFalse;
 	private List<String> arguments;
 
 	@BeforeEach
 	void setup() {
-		configurationTrue = new SimianBooleanConfiguration("ignoreCurlyBraces", true, "Curly braces are ignored");
-		configurationFalse = new SimianBooleanConfiguration("ignoreCurlyBraces", false, "Curly braces are ignored");
+		configurationTrue = new JplagBooleanConfiguration("d", true, "Non-parsable files will be stored");
+		configurationFalse = new JplagBooleanConfiguration("d", false, "Non-parsable files will be stored");
 		arguments = new LinkedList<>();
 	}
 
 	@Test
 	void nameAndDescription() throws Exception {
-		assertEquals("ignoreCurlyBraces", configurationTrue.getName());
-		assertEquals("Curly braces are ignored", configurationTrue.getDescription());
-		assertEquals("ignoreCurlyBraces", configurationFalse.getName());
-		assertEquals("Curly braces are ignored", configurationFalse.getDescription());
+		assertEquals("d", configurationTrue.getName());
+		assertEquals("Non-parsable files will be stored", configurationTrue.getDescription());
+		assertEquals("d", configurationFalse.getName());
+		assertEquals("Non-parsable files will be stored", configurationFalse.getDescription());
 	}
 
 	@Test
@@ -36,15 +36,14 @@ public class SimianBooleanConfigurationTest {
 		configurationTrue.addArgument(arguments);
 		assertTrue(configurationTrue.getValue());
 		assertEquals(1, arguments.size());
-		assertEquals("-ignoreCurlyBraces+", arguments.get(0));
+		assertEquals("-d", arguments.get(0));
 	}
 
 	@Test
 	void createFalse() throws Exception {
 		configurationFalse.addArgument(arguments);
 		assertFalse(configurationFalse.getValue());
-		assertEquals(1, arguments.size());
-		assertEquals("-ignoreCurlyBraces-", arguments.get(0));
+		assertEquals(0, arguments.size());
 	}
 
 	@Test
@@ -52,8 +51,7 @@ public class SimianBooleanConfigurationTest {
 		configurationTrue.unset();
 		configurationTrue.addArgument(arguments);
 		assertFalse(configurationTrue.getValue());
-		assertEquals(1, arguments.size());
-		assertEquals("-ignoreCurlyBraces-", arguments.get(0));
+		assertEquals(0, arguments.size());
 	}
 
 	@Test
@@ -62,7 +60,7 @@ public class SimianBooleanConfigurationTest {
 		configurationFalse.addArgument(arguments);
 		assertTrue(configurationFalse.getValue());
 		assertEquals(1, arguments.size());
-		assertEquals("-ignoreCurlyBraces+", arguments.get(0));
+		assertEquals("-d", arguments.get(0));
 	}
 
 }

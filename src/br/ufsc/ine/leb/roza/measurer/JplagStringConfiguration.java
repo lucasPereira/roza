@@ -3,19 +3,18 @@ package br.ufsc.ine.leb.roza.measurer;
 import java.util.List;
 
 import br.ufsc.ine.leb.roza.support.configuration.Configuration;
-
 import br.ufsc.ine.leb.roza.support.configuration.StringConfiguration;
 
-public class SimianStringConfiguration extends StringConfiguration implements Configuration {
+public class JplagStringConfiguration extends StringConfiguration implements Configuration {
 
-	public SimianStringConfiguration(String name, String value, String description) {
+	public JplagStringConfiguration(String name, String value, String description) {
 		super(name, value, description);
 	}
 
 	@Override
 	public void addArgument(List<String> arguments) {
-		String argument = String.format("-%s=%s", getName(), getValue());
-		arguments.add(argument);
+		arguments.add(String.format("-%s", getName()));
+		arguments.add(String.format("%s", getValue()));
 	}
 
 }

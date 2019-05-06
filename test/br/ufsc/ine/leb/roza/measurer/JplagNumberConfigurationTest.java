@@ -8,29 +8,30 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class SimianNumberConfigurationTest {
+public class JplagNumberConfigurationTest {
 
-	private SimianIntegerConfiguration configuration;
+	private JplagIntegerConfiguration configuration;
 	private List<String> arguments;
 
 	@BeforeEach
 	void setup() {
-		configuration = new SimianIntegerConfiguration("threshold", 6, "Matches will contain at least the specified number of lines");
+		configuration = new JplagIntegerConfiguration("t", 1, "Tune the sensitivity of the comparison");
 		arguments = new LinkedList<>();
 	}
 
 	@Test
 	void nameAndDescription() throws Exception {
-		assertEquals("threshold", configuration.getName());
-		assertEquals("Matches will contain at least the specified number of lines", configuration.getDescription());
+		assertEquals("t", configuration.getName());
+		assertEquals("Tune the sensitivity of the comparison", configuration.getDescription());
 	}
 
 	@Test
 	void create() throws Exception {
 		configuration.addArgument(arguments);
-		assertEquals(6, configuration.getValue().intValue());
-		assertEquals(1, arguments.size());
-		assertEquals("-threshold=6", arguments.get(0));
+		assertEquals(1, configuration.getValue().intValue());
+		assertEquals(2, arguments.size());
+		assertEquals("-t", arguments.get(0));
+		assertEquals("1", arguments.get(1));
 	}
 
 	@Test
@@ -38,8 +39,9 @@ public class SimianNumberConfigurationTest {
 		configuration.setValue(2);
 		configuration.addArgument(arguments);
 		assertEquals(2, configuration.getValue().intValue());
-		assertEquals(1, arguments.size());
-		assertEquals("-threshold=2", arguments.get(0));
+		assertEquals(2, arguments.size());
+		assertEquals("-t", arguments.get(0));
+		assertEquals("2", arguments.get(1));
 	}
 
 }

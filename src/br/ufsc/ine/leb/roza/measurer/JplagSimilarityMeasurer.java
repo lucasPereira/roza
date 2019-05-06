@@ -25,10 +25,10 @@ import br.ufsc.ine.leb.roza.utils.ProcessUtils;
 
 public class JplagSimilarityMeasurer implements SimilarityMeasurer {
 
-	private String resultsFolder;
+	private JplagConfigurations configurations;
 
-	public JplagSimilarityMeasurer(String resultsFolder) {
-		this.resultsFolder = resultsFolder;
+	public JplagSimilarityMeasurer(JplagConfigurations configurations) {
+		this.configurations = configurations;
 	}
 
 	@Override
@@ -54,7 +54,7 @@ public class JplagSimilarityMeasurer implements SimilarityMeasurer {
 
 	private void parse(Matrix<TestCaseMaterialization, String, BigDecimal> matrix, List<TestCaseMaterialization> materializations) {
 		try {
-			List<File> results = new FolderUtils(resultsFolder).listFilesRecursively("match[0-9]+-top.html");
+			List<File> results = new FolderUtils(configurations.results()).listFilesRecursively("match[0-9]+-top.html");
 			for (File result : results) {
 				Document document = Jsoup.parse(result, "utf-8");
 				Elements tables = document.body().getElementsByTag("table");
@@ -86,7 +86,7 @@ public class JplagSimilarityMeasurer implements SimilarityMeasurer {
 
 	protected void parseSymmetric(Matrix<TestCaseMaterialization, String, BigDecimal> matrix, List<TestCaseMaterialization> materializations) {
 		try {
-			Document document = Jsoup.parse(new File(resultsFolder, "index.html"), "utf-8");
+			Document document = Jsoup.parse(new File(configurations.results(), "index.html"), "utf-8");
 			Elements tables = document.body().getElementsByTag("table");
 			Element table = tables.get(2);
 			Elements rows = table.getElementsByTag("tr");
@@ -110,12 +110,14 @@ public class JplagSimilarityMeasurer implements SimilarityMeasurer {
 	}
 
 	private void run(MaterializationReport materializationReport) {
-		ProcessUtils processUtils = new ProcessUtils(true, true, true);
-		String tool = "tools/jplag/tool/jplag-2.11.9.jar";
-		String sensitivity = "5";
-		String sourceFolder = materializationReport.getBaseFolder();
-		String logFile = new File(resultsFolder, "log.txt").getPath();
-		processUtils.execute("java", "-jar", tool, "-vlpd", "-l", "java17", "-m", "0%", "-t", sensitivity, "-s", sourceFolder, "-r", resultsFolder, "-o", logFile);
+		ProcessUtils processUtils = new ProcessUtils(true, true, false);
+		List<String> arguments = new LinkedList<String>();
+		arguments.add("java");
+		arguments.add("-jar");
+		arguments.add("tools/jplag/tool/jplag-2.11.9.jar");
+		arguments.addAll(configurations.getAllAsArguments());
+		arguments.add(materializationReport.getBaseFolder());
+		processUtils.execute(arguments);
 	}
 
 }

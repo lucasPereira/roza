@@ -83,11 +83,9 @@ public class SimianConfigurationsTest {
 	}
 
 	@Test
-	void arguments() throws Exception {
+	void defaultValues() throws Exception {
 		assertEquals(20, configurations.getAllAsArguments().size());
-
 		assertEquals("-threshold=6", configurations.getAllAsArguments().get(0));
-
 		assertEquals("-ignoreCurlyBraces+", configurations.getAllAsArguments().get(1));
 		assertEquals("-ignoreIdentifiers-", configurations.getAllAsArguments().get(2));
 		assertEquals("-ignoreStrings-", configurations.getAllAsArguments().get(3));
@@ -95,7 +93,6 @@ public class SimianConfigurationsTest {
 		assertEquals("-ignoreCharacters-", configurations.getAllAsArguments().get(5));
 		assertEquals("-ignoreLiterals-", configurations.getAllAsArguments().get(6));
 		assertEquals("-ignoreVariableNames-", configurations.getAllAsArguments().get(7));
-
 		assertEquals("-formatter=xml", configurations.getAllAsArguments().get(8));
 		assertEquals("-language=java", configurations.getAllAsArguments().get(9));
 		assertEquals("-failOnDuplication-", configurations.getAllAsArguments().get(10));
@@ -115,9 +112,7 @@ public class SimianConfigurationsTest {
 		configurations.threshold(2);
 
 		assertEquals(20, configurations.getAllAsArguments().size());
-
 		assertEquals("-threshold=2", configurations.getAllAsArguments().get(0));
-
 		assertEquals("-ignoreCurlyBraces+", configurations.getAllAsArguments().get(1));
 		assertEquals("-ignoreIdentifiers-", configurations.getAllAsArguments().get(2));
 		assertEquals("-ignoreStrings-", configurations.getAllAsArguments().get(3));
@@ -125,7 +120,6 @@ public class SimianConfigurationsTest {
 		assertEquals("-ignoreCharacters-", configurations.getAllAsArguments().get(5));
 		assertEquals("-ignoreLiterals-", configurations.getAllAsArguments().get(6));
 		assertEquals("-ignoreVariableNames-", configurations.getAllAsArguments().get(7));
-
 		assertEquals("-formatter=xml", configurations.getAllAsArguments().get(8));
 		assertEquals("-language=java", configurations.getAllAsArguments().get(9));
 		assertEquals("-failOnDuplication-", configurations.getAllAsArguments().get(10));
@@ -143,16 +137,16 @@ public class SimianConfigurationsTest {
 	@Test
 	void threasholdShoudBeLargerThanTwo() throws Exception {
 		assertThrows(InvalidConfigurationException.class, () -> {
-			new SimianConfigurations().threshold(-1);
+			configurations.threshold(-1);
 		});
 		assertThrows(InvalidConfigurationException.class, () -> {
-			new SimianConfigurations().threshold(0);
+			configurations.threshold(0);
 		});
 		assertThrows(InvalidConfigurationException.class, () -> {
-			new SimianConfigurations().threshold(1);
+			configurations.threshold(1);
 		});
 		assertThrows(InvalidConfigurationException.class, () -> {
-			new SimianConfigurations().threshold(null);
+			configurations.threshold(null);
 		});
 	}
 

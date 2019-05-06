@@ -32,6 +32,12 @@ public class ProcessUtils {
 		execute(builder);
 	}
 
+	public void execute(List<String> arguments) {
+		ProcessBuilder builder = new ProcessBuilder();
+		builder.command(arguments);
+		execute(builder);
+	}
+
 	public void execute(File redirect, List<String> arguments) {
 		ProcessBuilder builder = new ProcessBuilder();
 		builder.command(arguments);

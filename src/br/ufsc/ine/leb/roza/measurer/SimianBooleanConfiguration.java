@@ -1,5 +1,7 @@
 package br.ufsc.ine.leb.roza.measurer;
 
+import java.util.List;
+
 import br.ufsc.ine.leb.roza.support.configuration.BooleanConfiguration;
 import br.ufsc.ine.leb.roza.support.configuration.Configuration;
 
@@ -10,9 +12,10 @@ public class SimianBooleanConfiguration extends BooleanConfiguration implements 
 	}
 
 	@Override
-	public String toArgument() {
+	public void addArgument(List<String> arguments) {
 		String sinal = getValue() ? "+" : "-";
-		return String.format("-%s%s", getName(), sinal);
+		String argument = String.format("-%s%s", getName(), sinal);
+		arguments.add(argument);
 	}
 
 }

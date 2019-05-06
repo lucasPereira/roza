@@ -11,8 +11,7 @@ public abstract class AbstractConfigurations implements Configurations {
 	public final List<String> getAllAsArguments() {
 		List<String> arguments = new ArrayList<>(getAll().size());
 		for (Configuration configuration : getAll()) {
-			String argument = configuration.toArgument();
-			arguments.add(argument);
+			configuration.addArgument(arguments);
 		}
 		return arguments;
 	}
