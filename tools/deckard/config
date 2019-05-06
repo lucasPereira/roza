@@ -1,58 +1,49 @@
 #!/bin/sh
 
-SRC_DIR="../../execution/materializer"
+MIN_TOKENS='1'
+export MIN_TOKENS
 
-FILE_PATTERN='*.java'
+STRIDE='0'
+export STRIDE
+
+SIMILARITY='1'
+export SIMILARITY
+
+SRC_DIR="../../execution/materializer"
+export SRC_DIR
+
+FILE_PATTERN="*.java"
+export FILE_PATTERN
 
 DECKARD_DIR="tool"
-
-MIN_TOKENS='10'
-
-STRIDE='2'
-
-SIMILARITY='0.5'
+export DECKARD_DIR
 
 VECTOR_DIR="../../execution/measurer/vectors"
+export VECTOR_DIR
 
 CLUSTER_DIR="../../execution/measurer/cluster"
+export CLUSTER_DIR
 
 TIME_DIR="../../execution/measurer/times"
+export TIME_DIR
 
-VGEN_EXEC="$DECKARD_DIR/src"
-
-VGEN_EXEC="$VGEN_EXEC/main/jvecgen"
+VGEN_EXEC="$DECKARD_DIR/src/main/jvecgen"
+export GROUPING_EXEC
 
 GROUPING_EXEC="$DECKARD_DIR/src/vgen/vgrouping/runvectorsort"
+export GROUPING_EXEC
 
 CLUSTER_EXEC="$DECKARD_DIR/src/lsh/bin/enumBuckets"
+export CLUSTER_EXEC
 
 QUERY_EXEC="$DECKARD_DIR/src/lsh/bin/queryBuckets"
+export QUERY_EXEC
 
 POSTPRO_EXEC="$DECKARD_DIR/scripts/clonedetect/post_process_groupfile"
-
-SRC2HTM_EXEC=source-highlight
-
-SRC2HTM_OPTS=--line-number-ref
-
-MAX_PROCS=8
-
-GROUPING_S='30'
-
-export DECKARD_DIR
-export FILE_PATTERN
-export VECTOR_DIR
-export TIME_DIR
-export CLUSTER_DIR
-export VGEN_EXEC
-export GROUPING_EXEC
-export CLUSTER_EXEC
 export POSTPRO_EXEC
-export SRC2HTM_EXEC
-export SRC2HTM_OPTS
-export MIN_TOKENS
-export STRIDE
-export SIMILARITY
+
+GROUPING_S='1'
 export GROUPING_S
-export GROUPING_D
-export GROUPING_C
+
+MAX_PROC='1'
 export MAX_PROCS

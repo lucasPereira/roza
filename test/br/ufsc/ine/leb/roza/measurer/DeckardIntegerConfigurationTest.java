@@ -1,0 +1,47 @@
+package br.ufsc.ine.leb.roza.measurer;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.util.LinkedList;
+import java.util.List;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+public class DeckardIntegerConfigurationTest {
+
+	private DeckardIntegerConfiguration configuration;
+	private List<String> arguments;
+
+	@BeforeEach
+	void setup() {
+		configuration = new DeckardIntegerConfiguration("MIN_TOKENS", 1, "Minimum token count to suppress vectors for small sub-trees");
+		arguments = new LinkedList<>();
+	}
+
+	@Test
+	void nameAndDescription() throws Exception {
+		assertEquals("MIN_TOKENS", configuration.getName());
+		assertEquals("Minimum token count to suppress vectors for small sub-trees", configuration.getDescription());
+	}
+
+	@Test
+	void create() throws Exception {
+		configuration.addArgument(arguments);
+		assertEquals(1, configuration.getValue().intValue());
+		assertEquals(2, arguments.size());
+		assertEquals("MIN_TOKENS=1", arguments.get(0));
+		assertEquals("export MIN_TOKENS", arguments.get(1));
+	}
+
+	@Test
+	void change() throws Exception {
+		configuration.setValue(2);
+		configuration.addArgument(arguments);
+		assertEquals(2, configuration.getValue().intValue());
+		assertEquals(2, arguments.size());
+		assertEquals("MIN_TOKENS=2", arguments.get(0));
+		assertEquals("export MIN_TOKENS", arguments.get(1));
+	}
+
+}
