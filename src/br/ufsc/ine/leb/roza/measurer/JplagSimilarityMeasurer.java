@@ -110,7 +110,7 @@ public class JplagSimilarityMeasurer implements SimilarityMeasurer {
 	}
 
 	private void run(MaterializationReport materializationReport) {
-		ProcessUtils processUtils = new ProcessUtils(true, true, false);
+		ProcessUtils processUtils = new ProcessUtils(true, true, true);
 		List<String> arguments = new LinkedList<String>();
 		arguments.add("java");
 		arguments.add("-jar");
