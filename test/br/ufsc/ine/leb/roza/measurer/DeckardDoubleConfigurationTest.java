@@ -29,9 +29,8 @@ public class DeckardDoubleConfigurationTest {
 	void create() throws Exception {
 		configuration.addArgument(arguments);
 		assertEquals(1, configuration.getValue().doubleValue());
-		assertEquals(2, arguments.size());
-		assertEquals("SIMILARITY=1.0", arguments.get(0));
-		assertEquals("export SIMILARITY", arguments.get(1));
+		assertEquals(1, arguments.size());
+		assertEquals("export SIMILARITY=1.0", arguments.get(0));
 	}
 
 	@Test
@@ -39,9 +38,8 @@ public class DeckardDoubleConfigurationTest {
 		configuration.setValue(0.5);
 		configuration.addArgument(arguments);
 		assertEquals(0.5, configuration.getValue().doubleValue());
-		assertEquals(2, arguments.size());
-		assertEquals("SIMILARITY=0.5", arguments.get(0));
-		assertEquals("export SIMILARITY", arguments.get(1));
+		assertEquals(1, arguments.size());
+		assertEquals("export SIMILARITY=0.5", arguments.get(0));
 	}
 
 }

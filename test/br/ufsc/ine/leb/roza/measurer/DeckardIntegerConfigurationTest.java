@@ -29,9 +29,8 @@ public class DeckardIntegerConfigurationTest {
 	void create() throws Exception {
 		configuration.addArgument(arguments);
 		assertEquals(1, configuration.getValue().intValue());
-		assertEquals(2, arguments.size());
-		assertEquals("MIN_TOKENS=1", arguments.get(0));
-		assertEquals("export MIN_TOKENS", arguments.get(1));
+		assertEquals(1, arguments.size());
+		assertEquals("export MIN_TOKENS=1", arguments.get(0));
 	}
 
 	@Test
@@ -39,9 +38,8 @@ public class DeckardIntegerConfigurationTest {
 		configuration.setValue(2);
 		configuration.addArgument(arguments);
 		assertEquals(2, configuration.getValue().intValue());
-		assertEquals(2, arguments.size());
-		assertEquals("MIN_TOKENS=2", arguments.get(0));
-		assertEquals("export MIN_TOKENS", arguments.get(1));
+		assertEquals(1, arguments.size());
+		assertEquals("export MIN_TOKENS=2", arguments.get(0));
 	}
 
 }

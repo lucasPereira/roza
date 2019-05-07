@@ -1,49 +1,33 @@
 #!/bin/sh
 
-MIN_TOKENS='1'
-export MIN_TOKENS
+export MIN_TOKENS='1'
 
-STRIDE='0'
-export STRIDE
+export STRIDE='0'
 
-SIMILARITY='1'
-export SIMILARITY
+export SIMILARITY='1'
 
-SRC_DIR="../../execution/materializer"
-export SRC_DIR
+export SRC_DIR="../../execution/materializer"
 
-FILE_PATTERN="*.java"
-export FILE_PATTERN
+export FILE_PATTERN="*.java"
 
-DECKARD_DIR="tool"
-export DECKARD_DIR
+export VECTOR_DIR="../../execution/measurer/vectors"
 
-VECTOR_DIR="../../execution/measurer/vectors"
-export VECTOR_DIR
+export CLUSTER_DIR="../../execution/measurer/cluster"
 
-CLUSTER_DIR="../../execution/measurer/cluster"
-export CLUSTER_DIR
+export TIME_DIR="../../execution/measurer/times"
 
-TIME_DIR="../../execution/measurer/times"
-export TIME_DIR
+export DECKARD_DIR="tool"
 
-VGEN_EXEC="$DECKARD_DIR/src/main/jvecgen"
-export GROUPING_EXEC
+export VGEN_EXEC="$DECKARD_DIR/src/main/jvecgen"
 
-GROUPING_EXEC="$DECKARD_DIR/src/vgen/vgrouping/runvectorsort"
-export GROUPING_EXEC
+export GROUPING_EXEC="$DECKARD_DIR/src/vgen/vgrouping/runvectorsort"
 
-CLUSTER_EXEC="$DECKARD_DIR/src/lsh/bin/enumBuckets"
-export CLUSTER_EXEC
+export CLUSTER_EXEC="$DECKARD_DIR/src/lsh/bin/enumBuckets"
 
-QUERY_EXEC="$DECKARD_DIR/src/lsh/bin/queryBuckets"
-export QUERY_EXEC
+export QUERY_EXEC="$DECKARD_DIR/src/lsh/bin/queryBuckets"
 
-POSTPRO_EXEC="$DECKARD_DIR/scripts/clonedetect/post_process_groupfile"
-export POSTPRO_EXEC
+export POSTPRO_EXEC="$DECKARD_DIR/scripts/clonedetect/post_process_groupfile"
 
-GROUPING_S='1'
-export GROUPING_S
+export GROUPING_S='1'
 
-MAX_PROC='1'
-export MAX_PROCS
+export MAX_PROC='1'

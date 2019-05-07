@@ -110,7 +110,6 @@ public class SimianConfigurationsTest {
 	@Test
 	void changeValues() throws Exception {
 		configurations.threshold(2);
-
 		assertEquals(20, configurations.getAllAsArguments().size());
 		assertEquals("-threshold=2", configurations.getAllAsArguments().get(0));
 		assertEquals("-ignoreCurlyBraces+", configurations.getAllAsArguments().get(1));

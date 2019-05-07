@@ -13,8 +13,7 @@ public class DeckardIntegerConfiguration extends IntegerConfiguration implements
 
 	@Override
 	public void addArgument(List<String> arguments) {
-		arguments.add(String.format("%s=%d", getName(), getValue()));
-		arguments.add(String.format("export %s", getName()));
+		arguments.add(String.format("export %s=%d", getName(), getValue()));
 	}
 
 }

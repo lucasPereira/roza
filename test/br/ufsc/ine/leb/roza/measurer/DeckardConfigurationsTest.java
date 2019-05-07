@@ -1,10 +1,11 @@
 package br.ufsc.ine.leb.roza.measurer;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import br.ufsc.ine.leb.roza.exceptions.InvalidConfigurationException;
 
 public class DeckardConfigurationsTest {
 
@@ -34,17 +35,17 @@ public class DeckardConfigurationsTest {
 		assertEquals("FILE_PATTERN", configurations.getAll().get(4).getName());
 		assertEquals("Input file name pattern", configurations.getAll().get(4).getDescription());
 
-		assertEquals("DECKARD_DIR", configurations.getAll().get(5).getName());
-		assertEquals("Where is the home directory of Deckard", configurations.getAll().get(5).getDescription());
+		assertEquals("VECTOR_DIR", configurations.getAll().get(5).getName());
+		assertEquals("Where to output detected clone clusters", configurations.getAll().get(5).getDescription());
 
-		assertEquals("VECTOR_DIR", configurations.getAll().get(6).getName());
+		assertEquals("CLUSTER_DIR", configurations.getAll().get(6).getName());
 		assertEquals("Where to output detected clone clusters", configurations.getAll().get(6).getDescription());
 
-		assertEquals("CLUSTER_DIR", configurations.getAll().get(7).getName());
-		assertEquals("Where to output detected clone clusters", configurations.getAll().get(7).getDescription());
+		assertEquals("TIME_DIR", configurations.getAll().get(7).getName());
+		assertEquals("Where to output timing/debugging info", configurations.getAll().get(7).getDescription());
 
-		assertEquals("TIME_DIR", configurations.getAll().get(8).getName());
-		assertEquals("Where to output timing/debugging info", configurations.getAll().get(8).getDescription());
+		assertEquals("DECKARD_DIR", configurations.getAll().get(8).getName());
+		assertEquals("Where is the home directory of Deckard", configurations.getAll().get(8).getDescription());
 
 		assertEquals("VGEN_EXEC", configurations.getAll().get(9).getName());
 		assertEquals("Where is the vector generator", configurations.getAll().get(9).getDescription());
@@ -70,14 +71,88 @@ public class DeckardConfigurationsTest {
 
 	@Test
 	void defaultValues() throws Exception {
-		assertEquals(32, configurations.getAllAsArguments().size());
-		fail();
+		assertEquals(16, configurations.getAllAsArguments().size());
+		assertEquals("export MIN_TOKES=1", configurations.getAllAsArguments().get(0));
+		assertEquals("export STRIDE=0", configurations.getAllAsArguments().get(1));
+		assertEquals("export SIMILARITY=1.0", configurations.getAllAsArguments().get(2));
+		assertEquals("export SRC_DIR=../../execution/materializer", configurations.getAllAsArguments().get(3));
+		assertEquals("export FILE_PATTERN=*.java", configurations.getAllAsArguments().get(4));
+		assertEquals("export VECTOR_DIR=../../execution/measurer/vectors", configurations.getAllAsArguments().get(5));
+		assertEquals("export CLUSTER_DIR=../../execution/measurer/cluster", configurations.getAllAsArguments().get(6));
+		assertEquals("export TIME_DIR=../../execution/measurer/times", configurations.getAllAsArguments().get(7));
+		assertEquals("export DECKARD_DIR=tool", configurations.getAllAsArguments().get(8));
+		assertEquals("export VGEN_EXEC=tool/src/main/jvecgen", configurations.getAllAsArguments().get(9));
+		assertEquals("export GROUPING_EXEC=tool/src/vgen/vgrouping/runvectorsort", configurations.getAllAsArguments().get(10));
+		assertEquals("export CLUSTER_EXEC=tool/src/lsh/bin/enumBuckets", configurations.getAllAsArguments().get(11));
+		assertEquals("export QUERY_EXEC=tool/src/lsh/bin/queryBuckets", configurations.getAllAsArguments().get(12));
+		assertEquals("export POSTPRO_EXEC=tool/scripts/clonedetect/post_process_groupfile", configurations.getAllAsArguments().get(13));
+		assertEquals("export GROUPING_S=1", configurations.getAllAsArguments().get(14));
+		assertEquals("export MAX_PROC=1", configurations.getAllAsArguments().get(15));
 	}
 
 	@Test
 	void changeValues() throws Exception {
-		assertEquals(32, configurations.getAllAsArguments().size());
-		fail();
+		configurations.minTokens(2).stride(1).similarity(0.9).srcDir("my/src");
+		assertEquals(16, configurations.getAllAsArguments().size());
+		assertEquals("export MIN_TOKES=2", configurations.getAllAsArguments().get(0));
+		assertEquals("export STRIDE=1", configurations.getAllAsArguments().get(1));
+		assertEquals("export SIMILARITY=0.9", configurations.getAllAsArguments().get(2));
+		assertEquals("export SRC_DIR=my/src", configurations.getAllAsArguments().get(3));
+		assertEquals("export FILE_PATTERN=*.java", configurations.getAllAsArguments().get(4));
+		assertEquals("export VECTOR_DIR=../../execution/measurer/vectors", configurations.getAllAsArguments().get(5));
+		assertEquals("export CLUSTER_DIR=../../execution/measurer/cluster", configurations.getAllAsArguments().get(6));
+		assertEquals("export TIME_DIR=../../execution/measurer/times", configurations.getAllAsArguments().get(7));
+		assertEquals("export DECKARD_DIR=tool", configurations.getAllAsArguments().get(8));
+		assertEquals("export VGEN_EXEC=tool/src/main/jvecgen", configurations.getAllAsArguments().get(9));
+		assertEquals("export GROUPING_EXEC=tool/src/vgen/vgrouping/runvectorsort", configurations.getAllAsArguments().get(10));
+		assertEquals("export CLUSTER_EXEC=tool/src/lsh/bin/enumBuckets", configurations.getAllAsArguments().get(11));
+		assertEquals("export QUERY_EXEC=tool/src/lsh/bin/queryBuckets", configurations.getAllAsArguments().get(12));
+		assertEquals("export POSTPRO_EXEC=tool/scripts/clonedetect/post_process_groupfile", configurations.getAllAsArguments().get(13));
+		assertEquals("export GROUPING_S=1", configurations.getAllAsArguments().get(14));
+		assertEquals("export MAX_PROC=1", configurations.getAllAsArguments().get(15));
+	}
+
+	@Test
+	void minTokensShouldBeLargerThanZero() throws Exception {
+		assertThrows(InvalidConfigurationException.class, () -> {
+			configurations.minTokens(-1);
+		});
+		assertThrows(InvalidConfigurationException.class, () -> {
+			configurations.minTokens(0);
+		});
+		assertThrows(InvalidConfigurationException.class, () -> {
+			configurations.minTokens(null);
+		});
+	}
+
+	@Test
+	void strideShouldBePositive() throws Exception {
+		assertThrows(InvalidConfigurationException.class, () -> {
+			configurations.stride(-1);
+		});
+		assertThrows(InvalidConfigurationException.class, () -> {
+			configurations.stride(null);
+		});
+	}
+
+	@Test
+	void similarityShouldBeBetweenZeroAndOne() throws Exception {
+		assertThrows(InvalidConfigurationException.class, () -> {
+			configurations.similarity(-0.1);
+		});
+		assertThrows(InvalidConfigurationException.class, () -> {
+			configurations.similarity(1.1);
+		});
+		assertThrows(InvalidConfigurationException.class, () -> {
+			configurations.minTokens(null);
+		});
+	}
+
+	@Test
+	void srcDirShouldBeDifferentThanNull() throws Exception {
+		assertThrows(InvalidConfigurationException.class, () -> {
+			configurations.srcDir(null);
+		});
 	}
 
 }

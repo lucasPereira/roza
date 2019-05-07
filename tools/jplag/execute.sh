@@ -1,10 +1,11 @@
 #!/bin/bash
 
 java -jar tool/jplag-2.11.9.jar \
-	-vlpd \
+	-t 1 \
 	-l java17 \
 	-m 0% \
-	-t 1 \
-	-s ../../execution/materializer \
+	-vl \
+	-o ../../execution/measurer/log.txt \
 	-r ../../execution/measurer \
-	-o ../../execution/measurer/log.txt
+	-s \
+	../../execution/materializer

@@ -14,8 +14,7 @@ public class DeckardDoubleConfiguration extends DoubleConfiguration implements C
 
 	@Override
 	public void addArgument(List<String> arguments) {
-		arguments.add(String.format(Locale.ENGLISH, "%s=%.1f", getName(), getValue()));
-		arguments.add(String.format("export %s", getName()));
+		arguments.add(String.format(Locale.ENGLISH, "export %s=%.1f", getName(), getValue()));
 	}
 
 }

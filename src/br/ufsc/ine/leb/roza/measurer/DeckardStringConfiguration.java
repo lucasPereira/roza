@@ -13,8 +13,7 @@ public class DeckardStringConfiguration extends StringConfiguration implements C
 
 	@Override
 	public void addArgument(List<String> arguments) {
-		arguments.add(String.format("%s=%s", getName(), getValue()));
-		arguments.add(String.format("export %s", getName()));
+		arguments.add(String.format("export %s=%s", getName(), getValue()));
 	}
 
 }

@@ -29,9 +29,8 @@ public class DeckardStringConfigurationTest {
 	void create() throws Exception {
 		configuration.addArgument(arguments);
 		assertEquals("*.java", configuration.getValue());
-		assertEquals(2, arguments.size());
-		assertEquals("FILE_PATTERN=*.java", arguments.get(0));
-		assertEquals("export FILE_PATTERN", arguments.get(1));
+		assertEquals(1, arguments.size());
+		assertEquals("export FILE_PATTERN=*.java", arguments.get(0));
 	}
 
 	@Test
@@ -39,9 +38,8 @@ public class DeckardStringConfigurationTest {
 		configuration.setValue("*.c");
 		configuration.addArgument(arguments);
 		assertEquals("*.c", configuration.getValue());
-		assertEquals(2, arguments.size());
-		assertEquals("FILE_PATTERN=*.c", arguments.get(0));
-		assertEquals("export FILE_PATTERN", arguments.get(1));
+		assertEquals(1, arguments.size());
+		assertEquals("export FILE_PATTERN=*.c", arguments.get(0));
 	}
 
 }
