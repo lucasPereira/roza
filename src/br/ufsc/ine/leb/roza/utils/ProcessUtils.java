@@ -32,6 +32,13 @@ public class ProcessUtils {
 		execute(builder);
 	}
 
+	public void execute(File directory, String command) {
+		ProcessBuilder builder = new ProcessBuilder();
+		builder.directory(directory);
+		builder.command(command);
+		execute(builder);
+	}
+
 	public void execute(List<String> arguments) {
 		ProcessBuilder builder = new ProcessBuilder();
 		builder.command(arguments);

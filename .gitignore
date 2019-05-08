@@ -1,3 +1,4 @@
 bin/
 execution/materializer/*.java
 execution/measurer/*
+tools/deckard/config

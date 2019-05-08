@@ -5,6 +5,6 @@ import br.ufsc.ine.leb.roza.SimilarityReport;
 
 public interface SimilarityMeasurer {
 
-	SimilarityReport measure(MaterializationReport materializations);
+	SimilarityReport measure(MaterializationReport materializationReport);
 
 }

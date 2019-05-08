@@ -15,7 +15,7 @@ public class DeckardConfigurations extends AbstractConfigurations implements Con
 	private DeckardStringConfiguration srcDir;
 
 	public DeckardConfigurations() {
-		minTokens = new DeckardIntegerConfiguration("MIN_TOKES", 1, "Minimum token count to suppress vectors for small sub-trees");
+		minTokens = new DeckardIntegerConfiguration("MIN_TOKENS", 1, "Minimum token count to suppress vectors for small sub-trees");
 		stride = new DeckardIntegerConfiguration("STRIDE", 0, "Width of the sliding window and how far it moves in each step");
 		similarity = new DeckardDoubleConfiguration("SIMILARITY", 1.0, "Similarity thresold based on editing distance");
 		srcDir = new DeckardStringConfiguration("SRC_DIR", "../../execution/materializer", "The root directory containing the source files");

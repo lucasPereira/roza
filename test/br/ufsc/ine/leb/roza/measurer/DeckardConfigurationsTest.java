@@ -20,7 +20,7 @@ public class DeckardConfigurationsTest {
 	void configurations() throws Exception {
 		assertEquals(16, configurations.getAll().size());
 
-		assertEquals("MIN_TOKES", configurations.getAll().get(0).getName());
+		assertEquals("MIN_TOKENS", configurations.getAll().get(0).getName());
 		assertEquals("Minimum token count to suppress vectors for small sub-trees", configurations.getAll().get(0).getDescription());
 
 		assertEquals("STRIDE", configurations.getAll().get(1).getName());
@@ -72,7 +72,7 @@ public class DeckardConfigurationsTest {
 	@Test
 	void defaultValues() throws Exception {
 		assertEquals(16, configurations.getAllAsArguments().size());
-		assertEquals("export MIN_TOKES=1", configurations.getAllAsArguments().get(0));
+		assertEquals("export MIN_TOKENS=1", configurations.getAllAsArguments().get(0));
 		assertEquals("export STRIDE=0", configurations.getAllAsArguments().get(1));
 		assertEquals("export SIMILARITY=1.0", configurations.getAllAsArguments().get(2));
 		assertEquals("export SRC_DIR=../../execution/materializer", configurations.getAllAsArguments().get(3));
@@ -94,7 +94,7 @@ public class DeckardConfigurationsTest {
 	void changeValues() throws Exception {
 		configurations.minTokens(2).stride(1).similarity(0.9).srcDir("my/src");
 		assertEquals(16, configurations.getAllAsArguments().size());
-		assertEquals("export MIN_TOKES=2", configurations.getAllAsArguments().get(0));
+		assertEquals("export MIN_TOKENS=2", configurations.getAllAsArguments().get(0));
 		assertEquals("export STRIDE=1", configurations.getAllAsArguments().get(1));
 		assertEquals("export SIMILARITY=0.9", configurations.getAllAsArguments().get(2));
 		assertEquals("export SRC_DIR=my/src", configurations.getAllAsArguments().get(3));

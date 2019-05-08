@@ -26,7 +26,7 @@ public class DeckardSimilarityMeasurerTest {
 		new FolderUtils("execution/materializer").createEmptyFolder();
 		new FolderUtils("execution/measurer").createEmptyFolder();
 		materializer = new OneTestCasePerClassTestCaseMaterializer("execution/materializer");
-		measurer = new DeckardSimilarityMeasurer();
+		measurer = new DeckardSimilarityMeasurer(new DeckardConfigurations());
 	}
 
 	@Test
@@ -66,10 +66,10 @@ public class DeckardSimilarityMeasurerTest {
 		assertEquals(BigDecimal.ONE, report.getAssessments().get(1).getScore());
 		assertEquals(testCaseB, report.getAssessments().get(1).getSource());
 		assertEquals(testCaseB, report.getAssessments().get(1).getTarget());
-		assertEquals(new BigDecimal("0.5"), report.getAssessments().get(2).getScore());
+		assertEquals(BigDecimal.ONE, report.getAssessments().get(2).getScore());
 		assertEquals(testCaseA, report.getAssessments().get(2).getSource());
 		assertEquals(testCaseB, report.getAssessments().get(2).getTarget());
-		assertEquals(new BigDecimal("0.5"), report.getAssessments().get(3).getScore());
+		assertEquals(BigDecimal.ONE, report.getAssessments().get(3).getScore());
 		assertEquals(testCaseB, report.getAssessments().get(3).getSource());
 		assertEquals(testCaseA, report.getAssessments().get(3).getTarget());
 	}
@@ -90,10 +90,10 @@ public class DeckardSimilarityMeasurerTest {
 		assertEquals(BigDecimal.ONE, report.getAssessments().get(1).getScore());
 		assertEquals(testCaseB, report.getAssessments().get(1).getSource());
 		assertEquals(testCaseB, report.getAssessments().get(1).getTarget());
-		assertEquals(new BigDecimal("0.25"), report.getAssessments().get(2).getScore());
+		assertEquals(BigDecimal.ONE, report.getAssessments().get(2).getScore());
 		assertEquals(testCaseA, report.getAssessments().get(2).getSource());
 		assertEquals(testCaseB, report.getAssessments().get(2).getTarget());
-		assertEquals(new BigDecimal("0.25"), report.getAssessments().get(3).getScore());
+		assertEquals(BigDecimal.ONE, report.getAssessments().get(3).getScore());
 		assertEquals(testCaseB, report.getAssessments().get(3).getSource());
 		assertEquals(testCaseA, report.getAssessments().get(3).getTarget());
 	}
@@ -114,10 +114,10 @@ public class DeckardSimilarityMeasurerTest {
 		assertEquals(BigDecimal.ONE, report.getAssessments().get(1).getScore());
 		assertEquals(testCaseB, report.getAssessments().get(1).getSource());
 		assertEquals(testCaseB, report.getAssessments().get(1).getTarget());
-		assertEquals(BigDecimal.ZERO, report.getAssessments().get(2).getScore());
+		assertEquals(new BigDecimal("0.14"), report.getAssessments().get(2).getScore());
 		assertEquals(testCaseA, report.getAssessments().get(2).getSource());
 		assertEquals(testCaseB, report.getAssessments().get(2).getTarget());
-		assertEquals(BigDecimal.ZERO, report.getAssessments().get(3).getScore());
+		assertEquals(new BigDecimal("0.14"), report.getAssessments().get(3).getScore());
 		assertEquals(testCaseB, report.getAssessments().get(3).getSource());
 		assertEquals(testCaseA, report.getAssessments().get(3).getTarget());
 	}
