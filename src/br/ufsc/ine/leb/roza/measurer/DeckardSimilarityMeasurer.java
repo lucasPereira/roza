@@ -2,6 +2,8 @@ package br.ufsc.ine.leb.roza.measurer;
 
 import java.io.File;
 import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -16,6 +18,7 @@ import br.ufsc.ine.leb.roza.support.matrix.Matrix;
 import br.ufsc.ine.leb.roza.support.matrix.MatrixElementToKeyConverter;
 import br.ufsc.ine.leb.roza.support.matrix.MatrixPair;
 import br.ufsc.ine.leb.roza.support.matrix.MatrixValueFactory;
+import br.ufsc.ine.leb.roza.utils.FileUtils;
 import br.ufsc.ine.leb.roza.utils.FolderUtils;
 import br.ufsc.ine.leb.roza.utils.ProcessUtils;
 
@@ -50,7 +53,30 @@ public class DeckardSimilarityMeasurer implements SimilarityMeasurer {
 	}
 
 	private void parse(Matrix<TestCaseMaterialization, String, Intersector> matrix, List<TestCaseMaterialization> materializations) {
-
+		List<File> reports = new FolderUtils(configurations.clusterDir()).listFilesRecursively("post_cluster_vdb_.*");
+		for (File reportFile : reports) {
+			String reportContent = new FileUtils().readContetAsString(reportFile).trim();
+			String lineSeparator = System.lineSeparator();
+			List<String> clusters = Arrays.asList(reportContent.split(lineSeparator + lineSeparator));
+			Iterator<String> clusterIterator = clusters.stream().filter((cluster) -> {
+				return !cluster.trim().isEmpty();
+			}).iterator();
+			while (clusterIterator.hasNext()) {
+				String cluster = clusterIterator.next();
+				List<String> matches = Arrays.asList(cluster.split(lineSeparator));
+				for (String sourceMatch : matches) {
+					List<String> sourceFields = Arrays.asList(sourceMatch.split("\\s"));
+					String sourceFile = sourceFields.get(3);
+					Integer sourceLine = Integer.parseInt(sourceFields.get(4).replaceFirst("LINE:([0-9]+):([0-9]+)", "$1"));
+					Integer sourceLenght = Integer.parseInt(sourceFields.get(4).replaceFirst("LINE:([0-9]+):([0-9]+)", "$2"));
+					for (String targetMatch : matches) {
+						List<String> targetFields = Arrays.asList(targetMatch.split("\\s"));
+						String targetFile = targetFields.get(3);
+						matrix.get(sourceFile, targetFile).addSegment(sourceLine, sourceLine + sourceLenght - 1);
+					}
+				}
+			}
+		}
 	}
 
 	private void run(MaterializationReport materializationReport) {
@@ -58,7 +84,7 @@ public class DeckardSimilarityMeasurer implements SimilarityMeasurer {
 		String argumentsText = configurations.getAllAsArguments().stream().collect(Collectors.joining(System.lineSeparator()));
 		String argumentsScript = String.format("#!/bin/sh\n%s", argumentsText);
 		folderUtils.writeContetAsString("config", argumentsScript);
-		ProcessUtils processUtils = new ProcessUtils(true, true, false);
+		ProcessUtils processUtils = new ProcessUtils(true, true, true);
 		processUtils.execute(new File("tools/deckard"), "./tool/scripts/clonedetect/deckard.sh");
 	}
 

@@ -79,16 +79,20 @@ public class DeckardConfigurations extends AbstractConfigurations implements Con
 
 	public DeckardConfigurations srcDir(String value) {
 		ensureThat(value != null);
-		srcDir.setValue(value);
+		srcDir.setValue(new File(value).getAbsolutePath());
 		return this;
 	}
 
 	public DeckardConfigurations results(String value) {
 		ensureThat(value != null);
-		vectorDir.setValue(new File(value, "vectors").getPath());
-		clusterDir.setValue(new File(value, "cluster").getPath());
-		timeDir.setValue(new File(value, "times").getPath());
+		vectorDir.setValue(new File(value, "vectors").getAbsolutePath());
+		clusterDir.setValue(new File(value, "cluster").getAbsolutePath());
+		timeDir.setValue(new File(value, "times").getAbsolutePath());
 		return this;
+	}
+
+	public String clusterDir() {
+		return clusterDir.getValue();
 	}
 
 }

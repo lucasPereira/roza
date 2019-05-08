@@ -7,7 +7,7 @@ public class DeckardMatrixElementToKeyConverter implements MatrixElementToKeyCon
 
 	@Override
 	public String convert(TestCaseMaterialization element) {
-		return "../../" + element.getFilePath();
+		return element.getAbsoluteFilePath();
 	}
 
 }

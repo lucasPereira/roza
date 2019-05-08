@@ -1,6 +1,9 @@
 package br.ufsc.ine.leb.roza.measurer;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import java.io.File;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -77,11 +80,11 @@ public class DeckardConfigurationsTest {
 		assertEquals("export MIN_TOKENS=1", configurations.getAllAsArguments().get(0));
 		assertEquals("export STRIDE=0", configurations.getAllAsArguments().get(1));
 		assertEquals("export SIMILARITY=1.0", configurations.getAllAsArguments().get(2));
-		assertEquals("export SRC_DIR=my/src", configurations.getAllAsArguments().get(3));
+		assertEquals("export SRC_DIR=" + new File("my/src").getAbsolutePath(), configurations.getAllAsArguments().get(3));
 		assertEquals("export FILE_PATTERN=*.java", configurations.getAllAsArguments().get(4));
-		assertEquals("export VECTOR_DIR=my/results/vectors", configurations.getAllAsArguments().get(5));
-		assertEquals("export CLUSTER_DIR=my/results/cluster", configurations.getAllAsArguments().get(6));
-		assertEquals("export TIME_DIR=my/results/times", configurations.getAllAsArguments().get(7));
+		assertEquals("export VECTOR_DIR=" + new File("my/results/vectors").getAbsolutePath(), configurations.getAllAsArguments().get(5));
+		assertEquals("export CLUSTER_DIR=" + new File("my/results/cluster").getAbsolutePath(), configurations.getAllAsArguments().get(6));
+		assertEquals("export TIME_DIR=" + new File("my/results/times").getAbsolutePath(), configurations.getAllAsArguments().get(7));
 		assertEquals("export DECKARD_DIR=tool", configurations.getAllAsArguments().get(8));
 		assertEquals("export VGEN_EXEC=tool/src/main/jvecgen", configurations.getAllAsArguments().get(9));
 		assertEquals("export GROUPING_EXEC=tool/src/vgen/vgrouping/runvectorsort", configurations.getAllAsArguments().get(10));
@@ -99,11 +102,11 @@ public class DeckardConfigurationsTest {
 		assertEquals("export MIN_TOKENS=2", configurations.getAllAsArguments().get(0));
 		assertEquals("export STRIDE=1", configurations.getAllAsArguments().get(1));
 		assertEquals("export SIMILARITY=0.9", configurations.getAllAsArguments().get(2));
-		assertEquals("export SRC_DIR=my/src", configurations.getAllAsArguments().get(3));
+		assertEquals("export SRC_DIR=" + new File("my/src").getAbsolutePath(), configurations.getAllAsArguments().get(3));
 		assertEquals("export FILE_PATTERN=*.java", configurations.getAllAsArguments().get(4));
-		assertEquals("export VECTOR_DIR=my/results/vectors", configurations.getAllAsArguments().get(5));
-		assertEquals("export CLUSTER_DIR=my/results/cluster", configurations.getAllAsArguments().get(6));
-		assertEquals("export TIME_DIR=my/results/times", configurations.getAllAsArguments().get(7));
+		assertEquals("export VECTOR_DIR=" + new File("my/results/vectors").getAbsolutePath(), configurations.getAllAsArguments().get(5));
+		assertEquals("export CLUSTER_DIR=" + new File("my/results/cluster").getAbsolutePath(), configurations.getAllAsArguments().get(6));
+		assertEquals("export TIME_DIR=" + new File("my/results/times").getAbsolutePath(), configurations.getAllAsArguments().get(7));
 		assertEquals("export DECKARD_DIR=tool", configurations.getAllAsArguments().get(8));
 		assertEquals("export VGEN_EXEC=tool/src/main/jvecgen", configurations.getAllAsArguments().get(9));
 		assertEquals("export GROUPING_EXEC=tool/src/vgen/vgrouping/runvectorsort", configurations.getAllAsArguments().get(10));
@@ -180,4 +183,9 @@ public class DeckardConfigurationsTest {
 		});
 	}
 
+	@Test
+	void getConfigurations() throws Exception {
+		configurations.srcDir(new File("my/src").getAbsolutePath()).results("my/results");
+		assertEquals(new File("my/results/cluster").getAbsolutePath(), configurations.clusterDir());
+	}
 }
