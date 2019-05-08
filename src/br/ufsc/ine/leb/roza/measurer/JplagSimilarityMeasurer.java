@@ -84,31 +84,6 @@ public class JplagSimilarityMeasurer implements SimilarityMeasurer {
 		}
 	}
 
-	protected void parseSymmetric(Matrix<TestCaseMaterialization, String, BigDecimal> matrix, List<TestCaseMaterialization> materializations) {
-		try {
-			Document document = Jsoup.parse(new File(configurations.results(), "index.html"), "utf-8");
-			Elements tables = document.body().getElementsByTag("table");
-			Element table = tables.get(2);
-			Elements rows = table.getElementsByTag("tr");
-			for (Integer rowIndex = 0; rowIndex < rows.size(); rowIndex++) {
-				Element row = rows.get(0);
-				Elements columns = row.getElementsByTag("td");
-				Element source = columns.get(0);
-				String sourceName = source.text();
-				for (Integer columnIndex = 2; columnIndex < columns.size(); columnIndex++) {
-					Element target = columns.get(columnIndex);
-					String targetName = target.getElementsByTag("a").get(0).text();
-					String textScore = target.getElementsByTag("font").get(0).text().replaceAll("[^0-9]", "");
-					BigDecimal score = new BigDecimal(textScore).divide(new BigDecimal(1000));
-					matrix.set(sourceName, targetName, score);
-					matrix.set(targetName, sourceName, score);
-				}
-			}
-		} catch (IOException excecao) {
-			throw new RuntimeException(excecao);
-		}
-	}
-
 	private void run(MaterializationReport materializationReport) {
 		ProcessUtils processUtils = new ProcessUtils(true, true, true);
 		List<String> arguments = new LinkedList<String>();
