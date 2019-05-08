@@ -26,7 +26,7 @@ public class DeckardSimilarityMeasurerTest {
 		new FolderUtils("execution/materializer").createEmptyFolder();
 		new FolderUtils("execution/measurer").createEmptyFolder();
 		materializer = new OneTestCasePerClassTestCaseMaterializer("execution/materializer");
-		measurer = new DeckardSimilarityMeasurer(new DeckardConfigurations());
+		measurer = new DeckardSimilarityMeasurer(new DeckardConfigurations().srcDir("../../execution/materializer").results("../../execution/measurer"));
 	}
 
 	@Test

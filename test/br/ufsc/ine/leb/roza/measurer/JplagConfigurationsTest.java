@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import br.ufsc.ine.leb.roza.exceptions.InvalidConfigurationException;
+import br.ufsc.ine.leb.roza.exceptions.MissingConfigurationException;
 
 public class JplagConfigurationsTest {
 
@@ -56,7 +57,9 @@ public class JplagConfigurationsTest {
 
 	@Test
 	void defaultValues() throws Exception {
-		assertEquals(12, configurations.getAllAsArguments().size());
+		configurations.results("my/results").sources("my/sources");
+
+		assertEquals(13, configurations.getAllAsArguments().size());
 
 		assertEquals("-t", configurations.getAllAsArguments().get(0));
 		assertEquals("1", configurations.getAllAsArguments().get(1));
@@ -70,17 +73,20 @@ public class JplagConfigurationsTest {
 		assertEquals("-vl", configurations.getAllAsArguments().get(6));
 
 		assertEquals("-o", configurations.getAllAsArguments().get(7));
-		assertEquals("results/log.txt", configurations.getAllAsArguments().get(8));
+		assertEquals("my/results/log.txt", configurations.getAllAsArguments().get(8));
 
 		assertEquals("-r", configurations.getAllAsArguments().get(9));
-		assertEquals("results", configurations.getAllAsArguments().get(10));
+		assertEquals("my/results", configurations.getAllAsArguments().get(10));
 
 		assertEquals("-s", configurations.getAllAsArguments().get(11));
+		assertEquals("my/sources", configurations.getAllAsArguments().get(12));
 	}
 
 	@Test
 	void changeValues() throws Exception {
-		configurations.sensitivity(2).results("my/results");
+		configurations.sensitivity(2).results("my/results").sources("my/sources");
+
+		assertEquals(13, configurations.getAllAsArguments().size());
 
 		assertEquals("-t", configurations.getAllAsArguments().get(0));
 		assertEquals("2", configurations.getAllAsArguments().get(1));
@@ -100,6 +106,23 @@ public class JplagConfigurationsTest {
 		assertEquals("my/results", configurations.getAllAsArguments().get(10));
 
 		assertEquals("-s", configurations.getAllAsArguments().get(11));
+		assertEquals("my/sources", configurations.getAllAsArguments().get(12));
+	}
+
+	@Test
+	void shouldSetResults() throws Exception {
+		assertThrows(MissingConfigurationException.class, () -> {
+			configurations.sources("my/sources");
+			configurations.getAllAsArguments();
+		});
+	}
+
+	@Test
+	void shouldSetSources() throws Exception {
+		assertThrows(MissingConfigurationException.class, () -> {
+			configurations.results("my/results");
+			configurations.getAllAsArguments();
+		});
 	}
 
 	@Test
@@ -113,6 +136,26 @@ public class JplagConfigurationsTest {
 		assertThrows(InvalidConfigurationException.class, () -> {
 			configurations.sensitivity(null);
 		});
+	}
+
+	@Test
+	void resultsShoudNotBeNull() throws Exception {
+		assertThrows(InvalidConfigurationException.class, () -> {
+			configurations.results(null);
+		});
+	}
+
+	@Test
+	void sourcesShoudNotBeNull() throws Exception {
+		assertThrows(InvalidConfigurationException.class, () -> {
+			configurations.sources(null);
+		});
+	}
+
+	@Test
+	void getConfigurations() throws Exception {
+		configurations.results("my/results").sources("my/sources");
+		assertEquals("my/results", configurations.results());
 	}
 
 }

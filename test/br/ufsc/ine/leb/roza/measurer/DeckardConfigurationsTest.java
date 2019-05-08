@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import br.ufsc.ine.leb.roza.exceptions.InvalidConfigurationException;
+import br.ufsc.ine.leb.roza.exceptions.MissingConfigurationException;
 
 public class DeckardConfigurationsTest {
 
@@ -71,15 +72,16 @@ public class DeckardConfigurationsTest {
 
 	@Test
 	void defaultValues() throws Exception {
+		configurations.srcDir("my/src").results("my/results");
 		assertEquals(16, configurations.getAllAsArguments().size());
 		assertEquals("export MIN_TOKENS=1", configurations.getAllAsArguments().get(0));
 		assertEquals("export STRIDE=0", configurations.getAllAsArguments().get(1));
 		assertEquals("export SIMILARITY=1.0", configurations.getAllAsArguments().get(2));
-		assertEquals("export SRC_DIR=../../execution/materializer", configurations.getAllAsArguments().get(3));
+		assertEquals("export SRC_DIR=my/src", configurations.getAllAsArguments().get(3));
 		assertEquals("export FILE_PATTERN=*.java", configurations.getAllAsArguments().get(4));
-		assertEquals("export VECTOR_DIR=../../execution/measurer/vectors", configurations.getAllAsArguments().get(5));
-		assertEquals("export CLUSTER_DIR=../../execution/measurer/cluster", configurations.getAllAsArguments().get(6));
-		assertEquals("export TIME_DIR=../../execution/measurer/times", configurations.getAllAsArguments().get(7));
+		assertEquals("export VECTOR_DIR=my/results/vectors", configurations.getAllAsArguments().get(5));
+		assertEquals("export CLUSTER_DIR=my/results/cluster", configurations.getAllAsArguments().get(6));
+		assertEquals("export TIME_DIR=my/results/times", configurations.getAllAsArguments().get(7));
 		assertEquals("export DECKARD_DIR=tool", configurations.getAllAsArguments().get(8));
 		assertEquals("export VGEN_EXEC=tool/src/main/jvecgen", configurations.getAllAsArguments().get(9));
 		assertEquals("export GROUPING_EXEC=tool/src/vgen/vgrouping/runvectorsort", configurations.getAllAsArguments().get(10));
@@ -92,16 +94,16 @@ public class DeckardConfigurationsTest {
 
 	@Test
 	void changeValues() throws Exception {
-		configurations.minTokens(2).stride(1).similarity(0.9).srcDir("my/src");
+		configurations.minTokens(2).stride(1).similarity(0.9).srcDir("my/src").results("my/results");
 		assertEquals(16, configurations.getAllAsArguments().size());
 		assertEquals("export MIN_TOKENS=2", configurations.getAllAsArguments().get(0));
 		assertEquals("export STRIDE=1", configurations.getAllAsArguments().get(1));
 		assertEquals("export SIMILARITY=0.9", configurations.getAllAsArguments().get(2));
 		assertEquals("export SRC_DIR=my/src", configurations.getAllAsArguments().get(3));
 		assertEquals("export FILE_PATTERN=*.java", configurations.getAllAsArguments().get(4));
-		assertEquals("export VECTOR_DIR=../../execution/measurer/vectors", configurations.getAllAsArguments().get(5));
-		assertEquals("export CLUSTER_DIR=../../execution/measurer/cluster", configurations.getAllAsArguments().get(6));
-		assertEquals("export TIME_DIR=../../execution/measurer/times", configurations.getAllAsArguments().get(7));
+		assertEquals("export VECTOR_DIR=my/results/vectors", configurations.getAllAsArguments().get(5));
+		assertEquals("export CLUSTER_DIR=my/results/cluster", configurations.getAllAsArguments().get(6));
+		assertEquals("export TIME_DIR=my/results/times", configurations.getAllAsArguments().get(7));
 		assertEquals("export DECKARD_DIR=tool", configurations.getAllAsArguments().get(8));
 		assertEquals("export VGEN_EXEC=tool/src/main/jvecgen", configurations.getAllAsArguments().get(9));
 		assertEquals("export GROUPING_EXEC=tool/src/vgen/vgrouping/runvectorsort", configurations.getAllAsArguments().get(10));
@@ -110,6 +112,22 @@ public class DeckardConfigurationsTest {
 		assertEquals("export POSTPRO_EXEC=tool/scripts/clonedetect/post_process_groupfile", configurations.getAllAsArguments().get(13));
 		assertEquals("export GROUPING_S=1", configurations.getAllAsArguments().get(14));
 		assertEquals("export MAX_PROC=1", configurations.getAllAsArguments().get(15));
+	}
+
+	@Test
+	void shouldSetSrcDir() throws Exception {
+		assertThrows(MissingConfigurationException.class, () -> {
+			configurations.results("my/results");
+			configurations.getAllAsArguments();
+		});
+	}
+
+	@Test
+	void shouldSetResults() throws Exception {
+		assertThrows(MissingConfigurationException.class, () -> {
+			configurations.srcDir("my/src");
+			configurations.getAllAsArguments();
+		});
 	}
 
 	@Test
@@ -149,9 +167,16 @@ public class DeckardConfigurationsTest {
 	}
 
 	@Test
-	void srcDirShouldBeDifferentThanNull() throws Exception {
+	void srcDirShouldNotBeNull() throws Exception {
 		assertThrows(InvalidConfigurationException.class, () -> {
 			configurations.srcDir(null);
+		});
+	}
+
+	@Test
+	void resultsShouldNotBeNull() throws Exception {
+		assertThrows(InvalidConfigurationException.class, () -> {
+			configurations.results(null);
 		});
 	}
 

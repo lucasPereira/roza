@@ -49,7 +49,9 @@ public class DeckardSimilarityMeasurer implements SimilarityMeasurer {
 		return new SimilarityReport(assessments);
 	}
 
-	private void parse(Matrix<TestCaseMaterialization, String, Intersector> matrix, List<TestCaseMaterialization> materializations) {}
+	private void parse(Matrix<TestCaseMaterialization, String, Intersector> matrix, List<TestCaseMaterialization> materializations) {
+
+	}
 
 	private void run(MaterializationReport materializationReport) {
 		FolderUtils folderUtils = new FolderUtils("tools/deckard");

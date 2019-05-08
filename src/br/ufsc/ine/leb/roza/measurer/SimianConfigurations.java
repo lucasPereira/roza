@@ -41,6 +41,11 @@ public class SimianConfigurations extends AbstractConfigurations implements Conf
 		return configurations;
 	}
 
+	@Override
+	protected Boolean hasAllConfigurations() {
+		return true;
+	}
+
 	public SimianConfigurations threshold(Integer value) {
 		ensureThat(value != null);
 		ensureThat(value >= 2);

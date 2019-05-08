@@ -26,7 +26,7 @@ public class JplagSimilarityMeasurerTest {
 		new FolderUtils("execution/materializer").createEmptyFolder();
 		new FolderUtils("execution/measurer").createEmptyFolder();
 		materializer = new OneTestCasePerClassTestCaseMaterializer("execution/materializer");
-		measurer = new JplagSimilarityMeasurer(new JplagConfigurations().sensitivity(5).results("execution/measurer"));
+		measurer = new JplagSimilarityMeasurer(new JplagConfigurations().sensitivity(5).sources("execution/materializer").results("execution/measurer"));
 	}
 
 	@Test

@@ -13,11 +13,13 @@ public class JplagConfigurations extends AbstractConfigurations implements Confi
 	private JplagIntegerConfiguration sensitivity;
 	private JplagStringConfiguration results;
 	private JplagStringConfiguration log;
+	private JplagStringConfiguration sources;
 
 	public JplagConfigurations() {
 		sensitivity = new JplagIntegerConfiguration("t", 1, "Tune the sensitivity of the comparison");
-		results = new JplagStringConfiguration("r", "results", "Name of directory in which the web pages will be stored");
-		log = new JplagStringConfiguration("o", "results/log.txt", "Output file of the parser log");
+		results = new JplagStringConfiguration("r", null, "Name of directory in which the web pages will be stored");
+		log = new JplagStringConfiguration("o", null, "Output file of the parser log");
+		sources = new JplagStringConfiguration("s", null, "Look at files in subdirs too");
 	}
 
 	@Override
@@ -33,8 +35,13 @@ public class JplagConfigurations extends AbstractConfigurations implements Confi
 		configurations.add(new JplagBooleanConfiguration("d", false, "Non-parsable files will be stored"));
 		configurations.add(log);
 		configurations.add(results);
-		configurations.add(new JplagBooleanConfiguration("s", true, "Look at files in subdirs too"));
+		configurations.add(sources);
 		return configurations;
+	}
+
+	@Override
+	protected Boolean hasAllConfigurations() {
+		return results.getValue() != null && log.getValue() != null && sources.getValue() != null;
 	}
 
 	public JplagConfigurations sensitivity(Integer value) {
@@ -45,8 +52,15 @@ public class JplagConfigurations extends AbstractConfigurations implements Confi
 	}
 
 	public JplagConfigurations results(String value) {
+		ensureThat(value != null);
 		results.setValue(value);
 		log.setValue(new File(value, "log.txt").getPath());
+		return this;
+	}
+
+	public JplagConfigurations sources(String value) {
+		ensureThat(value != null);
+		sources.setValue(value);
 		return this;
 	}
 
