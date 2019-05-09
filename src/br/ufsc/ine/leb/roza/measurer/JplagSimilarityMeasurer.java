@@ -16,10 +16,13 @@ import br.ufsc.ine.leb.roza.SimilarityAssessment;
 import br.ufsc.ine.leb.roza.SimilarityReport;
 import br.ufsc.ine.leb.roza.TestCase;
 import br.ufsc.ine.leb.roza.TestCaseMaterialization;
-import br.ufsc.ine.leb.roza.support.matrix.Matrix;
-import br.ufsc.ine.leb.roza.support.matrix.MatrixElementToKeyConverter;
-import br.ufsc.ine.leb.roza.support.matrix.MatrixPair;
-import br.ufsc.ine.leb.roza.support.matrix.MatrixValueFactory;
+import br.ufsc.ine.leb.roza.measurer.configuration.jplag.JplagConfigurations;
+import br.ufsc.ine.leb.roza.measurer.matrix.Matrix;
+import br.ufsc.ine.leb.roza.measurer.matrix.MatrixElementToKeyConverter;
+import br.ufsc.ine.leb.roza.measurer.matrix.MatrixPair;
+import br.ufsc.ine.leb.roza.measurer.matrix.MatrixValueFactory;
+import br.ufsc.ine.leb.roza.measurer.matrix.jplag.JplagMatrixElementToKeyConverter;
+import br.ufsc.ine.leb.roza.measurer.matrix.jplag.JplagMatrixValueFactory;
 import br.ufsc.ine.leb.roza.utils.FolderUtils;
 import br.ufsc.ine.leb.roza.utils.ProcessUtils;
 

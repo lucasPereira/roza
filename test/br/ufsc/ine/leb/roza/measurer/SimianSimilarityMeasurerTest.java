@@ -14,6 +14,7 @@ import br.ufsc.ine.leb.roza.Statement;
 import br.ufsc.ine.leb.roza.TestCase;
 import br.ufsc.ine.leb.roza.materializer.OneTestCasePerClassTestCaseMaterializer;
 import br.ufsc.ine.leb.roza.materializer.TestCaseMaterializer;
+import br.ufsc.ine.leb.roza.measurer.configuration.simian.SimianConfigurations;
 import br.ufsc.ine.leb.roza.utils.FolderUtils;
 
 public class SimianSimilarityMeasurerTest {
