@@ -22,15 +22,13 @@ import br.ufsc.ine.leb.roza.measurer.LccssSimilarityMeasurer;
 import br.ufsc.ine.leb.roza.measurer.SimilarityMeasurer;
 import br.ufsc.ine.leb.roza.utils.FolderUtils;
 
-public class LccssSimilarityMetricTest {
+public class LcsSimilarityMetricTest {
 
 	private BigDecimal oneOfTwo;
-	private BigDecimal oneOfThree;
 	private BigDecimal twoOfThree;
 	private BigDecimal fourOfFive;
-	private BigDecimal oneOfFour;
-	private BigDecimal fourOfSeven;
-	private BigDecimal twoOfFive;
+	private BigDecimal sixOfSeven;
+	private BigDecimal threeOfFour;
 
 	private TestCaseMaterializer materializer;
 	private SimilarityMeasurer measurer;
@@ -42,12 +40,10 @@ public class LccssSimilarityMetricTest {
 		materializer = new OneTestCasePerClassTestCaseMaterializer("execution/materializer");
 		measurer = new LccssSimilarityMeasurer();
 		oneOfTwo = new BigDecimal(1).divide(new BigDecimal(2), MathContext.DECIMAL32);
-		oneOfThree = new BigDecimal(1).divide(new BigDecimal(3), MathContext.DECIMAL32);
 		twoOfThree = new BigDecimal(2).divide(new BigDecimal(3), MathContext.DECIMAL32);
 		fourOfFive = new BigDecimal(4).divide(new BigDecimal(5), MathContext.DECIMAL32);
-		oneOfFour = new BigDecimal(1).divide(new BigDecimal(4), MathContext.DECIMAL32);
-		fourOfSeven = new BigDecimal(4).divide(new BigDecimal(7), MathContext.DECIMAL32);
-		twoOfFive = new BigDecimal(2).divide(new BigDecimal(5), MathContext.DECIMAL32);
+		sixOfSeven = new BigDecimal(6).divide(new BigDecimal(7), MathContext.DECIMAL32);
+		threeOfFour = new BigDecimal(3).divide(new BigDecimal(4), MathContext.DECIMAL32);
 	}
 
 	@Test
@@ -233,10 +229,10 @@ public class LccssSimilarityMetricTest {
 		assertEquals(BigDecimal.ONE, assessmentBB.getScore());
 		assertEquals(testCaseB, assessmentBB.getSource());
 		assertEquals(testCaseB, assessmentBB.getTarget());
-		assertEquals(oneOfThree, assessmentAB.getScore());
+		assertEquals(twoOfThree, assessmentAB.getScore());
 		assertEquals(testCaseA, assessmentAB.getSource());
 		assertEquals(testCaseB, assessmentAB.getTarget());
-		assertEquals(oneOfThree, assessmentBA.getScore());
+		assertEquals(twoOfThree, assessmentBA.getScore());
 		assertEquals(testCaseB, assessmentBA.getSource());
 		assertEquals(testCaseA, assessmentBA.getTarget());
 	}
@@ -267,10 +263,10 @@ public class LccssSimilarityMetricTest {
 		assertEquals(BigDecimal.ONE, assessmentBB.getScore());
 		assertEquals(testCaseB, assessmentBB.getSource());
 		assertEquals(testCaseB, assessmentBB.getTarget());
-		assertEquals(BigDecimal.ZERO, assessmentAB.getScore());
+		assertEquals(oneOfTwo, assessmentAB.getScore());
 		assertEquals(testCaseA, assessmentAB.getSource());
 		assertEquals(testCaseB, assessmentAB.getTarget());
-		assertEquals(BigDecimal.ZERO, assessmentBA.getScore());
+		assertEquals(oneOfTwo, assessmentBA.getScore());
 		assertEquals(testCaseB, assessmentBA.getSource());
 		assertEquals(testCaseA, assessmentBA.getTarget());
 	}
@@ -338,12 +334,12 @@ public class LccssSimilarityMetricTest {
 
 	@Test
 	void commonAsymmetricStartSequenceWithoutRemainings() throws Exception {
-		Statement fixture1 = new Statement("sut(1);");
-		Statement fixture2 = new Statement("sut(2);");
-		Statement fixture3 = new Statement("sut(3);");
-		TestCase testCaseA = new TestCase("testA", Arrays.asList(fixture1), Arrays.asList());
-		TestCase testCaseB = new TestCase("testB", Arrays.asList(fixture1, fixture2), Arrays.asList());
-		TestCase testCaseC = new TestCase("testC", Arrays.asList(fixture1, fixture2, fixture3), Arrays.asList());
+		Statement fixtureA = new Statement("sut(1);");
+		Statement fixtureB = new Statement("sut(2);");
+		Statement fixtureC = new Statement("sut(3);");
+		TestCase testCaseA = new TestCase("testA", Arrays.asList(fixtureA), Arrays.asList());
+		TestCase testCaseB = new TestCase("testB", Arrays.asList(fixtureA, fixtureB), Arrays.asList());
+		TestCase testCaseC = new TestCase("testC", Arrays.asList(fixtureA, fixtureB, fixtureC), Arrays.asList());
 		MaterializationReport materializationReport = materializer.materialize(Arrays.asList(testCaseA, testCaseB, testCaseC));
 		SimilarityReport report = measurer.measure(materializationReport);
 
@@ -421,22 +417,22 @@ public class LccssSimilarityMetricTest {
 		assertEquals(BigDecimal.ONE, assessmentBB.getScore());
 		assertEquals(testCaseC, assessmentCC.getSource());
 		assertEquals(testCaseC, assessmentCC.getTarget());
-		assertEquals(fourOfSeven, assessmentBC.getScore());
+		assertEquals(sixOfSeven, assessmentBC.getScore());
 		assertEquals(testCaseB, assessmentBC.getSource());
 		assertEquals(testCaseC, assessmentBC.getTarget());
-		assertEquals(fourOfSeven, assessmentCB.getScore());
+		assertEquals(sixOfSeven, assessmentCB.getScore());
 		assertEquals(testCaseC, assessmentCB.getSource());
 		assertEquals(testCaseB, assessmentCB.getTarget());
-		assertEquals(twoOfFive, assessmentAB.getScore());
+		assertEquals(fourOfFive, assessmentAB.getScore());
 		assertEquals(testCaseA, assessmentAB.getSource());
 		assertEquals(testCaseB, assessmentAB.getTarget());
-		assertEquals(twoOfFive, assessmentBA.getScore());
+		assertEquals(fourOfFive, assessmentBA.getScore());
 		assertEquals(testCaseB, assessmentBA.getSource());
 		assertEquals(testCaseA, assessmentBA.getTarget());
-		assertEquals(oneOfThree, assessmentAC.getScore());
+		assertEquals(twoOfThree, assessmentAC.getScore());
 		assertEquals(testCaseA, assessmentAC.getSource());
 		assertEquals(testCaseC, assessmentAC.getTarget());
-		assertEquals(oneOfThree, assessmentCA.getScore());
+		assertEquals(twoOfThree, assessmentCA.getScore());
 		assertEquals(testCaseC, assessmentCA.getSource());
 		assertEquals(testCaseA, assessmentCA.getTarget());
 	}
@@ -476,22 +472,22 @@ public class LccssSimilarityMetricTest {
 		assertEquals(BigDecimal.ONE, assessmentBB.getScore());
 		assertEquals(testCaseC, assessmentCC.getSource());
 		assertEquals(testCaseC, assessmentCC.getTarget());
-		assertEquals(twoOfFive, assessmentBC.getScore());
+		assertEquals(fourOfFive, assessmentBC.getScore());
 		assertEquals(testCaseB, assessmentBC.getSource());
 		assertEquals(testCaseC, assessmentBC.getTarget());
-		assertEquals(twoOfFive, assessmentCB.getScore());
+		assertEquals(fourOfFive, assessmentCB.getScore());
 		assertEquals(testCaseC, assessmentCB.getSource());
 		assertEquals(testCaseB, assessmentCB.getTarget());
-		assertEquals(oneOfThree, assessmentAB.getScore());
+		assertEquals(twoOfThree, assessmentAB.getScore());
 		assertEquals(testCaseA, assessmentAB.getSource());
 		assertEquals(testCaseB, assessmentAB.getTarget());
-		assertEquals(oneOfThree, assessmentBA.getScore());
+		assertEquals(twoOfThree, assessmentBA.getScore());
 		assertEquals(testCaseB, assessmentBA.getSource());
 		assertEquals(testCaseA, assessmentBA.getTarget());
-		assertEquals(oneOfFour, assessmentAC.getScore());
+		assertEquals(oneOfTwo, assessmentAC.getScore());
 		assertEquals(testCaseA, assessmentAC.getSource());
 		assertEquals(testCaseC, assessmentAC.getTarget());
-		assertEquals(oneOfFour, assessmentCA.getScore());
+		assertEquals(oneOfTwo, assessmentCA.getScore());
 		assertEquals(testCaseC, assessmentCA.getSource());
 		assertEquals(testCaseA, assessmentCA.getTarget());
 	}
@@ -514,11 +510,11 @@ public class LccssSimilarityMetricTest {
 		SimilarityAssessment assessmentAA = iterator.next();
 		SimilarityAssessment assessmentBB = iterator.next();
 		SimilarityAssessment assessmentCC = iterator.next();
+		SimilarityAssessment assessmentAB = iterator.next();
+		SimilarityAssessment assessmentBA = iterator.next();
 		SimilarityAssessment assessmentBC = iterator.next();
 		SimilarityAssessment assessmentCB = iterator.next();
-		SimilarityAssessment assessmentAB = iterator.next();
 		SimilarityAssessment assessmentAC = iterator.next();
-		SimilarityAssessment assessmentBA = iterator.next();
 		SimilarityAssessment assessmentCA = iterator.next();
 
 		assertFalse(iterator.hasNext());
@@ -531,22 +527,22 @@ public class LccssSimilarityMetricTest {
 		assertEquals(BigDecimal.ONE, assessmentBB.getScore());
 		assertEquals(testCaseC, assessmentCC.getSource());
 		assertEquals(testCaseC, assessmentCC.getTarget());
-		assertEquals(oneOfTwo, assessmentBC.getScore());
-		assertEquals(testCaseB, assessmentBC.getSource());
-		assertEquals(testCaseC, assessmentBC.getTarget());
-		assertEquals(oneOfTwo, assessmentCB.getScore());
-		assertEquals(testCaseC, assessmentCB.getSource());
-		assertEquals(testCaseB, assessmentCB.getTarget());
-		assertEquals(oneOfFour, assessmentAB.getScore());
+		assertEquals(threeOfFour, assessmentAB.getScore());
 		assertEquals(testCaseA, assessmentAB.getSource());
 		assertEquals(testCaseB, assessmentAB.getTarget());
-		assertEquals(oneOfFour, assessmentBA.getScore());
+		assertEquals(threeOfFour, assessmentBA.getScore());
 		assertEquals(testCaseA, assessmentAC.getSource());
 		assertEquals(testCaseC, assessmentAC.getTarget());
-		assertEquals(oneOfFour, assessmentAC.getScore());
+		assertEquals(threeOfFour, assessmentBC.getScore());
+		assertEquals(testCaseB, assessmentBC.getSource());
+		assertEquals(testCaseC, assessmentBC.getTarget());
+		assertEquals(threeOfFour, assessmentCB.getScore());
+		assertEquals(testCaseC, assessmentCB.getSource());
+		assertEquals(testCaseB, assessmentCB.getTarget());
+		assertEquals(oneOfTwo, assessmentAC.getScore());
 		assertEquals(testCaseB, assessmentBA.getSource());
 		assertEquals(testCaseA, assessmentBA.getTarget());
-		assertEquals(oneOfFour, assessmentCA.getScore());
+		assertEquals(oneOfTwo, assessmentCA.getScore());
 		assertEquals(testCaseC, assessmentCA.getSource());
 		assertEquals(testCaseA, assessmentCA.getTarget());
 	}
