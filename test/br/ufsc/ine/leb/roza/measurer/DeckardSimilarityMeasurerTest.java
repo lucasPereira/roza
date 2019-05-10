@@ -32,8 +32,7 @@ public class DeckardSimilarityMeasurerTest {
 
 	@Test
 	void zeroTestCases() throws Exception {
-		MaterializationReport materializationReport = new MaterializationReport("execution/materializer", Arrays.asList());
-		SimilarityReport report = measurer.measure(materializationReport);
+		SimilarityReport report = measurer.measure(materializer.materialize(Arrays.asList()));
 		assertEquals(0, report.getAssessments().size());
 	}
 

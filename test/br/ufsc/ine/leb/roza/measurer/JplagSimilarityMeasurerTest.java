@@ -32,8 +32,7 @@ public class JplagSimilarityMeasurerTest {
 
 	@Test
 	void zeroTestCases() throws Exception {
-		MaterializationReport materializationReport = new MaterializationReport("execution/materializer", Arrays.asList());
-		SimilarityReport report = measurer.measure(materializationReport);
+		SimilarityReport report = measurer.measure(materializer.materialize(Arrays.asList()));
 		assertEquals(0, report.getAssessments().size());
 	}
 
@@ -108,7 +107,6 @@ public class JplagSimilarityMeasurerTest {
 		MaterializationReport materializationReport = materializer.materialize(Arrays.asList(testCaseA, testCaseB));
 		SimilarityReport report = measurer.measure(materializationReport);
 
-		assertEquals(-1, new Integer(1).compareTo(new Integer(2)));
 		assertEquals(4, report.getAssessments().size());
 		assertEquals(BigDecimal.ONE, report.getAssessments().get(0).getScore());
 		assertEquals(testCaseA, report.getAssessments().get(0).getSource());
