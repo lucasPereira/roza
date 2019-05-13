@@ -38,14 +38,7 @@ public class LccssSimilarityMeasurer implements SimilarityMeasurer {
 				Integer sourceOnlyFixtures = sourceFixtures.size() - commonFixtures;
 				Integer targetOnlyFixtures = targetFixtures.size() - commonFixtures;
 				BigDecimal totalFixtures = new BigDecimal(reusedFixtures + sourceOnlyFixtures + targetOnlyFixtures);
-				BigDecimal score = null;
-				if (source.equals(target)) {
-					score = BigDecimal.ONE;
-				} else if (totalFixtures.equals(BigDecimal.ZERO)) {
-					score = BigDecimal.ZERO;
-				} else {
-					score = new BigDecimal(reusedFixtures).divide(totalFixtures, MathContext.DECIMAL32);
-				}
+				BigDecimal score = source.equals(target) ? BigDecimal.ONE : (totalFixtures.equals(BigDecimal.ZERO) ? BigDecimal.ZERO : new BigDecimal(reusedFixtures).divide(totalFixtures, MathContext.DECIMAL32));
 				SimilarityAssessment assessment = new SimilarityAssessment(source, target, score);
 				assessments.add(assessment);
 			}

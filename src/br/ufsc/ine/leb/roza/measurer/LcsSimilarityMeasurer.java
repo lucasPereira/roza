@@ -24,33 +24,32 @@ public class LcsSimilarityMeasurer implements SimilarityMeasurer {
 			for (TestCaseMaterialization targetMaterialization : materializations) {
 				TestCase target = targetMaterialization.getTestCase();
 				List<Statement> targetFixtures = target.getFixtures();
-				Boolean contigous = true;
-				Integer commonFixtures = 0;
-				for (Integer index = 0; contigous && index < sourceFixtures.size() && index < targetFixtures.size(); index++) {
-					Statement sourceFixture = sourceFixtures.get(index);
-					Statement targetFixture = targetFixtures.get(index);
-					contigous = sourceFixture.equals(targetFixture);
-					if (contigous) {
-						commonFixtures++;
-					}
-				}
+				Integer commonFixtures = lcs(sourceFixtures, targetFixtures, 0, 0);
 				Integer reusedFixtures = commonFixtures * 2;
 				Integer sourceOnlyFixtures = sourceFixtures.size() - commonFixtures;
 				Integer targetOnlyFixtures = targetFixtures.size() - commonFixtures;
 				BigDecimal totalFixtures = new BigDecimal(reusedFixtures + sourceOnlyFixtures + targetOnlyFixtures);
-				BigDecimal score = null;
-				if (source.equals(target)) {
-					score = BigDecimal.ONE;
-				} else if (totalFixtures.equals(BigDecimal.ZERO)) {
-					score = BigDecimal.ZERO;
-				} else {
-					score = new BigDecimal(reusedFixtures).divide(totalFixtures, MathContext.DECIMAL32);
-				}
+				BigDecimal score = source.equals(target) ? BigDecimal.ONE : (totalFixtures.equals(BigDecimal.ZERO) ? BigDecimal.ZERO : new BigDecimal(reusedFixtures).divide(totalFixtures, MathContext.DECIMAL32));
 				SimilarityAssessment assessment = new SimilarityAssessment(source, target, score);
 				assessments.add(assessment);
 			}
 		}
 		return new SimilarityReport(assessments);
+	}
+
+	private Integer lcs(List<Statement> sourceFixtures, List<Statement> targetFixtures, Integer sourceIndex, Integer targetIndex) {
+		if (sourceIndex == sourceFixtures.size() || targetIndex == targetFixtures.size()) {
+			return 0;
+		}
+		Statement sourceFixture = sourceFixtures.get(sourceIndex);
+		Statement targetFixture = targetFixtures.get(targetIndex);
+		if (sourceFixture.equals(targetFixture)) {
+			Integer nextLcs = lcs(sourceFixtures, targetFixtures, sourceIndex + 1, targetIndex + 1);
+			return 1 + nextLcs;
+		}
+		Integer nextSourceLcs = lcs(sourceFixtures, targetFixtures, sourceIndex + 1, targetIndex);
+		Integer nextTargetLcs = lcs(sourceFixtures, targetFixtures, sourceIndex, targetIndex + 1);
+		return Math.max(nextSourceLcs, nextTargetLcs);
 	}
 
 }

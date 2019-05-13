@@ -18,7 +18,7 @@ import br.ufsc.ine.leb.roza.Statement;
 import br.ufsc.ine.leb.roza.TestCase;
 import br.ufsc.ine.leb.roza.materializer.OneTestCasePerClassTestCaseMaterializer;
 import br.ufsc.ine.leb.roza.materializer.TestCaseMaterializer;
-import br.ufsc.ine.leb.roza.measurer.LccssSimilarityMeasurer;
+import br.ufsc.ine.leb.roza.measurer.LcsSimilarityMeasurer;
 import br.ufsc.ine.leb.roza.measurer.SimilarityMeasurer;
 import br.ufsc.ine.leb.roza.utils.FolderUtils;
 
@@ -38,7 +38,7 @@ public class LcsSimilarityMetricTest {
 		new FolderUtils("execution/materializer").createEmptyFolder();
 		new FolderUtils("execution/measurer").createEmptyFolder();
 		materializer = new OneTestCasePerClassTestCaseMaterializer("execution/materializer");
-		measurer = new LccssSimilarityMeasurer();
+		measurer = new LcsSimilarityMeasurer();
 		oneOfTwo = new BigDecimal(1).divide(new BigDecimal(2), MathContext.DECIMAL32);
 		twoOfThree = new BigDecimal(2).divide(new BigDecimal(3), MathContext.DECIMAL32);
 		fourOfFive = new BigDecimal(4).divide(new BigDecimal(5), MathContext.DECIMAL32);
