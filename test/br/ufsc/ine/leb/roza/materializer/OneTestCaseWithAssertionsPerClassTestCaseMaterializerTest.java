@@ -15,7 +15,7 @@ import br.ufsc.ine.leb.roza.TestCaseMaterialization;
 import br.ufsc.ine.leb.roza.utils.FileUtils;
 import br.ufsc.ine.leb.roza.utils.FolderUtils;
 
-public class OneTestCasePerClassTestCaseMaterializerTest {
+public class OneTestCaseWithAssertionsPerClassTestCaseMaterializerTest {
 
 	private TestCaseMaterializer materializer;
 	private FileUtils fileUtils;
@@ -24,7 +24,7 @@ public class OneTestCasePerClassTestCaseMaterializerTest {
 	void setup() {
 		new FolderUtils("execution/materializer").createEmptyFolder();
 		fileUtils = new FileUtils();
-		materializer = new OneTestCasePerClassTestCaseMaterializer("execution/materializer");
+		materializer = new OneTestCaseWithAssertionsPerClassTestCaseMaterializer("execution/materializer");
 	}
 
 	@Test

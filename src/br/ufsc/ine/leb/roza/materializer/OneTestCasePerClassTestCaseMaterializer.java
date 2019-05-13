@@ -17,7 +17,7 @@ import br.ufsc.ine.leb.roza.TestCase;
 import br.ufsc.ine.leb.roza.TestCaseMaterialization;
 import br.ufsc.ine.leb.roza.utils.FolderUtils;
 
-public class OneTestCasePerClassTestCaseMaterializer implements TestCaseMaterializer {
+public abstract class OneTestCasePerClassTestCaseMaterializer implements TestCaseMaterializer {
 
 	private Integer counter;
 	private FolderUtils foldereUtils;
@@ -28,7 +28,7 @@ public class OneTestCasePerClassTestCaseMaterializer implements TestCaseMaterial
 	}
 
 	@Override
-	public MaterializationReport materialize(List<TestCase> tests) {
+	public final MaterializationReport materialize(List<TestCase> tests) {
 		List<TestCaseMaterialization> materializations = new LinkedList<>();
 		tests.forEach((testCase) -> {
 			String className = createClassName(testCase.getName());
@@ -40,9 +40,7 @@ public class OneTestCasePerClassTestCaseMaterializer implements TestCaseMaterial
 			testCase.getFixtures().forEach((fixture) -> {
 				javaMethodBody.addStatement(JavaParser.parseStatement(fixture.getText()));
 			});
-			testCase.getAsserts().forEach((assertion) -> {
-				javaMethodBody.addStatement(JavaParser.parseStatement(assertion.getText()));
-			});
+			addAssertions(testCase, javaMethodBody);
 			javaMethod.setBody(javaMethodBody);
 			PrettyPrinterConfiguration configuration = new PrettyPrinterConfiguration();
 			configuration.setIndentType(IndentType.TABS);
@@ -55,6 +53,8 @@ public class OneTestCasePerClassTestCaseMaterializer implements TestCaseMaterial
 		});
 		return new MaterializationReport(foldereUtils.getBaseFolder(), materializations);
 	}
+
+	protected abstract void addAssertions(TestCase testCase, BlockStmt javaMethodBody);
 
 	private String createClassFileName(String className) {
 		return String.format("%s.java", className);
