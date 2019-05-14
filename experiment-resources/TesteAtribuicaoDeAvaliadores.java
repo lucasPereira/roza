@@ -32,13 +32,13 @@ public class TesteAtribuicaoDeAvaliadores {
 		selenium.passarOMouse("#navigationPrimary > li:nth-child(5) > a");
 		selenium.clicar("#navigationPrimary > li:nth-child(5) > ul > li:nth-child(1) > a");
 		selenium.clicar("#ui-id-2 > div > ul > li:nth-child(1) > a");
-		selenium.clicar("#capes-abas > ul > li:nth-child(5) > a");
 	}
 
 	@Test
 	void paginaAtribuicaoDeAvaliadoresSemProducoes() throws Exception {
 		String mensagem = "Para atribuir os avaliadores utilize o botão abaixo.";
 		String aviso = "Atribuições já existentes serão removidas.";
+		selenium.clicar("#capes-abas > ul > li:nth-child(5) > a");
 		selenium.assegurarTexto(mensagem, "#capes-atribuicao-avaliadores-form > fieldset > p:nth-of-type(1)");
 		selenium.assegurarTexto(aviso, "#capes-atribuicao-avaliadores-form > fieldset > p:nth-of-type(2)");
 		selenium.assegurarTexto("Prazo limite para avaliação", "#capes-atribuicao-avaliadores-form > fieldset > div:nth-child(3) > label");
@@ -48,7 +48,6 @@ public class TesteAtribuicaoDeAvaliadores {
 	@Test
 	void distribuirAvaliadoresComSucesso() throws Exception {
 		String arquivoAvaliadores = "src/test/resources/csv/avaliadores-e-coordenador-tres-exemplos.csv";
-		selenium.rolarParaCima();
 		selenium.clicar("#capes-abas > ul > li:nth-child(3) > a");
 		selenium.selecionarArquivo(arquivoAvaliadores, "#capes-importacao-avaliadores-e-coordenador-selecao-arquivo");
 		selenium.clicar("#capes-importacao-avaliadores-e-coordenador-form > fieldset > div.section.formButtons.form_buttons > button");
@@ -79,6 +78,7 @@ public class TesteAtribuicaoDeAvaliadores {
 
 	@Test
 	void distribuirAvaliadoresSemPreencherPrazoDeAvaliacao() throws Exception {
+		selenium.clicar("#capes-abas > ul > li:nth-child(5) > a");
 		selenium.fixarValor(new Utilitarios().daquiUmMes(), "input[type='text'][name='prazo-maximo']");
 		selenium.clicar("#capes-atribuicao-avaliadores-form > fieldset > div.section.formButtons.form_buttons > button");
 		selenium.assegurarTexto("Não foi possível realizar a atribuição, pois o prazo limite para avaliação não foi preenchido", ".ui-pnotify.notifyError .ui-pnotify-text");
@@ -87,7 +87,6 @@ public class TesteAtribuicaoDeAvaliadores {
 	@Test
 	void distribuirAvaliadoresSemCoordenadorDeArea() throws Exception {
 		String arquivoAvaliadores = "src/test/resources/csv/avaliadores-2-coordenadores-0.csv";
-		selenium.rolarParaCima();
 		selenium.clicar("#capes-abas > ul > li:nth-child(3) > a");
 		selenium.selecionarArquivo(arquivoAvaliadores, "#capes-importacao-avaliadores-e-coordenador-selecao-arquivo");
 		selenium.clicar("#capes-importacao-avaliadores-e-coordenador-form > fieldset > div.section.formButtons.form_buttons > button");
@@ -104,7 +103,6 @@ public class TesteAtribuicaoDeAvaliadores {
 	@Test
 	void distribuirAvaliadoresComMaisDeUmCoordenadorDeArea() throws Exception {
 		String arquivoAvaliadores = "src/test/resources/csv/avaliadores-1-coordenadores-2.csv";
-		selenium.rolarParaCima();
 		selenium.clicar("#capes-abas > ul > li:nth-child(3) > a");
 		selenium.selecionarArquivo(arquivoAvaliadores, "#capes-importacao-avaliadores-e-coordenador-selecao-arquivo");
 		selenium.clicar("#capes-importacao-avaliadores-e-coordenador-form > fieldset > div.section.formButtons.form_buttons > button");
@@ -121,7 +119,6 @@ public class TesteAtribuicaoDeAvaliadores {
 	@Test
 	void distribuirAvaliadoresSemAvaliadores() throws Exception {
 		String arquivoAvaliadores = "src/test/resources/csv/avaliadores-0-coordenadores-1.csv";
-		selenium.rolarParaCima();
 		selenium.clicar("#capes-abas > ul > li:nth-child(3) > a");
 		selenium.selecionarArquivo(arquivoAvaliadores, "#capes-importacao-avaliadores-e-coordenador-selecao-arquivo");
 		selenium.clicar("#capes-importacao-avaliadores-e-coordenador-form > fieldset > div.section.formButtons.form_buttons > button");
@@ -138,7 +135,6 @@ public class TesteAtribuicaoDeAvaliadores {
 	@Test
 	void distribuirAvaliadoresSemFichaDeAvaliacao() throws Exception {
 		String arquivoAvaliadores = "src/test/resources/csv/avaliadores-e-coordenador-tres-exemplos.csv";
-		selenium.rolarParaCima();
 		selenium.clicar("#capes-abas > ul > li:nth-child(3) > a");
 		selenium.selecionarArquivo(arquivoAvaliadores, "#capes-importacao-avaliadores-e-coordenador-selecao-arquivo");
 		selenium.clicar("#capes-importacao-avaliadores-e-coordenador-form > fieldset > div.section.formButtons.form_buttons > button");

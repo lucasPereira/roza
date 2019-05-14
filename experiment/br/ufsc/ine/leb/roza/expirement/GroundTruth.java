@@ -243,6 +243,27 @@ public class GroundTruth {
 		evaluationForm.add("verFormularioDaFichaDeAvaliacaoCadastrada");
 		evaluationForm.add("verFichaDeAvaliacaoRecadastrada");
 		populateMatrix(matrix, evaluationForm, 19);
+		matrix.set("paginaConfiguracaoDeFichaDeAvaliacaoFichaNaoCadastrada", "paginaConfiguracaoDeFichaDeAvaliacaoFichaNaoCadastrada", 21);
+		matrix.set("cadastrarFichaDeAvaliacao", "cadastrarFichaDeAvaliacao", 31);
+		matrix.set("cadastrarFichaDeAvaliacao", "cadastrarFichaDeAvaliacaoSomatorioDePontosAcimaDe100", 20);
+		matrix.set("cadastrarFichaDeAvaliacaoSomatorioDePontosAcimaDe100", "cadastrarFichaDeAvaliacaoSomatorioDePontosAcimaDe100", 23);
+		matrix.set("cadastrarFichaDeAvaliacaoSomatorioDePontosAcimaDe100", "cadastrarFichaDeAvaliacao", 20);
+		matrix.set("recadastrarFichaDeAvaliacao", "recadastrarFichaDeAvaliacao", 32);
+		matrix.set("recadastrarFichaDeAvaliacao", "verFichaDeAvaliacaoCadastrada", 25);
+		matrix.set("recadastrarFichaDeAvaliacao", "verFormularioDaFichaDeAvaliacaoCadastrada", 25);
+		matrix.set("recadastrarFichaDeAvaliacao", "verFichaDeAvaliacaoRecadastrada", 26);
+		matrix.set("verFichaDeAvaliacaoCadastrada", "verFichaDeAvaliacaoCadastrada", 29);
+		matrix.set("verFichaDeAvaliacaoCadastrada", "recadastrarFichaDeAvaliacao", 25);
+		matrix.set("verFichaDeAvaliacaoCadastrada", "verFormularioDaFichaDeAvaliacaoCadastrada", 29);
+		matrix.set("verFichaDeAvaliacaoCadastrada", "verFichaDeAvaliacaoRecadastrada", 25);
+		matrix.set("verFormularioDaFichaDeAvaliacaoCadastrada", "verFormularioDaFichaDeAvaliacaoCadastrada", 31);
+		matrix.set("verFormularioDaFichaDeAvaliacaoCadastrada", "recadastrarFichaDeAvaliacao", 25);
+		matrix.set("verFormularioDaFichaDeAvaliacaoCadastrada", "verFichaDeAvaliacaoCadastrada", 29);
+		matrix.set("verFormularioDaFichaDeAvaliacaoCadastrada", "verFichaDeAvaliacaoRecadastrada", 25);
+		matrix.set("verFichaDeAvaliacaoRecadastrada", "verFichaDeAvaliacaoRecadastrada", 33);
+		matrix.set("verFichaDeAvaliacaoRecadastrada", "recadastrarFichaDeAvaliacao", 26);
+		matrix.set("verFichaDeAvaliacaoRecadastrada", "verFichaDeAvaliacaoCadastrada", 25);
+		matrix.set("verFichaDeAvaliacaoRecadastrada", "verFormularioDaFichaDeAvaliacaoCadastrada", 25);
 	}
 
 	private void reviewerDistribution(Matrix<TestCase, String, Integer> matrix) {
@@ -258,21 +279,67 @@ public class GroundTruth {
 		reviewerDistribution.add("verDistribuirAvaliadoresComSucessoSegundaProducao");
 		reviewerDistribution.add("verDistribuirAvaliadoresComSucessoPelaSegundaVezTendoDadosAtualizadosPrimeiraProducao");
 		reviewerDistribution.add("verDistribuirAvaliadoresComSucessoPelaSegundaVezTendoDadosAtualizadosSegundaProducao");
-		populateMatrix(matrix, reviewerDistribution, 19);
+		populateMatrix(matrix, reviewerDistribution, 18);
+		matrix.set("paginaAtribuicaoDeAvaliadoresSemProducoes", "paginaAtribuicaoDeAvaliadoresSemProducoes", 21);
+		matrix.set("distribuirAvaliadoresComSucesso", "distribuirAvaliadoresComSucesso", 42);
+		matrix.set("distribuirAvaliadoresComSucesso", "distribuirAvaliadoresSemFichaDeAvaliacao", 24);
+		matrix.set("distribuirAvaliadoresComSucesso", "verDistribuirAvaliadoresComSucessoPrimeiraProducao", 24);
+		matrix.set("distribuirAvaliadoresComSucesso", "verDistribuirAvaliadoresComSucessoSegundaProducao", 24);
+		matrix.set("distribuirAvaliadoresComSucesso", "verDistribuirAvaliadoresComSucessoPelaSegundaVezTendoDadosAtualizadosPrimeiraProducao", 24);
+		matrix.set("distribuirAvaliadoresComSucesso", "verDistribuirAvaliadoresComSucessoPelaSegundaVezTendoDadosAtualizadosSegundaProducao", 24);
+		matrix.set("distribuirAvaliadoresSemPreencherPrazoDeAvaliacao", "distribuirAvaliadoresSemPreencherPrazoDeAvaliacao", 21);
+		matrix.set("distribuirAvaliadoresSemCoordenadorDeArea", "distribuirAvaliadoresSemCoordenadorDeArea", 28);
+		matrix.set("distribuirAvaliadoresComMaisDeUmCoordenadorDeArea", "distribuirAvaliadoresComMaisDeUmCoordenadorDeArea", 28);
+		matrix.set("distribuirAvaliadoresSemAvaliadores", "distribuirAvaliadoresSemAvaliadores", 28);
+		matrix.set("distribuirAvaliadoresSemFichaDeAvaliacao", "distribuirAvaliadoresSemFichaDeAvaliacao", 28);
+		matrix.set("distribuirAvaliadoresSemFichaDeAvaliacao", "distribuirAvaliadoresComSucesso", 24);
+		matrix.set("distribuirAvaliadoresSemFichaDeAvaliacao", "verDistribuirAvaliadoresComSucessoPrimeiraProducao", 24);
+		matrix.set("distribuirAvaliadoresSemFichaDeAvaliacao", "verDistribuirAvaliadoresComSucessoPrimeiraProducao", 24);
+		matrix.set("distribuirAvaliadoresSemFichaDeAvaliacao", "verDistribuirAvaliadoresComSucessoPelaSegundaVezTendoDadosAtualizadosPrimeiraProducao", 24);
+		matrix.set("distribuirAvaliadoresSemFichaDeAvaliacao", "verDistribuirAvaliadoresComSucessoPelaSegundaVezTendoDadosAtualizadosSegundaProducao", 24);
+		matrix.set("verDistribuirAvaliadoresComSucessoPrimeiraProducao", "verDistribuirAvaliadoresComSucessoPrimeiraProducao", 48);
+		matrix.set("verDistribuirAvaliadoresComSucessoPrimeiraProducao", "distribuirAvaliadoresComSucesso", 24);
+		matrix.set("verDistribuirAvaliadoresComSucessoPrimeiraProducao", "distribuirAvaliadoresSemFichaDeAvaliacao", 24);
+		matrix.set("verDistribuirAvaliadoresComSucessoPrimeiraProducao", "verDistribuirAvaliadoresComSucessoSegundaProducao", 48);
+		matrix.set("verDistribuirAvaliadoresComSucessoPrimeiraProducao", "verDistribuirAvaliadoresComSucessoPelaSegundaVezTendoDadosAtualizadosPrimeiraProducao", 45);
+		matrix.set("verDistribuirAvaliadoresComSucessoPrimeiraProducao", "verDistribuirAvaliadoresComSucessoPelaSegundaVezTendoDadosAtualizadosSegundaProducao", 45);
+		matrix.set("verDistribuirAvaliadoresComSucessoSegundaProducao", "verDistribuirAvaliadoresComSucessoPrimeiraProducao", 48);
+		matrix.set("verDistribuirAvaliadoresComSucessoSegundaProducao", "distribuirAvaliadoresComSucesso", 24);
+		matrix.set("verDistribuirAvaliadoresComSucessoSegundaProducao", "distribuirAvaliadoresSemFichaDeAvaliacao", 24);
+		matrix.set("verDistribuirAvaliadoresComSucessoSegundaProducao", "verDistribuirAvaliadoresComSucessoPrimeiraProducao", 48);
+		matrix.set("verDistribuirAvaliadoresComSucessoSegundaProducao", "verDistribuirAvaliadoresComSucessoPelaSegundaVezTendoDadosAtualizadosPrimeiraProducao", 45);
+		matrix.set("verDistribuirAvaliadoresComSucessoSegundaProducao", "verDistribuirAvaliadoresComSucessoPelaSegundaVezTendoDadosAtualizadosSegundaProducao", 45);
+		matrix.set("verDistribuirAvaliadoresComSucessoPelaSegundaVezTendoDadosAtualizadosPrimeiraProducao", "verDistribuirAvaliadoresComSucessoPelaSegundaVezTendoDadosAtualizadosPrimeiraProducao", 61);
+		matrix.set("verDistribuirAvaliadoresComSucessoPelaSegundaVezTendoDadosAtualizadosPrimeiraProducao", "distribuirAvaliadoresComSucesso", 24);
+		matrix.set("verDistribuirAvaliadoresComSucessoPelaSegundaVezTendoDadosAtualizadosPrimeiraProducao", "distribuirAvaliadoresSemPreencherPrazoDeAvaliacao", 24);
+		matrix.set("verDistribuirAvaliadoresComSucessoPelaSegundaVezTendoDadosAtualizadosPrimeiraProducao", "verDistribuirAvaliadoresComSucessoPrimeiraProducao", 45);
+		matrix.set("verDistribuirAvaliadoresComSucessoPelaSegundaVezTendoDadosAtualizadosPrimeiraProducao", "verDistribuirAvaliadoresComSucessoSegundaProducao", 45);
+		matrix.set("verDistribuirAvaliadoresComSucessoPelaSegundaVezTendoDadosAtualizadosPrimeiraProducao", "verDistribuirAvaliadoresComSucessoPelaSegundaVezTendoDadosAtualizadosSegundaProducao", 61);
+		matrix.set("verDistribuirAvaliadoresComSucessoPelaSegundaVezTendoDadosAtualizadosSegundaProducao", "verDistribuirAvaliadoresComSucessoPelaSegundaVezTendoDadosAtualizadosPrimeiraProducao", 61);
+		matrix.set("verDistribuirAvaliadoresComSucessoPelaSegundaVezTendoDadosAtualizadosSegundaProducao", "distribuirAvaliadoresComSucesso", 24);
+		matrix.set("verDistribuirAvaliadoresComSucessoPelaSegundaVezTendoDadosAtualizadosSegundaProducao", "distribuirAvaliadoresSemPreencherPrazoDeAvaliacao", 24);
+		matrix.set("verDistribuirAvaliadoresComSucessoPelaSegundaVezTendoDadosAtualizadosSegundaProducao", "verDistribuirAvaliadoresComSucessoPrimeiraProducao", 45);
+		matrix.set("verDistribuirAvaliadoresComSucessoPelaSegundaVezTendoDadosAtualizadosSegundaProducao", "verDistribuirAvaliadoresComSucessoSegundaProducao", 45);
+		matrix.set("verDistribuirAvaliadoresComSucessoPelaSegundaVezTendoDadosAtualizadosSegundaProducao", "verDistribuirAvaliadoresComSucessoPelaSegundaVezTendoDadosAtualizadosPrimeiraProducao", 61);
 	}
 
 	private void assessment(Matrix<TestCase, String, Integer> matrix) {
 		List<String> assessment = new LinkedList<String>();
 		assessment.add("avaliadorAvalia");
 		assessment.add("coordenadorDeAreaRatifica");
-		populateMatrix(matrix, assessment, 19);
+		populateMatrix(matrix, assessment, 46);
+		matrix.set("avaliadorAvalia", "avaliadorAvalia", 58);
+		matrix.set("avaliadorAvalia", "coordenadorDeAreaRatifica", 49);
+		matrix.set("coordenadorDeAreaRatifica", "coordenadorDeAreaRatifica", 0);
+		matrix.set("coordenadorDeAreaRatifica", "avaliadorAvalia", 58);
 	}
 
 	private void plugin(Matrix<TestCase, String, Integer> matrix) {
 		List<String> plugin = new LinkedList<String>();
 		plugin.add("paginaComPlugins");
 		plugin.add("entrarNaPaginaDoPlugin");
-		populateMatrix(matrix, plugin, 19);
+		populateMatrix(matrix, plugin, 17);
+		matrix.set("entrarNaPaginaDoPlugin", "entrarNaPaginaDoPlugin", 18);
 	}
 
 	private void populateMatrix(Matrix<TestCase, String, Integer> matrix, List<String> elements, Integer reusedFixtures) {
