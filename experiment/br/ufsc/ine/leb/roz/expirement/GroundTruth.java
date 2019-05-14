@@ -1,4 +1,4 @@
-package br.ufsc.ine.leb.roz.expirement1;
+package br.ufsc.ine.leb.roz.expirement;
 
 import java.util.LinkedList;
 import java.util.List;
