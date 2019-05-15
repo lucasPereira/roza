@@ -8,6 +8,8 @@ import java.util.Arrays;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import br.ufsc.ine.leb.roza.measurer.report.ScoreAndTestCaseNameAssessmentComparator;
+
 public class SimilarityReportTest {
 
 	private SimilarityAssessment assessmentAA;
@@ -39,6 +41,7 @@ public class SimilarityReportTest {
 	@Test
 	void create() throws Exception {
 		SimilarityReport report = new SimilarityReport(Arrays.asList(assessmentAA, assessmentAB));
+		report.sort(new ScoreAndTestCaseNameAssessmentComparator());
 		assertEquals(2, report.getAssessments().size());
 		assertEquals(assessmentAA, report.getAssessments().get(0));
 		assertEquals(assessmentAB, report.getAssessments().get(1));
@@ -55,6 +58,7 @@ public class SimilarityReportTest {
 	@Test
 	void order() throws Exception {
 		SimilarityReport report = new SimilarityReport(Arrays.asList(assessmentBB, assessmentAA, assessmentAB, assessmentAC, assessmentBA, assessmentBC, assessmentCA, assessmentCB, assessmentCC));
+		report.sort(new ScoreAndTestCaseNameAssessmentComparator());
 		assertEquals(9, report.getAssessments().size());
 		assertEquals(assessmentAA, report.getAssessments().get(0));
 		assertEquals(assessmentBB, report.getAssessments().get(1));
