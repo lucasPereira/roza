@@ -12,11 +12,13 @@ public class ProcessUtils {
 	private Boolean failOnException;
 	private Boolean failOnExitError;
 	private Boolean quiet;
+	private Boolean inheritIo;
 
-	public ProcessUtils(Boolean failOnError, Boolean failOnExitError, Boolean quiet) {
+	public ProcessUtils(Boolean failOnError, Boolean failOnExitError, Boolean quiet, Boolean inheritIo) {
 		this.failOnException = failOnError;
 		this.failOnExitError = failOnExitError;
 		this.quiet = quiet;
+		this.inheritIo = inheritIo;
 	}
 
 	public void execute(String... arguments) {
@@ -56,6 +58,9 @@ public class ProcessUtils {
 		Integer exitValue = 0;
 		Exception exceptionToThrow = null;
 		try {
+			if (inheritIo) {
+				builder.inheritIO();
+			}
 			Process process = builder.start();
 			process.waitFor();
 			exitValue = process.exitValue();
