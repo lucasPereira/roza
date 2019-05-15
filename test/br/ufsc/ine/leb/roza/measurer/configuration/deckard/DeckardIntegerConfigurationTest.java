@@ -37,11 +37,11 @@ public class DeckardIntegerConfigurationTest {
 
 	@Test
 	void change() throws Exception {
-		configuration.setValue(2);
+		configuration.setValue(Integer.MAX_VALUE);
 		configuration.addArgument(arguments);
-		assertEquals(2, configuration.getValue().intValue());
+		assertEquals(Integer.MAX_VALUE, configuration.getValue().intValue());
 		assertEquals(1, arguments.size());
-		assertEquals("export MIN_TOKENS=2", arguments.get(0));
+		assertEquals("export MIN_TOKENS=inf", arguments.get(0));
 	}
 
 }

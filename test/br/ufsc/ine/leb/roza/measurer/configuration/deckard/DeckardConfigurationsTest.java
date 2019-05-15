@@ -98,10 +98,10 @@ public class DeckardConfigurationsTest {
 
 	@Test
 	void changeValues() throws Exception {
-		configurations.minTokens(2).stride(1).similarity(0.9).srcDir("my/src").results("my/results");
+		configurations.minTokens(2).stride(Integer.MAX_VALUE).similarity(0.9).srcDir("my/src").results("my/results");
 		assertEquals(16, configurations.getAllAsArguments().size());
 		assertEquals("export MIN_TOKENS=2", configurations.getAllAsArguments().get(0));
-		assertEquals("export STRIDE=1", configurations.getAllAsArguments().get(1));
+		assertEquals("export STRIDE=inf", configurations.getAllAsArguments().get(1));
 		assertEquals("export SIMILARITY=0.9", configurations.getAllAsArguments().get(2));
 		assertEquals("export SRC_DIR=" + new File("my/src").getAbsolutePath(), configurations.getAllAsArguments().get(3));
 		assertEquals("export FILE_PATTERN=*.java", configurations.getAllAsArguments().get(4));
