@@ -67,7 +67,7 @@ public class TesteAvaliacao {
 	}
 
 	@Test
-	void avaliadorAvalia() throws Exception {
+	void avaliarAvaliador() throws Exception {
 		selenium.passarOMouse("ul#navigationUser > li:nth-child(3)");
 		selenium.clicar("ul#navigationUser > li:nth-child(3) > ul > li:nth-child(2)");
 		selenium.limpar("#username");
@@ -86,7 +86,7 @@ public class TesteAvaliacao {
 	}
 
 	@Test
-	void coordenadorDeAreaRatifica() throws Exception {
+	void avaliarCoordenadorDeArea() throws Exception {
 		selenium.passarOMouse("ul#navigationUser > li:nth-child(3)");
 		selenium.clicar("ul#navigationUser > li:nth-child(3) > ul > li:nth-child(2)");
 		selenium.limpar("#username");

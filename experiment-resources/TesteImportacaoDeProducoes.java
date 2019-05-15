@@ -36,7 +36,7 @@ public class TesteImportacaoDeProducoes {
 	}
 
 	@Test
-	void paginaImportacaoDeProducoes() throws Exception {
+	void importarProducoesPagina() throws Exception {
 		String instrucoes = "Utilize o espaço abaixo para importar as produções de livros a partir de um arquivo em formato CSV codificado em ISO-8859-1. O arquivo deve ter os campos separados por vírgula e utilizar aspas duplas como delimitador textual. A primeira linha do arquivo CSV deve conter o cabeçalho, sendo que, pelo menos, as seguintes colunas são esperadas (não necessáriamente na ordem apresentada):";
 		String aviso = "Produções já existentes, bem como seus respectivos dados, serão perdidas.";
 		selenium.assegurarTexto("Instruções", "#capes-importacao-livros-form > fieldset > div:nth-child(1) > label");
@@ -129,7 +129,7 @@ public class TesteImportacaoDeProducoes {
 	}
 
 	@Test
-	void verSubmissoesDeImportacaoComSucesso() throws Exception {
+	void importarProducoesVerSubmissoesDeImportacaoComSucesso() throws Exception {
 		String arquivo = "src/test/resources/csv/livros-computacao-dois-exemplos.csv";
 		selenium.selecionarArquivo(arquivo, "#capes-importacao-livros-selecao-arquivo");
 		selenium.clicar("#capes-importacao-livros-form > fieldset > div.section.formButtons.form_buttons > button");
@@ -150,7 +150,7 @@ public class TesteImportacaoDeProducoes {
 	}
 
 	@Test
-	void verSubmissoesDeDuasImportacoesDiferentesComSucesso() throws Exception {
+	void importarProducoesVerSubmissoesDeDuasImportacoesDiferentesComSucesso() throws Exception {
 		String arquivo = "src/test/resources/csv/livros-computacao-dois-exemplos.csv";
 		selenium.selecionarArquivo(arquivo, "#capes-importacao-livros-selecao-arquivo");
 		selenium.clicar("#capes-importacao-livros-form > fieldset > div.section.formButtons.form_buttons > button");

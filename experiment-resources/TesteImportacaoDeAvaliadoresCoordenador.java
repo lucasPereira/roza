@@ -36,7 +36,7 @@ public class TesteImportacaoDeAvaliadoresCoordenador {
 	}
 
 	@Test
-	void paginaImportacaoAvaliadoresCoordenador() throws Exception {
+	void importarAvaliadoresCoordenadorPagina() throws Exception {
 		String instrucoes = "Utilize o espaço abaixo para importar os avaliadores e o coordenador de área a partir de um arquivo em formato CSV codificado em ISO-8859-1. O arquivo deve ter os campos separados por vírgula e utilizar aspas duplas como delimitador textual. A primeira linha do arquivo CSV deve conter o cabeçalho, sendo que, pelo menos, as seguintes colunas são esperadas (não necessáriamente na ordem apresentada):";
 		String aviso1 = "Usuários já existentes, isto é, com mesmo CPF, terão seus dados atualizados de acordo com a versão presente no arquivo de importação.";
 		String aviso2 = "Definições de avaliadores e coordenador de área já existentes nesta área do conhecimento serão removidas.";
@@ -121,7 +121,7 @@ public class TesteImportacaoDeAvaliadoresCoordenador {
 	}
 
 	@Test
-	void verAvaliadoresDeImportacao() throws Exception {
+	void importarAvaliadoresCoordenadorVerAvaliadoresDeImportacao() throws Exception {
 		String arquivo = "src/test/resources/csv/avaliadores-e-coordenador-tres-exemplos.csv";
 		selenium.selecionarArquivo(arquivo, "#capes-importacao-avaliadores-e-coordenador-selecao-arquivo");
 		selenium.clicar("#capes-importacao-avaliadores-e-coordenador-form > fieldset > div.section.formButtons.form_buttons > button");
@@ -145,7 +145,7 @@ public class TesteImportacaoDeAvaliadoresCoordenador {
 	}
 
 	@Test
-	void verCoordenadorDeImportacao() throws Exception {
+	void importarAvaliadoresCoordenadorVerCoordenadorDeImportacao() throws Exception {
 		String arquivo = "src/test/resources/csv/avaliadores-e-coordenador-tres-exemplos.csv";
 		selenium.selecionarArquivo(arquivo, "#capes-importacao-avaliadores-e-coordenador-selecao-arquivo");
 		selenium.clicar("#capes-importacao-avaliadores-e-coordenador-form > fieldset > div.section.formButtons.form_buttons > button");
@@ -165,7 +165,7 @@ public class TesteImportacaoDeAvaliadoresCoordenador {
 	}
 
 	@Test
-	void verAvaliadoresDeSegundaImportacaoComDadosAtualizados() throws Exception {
+	void importarAvaliadoresCoordenadorVerAvaliadoresDeSegundaImportacaoComDadosAtualizados() throws Exception {
 		String arquivo = "src/test/resources/csv/avaliadores-e-coordenador-tres-exemplos.csv";
 		selenium.selecionarArquivo(arquivo, "#capes-importacao-avaliadores-e-coordenador-selecao-arquivo");
 		selenium.clicar("#capes-importacao-avaliadores-e-coordenador-form > fieldset > div.section.formButtons.form_buttons > button");
@@ -195,7 +195,7 @@ public class TesteImportacaoDeAvaliadoresCoordenador {
 	}
 
 	@Test
-	void verCoordenadorDeSegundaImportacaoComDadosAtualizados() throws Exception {
+	void importarAvaliadoresCoordenadorVerCoordenadorDeSegundaImportacaoComDadosAtualizados() throws Exception {
 		String arquivo = "src/test/resources/csv/avaliadores-e-coordenador-tres-exemplos.csv";
 		selenium.selecionarArquivo(arquivo, "#capes-importacao-avaliadores-e-coordenador-selecao-arquivo");
 		selenium.clicar("#capes-importacao-avaliadores-e-coordenador-form > fieldset > div.section.formButtons.form_buttons > button");
@@ -221,7 +221,7 @@ public class TesteImportacaoDeAvaliadoresCoordenador {
 	}
 
 	@Test
-	void verAvaliadoresDeSegundaImportacaoDeDuasImportacoesEmAreaDiferenteComDadosAtualizados() throws Exception {
+	void importarAvaliadoresCoordenadorVerAvaliadoresDeSegundaImportacaoDeDuasImportacoesEmAreaDiferenteComDadosAtualizados() throws Exception {
 		String arquivo = "src/test/resources/csv/avaliadores-e-coordenador-tres-exemplos.csv";
 		selenium.selecionarArquivo(arquivo, "#capes-importacao-avaliadores-e-coordenador-selecao-arquivo");
 		selenium.clicar("#capes-importacao-avaliadores-e-coordenador-form > fieldset > div.section.formButtons.form_buttons > button");
@@ -257,7 +257,7 @@ public class TesteImportacaoDeAvaliadoresCoordenador {
 	}
 
 	@Test
-	void verCoordenadorDeSegundaImportacaoDeDuasImportacoesEmAreaDiferenteComDadosAtualizados() throws Exception {
+	void importarAvaliadoresCoordenadorVerCoordenadorDeSegundaImportacaoDeDuasImportacoesEmAreaDiferenteComDadosAtualizados() throws Exception {
 		String arquivo = "src/test/resources/csv/avaliadores-e-coordenador-tres-exemplos.csv";
 		selenium.selecionarArquivo(arquivo, "#capes-importacao-avaliadores-e-coordenador-selecao-arquivo");
 		selenium.clicar("#capes-importacao-avaliadores-e-coordenador-form > fieldset > div.section.formButtons.form_buttons > button");
@@ -289,7 +289,7 @@ public class TesteImportacaoDeAvaliadoresCoordenador {
 	}
 
 	@Test
-	void verAvaliadoresDePrimeiraImportacaoDeDuasImportacoesEmAreaDiferenteComDadosAtualizados() throws Exception {
+	void importarAvaliadoresCoordenadorVerAvaliadoresDePrimeiraImportacaoDeDuasImportacoesEmAreaDiferenteComDadosAtualizados() throws Exception {
 		String arquivo = "src/test/resources/csv/avaliadores-e-coordenador-tres-exemplos.csv";
 		selenium.selecionarArquivo(arquivo, "#capes-importacao-avaliadores-e-coordenador-selecao-arquivo");
 		selenium.clicar("#capes-importacao-avaliadores-e-coordenador-form > fieldset > div.section.formButtons.form_buttons > button");
@@ -327,7 +327,7 @@ public class TesteImportacaoDeAvaliadoresCoordenador {
 	}
 
 	@Test
-	void verCoordenadorDePrimeiraImportacaoDeDuasImportacoesEmAreaDiferenteComDadosAtualizados() throws Exception {
+	void importarAvaliadoresCoordenadorVerCoordenadorDePrimeiraImportacaoDeDuasImportacoesEmAreaDiferenteComDadosAtualizados() throws Exception {
 		String arquivo = "src/test/resources/csv/avaliadores-e-coordenador-tres-exemplos.csv";
 		selenium.selecionarArquivo(arquivo, "#capes-importacao-avaliadores-e-coordenador-selecao-arquivo");
 		selenium.clicar("#capes-importacao-avaliadores-e-coordenador-form > fieldset > div.section.formButtons.form_buttons > button");

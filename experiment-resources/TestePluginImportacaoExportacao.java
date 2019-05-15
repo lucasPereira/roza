@@ -34,13 +34,13 @@ public class TestePluginImportacaoExportacao {
 	}
 
 	@Test
-	void paginaComPlugins() throws Exception {
+	void pluginsPaginaGeral() throws Exception {
 		selenium.assegurarTexto("Tools", ".pkp_page_title");
 		selenium.assegurarTexto("Produções de livros CAPES: Importação e exportação de produções de livros", ".pkp_page_content > ul:nth-child(2) > li:nth-child(1)");
 	}
 
 	@Test
-	void entrarNaPaginaDoPlugin() throws Exception {
+	void pluginsPaginaDoPlugin() throws Exception {
 		selenium.clicar("#ui-id-2 > div > ul > li:nth-child(1) > a");
 		selenium.assegurarTexto("Produções de livros CAPES", ".pkp_page_title");
 		selenium.assegurarQuantidadeDeElementos(5, "#capes-abas > ul > li");

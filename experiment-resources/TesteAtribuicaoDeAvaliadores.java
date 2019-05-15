@@ -35,7 +35,7 @@ public class TesteAtribuicaoDeAvaliadores {
 	}
 
 	@Test
-	void paginaAtribuicaoDeAvaliadoresSemProducoes() throws Exception {
+	void distribuirAvaliadoresPagina() throws Exception {
 		String mensagem = "Para atribuir os avaliadores utilize o botão abaixo.";
 		String aviso = "Atribuições já existentes serão removidas.";
 		selenium.clicar("#capes-abas > ul > li:nth-child(5) > a");
@@ -149,7 +149,7 @@ public class TesteAtribuicaoDeAvaliadores {
 	}
 
 	@Test
-	void verDistribuirAvaliadoresComSucessoPrimeiraProducao() throws Exception {
+	void distribuirAvaliadoresVerPrimeiraProducao() throws Exception {
 		String arquivoProducoes = "src/test/resources/csv/livros-computacao-dois-exemplos.csv";
 		selenium.clicar("#capes-abas > ul > li:nth-child(2) > a");
 		selenium.selecionarArquivo(arquivoProducoes, "#capes-importacao-livros-selecao-arquivo");
@@ -192,7 +192,7 @@ public class TesteAtribuicaoDeAvaliadores {
 	}
 
 	@Test
-	void verDistribuirAvaliadoresComSucessoSegundaProducao() throws Exception {
+	void distribuirAvaliadoresVerSegundaProducao() throws Exception {
 		String arquivoProducoes = "src/test/resources/csv/livros-computacao-dois-exemplos.csv";
 		selenium.clicar("#capes-abas > ul > li:nth-child(2) > a");
 		selenium.selecionarArquivo(arquivoProducoes, "#capes-importacao-livros-selecao-arquivo");
@@ -235,7 +235,7 @@ public class TesteAtribuicaoDeAvaliadores {
 	}
 
 	@Test
-	void verDistribuirAvaliadoresComSucessoPelaSegundaVezTendoDadosAtualizadosPrimeiraProducao() throws Exception {
+	void distribuirAvaliadoresVerPrimeiraProducaoAtualizada() throws Exception {
 		String arquivoProducoes = "src/test/resources/csv/livros-computacao-dois-exemplos.csv";
 		selenium.clicar("#capes-abas > ul > li:nth-child(2) > a");
 		selenium.selecionarArquivo(arquivoProducoes, "#capes-importacao-livros-selecao-arquivo");
@@ -293,7 +293,7 @@ public class TesteAtribuicaoDeAvaliadores {
 	}
 
 	@Test
-	void verDistribuirAvaliadoresComSucessoPelaSegundaVezTendoDadosAtualizadosSegundaProducao() throws Exception {
+	void distribuirAvaliadoresVerSegundaProducaoAtualizada() throws Exception {
 		String arquivoProducoes = "src/test/resources/csv/livros-computacao-dois-exemplos.csv";
 		selenium.clicar("#capes-abas > ul > li:nth-child(2) > a");
 		selenium.selecionarArquivo(arquivoProducoes, "#capes-importacao-livros-selecao-arquivo");
