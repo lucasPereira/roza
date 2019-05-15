@@ -4,7 +4,7 @@ import java.util.Comparator;
 
 import br.ufsc.ine.leb.roza.SimilarityAssessment;
 
-public class TestCaseNameAssessmentComparator implements Comparator<SimilarityAssessment>{
+public class AssessmentTestCaseNameComparator implements Comparator<SimilarityAssessment> {
 
 	@Override
 	public int compare(SimilarityAssessment assessment1, SimilarityAssessment assessment2) {

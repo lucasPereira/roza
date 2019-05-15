@@ -15,7 +15,7 @@ import br.ufsc.ine.leb.roza.TestCase;
 import br.ufsc.ine.leb.roza.materializer.Junit4WithAssertionsTestCaseMaterializer;
 import br.ufsc.ine.leb.roza.materializer.TestCaseMaterializer;
 import br.ufsc.ine.leb.roza.measurer.configuration.jplag.JplagConfigurations;
-import br.ufsc.ine.leb.roza.measurer.report.ScoreAndTestCaseNameAssessmentComparator;
+import br.ufsc.ine.leb.roza.measurer.report.AssessmentScoreAndTestCaseNameComparator;
 import br.ufsc.ine.leb.roza.utils.FolderUtils;
 
 public class JplagSimilarityMeasurerTest {
@@ -59,7 +59,7 @@ public class JplagSimilarityMeasurerTest {
 		TestCase testCaseB = new TestCase("test", Arrays.asList(fixture), Arrays.asList(assertion));
 		MaterializationReport materializationReport = materializer.materialize(Arrays.asList(testCaseA, testCaseB));
 		SimilarityReport report = measurer.measure(materializationReport);
-		report.sort(new ScoreAndTestCaseNameAssessmentComparator());
+		report.sort(new AssessmentScoreAndTestCaseNameComparator());
 
 		assertEquals(4, report.getAssessments().size());
 		assertEquals(BigDecimal.ONE, report.getAssessments().get(0).getScore());
@@ -84,7 +84,7 @@ public class JplagSimilarityMeasurerTest {
 		TestCase testCaseB = new TestCase("testB", Arrays.asList(fixture), Arrays.asList(assertion));
 		MaterializationReport materializationReport = materializer.materialize(Arrays.asList(testCaseA, testCaseB));
 		SimilarityReport report = measurer.measure(materializationReport);
-		report.sort(new ScoreAndTestCaseNameAssessmentComparator());
+		report.sort(new AssessmentScoreAndTestCaseNameComparator());
 
 		assertEquals(4, report.getAssessments().size());
 		assertEquals(BigDecimal.ONE, report.getAssessments().get(0).getScore());
@@ -109,7 +109,7 @@ public class JplagSimilarityMeasurerTest {
 		TestCase testCaseB = new TestCase("testB", Arrays.asList(), Arrays.asList(assertion));
 		MaterializationReport materializationReport = materializer.materialize(Arrays.asList(testCaseA, testCaseB));
 		SimilarityReport report = measurer.measure(materializationReport);
-		report.sort(new ScoreAndTestCaseNameAssessmentComparator());
+		report.sort(new AssessmentScoreAndTestCaseNameComparator());
 
 		assertEquals(4, report.getAssessments().size());
 		assertEquals(BigDecimal.ONE, report.getAssessments().get(0).getScore());
