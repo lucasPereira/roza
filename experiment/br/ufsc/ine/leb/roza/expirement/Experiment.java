@@ -16,10 +16,12 @@ import br.ufsc.ine.leb.roza.loader.RecursiveTextFileLoader;
 import br.ufsc.ine.leb.roza.loader.TextFileLoader;
 import br.ufsc.ine.leb.roza.materializer.Junit4WithoutAssertionsTestCaseMaterializer;
 import br.ufsc.ine.leb.roza.materializer.TestCaseMaterializer;
+import br.ufsc.ine.leb.roza.measurer.DeckardSimilarityMeasurer;
 import br.ufsc.ine.leb.roza.measurer.JplagSimilarityMeasurer;
 import br.ufsc.ine.leb.roza.measurer.LccssSimilarityMeasurer;
 import br.ufsc.ine.leb.roza.measurer.SimianSimilarityMeasurer;
 import br.ufsc.ine.leb.roza.measurer.SimilarityMeasurer;
+import br.ufsc.ine.leb.roza.measurer.configuration.deckard.DeckardConfigurations;
 import br.ufsc.ine.leb.roza.measurer.configuration.jplag.JplagConfigurations;
 import br.ufsc.ine.leb.roza.measurer.configuration.simian.SimianConfigurations;
 import br.ufsc.ine.leb.roza.measurer.report.AssessmentTestCaseNameComparator;
@@ -35,26 +37,34 @@ public class Experiment {
 		groundTruth.findInconsistences();
 		new FolderUtils("experiment-results").createEmptyFolder();
 		lccss();
-		simian(2);
-		simian(3);
-		simian(4);
-		simian(5);
-		simian(6);
-		simian(7);
-		simian(8);
-		simian(9);
-		simian(10);
-		jplag(1);
-		jplag(2);
-		jplag(3);
-		jplag(4);
-		jplag(5);
-		jplag(6);
-		jplag(7);
-		jplag(8);
-		jplag(9);
-		jplag(10);
-		jplag(11);
+		simian();
+		jplag();
+		deckard();
+	}
+
+	private static void simian() {
+		for (Integer threshold = 2; threshold <= 10; threshold++) {
+			simian(threshold);
+		}
+	}
+
+	private static void jplag() {
+		for (Integer sensitivity = 1; sensitivity <= 11; sensitivity++) {
+			jplag(sensitivity);
+		}
+	}
+
+	private static void deckard() {
+		List<Integer> minTokens = Arrays.asList(1, 10, 50);
+		List<Integer> strides = Arrays.asList(0, 1, Integer.MAX_VALUE);
+		List<Double> similarities = Arrays.asList(0.9, 1.0);
+		for (Integer minToken : minTokens) {
+			for (Integer stride : strides) {
+				for (Double similarity : similarities) {
+					deckard(minToken, stride, similarity);
+				}
+			}
+		}
 	}
 
 	private static void lccss() {
@@ -74,6 +84,13 @@ public class Experiment {
 		String fileName = String.format("jplag-%d.csv", sensitivity);
 		JplagConfigurations configurations = new JplagConfigurations().sensitivity(sensitivity).sources("execution/materializer").results("execution/measurer");
 		SimilarityMeasurer measurer = new JplagSimilarityMeasurer(configurations);
+		measure(measurer, fileName);
+	}
+
+	private static void deckard(Integer minTokens, Integer stride, Double similarity) {
+		String fileName = String.format("deckard-%d-%d-%.1f.csv", minTokens, stride, similarity);
+		DeckardConfigurations configurations = new DeckardConfigurations().minTokens(minTokens).stride(stride).similarity(similarity).srcDir("execution/materializer").results("execution/measurer");
+		SimilarityMeasurer measurer = new DeckardSimilarityMeasurer(configurations);
 		measure(measurer, fileName);
 	}
 
