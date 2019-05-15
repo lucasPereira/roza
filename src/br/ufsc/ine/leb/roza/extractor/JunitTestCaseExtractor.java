@@ -15,7 +15,7 @@ import br.ufsc.ine.leb.roza.TestCase;
 import br.ufsc.ine.leb.roza.TestClass;
 import br.ufsc.ine.leb.roza.TestMethod;
 
-public abstract class JunitTestCaseExtractor implements TestCaseExtractor {
+public class JunitTestCaseExtractor implements TestCaseExtractor {
 
 	private List<String> assertions;
 

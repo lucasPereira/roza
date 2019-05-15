@@ -19,7 +19,7 @@ import br.ufsc.ine.leb.roza.TestClass;
 import br.ufsc.ine.leb.roza.TestMethod;
 import br.ufsc.ine.leb.roza.TextFile;
 
-public abstract class JunitTestClassParser implements TestClassParser {
+public class JunitTestClassParser implements TestClassParser {
 
 	private Class<? extends Annotation> testAnnotation;
 	private Class<? extends Annotation> setupAnnotation;

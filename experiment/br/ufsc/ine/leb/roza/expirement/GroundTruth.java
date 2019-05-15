@@ -1,35 +1,42 @@
 package br.ufsc.ine.leb.roza.expirement;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
+import br.ufsc.ine.leb.roza.Statement;
 import br.ufsc.ine.leb.roza.TestCase;
 import br.ufsc.ine.leb.roza.TestClass;
 import br.ufsc.ine.leb.roza.TextFile;
-import br.ufsc.ine.leb.roza.extractor.Junit4TestCaseExtractor;
+import br.ufsc.ine.leb.roza.extractor.JunitTestCaseExtractor;
 import br.ufsc.ine.leb.roza.extractor.TestCaseExtractor;
 import br.ufsc.ine.leb.roza.loader.RecursiveTextFileLoader;
 import br.ufsc.ine.leb.roza.loader.TextFileLoader;
 import br.ufsc.ine.leb.roza.measurer.matrix.Matrix;
 import br.ufsc.ine.leb.roza.measurer.matrix.MatrixElementToKeyConverter;
 import br.ufsc.ine.leb.roza.measurer.matrix.MatrixIntegerValueFactory;
+import br.ufsc.ine.leb.roza.measurer.matrix.MatrixPair;
 import br.ufsc.ine.leb.roza.measurer.matrix.MatrixTestCaseToStringConverter;
 import br.ufsc.ine.leb.roza.measurer.matrix.MatrixValueFactory;
-import br.ufsc.ine.leb.roza.parser.Junit4TestClassParser;
+import br.ufsc.ine.leb.roza.parser.Junit5TestClassParser;
 import br.ufsc.ine.leb.roza.parser.TestClassParser;
 
 public class GroundTruth {
 
+	private Matrix<TestCase, String, Integer> matrix;
+	private List<TestCase> testCases;
+
 	public GroundTruth() {
-		TextFileLoader loader = new RecursiveTextFileLoader("tests");
-		TestClassParser parser = new Junit4TestClassParser();
-		TestCaseExtractor extractor = new Junit4TestCaseExtractor();
+		TextFileLoader loader = new RecursiveTextFileLoader("experiment-resources");
+		TestClassParser parser = new Junit5TestClassParser();
+		List<String> assercoes = Arrays.asList("assegurarTexto", "assegurarValor", "assegurarQuantidadeDeElementos", "assegurarConteudoDeArquivoBaixado", "assegurarNaoMarcado", "assegurarMarcado", "assegurarMarcacao");
+		TestCaseExtractor extractor = new JunitTestCaseExtractor(assercoes);
 		List<TextFile> files = loader.load();
 		List<TestClass> classes = parser.parse(files);
-		List<TestCase> testCases = extractor.extract(classes);
+		testCases = extractor.extract(classes);
 		MatrixElementToKeyConverter<TestCase, String> converter = new MatrixTestCaseToStringConverter();
 		MatrixValueFactory<TestCase, Integer> factory = new MatrixIntegerValueFactory();
-		Matrix<TestCase, String, Integer> matrix = new Matrix<>(testCases, converter, factory);
+		matrix = new Matrix<>(testCases, converter, factory);
 
 		all(matrix);
 		productionImport(matrix);
@@ -88,7 +95,7 @@ public class GroundTruth {
 		all.add("coordenadorDeAreaRatifica");
 		all.add("paginaComPlugins");
 		all.add("entrarNaPaginaDoPlugin");
-		populateMatrix(matrix, all, 3);
+		populate(matrix, all, 3);
 	}
 
 	private void productionImport(Matrix<TestCase, String, Integer> matrix) {
@@ -102,7 +109,7 @@ public class GroundTruth {
 		productionImport.add("importarProducoesArquivoSemIdentificador");
 		productionImport.add("verSubmissoesDeImportacaoComSucesso");
 		productionImport.add("verSubmissoesDeDuasImportacoesDiferentesComSucesso");
-		populateMatrix(matrix, productionImport, 19);
+		populate(matrix, productionImport, 19);
 		matrix.set("paginaImportacaoDeProducoes", "paginaImportacaoDeProducoes", 21);
 		matrix.set("importarProducoesComSucesso", "importarProducoesComSucesso", 25);
 		matrix.set("importarProducoesComSucesso", "importarProducoesDuasVezesComSucesso", 22);
@@ -143,18 +150,18 @@ public class GroundTruth {
 		reviewerImport.add("verCoordenadorDeSegundaImportacaoDeDuasImportacoesEmAreaDiferenteComDadosAtualizados");
 		reviewerImport.add("verAvaliadoresDePrimeiraImportacaoDeDuasImportacoesEmAreaDiferenteComDadosAtualizados");
 		reviewerImport.add("verCoordenadorDePrimeiraImportacaoDeDuasImportacoesEmAreaDiferenteComDadosAtualizados");
-		populateMatrix(matrix, reviewerImport, 19);
+		populate(matrix, reviewerImport, 19);
 		matrix.set("paginaImportacaoAvaliadoresCoordenador", "paginaImportacaoAvaliadoresCoordenador", 22);
 		matrix.set("importarAvaliadoresCoordenadorComSucesso", "importarAvaliadoresCoordenadorComSucesso", 28);
 		matrix.set("importarAvaliadoresCoordenadorDuasVezesComSucesso", "importarAvaliadoresCoordenadorDuasVezesComSucesso", 33);
 		matrix.set("importarAvaliadoresCoordenadorDuasVezesComSucesso", "verAvaliadoresDeImportacao", 23);
 		matrix.set("importarAvaliadoresCoordenadorDuasVezesComSucesso", "verCoordenadorDeImportacao", 23);
-		matrix.set("importarAvaliadoresCoordenadorDuasVezesComSucesso", "verAvaliadoresDeSegundaImportacaoComDadosAtualizados", 23);
-		matrix.set("importarAvaliadoresCoordenadorDuasVezesComSucesso", "verCoordenadorDeSegundaImportacaoComDadosAtualizados", 23);
-		matrix.set("importarAvaliadoresCoordenadorDuasVezesComSucesso", "verAvaliadoresDeSegundaImportacaoDeDuasImportacoesEmAreaDiferenteComDadosAtualizados", 23);
-		matrix.set("importarAvaliadoresCoordenadorDuasVezesComSucesso", "verCoordenadorDeSegundaImportacaoDeDuasImportacoesEmAreaDiferenteComDadosAtualizados", 23);
-		matrix.set("importarAvaliadoresCoordenadorDuasVezesComSucesso", "verAvaliadoresDePrimeiraImportacaoDeDuasImportacoesEmAreaDiferenteComDadosAtualizados", 23);
-		matrix.set("importarAvaliadoresCoordenadorDuasVezesComSucesso", "verCoordenadorDePrimeiraImportacaoDeDuasImportacoesEmAreaDiferenteComDadosAtualizados", 23);
+		matrix.set("importarAvaliadoresCoordenadorDuasVezesComSucesso", "verAvaliadoresDeSegundaImportacaoComDadosAtualizados", 27);
+		matrix.set("importarAvaliadoresCoordenadorDuasVezesComSucesso", "verCoordenadorDeSegundaImportacaoComDadosAtualizados", 27);
+		matrix.set("importarAvaliadoresCoordenadorDuasVezesComSucesso", "verAvaliadoresDeSegundaImportacaoDeDuasImportacoesEmAreaDiferenteComDadosAtualizados", 25);
+		matrix.set("importarAvaliadoresCoordenadorDuasVezesComSucesso", "verCoordenadorDeSegundaImportacaoDeDuasImportacoesEmAreaDiferenteComDadosAtualizados", 25);
+		matrix.set("importarAvaliadoresCoordenadorDuasVezesComSucesso", "verAvaliadoresDePrimeiraImportacaoDeDuasImportacoesEmAreaDiferenteComDadosAtualizados", 25);
+		matrix.set("importarAvaliadoresCoordenadorDuasVezesComSucesso", "verCoordenadorDePrimeiraImportacaoDeDuasImportacoesEmAreaDiferenteComDadosAtualizados", 25);
 		matrix.set("importarAvaliadoresCoordenadorSemArquivo", "importarAvaliadoresCoordenadorSemArquivo", 20);
 		matrix.set("importarAvaliadoresCoordenadorArquivoVazio", "importarAvaliadoresCoordenadorArquivoVazio", 22);
 		matrix.set("importarAvaliadoresCoordenadorArquivoSemCabecalho", "importarAvaliadoresCoordenadorArquivoSemCabecalho", 22);
@@ -178,7 +185,7 @@ public class GroundTruth {
 		matrix.set("verCoordenadorDeImportacao", "verAvaliadoresDePrimeiraImportacaoDeDuasImportacoesEmAreaDiferenteComDadosAtualizados", 23);
 		matrix.set("verCoordenadorDeImportacao", "verCoordenadorDePrimeiraImportacaoDeDuasImportacoesEmAreaDiferenteComDadosAtualizados", 23);
 		matrix.set("verAvaliadoresDeSegundaImportacaoComDadosAtualizados", "verAvaliadoresDeSegundaImportacaoComDadosAtualizados", 33);
-		matrix.set("verAvaliadoresDeSegundaImportacaoComDadosAtualizados", "importarAvaliadoresCoordenadorDuasVezesComSucesso", 23);
+		matrix.set("verAvaliadoresDeSegundaImportacaoComDadosAtualizados", "importarAvaliadoresCoordenadorDuasVezesComSucesso", 27);
 		matrix.set("verAvaliadoresDeSegundaImportacaoComDadosAtualizados", "verAvaliadoresDeImportacao", 23);
 		matrix.set("verAvaliadoresDeSegundaImportacaoComDadosAtualizados", "verCoordenadorDeImportacao", 23);
 		matrix.set("verAvaliadoresDeSegundaImportacaoComDadosAtualizados", "verCoordenadorDeSegundaImportacaoComDadosAtualizados", 31);
@@ -187,7 +194,7 @@ public class GroundTruth {
 		matrix.set("verAvaliadoresDeSegundaImportacaoComDadosAtualizados", "verAvaliadoresDePrimeiraImportacaoDeDuasImportacoesEmAreaDiferenteComDadosAtualizados", 25);
 		matrix.set("verAvaliadoresDeSegundaImportacaoComDadosAtualizados", "verCoordenadorDePrimeiraImportacaoDeDuasImportacoesEmAreaDiferenteComDadosAtualizados", 25);
 		matrix.set("verCoordenadorDeSegundaImportacaoComDadosAtualizados", "verCoordenadorDeSegundaImportacaoComDadosAtualizados", 33);
-		matrix.set("verCoordenadorDeSegundaImportacaoComDadosAtualizados", "importarAvaliadoresCoordenadorDuasVezesComSucesso", 23);
+		matrix.set("verCoordenadorDeSegundaImportacaoComDadosAtualizados", "importarAvaliadoresCoordenadorDuasVezesComSucesso", 27);
 		matrix.set("verCoordenadorDeSegundaImportacaoComDadosAtualizados", "verAvaliadoresDeImportacao", 23);
 		matrix.set("verCoordenadorDeSegundaImportacaoComDadosAtualizados", "verCoordenadorDeImportacao", 23);
 		matrix.set("verCoordenadorDeSegundaImportacaoComDadosAtualizados", "verAvaliadoresDeSegundaImportacaoComDadosAtualizados", 31);
@@ -196,7 +203,7 @@ public class GroundTruth {
 		matrix.set("verCoordenadorDeSegundaImportacaoComDadosAtualizados", "verAvaliadoresDePrimeiraImportacaoDeDuasImportacoesEmAreaDiferenteComDadosAtualizados", 25);
 		matrix.set("verCoordenadorDeSegundaImportacaoComDadosAtualizados", "verCoordenadorDePrimeiraImportacaoDeDuasImportacoesEmAreaDiferenteComDadosAtualizados", 25);
 		matrix.set("verAvaliadoresDeSegundaImportacaoDeDuasImportacoesEmAreaDiferenteComDadosAtualizados", "verAvaliadoresDeSegundaImportacaoDeDuasImportacoesEmAreaDiferenteComDadosAtualizados", 39);
-		matrix.set("verAvaliadoresDeSegundaImportacaoDeDuasImportacoesEmAreaDiferenteComDadosAtualizados", "importarAvaliadoresCoordenadorDuasVezesComSucesso", 23);
+		matrix.set("verAvaliadoresDeSegundaImportacaoDeDuasImportacoesEmAreaDiferenteComDadosAtualizados", "importarAvaliadoresCoordenadorDuasVezesComSucesso", 25);
 		matrix.set("verAvaliadoresDeSegundaImportacaoDeDuasImportacoesEmAreaDiferenteComDadosAtualizados", "verAvaliadoresDeImportacao", 23);
 		matrix.set("verAvaliadoresDeSegundaImportacaoDeDuasImportacoesEmAreaDiferenteComDadosAtualizados", "verCoordenadorDeImportacao", 23);
 		matrix.set("verAvaliadoresDeSegundaImportacaoDeDuasImportacoesEmAreaDiferenteComDadosAtualizados", "verAvaliadoresDeSegundaImportacaoComDadosAtualizados", 25);
@@ -204,8 +211,8 @@ public class GroundTruth {
 		matrix.set("verAvaliadoresDeSegundaImportacaoDeDuasImportacoesEmAreaDiferenteComDadosAtualizados", "verCoordenadorDeSegundaImportacaoDeDuasImportacoesEmAreaDiferenteComDadosAtualizados", 37);
 		matrix.set("verAvaliadoresDeSegundaImportacaoDeDuasImportacoesEmAreaDiferenteComDadosAtualizados", "verAvaliadoresDePrimeiraImportacaoDeDuasImportacoesEmAreaDiferenteComDadosAtualizados", 34);
 		matrix.set("verAvaliadoresDeSegundaImportacaoDeDuasImportacoesEmAreaDiferenteComDadosAtualizados", "verCoordenadorDePrimeiraImportacaoDeDuasImportacoesEmAreaDiferenteComDadosAtualizados", 34);
-		matrix.set("verCoordenadorDeSegundaImportacaoDeDuasImportacoesEmAreaDiferenteComDadosAtualizados", "verAvaliadoresDeSegundaImportacaoDeDuasImportacoesEmAreaDiferenteComDadosAtualizados", 39);
-		matrix.set("verCoordenadorDeSegundaImportacaoDeDuasImportacoesEmAreaDiferenteComDadosAtualizados", "importarAvaliadoresCoordenadorDuasVezesComSucesso", 23);
+		matrix.set("verCoordenadorDeSegundaImportacaoDeDuasImportacoesEmAreaDiferenteComDadosAtualizados", "verCoordenadorDeSegundaImportacaoDeDuasImportacoesEmAreaDiferenteComDadosAtualizados", 39);
+		matrix.set("verCoordenadorDeSegundaImportacaoDeDuasImportacoesEmAreaDiferenteComDadosAtualizados", "importarAvaliadoresCoordenadorDuasVezesComSucesso", 25);
 		matrix.set("verCoordenadorDeSegundaImportacaoDeDuasImportacoesEmAreaDiferenteComDadosAtualizados", "verAvaliadoresDeImportacao", 23);
 		matrix.set("verCoordenadorDeSegundaImportacaoDeDuasImportacoesEmAreaDiferenteComDadosAtualizados", "verCoordenadorDeImportacao", 23);
 		matrix.set("verCoordenadorDeSegundaImportacaoDeDuasImportacoesEmAreaDiferenteComDadosAtualizados", "verAvaliadoresDeSegundaImportacaoComDadosAtualizados", 25);
@@ -214,7 +221,7 @@ public class GroundTruth {
 		matrix.set("verCoordenadorDeSegundaImportacaoDeDuasImportacoesEmAreaDiferenteComDadosAtualizados", "verAvaliadoresDePrimeiraImportacaoDeDuasImportacoesEmAreaDiferenteComDadosAtualizados", 34);
 		matrix.set("verCoordenadorDeSegundaImportacaoDeDuasImportacoesEmAreaDiferenteComDadosAtualizados", "verCoordenadorDePrimeiraImportacaoDeDuasImportacoesEmAreaDiferenteComDadosAtualizados", 34);
 		matrix.set("verAvaliadoresDePrimeiraImportacaoDeDuasImportacoesEmAreaDiferenteComDadosAtualizados", "verAvaliadoresDePrimeiraImportacaoDeDuasImportacoesEmAreaDiferenteComDadosAtualizados", 41);
-		matrix.set("verAvaliadoresDePrimeiraImportacaoDeDuasImportacoesEmAreaDiferenteComDadosAtualizados", "importarAvaliadoresCoordenadorDuasVezesComSucesso", 23);
+		matrix.set("verAvaliadoresDePrimeiraImportacaoDeDuasImportacoesEmAreaDiferenteComDadosAtualizados", "importarAvaliadoresCoordenadorDuasVezesComSucesso", 25);
 		matrix.set("verAvaliadoresDePrimeiraImportacaoDeDuasImportacoesEmAreaDiferenteComDadosAtualizados", "verAvaliadoresDeImportacao", 23);
 		matrix.set("verAvaliadoresDePrimeiraImportacaoDeDuasImportacoesEmAreaDiferenteComDadosAtualizados", "verCoordenadorDeImportacao", 23);
 		matrix.set("verAvaliadoresDePrimeiraImportacaoDeDuasImportacoesEmAreaDiferenteComDadosAtualizados", "verAvaliadoresDeSegundaImportacaoComDadosAtualizados", 25);
@@ -223,7 +230,7 @@ public class GroundTruth {
 		matrix.set("verAvaliadoresDePrimeiraImportacaoDeDuasImportacoesEmAreaDiferenteComDadosAtualizados", "verCoordenadorDeSegundaImportacaoDeDuasImportacoesEmAreaDiferenteComDadosAtualizados", 34);
 		matrix.set("verAvaliadoresDePrimeiraImportacaoDeDuasImportacoesEmAreaDiferenteComDadosAtualizados", "verCoordenadorDePrimeiraImportacaoDeDuasImportacoesEmAreaDiferenteComDadosAtualizados", 39);
 		matrix.set("verCoordenadorDePrimeiraImportacaoDeDuasImportacoesEmAreaDiferenteComDadosAtualizados", "verCoordenadorDePrimeiraImportacaoDeDuasImportacoesEmAreaDiferenteComDadosAtualizados", 41);
-		matrix.set("verCoordenadorDePrimeiraImportacaoDeDuasImportacoesEmAreaDiferenteComDadosAtualizados", "importarAvaliadoresCoordenadorDuasVezesComSucesso", 23);
+		matrix.set("verCoordenadorDePrimeiraImportacaoDeDuasImportacoesEmAreaDiferenteComDadosAtualizados", "importarAvaliadoresCoordenadorDuasVezesComSucesso", 25);
 		matrix.set("verCoordenadorDePrimeiraImportacaoDeDuasImportacoesEmAreaDiferenteComDadosAtualizados", "verAvaliadoresDeImportacao", 23);
 		matrix.set("verCoordenadorDePrimeiraImportacaoDeDuasImportacoesEmAreaDiferenteComDadosAtualizados", "verCoordenadorDeImportacao", 23);
 		matrix.set("verCoordenadorDePrimeiraImportacaoDeDuasImportacoesEmAreaDiferenteComDadosAtualizados", "verAvaliadoresDeSegundaImportacaoComDadosAtualizados", 25);
@@ -242,7 +249,7 @@ public class GroundTruth {
 		evaluationForm.add("verFichaDeAvaliacaoCadastrada");
 		evaluationForm.add("verFormularioDaFichaDeAvaliacaoCadastrada");
 		evaluationForm.add("verFichaDeAvaliacaoRecadastrada");
-		populateMatrix(matrix, evaluationForm, 19);
+		populate(matrix, evaluationForm, 19);
 		matrix.set("paginaConfiguracaoDeFichaDeAvaliacaoFichaNaoCadastrada", "paginaConfiguracaoDeFichaDeAvaliacaoFichaNaoCadastrada", 21);
 		matrix.set("cadastrarFichaDeAvaliacao", "cadastrarFichaDeAvaliacao", 31);
 		matrix.set("cadastrarFichaDeAvaliacao", "cadastrarFichaDeAvaliacaoSomatorioDePontosAcimaDe100", 20);
@@ -279,70 +286,55 @@ public class GroundTruth {
 		reviewerDistribution.add("verDistribuirAvaliadoresComSucessoSegundaProducao");
 		reviewerDistribution.add("verDistribuirAvaliadoresComSucessoPelaSegundaVezTendoDadosAtualizadosPrimeiraProducao");
 		reviewerDistribution.add("verDistribuirAvaliadoresComSucessoPelaSegundaVezTendoDadosAtualizadosSegundaProducao");
-		populateMatrix(matrix, reviewerDistribution, 18);
+		populate(matrix, reviewerDistribution, 18);
 		matrix.set("paginaAtribuicaoDeAvaliadoresSemProducoes", "paginaAtribuicaoDeAvaliadoresSemProducoes", 21);
-		matrix.set("distribuirAvaliadoresComSucesso", "distribuirAvaliadoresComSucesso", 42);
+		matrix.set("distribuirAvaliadoresComSucesso", "distribuirAvaliadoresComSucesso", 41);
 		matrix.set("distribuirAvaliadoresComSucesso", "distribuirAvaliadoresSemFichaDeAvaliacao", 24);
-		matrix.set("distribuirAvaliadoresComSucesso", "verDistribuirAvaliadoresComSucessoPrimeiraProducao", 24);
-		matrix.set("distribuirAvaliadoresComSucesso", "verDistribuirAvaliadoresComSucessoSegundaProducao", 24);
-		matrix.set("distribuirAvaliadoresComSucesso", "verDistribuirAvaliadoresComSucessoPelaSegundaVezTendoDadosAtualizadosPrimeiraProducao", 24);
-		matrix.set("distribuirAvaliadoresComSucesso", "verDistribuirAvaliadoresComSucessoPelaSegundaVezTendoDadosAtualizadosSegundaProducao", 24);
 		matrix.set("distribuirAvaliadoresSemPreencherPrazoDeAvaliacao", "distribuirAvaliadoresSemPreencherPrazoDeAvaliacao", 21);
 		matrix.set("distribuirAvaliadoresSemCoordenadorDeArea", "distribuirAvaliadoresSemCoordenadorDeArea", 28);
 		matrix.set("distribuirAvaliadoresComMaisDeUmCoordenadorDeArea", "distribuirAvaliadoresComMaisDeUmCoordenadorDeArea", 28);
 		matrix.set("distribuirAvaliadoresSemAvaliadores", "distribuirAvaliadoresSemAvaliadores", 28);
 		matrix.set("distribuirAvaliadoresSemFichaDeAvaliacao", "distribuirAvaliadoresSemFichaDeAvaliacao", 28);
 		matrix.set("distribuirAvaliadoresSemFichaDeAvaliacao", "distribuirAvaliadoresComSucesso", 24);
-		matrix.set("distribuirAvaliadoresSemFichaDeAvaliacao", "verDistribuirAvaliadoresComSucessoPrimeiraProducao", 24);
-		matrix.set("distribuirAvaliadoresSemFichaDeAvaliacao", "verDistribuirAvaliadoresComSucessoPrimeiraProducao", 24);
-		matrix.set("distribuirAvaliadoresSemFichaDeAvaliacao", "verDistribuirAvaliadoresComSucessoPelaSegundaVezTendoDadosAtualizadosPrimeiraProducao", 24);
-		matrix.set("distribuirAvaliadoresSemFichaDeAvaliacao", "verDistribuirAvaliadoresComSucessoPelaSegundaVezTendoDadosAtualizadosSegundaProducao", 24);
 		matrix.set("verDistribuirAvaliadoresComSucessoPrimeiraProducao", "verDistribuirAvaliadoresComSucessoPrimeiraProducao", 48);
-		matrix.set("verDistribuirAvaliadoresComSucessoPrimeiraProducao", "distribuirAvaliadoresComSucesso", 24);
-		matrix.set("verDistribuirAvaliadoresComSucessoPrimeiraProducao", "distribuirAvaliadoresSemFichaDeAvaliacao", 24);
-		matrix.set("verDistribuirAvaliadoresComSucessoPrimeiraProducao", "verDistribuirAvaliadoresComSucessoSegundaProducao", 48);
+		matrix.set("verDistribuirAvaliadoresComSucessoPrimeiraProducao", "verDistribuirAvaliadoresComSucessoSegundaProducao", 47);
 		matrix.set("verDistribuirAvaliadoresComSucessoPrimeiraProducao", "verDistribuirAvaliadoresComSucessoPelaSegundaVezTendoDadosAtualizadosPrimeiraProducao", 45);
 		matrix.set("verDistribuirAvaliadoresComSucessoPrimeiraProducao", "verDistribuirAvaliadoresComSucessoPelaSegundaVezTendoDadosAtualizadosSegundaProducao", 45);
-		matrix.set("verDistribuirAvaliadoresComSucessoSegundaProducao", "verDistribuirAvaliadoresComSucessoPrimeiraProducao", 48);
-		matrix.set("verDistribuirAvaliadoresComSucessoSegundaProducao", "distribuirAvaliadoresComSucesso", 24);
-		matrix.set("verDistribuirAvaliadoresComSucessoSegundaProducao", "distribuirAvaliadoresSemFichaDeAvaliacao", 24);
-		matrix.set("verDistribuirAvaliadoresComSucessoSegundaProducao", "verDistribuirAvaliadoresComSucessoPrimeiraProducao", 48);
+		matrix.set("verDistribuirAvaliadoresComSucessoSegundaProducao", "verDistribuirAvaliadoresComSucessoSegundaProducao", 48);
+		matrix.set("verDistribuirAvaliadoresComSucessoSegundaProducao", "verDistribuirAvaliadoresComSucessoPrimeiraProducao", 47);
 		matrix.set("verDistribuirAvaliadoresComSucessoSegundaProducao", "verDistribuirAvaliadoresComSucessoPelaSegundaVezTendoDadosAtualizadosPrimeiraProducao", 45);
 		matrix.set("verDistribuirAvaliadoresComSucessoSegundaProducao", "verDistribuirAvaliadoresComSucessoPelaSegundaVezTendoDadosAtualizadosSegundaProducao", 45);
 		matrix.set("verDistribuirAvaliadoresComSucessoPelaSegundaVezTendoDadosAtualizadosPrimeiraProducao", "verDistribuirAvaliadoresComSucessoPelaSegundaVezTendoDadosAtualizadosPrimeiraProducao", 61);
-		matrix.set("verDistribuirAvaliadoresComSucessoPelaSegundaVezTendoDadosAtualizadosPrimeiraProducao", "distribuirAvaliadoresComSucesso", 24);
-		matrix.set("verDistribuirAvaliadoresComSucessoPelaSegundaVezTendoDadosAtualizadosPrimeiraProducao", "distribuirAvaliadoresSemPreencherPrazoDeAvaliacao", 24);
 		matrix.set("verDistribuirAvaliadoresComSucessoPelaSegundaVezTendoDadosAtualizadosPrimeiraProducao", "verDistribuirAvaliadoresComSucessoPrimeiraProducao", 45);
 		matrix.set("verDistribuirAvaliadoresComSucessoPelaSegundaVezTendoDadosAtualizadosPrimeiraProducao", "verDistribuirAvaliadoresComSucessoSegundaProducao", 45);
-		matrix.set("verDistribuirAvaliadoresComSucessoPelaSegundaVezTendoDadosAtualizadosPrimeiraProducao", "verDistribuirAvaliadoresComSucessoPelaSegundaVezTendoDadosAtualizadosSegundaProducao", 61);
-		matrix.set("verDistribuirAvaliadoresComSucessoPelaSegundaVezTendoDadosAtualizadosSegundaProducao", "verDistribuirAvaliadoresComSucessoPelaSegundaVezTendoDadosAtualizadosPrimeiraProducao", 61);
-		matrix.set("verDistribuirAvaliadoresComSucessoPelaSegundaVezTendoDadosAtualizadosSegundaProducao", "distribuirAvaliadoresComSucesso", 24);
-		matrix.set("verDistribuirAvaliadoresComSucessoPelaSegundaVezTendoDadosAtualizadosSegundaProducao", "distribuirAvaliadoresSemPreencherPrazoDeAvaliacao", 24);
+		matrix.set("verDistribuirAvaliadoresComSucessoPelaSegundaVezTendoDadosAtualizadosPrimeiraProducao", "verDistribuirAvaliadoresComSucessoPelaSegundaVezTendoDadosAtualizadosSegundaProducao", 60);
+		matrix.set("verDistribuirAvaliadoresComSucessoPelaSegundaVezTendoDadosAtualizadosSegundaProducao", "verDistribuirAvaliadoresComSucessoPelaSegundaVezTendoDadosAtualizadosSegundaProducao", 61);
 		matrix.set("verDistribuirAvaliadoresComSucessoPelaSegundaVezTendoDadosAtualizadosSegundaProducao", "verDistribuirAvaliadoresComSucessoPrimeiraProducao", 45);
 		matrix.set("verDistribuirAvaliadoresComSucessoPelaSegundaVezTendoDadosAtualizadosSegundaProducao", "verDistribuirAvaliadoresComSucessoSegundaProducao", 45);
-		matrix.set("verDistribuirAvaliadoresComSucessoPelaSegundaVezTendoDadosAtualizadosSegundaProducao", "verDistribuirAvaliadoresComSucessoPelaSegundaVezTendoDadosAtualizadosPrimeiraProducao", 61);
+		matrix.set("verDistribuirAvaliadoresComSucessoPelaSegundaVezTendoDadosAtualizadosSegundaProducao", "verDistribuirAvaliadoresComSucessoPelaSegundaVezTendoDadosAtualizadosPrimeiraProducao", 60);
 	}
 
 	private void assessment(Matrix<TestCase, String, Integer> matrix) {
 		List<String> assessment = new LinkedList<String>();
 		assessment.add("avaliadorAvalia");
 		assessment.add("coordenadorDeAreaRatifica");
-		populateMatrix(matrix, assessment, 46);
+		populate(matrix, assessment, 46);
 		matrix.set("avaliadorAvalia", "avaliadorAvalia", 58);
 		matrix.set("avaliadorAvalia", "coordenadorDeAreaRatifica", 49);
-		matrix.set("coordenadorDeAreaRatifica", "coordenadorDeAreaRatifica", 0);
-		matrix.set("coordenadorDeAreaRatifica", "avaliadorAvalia", 58);
+		matrix.set("coordenadorDeAreaRatifica", "coordenadorDeAreaRatifica", 58);
+		matrix.set("coordenadorDeAreaRatifica", "avaliadorAvalia", 49);
 	}
 
 	private void plugin(Matrix<TestCase, String, Integer> matrix) {
 		List<String> plugin = new LinkedList<String>();
 		plugin.add("paginaComPlugins");
 		plugin.add("entrarNaPaginaDoPlugin");
-		populateMatrix(matrix, plugin, 17);
+		populate(matrix, plugin, 17);
+		matrix.set("paginaComPlugins", "paginaComPlugins", 17);
 		matrix.set("entrarNaPaginaDoPlugin", "entrarNaPaginaDoPlugin", 18);
 	}
 
-	private void populateMatrix(Matrix<TestCase, String, Integer> matrix, List<String> elements, Integer reusedFixtures) {
+	private void populate(Matrix<TestCase, String, Integer> matrix, List<String> elements, Integer reusedFixtures) {
 		for (String source : elements) {
 			for (String target : elements) {
 				if (!source.equals(target)) {
@@ -350,6 +342,43 @@ public class GroundTruth {
 				}
 			}
 		}
+	}
+
+	public void findInconsistences() {
+		for (MatrixPair<TestCase, Integer> pair : matrix.getPairs()) {
+			if (pair.getValue() == null) {
+				System.out.println(String.format("Missing: %s -> %s", pair.getSource().getName(), pair.getTarget().getName()));
+			}
+		}
+		Integer errors = 0;
+		for (TestCase source : testCases) {
+			List<Statement> sourceFixtures = source.getFixtures();
+			for (TestCase target : testCases) {
+				List<Statement> targetFixtures = target.getFixtures();
+				Boolean contigous = true;
+				Integer commonFixtures = 0;
+				for (Integer index = 0; contigous && index < sourceFixtures.size() && index < targetFixtures.size(); index++) {
+					Statement sourceFixture = sourceFixtures.get(index);
+					Statement targetFixture = targetFixtures.get(index);
+					contigous = sourceFixture.equals(targetFixture);
+					if (contigous) {
+						commonFixtures++;
+					}
+				}
+				Integer truth = matrix.get(source.getName(), target.getName());
+				Boolean inconsistent = !truth.equals(commonFixtures);
+				if (inconsistent) {
+					errors++;
+				}
+				if (inconsistent && errors == 1) {
+					System.out.println(String.format("%s --> %s (%d:%d)", source.getName(), target.getName(), truth, commonFixtures));
+					System.out.println(source.getFixtures());
+					System.out.println(target.getFixtures());
+				}
+			}
+		}
+		System.out.println(String.format("Pairs: %d", matrix.getPairs().size()));
+		System.out.println(String.format("Errors: %d", errors));
 	}
 
 }
