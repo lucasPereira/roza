@@ -12,7 +12,7 @@ import br.ufsc.ine.leb.roza.MaterializationReport;
 import br.ufsc.ine.leb.roza.SimilarityReport;
 import br.ufsc.ine.leb.roza.Statement;
 import br.ufsc.ine.leb.roza.TestCase;
-import br.ufsc.ine.leb.roza.materializer.OneTestCaseWithAssertionsPerClassTestCaseMaterializer;
+import br.ufsc.ine.leb.roza.materializer.Junit4WithAssertionsTestCaseMaterializer;
 import br.ufsc.ine.leb.roza.materializer.TestCaseMaterializer;
 import br.ufsc.ine.leb.roza.measurer.configuration.jplag.JplagConfigurations;
 import br.ufsc.ine.leb.roza.utils.FolderUtils;
@@ -26,7 +26,7 @@ public class JplagSimilarityMeasurerTest {
 	void setup() {
 		new FolderUtils("execution/materializer").createEmptyFolder();
 		new FolderUtils("execution/measurer").createEmptyFolder();
-		materializer = new OneTestCaseWithAssertionsPerClassTestCaseMaterializer("execution/materializer");
+		materializer = new Junit4WithAssertionsTestCaseMaterializer("execution/materializer");
 		measurer = new JplagSimilarityMeasurer(new JplagConfigurations().sensitivity(5).sources("execution/materializer").results("execution/measurer"));
 	}
 

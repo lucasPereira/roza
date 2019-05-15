@@ -4,9 +4,9 @@ import com.github.javaparser.ast.stmt.BlockStmt;
 
 import br.ufsc.ine.leb.roza.TestCase;
 
-public class OneTestCaseWithoutAssertionsPerClassTestCaseMaterializer extends OneTestCasePerClassTestCaseMaterializer implements TestCaseMaterializer {
+public class Junit4WithoutAssertionsTestCaseMaterializer extends Junit4TestCaseMaterializer implements TestCaseMaterializer {
 
-	public OneTestCaseWithoutAssertionsPerClassTestCaseMaterializer(String baseFolder) {
+	public Junit4WithoutAssertionsTestCaseMaterializer(String baseFolder) {
 		super(baseFolder);
 	}
 

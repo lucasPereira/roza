@@ -17,12 +17,12 @@ import br.ufsc.ine.leb.roza.TestCase;
 import br.ufsc.ine.leb.roza.TestCaseMaterialization;
 import br.ufsc.ine.leb.roza.utils.FolderUtils;
 
-public abstract class OneTestCasePerClassTestCaseMaterializer implements TestCaseMaterializer {
+public abstract class Junit4TestCaseMaterializer implements TestCaseMaterializer {
 
 	private Integer counter;
 	private FolderUtils foldereUtils;
 
-	public OneTestCasePerClassTestCaseMaterializer(String baseFolder) {
+	public Junit4TestCaseMaterializer(String baseFolder) {
 		counter = 1;
 		foldereUtils = new FolderUtils(baseFolder);
 	}

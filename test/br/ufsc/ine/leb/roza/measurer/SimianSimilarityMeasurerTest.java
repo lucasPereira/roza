@@ -12,7 +12,7 @@ import br.ufsc.ine.leb.roza.MaterializationReport;
 import br.ufsc.ine.leb.roza.SimilarityReport;
 import br.ufsc.ine.leb.roza.Statement;
 import br.ufsc.ine.leb.roza.TestCase;
-import br.ufsc.ine.leb.roza.materializer.OneTestCaseWithAssertionsPerClassTestCaseMaterializer;
+import br.ufsc.ine.leb.roza.materializer.Junit4WithAssertionsTestCaseMaterializer;
 import br.ufsc.ine.leb.roza.materializer.TestCaseMaterializer;
 import br.ufsc.ine.leb.roza.measurer.configuration.simian.SimianConfigurations;
 import br.ufsc.ine.leb.roza.utils.FolderUtils;
@@ -26,7 +26,7 @@ public class SimianSimilarityMeasurerTest {
 	void setup() {
 		new FolderUtils("execution/materializer").createEmptyFolder();
 		new FolderUtils("execution/measurer").createEmptyFolder();
-		materializer = new OneTestCaseWithAssertionsPerClassTestCaseMaterializer("execution/materializer");
+		materializer = new Junit4WithAssertionsTestCaseMaterializer("execution/materializer");
 		measurer = new SimianSimilarityMeasurer(new SimianConfigurations().threshold(2), "execution/measurer");
 	}
 
