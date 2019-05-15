@@ -5,6 +5,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import br.ufsc.ine.leb.roza.exceptions.MissingPairException;
+
 public class Matrix<T, K, V> {
 
 	private Map<K, T> keys;
@@ -39,12 +41,18 @@ public class Matrix<T, K, V> {
 	public V get(K sourceKey, K targetKey) {
 		T source = keys.get(sourceKey);
 		T target = keys.get(targetKey);
+		if (!matrix.containsKey(source) || !matrix.get(source).containsKey(target)) {
+			throw new MissingPairException(sourceKey.toString(), targetKey.toString());
+		}
 		return matrix.get(source).get(target);
 	}
 
 	public void set(K sourceKey, K targetKey, V value) {
 		T source = keys.get(sourceKey);
 		T target = keys.get(targetKey);
+		if (!matrix.containsKey(source) || !matrix.get(source).containsKey(target)) {
+			throw new MissingPairException(sourceKey.toString(), targetKey.toString());
+		}
 		matrix.get(source).put(target, value);
 	}
 
