@@ -338,19 +338,17 @@ public class GroundTruth {
 		for (String source : elements) {
 			for (String target : elements) {
 				if (!source.equals(target)) {
-					try {
-						matrix.set(source, target, reusedFixtures);
-					} catch (NullPointerException excecao) {
-						throw new RuntimeException(String.format("Par não encontrado: %s -> %s", source, target));
-					}
+					matrix.set(source, target, reusedFixtures);
 				}
 			}
 		}
 	}
 
 	public void findInconsistences() {
+		Boolean missingPair = false;
 		for (MatrixPair<TestCase, Integer> pair : matrix.getPairs()) {
 			if (pair.getValue() == null) {
+				missingPair = true;
 				System.out.println(String.format("Missing: %s -> %s", pair.getSource().getName(), pair.getTarget().getName()));
 			}
 		}
@@ -383,6 +381,9 @@ public class GroundTruth {
 		}
 		System.out.println(String.format("Pairs: %d", matrix.getPairs().size()));
 		System.out.println(String.format("Errors: %d", errors));
+		if (missingPair || errors > 0) {
+			throw new RuntimeException("Inconsistence in the ground truth");
+		}
 	}
 
 }
