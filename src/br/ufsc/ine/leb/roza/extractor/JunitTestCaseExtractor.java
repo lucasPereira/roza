@@ -1,5 +1,6 @@
 package br.ufsc.ine.leb.roza.extractor;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -36,7 +37,7 @@ public class JunitTestCaseExtractor implements TestCaseExtractor {
 
 	private void extractTestCase(List<TestCase> testCases, TestClass testClass, TestMethod testMethod) {
 		String name = testMethod.getName();
-		List<Statement> fixtures = new LinkedList<>();
+		List<Statement> fixtures = new ArrayList<>();
 		List<Statement> assertions = new LinkedList<>();
 		List<Statement> statements = extractStatements(testClass, testMethod);
 		statements.forEach((statement) -> {
