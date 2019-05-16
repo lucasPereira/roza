@@ -19,6 +19,7 @@ import br.ufsc.ine.leb.roza.materializer.TestCaseMaterializer;
 import br.ufsc.ine.leb.roza.measurer.DeckardSimilarityMeasurer;
 import br.ufsc.ine.leb.roza.measurer.JplagSimilarityMeasurer;
 import br.ufsc.ine.leb.roza.measurer.LccssSimilarityMeasurer;
+import br.ufsc.ine.leb.roza.measurer.LcsSimilarityMeasurer;
 import br.ufsc.ine.leb.roza.measurer.SimianSimilarityMeasurer;
 import br.ufsc.ine.leb.roza.measurer.SimilarityMeasurer;
 import br.ufsc.ine.leb.roza.measurer.configuration.deckard.DeckardConfigurations;
@@ -36,6 +37,7 @@ public class Experiment {
 		GroundTruth groundTruth = new GroundTruth();
 		groundTruth.findInconsistences();
 		new FolderUtils("experiment-results").createEmptyFolder();
+		lcs();
 		lccss();
 		simian();
 		jplag();
@@ -65,6 +67,12 @@ public class Experiment {
 				}
 			}
 		}
+	}
+
+	private static void lcs() {
+		String fileName = "lcs.csv";
+		SimilarityMeasurer measurer = new LcsSimilarityMeasurer();
+		measure(measurer, fileName);
 	}
 
 	private static void lccss() {
