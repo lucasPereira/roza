@@ -1,5 +1,6 @@
 package br.ufsc.ine.leb.roza.expirement;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -384,6 +385,16 @@ public class GroundTruth {
 		if (missingPair || errors > 0) {
 			throw new RuntimeException("Inconsistence in the ground truth");
 		}
+	}
+
+	public List<TestCase> getRelevanteElements(List<TestCase> testCases, TestCase source) {
+		List<TestCase> result = new ArrayList<>();
+		for (TestCase target : testCases) {
+			if (!source.equals(target) && matrix.get(source.getName(), target.getName()) > 3 ) {
+				result.add(target);
+			}
+		}
+		return result;
 	}
 
 }
