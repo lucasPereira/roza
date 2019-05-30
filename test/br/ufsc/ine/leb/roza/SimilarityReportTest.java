@@ -21,12 +21,15 @@ public class SimilarityReportTest {
 	private SimilarityAssessment assessmentCA;
 	private SimilarityAssessment assessmentCB;
 	private SimilarityAssessment assessmentCC;
+	private TestCase testCaseA;
+	private TestCase testCaseB;
+	private TestCase testCaseC;
 
 	@BeforeEach
 	void setup() {
-		TestCase testCaseA = new TestCase("testA", Arrays.asList(), Arrays.asList());
-		TestCase testCaseB = new TestCase("testB", Arrays.asList(), Arrays.asList());
-		TestCase testCaseC = new TestCase("testC", Arrays.asList(), Arrays.asList());
+		testCaseA = new TestCase("testA", Arrays.asList(), Arrays.asList());
+		testCaseB = new TestCase("testB", Arrays.asList(), Arrays.asList());
+		testCaseC = new TestCase("testC", Arrays.asList(), Arrays.asList());
 		assessmentAA = new SimilarityAssessment(testCaseA, testCaseA, BigDecimal.ONE);
 		assessmentAB = new SimilarityAssessment(testCaseA, testCaseB, new BigDecimal("0.2"));
 		assessmentAC = new SimilarityAssessment(testCaseA, testCaseC, new BigDecimal("0.9"));
@@ -48,11 +51,23 @@ public class SimilarityReportTest {
 	}
 
 	@Test
-	void removeReflexiveAssessments() throws Exception {
+	void removeReflexives() throws Exception {
 		SimilarityReport report = new SimilarityReport(Arrays.asList(assessmentAA, assessmentAB));
-		report.removeReflexiveAssessments();
-		assertEquals(1, report.getAssessments().size());
-		assertEquals(assessmentAB, report.getAssessments().get(0));
+		SimilarityReport filtered = report.removeReflexives();
+		assertEquals(2, report.getAssessments().size());
+		assertEquals(1, filtered.getAssessments().size());
+		assertEquals(assessmentAB, filtered.getAssessments().get(0));
+	}
+
+	@Test
+	void selectSource() throws Exception {
+		SimilarityReport report = new SimilarityReport(Arrays.asList(assessmentBB, assessmentAA, assessmentAB, assessmentAC, assessmentBA, assessmentBC, assessmentCA, assessmentCB, assessmentCC));
+		SimilarityReport filtered = report.selectSource(testCaseA);
+		assertEquals(9, report.getAssessments().size());
+		assertEquals(3, filtered.getAssessments().size());
+		assertEquals(assessmentAA, filtered.getAssessments().get(0));
+		assertEquals(assessmentAB, filtered.getAssessments().get(1));
+		assertEquals(assessmentAC, filtered.getAssessments().get(2));
 	}
 
 	@Test

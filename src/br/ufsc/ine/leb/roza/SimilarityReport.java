@@ -21,10 +21,24 @@ public class SimilarityReport {
 		return Collections.unmodifiableList(assessments);
 	}
 
-	public void removeReflexiveAssessments() {
-		assessments.removeIf((assessment) -> {
-			return assessment == null || assessment.getSource().equals(assessment.getTarget());
-		});
+	public SimilarityReport removeReflexives() {
+		List<SimilarityAssessment> filtered = new ArrayList<>();
+		for (SimilarityAssessment assessment : assessments) {
+			if (assessment != null && !assessment.getSource().equals(assessment.getTarget())) {
+				filtered.add(assessment);
+			}
+		}
+		return new SimilarityReport(filtered);
+	}
+
+	public SimilarityReport selectSource(TestCase source) {
+		List<SimilarityAssessment> filtered = new ArrayList<>();
+		for (SimilarityAssessment assessment : assessments) {
+			if (assessment != null && assessment.getSource().equals(source)) {
+				filtered.add(assessment);
+			}
+		}
+		return new SimilarityReport(filtered);
 	}
 
 }
