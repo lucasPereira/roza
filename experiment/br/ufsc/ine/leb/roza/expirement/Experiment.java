@@ -43,6 +43,9 @@ public class Experiment {
 		groundTruth = new GroundTruth();
 		groundTruth.findInconsistences();
 		new FolderUtils("experiment-results").createEmptyFolder();
+		new FolderUtils("experiment-results/average-precision-recall-curve").createEmptyFolder();
+		new FolderUtils("experiment-results/precision-recall-curve").createEmptyFolder();
+		new FolderUtils("experiment-results/matrix").createEmptyFolder();
 		lcs();
 		lccss();
 		simian();
@@ -50,21 +53,21 @@ public class Experiment {
 		deckard();
 	}
 
-	private static void simian() {
+	protected static void simian() {
 		for (Integer threshold = 2; threshold <= 10; threshold++) {
 			simian(threshold);
 		}
 	}
 
-	private static void jplag() {
+	protected static void jplag() {
 		for (Integer sensitivity = 1; sensitivity <= 11; sensitivity++) {
 			jplag(sensitivity);
 		}
 	}
 
-	private static void deckard() {
-		List<Integer> minTokens = Arrays.asList(1, 10, 50);
-		List<Integer> strides = Arrays.asList(0, 1, Integer.MAX_VALUE);
+	protected static void deckard() {
+		List<Integer> minTokens = Arrays.asList(1, 10, 20, 30, 40, 50, 60);
+		List<Integer> strides = Arrays.asList(0, 2, 4, Integer.MAX_VALUE);
 		List<Double> similarities = Arrays.asList(0.9, 1.0);
 		for (Integer minToken : minTokens) {
 			for (Integer stride : strides) {
@@ -75,64 +78,63 @@ public class Experiment {
 		}
 	}
 
-	private static void lcs() {
+	protected static void lcs() {
 		String fileName = "lcs.csv";
 		SimilarityMeasurer measurer = new LcsSimilarityMeasurer();
-		averagePrecisionRecallCurve(measurer, fileName);
-		precisionRecallCurve(measurer, fileName);
-		matrix(measurer, fileName);
+		evaluateMeasure(fileName, measurer);
 	}
 
-	private static void lccss() {
+	protected static void lccss() {
 		String fileName = "lccss.csv";
 		SimilarityMeasurer measurer = new LccssSimilarityMeasurer();
-		averagePrecisionRecallCurve(measurer, fileName);
-		precisionRecallCurve(measurer, fileName);
-		matrix(measurer, fileName);
+		evaluateMeasure(fileName, measurer);
 	}
 
 	private static void simian(Integer threshold) {
 		String fileName = String.format("simian-%d.csv", threshold);
 		SimianConfigurations configurations = new SimianConfigurations().threshold(threshold);
 		SimilarityMeasurer measurer = new SimianSimilarityMeasurer(configurations, "execution/measurer");
-		precisionRecallCurve(measurer, fileName);
+		evaluateMeasure(fileName, measurer);
 	}
 
 	private static void jplag(Integer sensitivity) {
 		String fileName = String.format("jplag-%d.csv", sensitivity);
 		JplagConfigurations configurations = new JplagConfigurations().sensitivity(sensitivity).sources("execution/materializer").results("execution/measurer");
 		SimilarityMeasurer measurer = new JplagSimilarityMeasurer(configurations);
-		precisionRecallCurve(measurer, fileName);
+		evaluateMeasure(fileName, measurer);
 	}
 
 	private static void deckard(Integer minTokens, Integer stride, Double similarity) {
 		String fileName = String.format("deckard-%d-%d-%.1f.csv", minTokens, stride, similarity);
 		DeckardConfigurations configurations = new DeckardConfigurations().minTokens(minTokens).stride(stride).similarity(similarity).srcDir("execution/materializer").results("execution/measurer");
 		SimilarityMeasurer measurer = new DeckardSimilarityMeasurer(configurations);
-		precisionRecallCurve(measurer, fileName);
+		evaluateMeasure(fileName, measurer);
 	}
 
-	private static void averagePrecisionRecallCurve(SimilarityMeasurer measurer, String fileName) {
+	private static void evaluateMeasure(String fileName, SimilarityMeasurer measurer) {
 		new FolderUtils("execution/materializer").createEmptyFolder();
 		new FolderUtils("execution/measurer").createEmptyFolder();
-
-		FolderUtils folderUtils = new FolderUtils("experiment-results");
-		CommaSeparatedValues csv = new CommaSeparatedValues();
 		DecimalFormat scoreFormatter = new DecimalFormat();
 		scoreFormatter.setMaximumFractionDigits(Integer.MAX_VALUE);
-
 		TextFileLoader loader = new RecursiveTextFileLoader("experiment-resources");
 		TestClassParser parser = new Junit5TestClassParser();
 		TestCaseExtractor extractor = new JunitTestCaseExtractor(Arrays.asList("assegurarTexto", "assegurarValor", "assegurarQuantidadeDeElementos", "assegurarConteudoDeArquivoBaixado", "assegurarNaoMarcado", "assegurarMarcado", "assegurarMarcacao"));
 		TestCaseMaterializer materializer = new Junit4WithoutAssertionsTestCaseMaterializer("execution/materializer");
-
 		List<TextFile> files = loader.load();
 		List<TestClass> testClasses = parser.parse(files);
 		List<TestCase> testCases = extractor.extract(testClasses);
 		MaterializationReport materializationReport = materializer.materialize(testCases);
 		SimilarityReport similarityReport = measurer.measure(materializationReport);
-		Comparator<SimilarityAssessment> scoreComparator = new AssessmentScoreAndTestCaseNameComparator();
 
+		averagePrecisionRecallCurve(testCases, similarityReport, scoreFormatter, fileName);
+		precisionRecallCurve(testCases, similarityReport, scoreFormatter, fileName);
+		matrix(similarityReport, scoreFormatter, fileName);
+	}
+
+	private static void averagePrecisionRecallCurve(List<TestCase> testCases, SimilarityReport similarityReport, DecimalFormat scoreFormatter, String fileName) {
+		CommaSeparatedValues csv = new CommaSeparatedValues();
+		FolderUtils folderUtils = new FolderUtils("experiment-results/average-precision-recall-curve");
+		Comparator<SimilarityAssessment> scoreComparator = new AssessmentScoreAndTestCaseNameComparator();
 		for (Integer recallLevel = 1; recallLevel <= 10; recallLevel++) {
 			BigDecimal sumPrecision = BigDecimal.ZERO;
 			for (TestCase source : testCases) {
@@ -154,30 +156,13 @@ public class Experiment {
 			BigDecimal average = sumPrecision.divide(new BigDecimal(testCases.size()), MathContext.DECIMAL32);
 			csv.addLine(recallLevel.toString(), scoreFormatter.format(average));
 		}
-		folderUtils.writeContetAsString(String.format("average-precision-recall-curve-%s", fileName), csv.getContent());
+		folderUtils.writeContetAsString(fileName, csv.getContent());
 	}
 
-	private static void precisionRecallCurve(SimilarityMeasurer measurer, String fileName) {
-		new FolderUtils("execution/materializer").createEmptyFolder();
-		new FolderUtils("execution/measurer").createEmptyFolder();
-
-		FolderUtils folderUtils = new FolderUtils("experiment-results");
+	private static void precisionRecallCurve(List<TestCase> testCases, SimilarityReport similarityReport, DecimalFormat scoreFormatter, String fileName) {
 		CommaSeparatedValues csv = new CommaSeparatedValues();
-		DecimalFormat scoreFormatter = new DecimalFormat();
-		scoreFormatter.setMaximumFractionDigits(Integer.MAX_VALUE);
-
-		TextFileLoader loader = new RecursiveTextFileLoader("experiment-resources");
-		TestClassParser parser = new Junit5TestClassParser();
-		TestCaseExtractor extractor = new JunitTestCaseExtractor(Arrays.asList("assegurarTexto", "assegurarValor", "assegurarQuantidadeDeElementos", "assegurarConteudoDeArquivoBaixado", "assegurarNaoMarcado", "assegurarMarcado", "assegurarMarcacao"));
-		TestCaseMaterializer materializer = new Junit4WithoutAssertionsTestCaseMaterializer("execution/materializer");
-
-		List<TextFile> files = loader.load();
-		List<TestClass> testClasses = parser.parse(files);
-		List<TestCase> testCases = extractor.extract(testClasses);
-		MaterializationReport materializationReport = materializer.materialize(testCases);
-		SimilarityReport similarityReport = measurer.measure(materializationReport);
+		FolderUtils folderUtils = new FolderUtils("experiment-results/precision-recall-curve");
 		Comparator<SimilarityAssessment> scoreComparator = new AssessmentScoreAndTestCaseNameComparator();
-
 		for (TestCase source : testCases) {
 			SimilarityReport filtered = similarityReport.selectSource(source).removeReflexives();
 			similarityReport.sort(scoreComparator);
@@ -196,30 +181,14 @@ public class Experiment {
 				csv.addLine(source.getName(), recallLevel.toString(), scoreFormatter.format(precision));
 			}
 		}
-		folderUtils.writeContetAsString(String.format("precision-recall-curve-%s", fileName), csv.getContent());
+		folderUtils.writeContetAsString(fileName, csv.getContent());
 	}
 
-	protected static void matrix(SimilarityMeasurer measurer, String fileName) {
-		new FolderUtils("execution/materializer").createEmptyFolder();
-		new FolderUtils("execution/measurer").createEmptyFolder();
-
-		FolderUtils folderUtils = new FolderUtils("experiment-results");
+	protected static void matrix(SimilarityReport similarityReport, DecimalFormat scoreFormatter, String fileName) {
 		CommaSeparatedValues csv = new CommaSeparatedValues();
-		DecimalFormat scoreFormatter = new DecimalFormat();
-		scoreFormatter.setMaximumFractionDigits(Integer.MAX_VALUE);
-
-		TextFileLoader loader = new RecursiveTextFileLoader("experiment-resources");
-		TestClassParser parser = new Junit5TestClassParser();
-		TestCaseExtractor extractor = new JunitTestCaseExtractor(Arrays.asList("assegurarTexto", "assegurarValor", "assegurarQuantidadeDeElementos", "assegurarConteudoDeArquivoBaixado", "assegurarNaoMarcado", "assegurarMarcado", "assegurarMarcacao"));
-		TestCaseMaterializer materializer = new Junit4WithoutAssertionsTestCaseMaterializer("execution/materializer");
-
-		List<TextFile> files = loader.load();
-		List<TestClass> testClasses = parser.parse(files);
-		List<TestCase> testCases = extractor.extract(testClasses);
-		MaterializationReport materializationReport = materializer.materialize(testCases);
-		SimilarityReport similarityReport = measurer.measure(materializationReport);
-
-		similarityReport.sort(new AssessmentTestCaseNameComparator());
+		FolderUtils folderUtils = new FolderUtils("experiment-results/matrix");
+		Comparator<SimilarityAssessment> nameComparator = new AssessmentTestCaseNameComparator();
+		similarityReport.sort(nameComparator);
 		List<SimilarityAssessment> assessments = similarityReport.getAssessments();
 		for (SimilarityAssessment assessment : assessments) {
 			String sourceName = assessment.getSource().getName();
@@ -227,7 +196,7 @@ public class Experiment {
 			String score = scoreFormatter.format(assessment.getScore());
 			csv.addLine(sourceName, targetName, score);
 		}
-		folderUtils.writeContetAsString(String.format("matrix-%s", fileName), csv.getContent());
+		folderUtils.writeContetAsString(fileName, csv.getContent());
 	}
 
 }

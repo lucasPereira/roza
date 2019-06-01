@@ -345,56 +345,68 @@ public class GroundTruth {
 		}
 	}
 
+	public List<TestCase> getRelevanteElements(List<TestCase> testCases, TestCase source) {
+		List<TestCase> result = new ArrayList<>();
+		for (TestCase target : testCases) {
+			if (!source.equals(target) && matrix.get(source.getName(), target.getName()) > 3) {
+				result.add(target);
+			}
+		}
+		return result;
+	}
+
 	public void findInconsistences() {
-		Boolean missingPair = false;
 		for (MatrixPair<TestCase, Integer> pair : matrix.getPairs()) {
 			if (pair.getValue() == null) {
-				missingPair = true;
-				System.out.println(String.format("Missing: %s -> %s", pair.getSource().getName(), pair.getTarget().getName()));
+				logMissingPair(pair);
 			}
 		}
 		Integer errors = 0;
 		for (TestCase source : testCases) {
 			List<Statement> sourceFixtures = source.getFixtures();
 			for (TestCase target : testCases) {
-				List<Statement> targetFixtures = target.getFixtures();
-				Boolean contigous = true;
-				Integer commonFixtures = 0;
-				for (Integer index = 0; contigous && index < sourceFixtures.size() && index < targetFixtures.size(); index++) {
-					Statement sourceFixture = sourceFixtures.get(index);
-					Statement targetFixture = targetFixtures.get(index);
-					contigous = sourceFixture.equals(targetFixture);
-					if (contigous) {
-						commonFixtures++;
-					}
-				}
+				Integer commonFixtures = countCommonFixtures(sourceFixtures, target);
 				Integer truth = matrix.get(source.getName(), target.getName());
 				Boolean inconsistent = !truth.equals(commonFixtures);
 				if (inconsistent) {
 					errors++;
 				}
 				if (inconsistent && errors == 1) {
-					System.out.println(String.format("%s --> %s (%d:%d)", source.getName(), target.getName(), truth, commonFixtures));
-					System.out.println(source.getFixtures());
-					System.out.println(target.getFixtures());
+					logInconsistence(source, target, commonFixtures, truth);
 				}
 			}
 		}
-		System.out.println(String.format("Pairs: %d", matrix.getPairs().size()));
-		System.out.println(String.format("Errors: %d", errors));
-		if (missingPair || errors > 0) {
-			throw new RuntimeException("Inconsistence in the ground truth");
-		}
+		logSummary(errors);
 	}
 
-	public List<TestCase> getRelevanteElements(List<TestCase> testCases, TestCase source) {
-		List<TestCase> result = new ArrayList<>();
-		for (TestCase target : testCases) {
-			if (!source.equals(target) && matrix.get(source.getName(), target.getName()) > 3 ) {
-				result.add(target);
+	private Integer countCommonFixtures(List<Statement> sourceFixtures, TestCase target) {
+		Boolean contiguous = true;
+		List<Statement> targetFixtures = target.getFixtures();
+		Integer commonFixtures = 0;
+		for (Integer index = 0; contiguous && index < sourceFixtures.size() && index < targetFixtures.size(); index++) {
+			Statement sourceFixture = sourceFixtures.get(index);
+			Statement targetFixture = targetFixtures.get(index);
+			contiguous = sourceFixture.equals(targetFixture);
+			if (contiguous) {
+				commonFixtures++;
 			}
 		}
-		return result;
+		return commonFixtures;
+	}
+
+	private void logSummary(Integer errors) {
+		System.out.println(String.format("Pairs: %d", matrix.getPairs().size()));
+		System.out.println(String.format("Errors: %d", errors));
+	}
+
+	private void logInconsistence(TestCase source, TestCase target, Integer commonFixtures, Integer truth) {
+		System.out.println(String.format("%s --> %s (%d:%d)", source.getName(), target.getName(), truth, commonFixtures));
+		System.out.println(source.getFixtures());
+		System.out.println(target.getFixtures());
+	}
+
+	private void logMissingPair(MatrixPair<TestCase, Integer> pair) {
+		System.out.println(String.format("Missing: %s -> %s", pair.getSource().getName(), pair.getTarget().getName()));
 	}
 
 }
