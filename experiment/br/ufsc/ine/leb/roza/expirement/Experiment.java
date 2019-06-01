@@ -42,7 +42,6 @@ public class Experiment {
 	public static void main(String[] args) {
 		groundTruth = new GroundTruth();
 		groundTruth.findInconsistences();
-		new FolderUtils("experiment-results").createEmptyFolder();
 		new FolderUtils("experiment-results/average-precision-recall-curve").createEmptyFolder();
 		new FolderUtils("experiment-results/precision-recall-curve").createEmptyFolder();
 		new FolderUtils("experiment-results/matrix").createEmptyFolder();
@@ -132,9 +131,10 @@ public class Experiment {
 	}
 
 	private static void averagePrecisionRecallCurve(List<TestCase> testCases, SimilarityReport similarityReport, DecimalFormat scoreFormatter, String fileName) {
-		CommaSeparatedValues csv = new CommaSeparatedValues();
 		FolderUtils folderUtils = new FolderUtils("experiment-results/average-precision-recall-curve");
+		CommaSeparatedValues csv = new CommaSeparatedValues();
 		Comparator<SimilarityAssessment> scoreComparator = new AssessmentScoreAndTestCaseNameComparator();
+		csv.addLine("Precisão/Revocação", fileName);
 		for (Integer recallLevel = 1; recallLevel <= 10; recallLevel++) {
 			BigDecimal sumPrecision = BigDecimal.ZERO;
 			for (TestCase source : testCases) {
