@@ -13,12 +13,21 @@ public class SimilarityReport {
 		this.assessments = new ArrayList<>(assessments);
 	}
 
-	public void sort(Comparator<SimilarityAssessment> comparator) {
+	public SimilarityReport sort(Comparator<SimilarityAssessment> comparator) {
 		Collections.sort(this.assessments, comparator);
+		return this;
 	}
 
 	public List<SimilarityAssessment> getAssessments() {
 		return Collections.unmodifiableList(assessments);
+	}
+
+	public List<TestCase> getTargets() {
+		List<TestCase> targets = new ArrayList<>();
+		for (SimilarityAssessment assessment : assessments) {
+			targets.add(assessment.getTarget());
+		}
+		return targets;
 	}
 
 	public SimilarityReport removeReflexives() {

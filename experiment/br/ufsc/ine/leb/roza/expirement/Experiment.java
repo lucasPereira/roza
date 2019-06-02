@@ -2,7 +2,6 @@ package br.ufsc.ine.leb.roza.expirement;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
-import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
@@ -32,8 +31,12 @@ import br.ufsc.ine.leb.roza.measurer.report.AssessmentScoreAndTestCaseNameCompar
 import br.ufsc.ine.leb.roza.measurer.report.AssessmentTestCaseNameComparator;
 import br.ufsc.ine.leb.roza.parser.Junit5TestClassParser;
 import br.ufsc.ine.leb.roza.parser.TestClassParser;
+import br.ufsc.ine.leb.roza.retrieval.PrecisionRecall;
+import br.ufsc.ine.leb.roza.retrieval.RecallLevel;
+import br.ufsc.ine.leb.roza.retrieval.StandardRecallLevels;
 import br.ufsc.ine.leb.roza.utils.CommaSeparatedValues;
 import br.ufsc.ine.leb.roza.utils.FolderUtils;
+import br.ufsc.ine.leb.roza.utils.FormatterUtils;
 
 public class Experiment {
 
@@ -53,25 +56,24 @@ public class Experiment {
 	}
 
 	protected static void simian() {
-		for (Integer threshold = 2; threshold <= 10; threshold++) {
+		for (Integer threshold = 2; threshold <= 15; threshold++) {
 			simian(threshold);
 		}
 	}
 
 	protected static void jplag() {
-		for (Integer sensitivity = 1; sensitivity <= 11; sensitivity++) {
+		for (Integer sensitivity = 1; sensitivity <= 15; sensitivity++) {
 			jplag(sensitivity);
 		}
 	}
 
 	protected static void deckard() {
-		List<Integer> minTokens = Arrays.asList(1, 10, 20, 30, 40, 50, 60);
-		List<Integer> strides = Arrays.asList(0, 2, 4, Integer.MAX_VALUE);
+		List<Integer> strides = Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, Integer.MAX_VALUE);
 		List<Double> similarities = Arrays.asList(0.9, 1.0);
-		for (Integer minToken : minTokens) {
+		for (Integer minTokens = 1; minTokens < 15; minTokens++) {
 			for (Integer stride : strides) {
 				for (Double similarity : similarities) {
-					deckard(minToken, stride, similarity);
+					deckard(minTokens, stride, similarity);
 				}
 			}
 		}
@@ -113,8 +115,7 @@ public class Experiment {
 	private static void evaluateMeasure(String fileName, SimilarityMeasurer measurer) {
 		new FolderUtils("execution/materializer").createEmptyFolder();
 		new FolderUtils("execution/measurer").createEmptyFolder();
-		DecimalFormat scoreFormatter = new DecimalFormat();
-		scoreFormatter.setMaximumFractionDigits(Integer.MAX_VALUE);
+
 		TextFileLoader loader = new RecursiveTextFileLoader("experiment-resources");
 		TestClassParser parser = new Junit5TestClassParser();
 		TestCaseExtractor extractor = new JunitTestCaseExtractor(Arrays.asList("assegurarTexto", "assegurarValor", "assegurarQuantidadeDeElementos", "assegurarConteudoDeArquivoBaixado", "assegurarNaoMarcado", "assegurarMarcado", "assegurarMarcacao"));
@@ -125,66 +126,58 @@ public class Experiment {
 		MaterializationReport materializationReport = materializer.materialize(testCases);
 		SimilarityReport similarityReport = measurer.measure(materializationReport);
 
-		averagePrecisionRecallCurve(testCases, similarityReport, scoreFormatter, fileName);
-		precisionRecallCurve(testCases, similarityReport, scoreFormatter, fileName);
-		matrix(similarityReport, scoreFormatter, fileName);
+		averagePrecisionRecallCurve(testCases, similarityReport, fileName);
+		precisionRecallCurve(testCases, similarityReport, fileName);
+		matrix(similarityReport, fileName);
 	}
 
-	private static void averagePrecisionRecallCurve(List<TestCase> testCases, SimilarityReport similarityReport, DecimalFormat scoreFormatter, String fileName) {
-		FolderUtils folderUtils = new FolderUtils("experiment-results/average-precision-recall-curve");
+	protected static void averagePrecisionRecallCurve(List<TestCase> testCases, SimilarityReport similarityReport, String fileName) {
+		FormatterUtils formatterUtils = new FormatterUtils();
 		CommaSeparatedValues csv = new CommaSeparatedValues();
+		FolderUtils folderUtils = new FolderUtils("experiment-results/average-precision-recall-curve");
 		Comparator<SimilarityAssessment> scoreComparator = new AssessmentScoreAndTestCaseNameComparator();
+		StandardRecallLevels standardRecallLevels = new StandardRecallLevels();
 		csv.addLine("Precisão/Revocação", fileName);
-		for (Integer recallLevel = 1; recallLevel <= 10; recallLevel++) {
-			BigDecimal sumPrecision = BigDecimal.ZERO;
+		for (RecallLevel recallLevel : standardRecallLevels) {
+			BigDecimal totalPrecision = BigDecimal.ZERO;
 			for (TestCase source : testCases) {
-				SimilarityReport filtered = similarityReport.selectSource(source).removeReflexives();
-				similarityReport.sort(scoreComparator);
-				List<SimilarityAssessment> rankingForSource = filtered.getAssessments();
-				List<TestCase> relevantElementsForSource = groundTruth.getRelevanteElements(testCases, source);
-				Integer elementsForRecallLevel = (int) (recallLevel / 10.0 * relevantElementsForSource.size());
-				List<SimilarityAssessment> rankingForRecallLevel = rankingForSource.subList(0, elementsForRecallLevel);
-				Integer relevantElements = 0;
-				for (Integer index = 0; index < rankingForRecallLevel.size(); index++) {
-					if (relevantElementsForSource.contains(rankingForSource.get(index).getTarget())) {
-						relevantElements++;
-					}
-				}
-				BigDecimal precision = elementsForRecallLevel > 0 ? new BigDecimal(relevantElements).divide(new BigDecimal(elementsForRecallLevel), MathContext.DECIMAL32) : BigDecimal.ONE;
-				sumPrecision = sumPrecision.add(precision);
+				List<TestCase> ranking = similarityReport.selectSource(source).removeReflexives().sort(scoreComparator).getTargets();
+				List<TestCase> relevantSet = groundTruth.getRelevanteElements(testCases, source);
+				PrecisionRecall<TestCase> precisionRecall = new PrecisionRecall<>(ranking, relevantSet);
+				BigDecimal precisionAtRecallLevel = precisionRecall.precisionAtRecallLevel(recallLevel);
+				totalPrecision = totalPrecision.add(precisionAtRecallLevel);
 			}
-			BigDecimal average = sumPrecision.divide(new BigDecimal(testCases.size()), MathContext.DECIMAL32);
-			csv.addLine(recallLevel.toString(), scoreFormatter.format(average));
+			BigDecimal averagePrecision = totalPrecision.divide(new BigDecimal(testCases.size()), MathContext.DECIMAL32);
+			String recallLevelText = formatterUtils.recallLevel(recallLevel);
+			String averagePrecisionText = formatterUtils.bigDecimal(averagePrecision);
+			csv.addLine(recallLevelText, averagePrecisionText);
 		}
 		folderUtils.writeContetAsString(fileName, csv.getContent());
 	}
 
-	private static void precisionRecallCurve(List<TestCase> testCases, SimilarityReport similarityReport, DecimalFormat scoreFormatter, String fileName) {
+	protected static void precisionRecallCurve(List<TestCase> testCases, SimilarityReport similarityReport, String fileName) {
+		FormatterUtils formatterUtils = new FormatterUtils();
 		CommaSeparatedValues csv = new CommaSeparatedValues();
 		FolderUtils folderUtils = new FolderUtils("experiment-results/precision-recall-curve");
 		Comparator<SimilarityAssessment> scoreComparator = new AssessmentScoreAndTestCaseNameComparator();
+		StandardRecallLevels standardRecallLevels = new StandardRecallLevels();
 		for (TestCase source : testCases) {
-			SimilarityReport filtered = similarityReport.selectSource(source).removeReflexives();
-			similarityReport.sort(scoreComparator);
-			List<SimilarityAssessment> rankingForSource = filtered.getAssessments();
-			List<TestCase> relevantElementsForSource = groundTruth.getRelevanteElements(testCases, source);
-			for (Integer recallLevel = 1; recallLevel <= 10; recallLevel++) {
-				Integer elementsForRecallLevel = (int) (recallLevel / 10.0 * relevantElementsForSource.size());
-				List<SimilarityAssessment> rankingForRecallLevel = rankingForSource.subList(0, elementsForRecallLevel);
-				Integer relevantElements = 0;
-				for (Integer index = 0; index < rankingForRecallLevel.size(); index++) {
-					if (relevantElementsForSource.contains(rankingForSource.get(index).getTarget())) {
-						relevantElements++;
-					}
-				}
-				BigDecimal precision = elementsForRecallLevel > 0 ? new BigDecimal(relevantElements).divide(new BigDecimal(elementsForRecallLevel), MathContext.DECIMAL32) : BigDecimal.ONE;
-				csv.addLine(source.getName(), recallLevel.toString(), scoreFormatter.format(precision));
+			List<TestCase> ranking = similarityReport.selectSource(source).removeReflexives().sort(scoreComparator).getTargets();
+			List<TestCase> relevantSet = groundTruth.getRelevanteElements(testCases, source);
+			PrecisionRecall<TestCase> precisionRecall = new PrecisionRecall<>(ranking, relevantSet);
+			for (RecallLevel recallLevel : standardRecallLevels) {
+				BigDecimal precisionAtRecallLevel = precisionRecall.precisionAtRecallLevel(recallLevel);
+				String sourceName = source.getName();
+				String recallLevelText = formatterUtils.recallLevel(recallLevel);
+				String precisionText = formatterUtils.bigDecimal(precisionAtRecallLevel);
+				csv.addLine(sourceName, recallLevelText, precisionText);
 			}
 		}
 		folderUtils.writeContetAsString(fileName, csv.getContent());
 	}
 
-	protected static void matrix(SimilarityReport similarityReport, DecimalFormat scoreFormatter, String fileName) {
+	protected static void matrix(SimilarityReport similarityReport, String fileName) {
+		FormatterUtils formatterUtils = new FormatterUtils();
 		CommaSeparatedValues csv = new CommaSeparatedValues();
 		FolderUtils folderUtils = new FolderUtils("experiment-results/matrix");
 		Comparator<SimilarityAssessment> nameComparator = new AssessmentTestCaseNameComparator();
@@ -193,7 +186,7 @@ public class Experiment {
 		for (SimilarityAssessment assessment : assessments) {
 			String sourceName = assessment.getSource().getName();
 			String targetName = assessment.getTarget().getName();
-			String score = scoreFormatter.format(assessment.getScore());
+			String score = formatterUtils.bigDecimal(assessment.getScore());
 			csv.addLine(sourceName, targetName, score);
 		}
 		folderUtils.writeContetAsString(fileName, csv.getContent());
