@@ -62,7 +62,7 @@ public class Experiment {
 	}
 
 	protected static void jplag() {
-		for (Integer sensitivity = 1; sensitivity <= 15; sensitivity++) {
+		for (Integer sensitivity = 1; sensitivity <= 50; sensitivity++) {
 			jplag(sensitivity);
 		}
 	}
