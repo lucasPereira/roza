@@ -39,14 +39,31 @@ public class TestCaseClustererTest {
 		TestCase testBeta = new TestCase("beta", Arrays.asList(), Arrays.asList());
 		SimilarityAssessment assessmentAlfa = new SimilarityAssessment(testAlfa, testAlfa, BigDecimal.ONE);
 		SimilarityAssessment assessmentAlfaBeta = new SimilarityAssessment(testAlfa, testBeta, BigDecimal.ONE);
-		SimilarityAssessment assessmentBeta = new SimilarityAssessment(testBeta, testBeta, BigDecimal.ONE);
 		SimilarityAssessment assessmentBetaAlfa = new SimilarityAssessment(testBeta, testAlfa, BigDecimal.ONE);
-		SimilarityReport similarityReport = new SimilarityReport(Arrays.asList(assessmentAlfa, assessmentAlfaBeta, assessmentBeta, assessmentBetaAlfa));
+		SimilarityAssessment assessmentBeta = new SimilarityAssessment(testBeta, testBeta, BigDecimal.ONE);
+		SimilarityReport similarityReport = new SimilarityReport(Arrays.asList(assessmentAlfa, assessmentAlfaBeta, assessmentBetaAlfa, assessmentBeta));
 		List<List<TestCase>> cluster = clusterer.cluster(similarityReport);
 		assertEquals(1, cluster.size());
 		assertEquals(2, cluster.get(0).size());
 		assertEquals(testAlfa, cluster.get(0).get(0));
 		assertEquals(testBeta, cluster.get(0).get(1));
+	}
+
+	@Test
+	void twoTestCasesWithSimilarityEqualsToZero() throws Exception {
+		TestCase testAlfa = new TestCase("alpha", Arrays.asList(), Arrays.asList());
+		TestCase testBeta = new TestCase("beta", Arrays.asList(), Arrays.asList());
+		SimilarityAssessment assessmentAlfa = new SimilarityAssessment(testAlfa, testAlfa, BigDecimal.ONE);
+		SimilarityAssessment assessmentAlfaBeta = new SimilarityAssessment(testAlfa, testBeta, BigDecimal.ZERO);
+		SimilarityAssessment assessmentBetaAlfa = new SimilarityAssessment(testBeta, testAlfa, BigDecimal.ZERO);
+		SimilarityAssessment assessmentBeta = new SimilarityAssessment(testBeta, testBeta, BigDecimal.ONE);
+		SimilarityReport similarityReport = new SimilarityReport(Arrays.asList(assessmentAlfa, assessmentAlfaBeta, assessmentBetaAlfa, assessmentBeta));
+		List<List<TestCase>> cluster = clusterer.cluster(similarityReport);
+		assertEquals(2, cluster.size());
+		assertEquals(1, cluster.get(0).size());
+		assertEquals(testAlfa, cluster.get(0).get(0));
+		assertEquals(1, cluster.get(1).size());
+		assertEquals(testBeta, cluster.get(0).get(0));
 	}
 
 }
