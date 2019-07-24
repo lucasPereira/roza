@@ -9,18 +9,18 @@ import br.ufsc.ine.leb.roza.Statement;
 import br.ufsc.ine.leb.roza.TestCase;
 import br.ufsc.ine.leb.roza.TestClass;
 import br.ufsc.ine.leb.roza.TextFile;
-import br.ufsc.ine.leb.roza.extractor.JunitTestCaseExtractor;
-import br.ufsc.ine.leb.roza.extractor.TestCaseExtractor;
-import br.ufsc.ine.leb.roza.loader.RecursiveTextFileLoader;
-import br.ufsc.ine.leb.roza.loader.TextFileLoader;
-import br.ufsc.ine.leb.roza.measurer.matrix.Matrix;
-import br.ufsc.ine.leb.roza.measurer.matrix.MatrixElementToKeyConverter;
-import br.ufsc.ine.leb.roza.measurer.matrix.MatrixIntegerValueFactory;
-import br.ufsc.ine.leb.roza.measurer.matrix.MatrixPair;
-import br.ufsc.ine.leb.roza.measurer.matrix.MatrixTestCaseToStringConverter;
-import br.ufsc.ine.leb.roza.measurer.matrix.MatrixValueFactory;
-import br.ufsc.ine.leb.roza.parser.Junit5TestClassParser;
-import br.ufsc.ine.leb.roza.parser.TestClassParser;
+import br.ufsc.ine.leb.roza.extraction.JunitTestCaseExtractor;
+import br.ufsc.ine.leb.roza.extraction.TestCaseExtractor;
+import br.ufsc.ine.leb.roza.loading.RecursiveTextFileLoader;
+import br.ufsc.ine.leb.roza.loading.TextFileLoader;
+import br.ufsc.ine.leb.roza.measurement.matrix.Matrix;
+import br.ufsc.ine.leb.roza.measurement.matrix.MatrixElementToKeyConverter;
+import br.ufsc.ine.leb.roza.measurement.matrix.MatrixIntegerValueFactory;
+import br.ufsc.ine.leb.roza.measurement.matrix.MatrixPair;
+import br.ufsc.ine.leb.roza.measurement.matrix.MatrixTestCaseToStringConverter;
+import br.ufsc.ine.leb.roza.measurement.matrix.MatrixValueFactory;
+import br.ufsc.ine.leb.roza.parsing.Junit5TestClassParser;
+import br.ufsc.ine.leb.roza.parsing.TestClassParser;
 
 public class GroundTruth {
 

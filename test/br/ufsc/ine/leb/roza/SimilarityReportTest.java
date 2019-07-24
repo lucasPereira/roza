@@ -8,7 +8,7 @@ import java.util.Arrays;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import br.ufsc.ine.leb.roza.measurer.report.AssessmentScoreAndTestCaseNameComparator;
+import br.ufsc.ine.leb.roza.measurement.report.AssessmentScoreAndTestCaseNameComparator;
 
 public class SimilarityReportTest {
 
