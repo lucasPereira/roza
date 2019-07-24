@@ -5,6 +5,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import br.ufsc.ine.leb.roza.measurement.report.TestCaseNameComparator;
+
 public class SimilarityReport {
 
 	private List<SimilarityAssessment> assessments;
@@ -48,6 +50,22 @@ public class SimilarityReport {
 			}
 		}
 		return new SimilarityReport(filtered);
+	}
+
+	public List<TestCase> getUniqueTestCases() {
+		List<TestCase> testCases = new ArrayList<>();
+		for (SimilarityAssessment assessment : assessments) {
+			TestCase source = assessment.getSource();
+			if (!testCases.contains(source)) {
+				testCases.add(source);
+			}
+			TestCase target = assessment.getTarget();
+			if (!testCases.contains(target)) {
+				testCases.add(target);
+			}
+		}
+		testCases.sort(new TestCaseNameComparator());
+		return testCases;
 	}
 
 }
