@@ -13,7 +13,7 @@ import br.ufsc.ine.leb.roza.SimilarityAssessment;
 import br.ufsc.ine.leb.roza.SimilarityReport;
 import br.ufsc.ine.leb.roza.TestCase;
 
-public class TestCaseClustererTest {
+public class DendogramTestCaseClustererTest {
 
 	private TestCaseClusterer clusterer;
 

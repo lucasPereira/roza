@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import br.ufsc.ine.leb.roza.exceptions.EmptyReportException;
 import br.ufsc.ine.leb.roza.measurement.report.TestCaseNameComparator;
 
 public class SimilarityReport {
@@ -20,22 +21,20 @@ public class SimilarityReport {
 		return this;
 	}
 
-	public List<SimilarityAssessment> getAssessments() {
-		return Collections.unmodifiableList(assessments);
-	}
-
-	public List<TestCase> getTargets() {
-		List<TestCase> targets = new ArrayList<>();
-		for (SimilarityAssessment assessment : assessments) {
-			targets.add(assessment.getTarget());
-		}
-		return targets;
-	}
-
 	public SimilarityReport removeReflexives() {
 		List<SimilarityAssessment> filtered = new ArrayList<>();
 		for (SimilarityAssessment assessment : assessments) {
 			if (assessment != null && !assessment.getSource().equals(assessment.getTarget())) {
+				filtered.add(assessment);
+			}
+		}
+		return new SimilarityReport(filtered);
+	}
+
+	public SimilarityReport removeNonReflexives() {
+		List<SimilarityAssessment> filtered = new ArrayList<>();
+		for (SimilarityAssessment assessment : assessments) {
+			if (assessment != null && assessment.getSource().equals(assessment.getTarget())) {
 				filtered.add(assessment);
 			}
 		}
@@ -52,6 +51,18 @@ public class SimilarityReport {
 		return new SimilarityReport(filtered);
 	}
 
+	public List<SimilarityAssessment> getAssessments() {
+		return Collections.unmodifiableList(assessments);
+	}
+
+	public List<TestCase> getTargets() {
+		List<TestCase> targets = new ArrayList<>();
+		for (SimilarityAssessment assessment : assessments) {
+			targets.add(assessment.getTarget());
+		}
+		return targets;
+	}
+
 	public List<TestCase> getUniqueTestCases() {
 		List<TestCase> testCases = new ArrayList<>();
 		for (SimilarityAssessment assessment : assessments) {
@@ -66,6 +77,17 @@ public class SimilarityReport {
 		}
 		testCases.sort(new TestCaseNameComparator());
 		return testCases;
+	}
+
+	public SimilarityAssessment getFirst() {
+		if (isEmpty()) {
+			throw new EmptyReportException();
+		}
+		return assessments.get(0);
+	}
+
+	public Boolean isEmpty() {
+		return assessments.isEmpty();
 	}
 
 }

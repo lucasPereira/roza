@@ -1,6 +1,5 @@
 package br.ufsc.ine.leb.roza.clustering;
 
-import java.util.Arrays;
 import java.util.List;
 
 import br.ufsc.ine.leb.roza.SimilarityReport;
@@ -10,7 +9,7 @@ public class DendogramTestCaseClusterer implements TestCaseClusterer {
 
 	@Override
 	public List<List<TestCase>> cluster(SimilarityReport similarityReport) {
-		return Arrays.asList(similarityReport.getUniqueTestCases());
+		return null;
 	}
 
 }

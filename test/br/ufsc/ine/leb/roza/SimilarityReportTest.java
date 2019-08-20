@@ -1,6 +1,9 @@
 package br.ufsc.ine.leb.roza;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -9,6 +12,7 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import br.ufsc.ine.leb.roza.exceptions.EmptyReportException;
 import br.ufsc.ine.leb.roza.measurement.report.AssessmentScoreAndTestCaseNameComparator;
 
 public class SimilarityReportTest {
@@ -61,6 +65,15 @@ public class SimilarityReportTest {
 	}
 
 	@Test
+	void removeNonReflexives() throws Exception {
+		SimilarityReport report = new SimilarityReport(Arrays.asList(assessmentAA, assessmentAB));
+		SimilarityReport filtered = report.removeNonReflexives();
+		assertEquals(2, report.getAssessments().size());
+		assertEquals(1, filtered.getAssessments().size());
+		assertEquals(assessmentAA, filtered.getAssessments().get(0));
+	}
+
+	@Test
 	void selectSource() throws Exception {
 		SimilarityReport report = new SimilarityReport(Arrays.asList(assessmentBB, assessmentAA, assessmentAB, assessmentAC, assessmentBA, assessmentBC, assessmentCA, assessmentCB, assessmentCC));
 		SimilarityReport filtered = report.selectSource(testCaseA);
@@ -72,7 +85,7 @@ public class SimilarityReportTest {
 	}
 
 	@Test
-	void order() throws Exception {
+	void sort() throws Exception {
 		SimilarityReport report = new SimilarityReport(Arrays.asList(assessmentBB, assessmentAA, assessmentAB, assessmentAC, assessmentBA, assessmentBC, assessmentCA, assessmentCB, assessmentCC));
 		report.sort(new AssessmentScoreAndTestCaseNameComparator());
 		assertEquals(9, report.getAssessments().size());
@@ -94,6 +107,31 @@ public class SimilarityReportTest {
 		assertEquals(2, filtered.size());
 		assertEquals(testCaseA, filtered.get(0));
 		assertEquals(testCaseB, filtered.get(1));
+	}
+
+	@Test
+	void getFirst() throws Exception {
+		SimilarityReport report = new SimilarityReport(Arrays.asList(assessmentAA, assessmentAB, assessmentBA, assessmentBB));
+		assertEquals(assessmentAA, report.getFirst());
+	}
+
+	@Test
+	void getFirstInEmptyReport() throws Exception {
+		assertThrows(EmptyReportException.class, () -> {
+			new SimilarityReport(Arrays.asList()).getFirst();
+		});
+	}
+
+	@Test
+	void isEmpty() throws Exception {
+		SimilarityReport report = new SimilarityReport(Arrays.asList());
+		assertTrue(report.isEmpty());
+	}
+
+	@Test
+	void isNotEmpty() throws Exception {
+		SimilarityReport report = new SimilarityReport(Arrays.asList(assessmentAA));
+		assertFalse(report.isEmpty());
 	}
 
 }
