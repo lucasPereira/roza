@@ -86,6 +86,15 @@ public class SimilarityReport {
 		return assessments.get(0);
 	}
 
+	public SimilarityAssessment getPair(TestCase source, TestCase target) {
+		for (SimilarityAssessment assessment : assessments) {
+			if (assessment.getSource().equals(source) && assessment.getTarget().equals(target)) {
+				return assessment;
+			}
+		}
+		return null;
+	}
+
 	public Boolean isEmpty() {
 		return assessments.isEmpty();
 	}

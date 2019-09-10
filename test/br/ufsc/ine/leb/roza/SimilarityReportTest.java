@@ -85,6 +85,13 @@ public class SimilarityReportTest {
 	}
 
 	@Test
+	void getPair() throws Exception {
+		SimilarityReport report = new SimilarityReport(Arrays.asList(assessmentBB, assessmentAA, assessmentAB, assessmentAC, assessmentBA, assessmentBC, assessmentCA, assessmentCB, assessmentCC));
+		SimilarityAssessment assessment = report.getPair(testCaseA, testCaseB);
+		assertEquals(assessmentAB, assessment);
+	}
+
+	@Test
 	void sort() throws Exception {
 		SimilarityReport report = new SimilarityReport(Arrays.asList(assessmentBB, assessmentAA, assessmentAB, assessmentAC, assessmentBA, assessmentBC, assessmentCA, assessmentCB, assessmentCC));
 		report.sort(new AssessmentScoreAndTestCaseNameComparator());
