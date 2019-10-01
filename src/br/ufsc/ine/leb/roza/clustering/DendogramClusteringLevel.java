@@ -10,8 +10,10 @@ public class DendogramClusteringLevel {
 
 	private List<DendogramCluster> clusters;
 	private SimilarityReport similarityReport;
+	private DendogramLinkageMethod linkageMethod;
 
-	public DendogramClusteringLevel(List<DendogramCluster> clusters, SimilarityReport similarityReport) {
+	public DendogramClusteringLevel(DendogramLinkageMethod linkageMethod, List<DendogramCluster> clusters, SimilarityReport similarityReport) {
+		this.linkageMethod = linkageMethod;
 		this.clusters = clusters;
 		this.similarityReport = similarityReport;
 	}
@@ -25,16 +27,17 @@ public class DendogramClusteringLevel {
 			throw new NoNextLevelException();
 		}
 		List<DendogramCluster> newClusters = new ArrayList<>(clusters.size() - 1);
-		DendogramCluster clusterToBeMerged1 = clusters.get(0);
-		DendogramCluster clusterToBeMerged2 = clusters.get(1);
-		DendogramCluster mergedCluster = clusterToBeMerged1.merge(clusterToBeMerged2);
+		DendogramLinkage linkage = linkageMethod.link(clusters, similarityReport);
+		DendogramCluster firtClusterToBeMerged = linkage.getFirst();
+		DendogramCluster secondClusterToBeMerged = linkage.getSecond();
+		DendogramCluster mergedCluster = firtClusterToBeMerged.merge(secondClusterToBeMerged);
 		newClusters.add(mergedCluster);
 		for (DendogramCluster cluster : clusters) {
-			if (!cluster.equals(clusterToBeMerged1) && !cluster.equals(clusterToBeMerged2)) {
+			if (!cluster.equals(firtClusterToBeMerged) && !cluster.equals(secondClusterToBeMerged)) {
 				newClusters.add(cluster);
 			}
 		}
-		return new DendogramClusteringLevel(newClusters, similarityReport);
+		return new DendogramClusteringLevel(linkageMethod, newClusters, similarityReport);
 	}
 
 	public List<DendogramCluster> getClusters() {

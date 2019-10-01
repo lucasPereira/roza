@@ -19,6 +19,7 @@ public class DendogramTestCaseClustererTest {
 
 	@BeforeEach
 	void setup() {
+		fail("Integrate clusterer with the other entities");
 		clusterer = new DendogramTestCaseClusterer();
 	}
 

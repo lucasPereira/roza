@@ -5,7 +5,6 @@ import java.math.BigDecimal;
 import br.ufsc.ine.leb.roza.SimilarityReport;
 import br.ufsc.ine.leb.roza.TestCase;
 
-
 public class DendogramCompleteLinkageMethod extends DendogramAbstractLinkageMethod implements DendogramLinkageMethod {
 
 	@Override

@@ -13,7 +13,7 @@ import br.ufsc.ine.leb.roza.SimilarityReport;
 import br.ufsc.ine.leb.roza.TestCase;
 import br.ufsc.ine.leb.roza.exceptions.NoNextLevelException;
 
-public class DendogramClusteringLevelTest {
+public class DendogramClusteringLevelEqualDistancesTest {
 
 	private TestCase alfa;
 	private TestCase beta;
@@ -30,22 +30,22 @@ public class DendogramClusteringLevelTest {
 		gamma = new TestCase("gamma", Arrays.asList(), Arrays.asList());
 		clusterAlfa = new DendogramCluster(alfa);
 		clusterBeta = new DendogramCluster(beta);
-		clusterGamma= new DendogramCluster(gamma);
+		clusterGamma = new DendogramCluster(gamma);
 		SimilarityAssessment assessmentAlfaAlfa = new SimilarityAssessment(alfa, alfa, BigDecimal.ONE);
-		SimilarityAssessment assessmentAlfaBeta = new SimilarityAssessment(alfa, beta, new BigDecimal("0.4"));
+		SimilarityAssessment assessmentAlfaBeta = new SimilarityAssessment(alfa, beta, BigDecimal.ONE);
 		SimilarityAssessment assessmentAlfaGamma = new SimilarityAssessment(alfa, gamma, BigDecimal.ONE);
 		SimilarityAssessment assessmentBetaAlfa = new SimilarityAssessment(beta, alfa, BigDecimal.ONE);
 		SimilarityAssessment assessmentBetaBeta = new SimilarityAssessment(beta, beta, BigDecimal.ONE);
 		SimilarityAssessment assessmentBetaGamma = new SimilarityAssessment(beta, gamma, BigDecimal.ONE);
 		SimilarityAssessment assessmentGammaAlfa = new SimilarityAssessment(gamma, alfa, BigDecimal.ONE);
-		SimilarityAssessment assessmentGammaBeta = new SimilarityAssessment(beta, beta, BigDecimal.ONE);
+		SimilarityAssessment assessmentGammaBeta = new SimilarityAssessment(gamma, beta, BigDecimal.ONE);
 		SimilarityAssessment assessmentGammaGamma = new SimilarityAssessment(gamma, gamma, BigDecimal.ONE);
 		similarityReport = new SimilarityReport(Arrays.asList(assessmentAlfaAlfa, assessmentAlfaBeta, assessmentAlfaGamma, assessmentBetaAlfa, assessmentBetaBeta, assessmentBetaGamma, assessmentGammaAlfa, assessmentGammaBeta, assessmentGammaGamma));
 	}
 
 	@Test
 	void oneElement() throws Exception {
-		DendogramClusteringLevel one = new DendogramClusteringLevel(Arrays.asList(clusterAlfa), similarityReport);
+		DendogramClusteringLevel one = new DendogramClusteringLevel(new DendogramSingleLinkageMethod(), Arrays.asList(clusterAlfa), similarityReport);
 
 		assertFalse(one.hasNextLevel());
 		assertEquals(1, one.getClusters().size());
@@ -55,7 +55,7 @@ public class DendogramClusteringLevelTest {
 
 	@Test
 	void twoElements() throws Exception {
-		DendogramClusteringLevel one = new DendogramClusteringLevel(Arrays.asList(clusterAlfa, clusterBeta), similarityReport);
+		DendogramClusteringLevel one = new DendogramClusteringLevel(new DendogramSingleLinkageMethod(), Arrays.asList(clusterAlfa, clusterBeta), similarityReport);
 		DendogramClusteringLevel two = one.generateNextLevel();
 
 		assertTrue(one.hasNextLevel());
@@ -74,7 +74,7 @@ public class DendogramClusteringLevelTest {
 
 	@Test
 	void threeElements() throws Exception {
-		DendogramClusteringLevel one = new DendogramClusteringLevel(Arrays.asList(clusterAlfa, clusterBeta, clusterGamma), similarityReport);
+		DendogramClusteringLevel one = new DendogramClusteringLevel(new DendogramSingleLinkageMethod(), Arrays.asList(clusterAlfa, clusterBeta, clusterGamma), similarityReport);
 		DendogramClusteringLevel two = one.generateNextLevel();
 		DendogramClusteringLevel three = two.generateNextLevel();
 
@@ -106,7 +106,7 @@ public class DendogramClusteringLevelTest {
 	@Test
 	void levelUpWithoutNextLevel() throws Exception {
 		assertThrows(NoNextLevelException.class, () -> {
-			new DendogramClusteringLevel(Arrays.asList(clusterAlfa), similarityReport).generateNextLevel();
+			new DendogramClusteringLevel(new DendogramSingleLinkageMethod(), Arrays.asList(clusterAlfa), similarityReport).generateNextLevel();
 		});
 	}
 
