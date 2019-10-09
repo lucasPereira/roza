@@ -1,4 +1,4 @@
-package br.ufsc.ine.leb.roza.expirement;
+package br.ufsc.ine.leb.roza.expirement.a;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,7 +28,7 @@ public class GroundTruth {
 	private List<TestCase> testCases;
 
 	public GroundTruth() {
-		TextFileLoader loader = new RecursiveTextFileLoader("experiment-resources");
+		TextFileLoader loader = new RecursiveTextFileLoader("experiment-resources/a");
 		TestClassParser parser = new Junit5TestClassParser();
 		List<String> assercoes = Arrays.asList("assegurarTexto", "assegurarValor", "assegurarQuantidadeDeElementos", "assegurarConteudoDeArquivoBaixado", "assegurarNaoMarcado", "assegurarMarcado", "assegurarMarcacao");
 		TestCaseExtractor extractor = new JunitTestCaseExtractor(assercoes);

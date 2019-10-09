@@ -1,4 +1,4 @@
-package br.ufsc.ine.leb.roza.expirement;
+package br.ufsc.ine.leb.roza.expirement.a;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
@@ -45,9 +45,9 @@ public class Experiment {
 	public static void main(String[] args) {
 		groundTruth = new GroundTruth();
 		groundTruth.findInconsistences();
-		new FolderUtils("experiment-results/average-precision-recall-curve").createEmptyFolder();
-		new FolderUtils("experiment-results/precision-recall-curve").createEmptyFolder();
-		new FolderUtils("experiment-results/matrix").createEmptyFolder();
+		new FolderUtils("experiment-results/a/average-precision-recall-curve").createEmptyFolder();
+		new FolderUtils("experiment-results/a/precision-recall-curve").createEmptyFolder();
+		new FolderUtils("experiment-results/a/matrix").createEmptyFolder();
 		lcs();
 		lccss();
 		simian();
@@ -116,7 +116,7 @@ public class Experiment {
 		new FolderUtils("execution/materializer").createEmptyFolder();
 		new FolderUtils("execution/measurer").createEmptyFolder();
 
-		TextFileLoader loader = new RecursiveTextFileLoader("experiment-resources");
+		TextFileLoader loader = new RecursiveTextFileLoader("experiment-resources/a");
 		TestClassParser parser = new Junit5TestClassParser();
 		TestCaseExtractor extractor = new JunitTestCaseExtractor(Arrays.asList("assegurarTexto", "assegurarValor", "assegurarQuantidadeDeElementos", "assegurarConteudoDeArquivoBaixado", "assegurarNaoMarcado", "assegurarMarcado", "assegurarMarcacao"));
 		TestCaseMaterializer materializer = new Junit4WithoutAssertionsTestCaseMaterializer("execution/materializer");
@@ -134,7 +134,7 @@ public class Experiment {
 	protected static void averagePrecisionRecallCurve(List<TestCase> testCases, SimilarityReport similarityReport, String fileName) {
 		FormatterUtils formatterUtils = new FormatterUtils();
 		CommaSeparatedValues csv = new CommaSeparatedValues();
-		FolderUtils folderUtils = new FolderUtils("experiment-results/average-precision-recall-curve");
+		FolderUtils folderUtils = new FolderUtils("experiment-results/a/average-precision-recall-curve");
 		Comparator<SimilarityAssessment> scoreComparator = new AssessmentScoreAndTestCaseNameComparator();
 		StandardRecallLevels standardRecallLevels = new StandardRecallLevels();
 		csv.addLine("Precisão/Revocação", fileName);
@@ -158,7 +158,7 @@ public class Experiment {
 	protected static void precisionRecallCurve(List<TestCase> testCases, SimilarityReport similarityReport, String fileName) {
 		FormatterUtils formatterUtils = new FormatterUtils();
 		CommaSeparatedValues csv = new CommaSeparatedValues();
-		FolderUtils folderUtils = new FolderUtils("experiment-results/precision-recall-curve");
+		FolderUtils folderUtils = new FolderUtils("experiment-results/a/precision-recall-curve");
 		Comparator<SimilarityAssessment> scoreComparator = new AssessmentScoreAndTestCaseNameComparator();
 		StandardRecallLevels standardRecallLevels = new StandardRecallLevels();
 		for (TestCase source : testCases) {
@@ -179,7 +179,7 @@ public class Experiment {
 	protected static void matrix(SimilarityReport similarityReport, String fileName) {
 		FormatterUtils formatterUtils = new FormatterUtils();
 		CommaSeparatedValues csv = new CommaSeparatedValues();
-		FolderUtils folderUtils = new FolderUtils("experiment-results/matrix");
+		FolderUtils folderUtils = new FolderUtils("experiment-results/a/matrix");
 		Comparator<SimilarityAssessment> nameComparator = new AssessmentTestCaseNameComparator();
 		similarityReport.sort(nameComparator);
 		List<SimilarityAssessment> assessments = similarityReport.getAssessments();
