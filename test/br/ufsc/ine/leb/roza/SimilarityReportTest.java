@@ -1,6 +1,7 @@
 package br.ufsc.ine.leb.roza;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -8,6 +9,7 @@ import java.util.Arrays;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import br.ufsc.ine.leb.roza.exceptions.MissingPairException;
 import br.ufsc.ine.leb.roza.measurement.report.AssessmentScoreAndTestCaseNameComparator;
 
 public class SimilarityReportTest {
@@ -80,13 +82,6 @@ public class SimilarityReportTest {
 	}
 
 	@Test
-	void getPair() throws Exception {
-		SimilarityReport report = new SimilarityReport(Arrays.asList(assessmentBB, assessmentAA, assessmentAB, assessmentAC, assessmentBA, assessmentBC, assessmentCA, assessmentCB, assessmentCC));
-		SimilarityAssessment assessment = report.getPair(testCaseA, testCaseB);
-		assertEquals(assessmentAB, assessment);
-	}
-
-	@Test
 	void unsorted() throws Exception {
 		SimilarityReport unsorted = new SimilarityReport(Arrays.asList(assessmentBB, assessmentAA, assessmentAB, assessmentAC, assessmentBA, assessmentBC, assessmentCA, assessmentCB, assessmentCC));
 		assertEquals(9, unsorted.getAssessments().size());
@@ -115,6 +110,32 @@ public class SimilarityReportTest {
 		assertEquals(assessmentCB, sorted.getAssessments().get(6));
 		assertEquals(assessmentBA, sorted.getAssessments().get(7));
 		assertEquals(assessmentAB, sorted.getAssessments().get(8));
+	}
+
+	@Test
+	void existingPair() throws Exception {
+		SimilarityReport report = new SimilarityReport(Arrays.asList(assessmentBB, assessmentAA, assessmentAB, assessmentBA));
+		assertEquals(assessmentAA, report.getPair(testCaseA, testCaseA));
+		assertEquals(assessmentAB, report.getPair(testCaseA, testCaseB));
+		assertEquals(assessmentBA, report.getPair(testCaseB, testCaseA));
+		assertEquals(assessmentBB, report.getPair(testCaseB, testCaseB));
+	}
+
+	@Test
+	void nonExistentPair() throws Exception {
+		SimilarityReport report = new SimilarityReport(Arrays.asList(assessmentBB, assessmentAA, assessmentAB, assessmentBA));
+		assertThrows(MissingPairException.class, () -> {
+			report.getPair(testCaseA, testCaseC);
+		});
+		assertThrows(MissingPairException.class, () -> {
+			report.getPair(testCaseC, testCaseA);
+		});
+		assertThrows(MissingPairException.class, () -> {
+			report.getPair(testCaseB, testCaseC);
+		});
+		assertThrows(MissingPairException.class, () -> {
+			report.getPair(testCaseC, testCaseB);
+		});
 	}
 
 }

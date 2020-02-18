@@ -1,6 +1,6 @@
 package br.ufsc.ine.leb.roza.retrieval;
 
-import br.ufsc.ine.leb.roza.exceptions.NegativeRelevantSetSize;
+import br.ufsc.ine.leb.roza.exceptions.NegativeRelevantSetSizeException;
 import br.ufsc.ine.leb.roza.exceptions.RecallLevelOutOfBoundsException;
 
 public class RecallLevel {
@@ -16,7 +16,7 @@ public class RecallLevel {
 
 	public Integer getAmountOfElementsInRelevantSet(Integer relevantSetSize) {
 		if (relevantSetSize < 0) {
-			throw new NegativeRelevantSetSize();
+			throw new NegativeRelevantSetSizeException();
 		}
 		Double percent = level / 10.0;
 		return (int) (percent * relevantSetSize);

@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
 
-import br.ufsc.ine.leb.roza.exceptions.NegativeRelevantSetSize;
+import br.ufsc.ine.leb.roza.exceptions.NegativeRelevantSetSizeException;
 import br.ufsc.ine.leb.roza.exceptions.RecallLevelOutOfBoundsException;
 
 public class RecallLevelTest {
@@ -64,7 +64,7 @@ public class RecallLevelTest {
 
 	@Test
 	void negativeRelevantSetSize() throws Exception {
-		assertThrows(NegativeRelevantSetSize.class, () -> {
+		assertThrows(NegativeRelevantSetSizeException.class, () -> {
 			new RecallLevel(1).getAmountOfElementsInRelevantSet(-1);
 		});
 	}
