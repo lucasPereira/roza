@@ -1,14 +1,13 @@
 package br.ufsc.ine.leb.roza.clustering.dendrogram;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 import br.ufsc.ine.leb.roza.SimilarityReport;
 
 abstract class AbstractLinkage implements Linkage {
 
 	@Override
-	public final Link link(List<Cluster> clusters, SimilarityReport similarityReport) {
+	public final Link link(ClustersToMerge clusters, SimilarityReport similarityReport) {
 		Cluster firstMostSimilar = null;
 		Cluster secondMostSimilar = null;
 		BigDecimal mostSimilarDistance = BigDecimal.ZERO;

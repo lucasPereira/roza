@@ -24,7 +24,7 @@ public class FirstLinkageTest {
 		TestCase beta = new TestCase("beta", Arrays.asList(), Arrays.asList());
 		Cluster clusterAlfa = new Cluster(alfa);
 		Cluster clusterBeta = new Cluster(beta);
-		Link link = linkage.link(Arrays.asList(clusterAlfa, clusterBeta), null);
+		Link link = linkage.link(new ClustersToMerge(Arrays.asList(clusterAlfa, clusterBeta)), null);
 		assertEquals(clusterAlfa, link.getFirst());
 		assertEquals(clusterBeta, link.getSecond());
 	}
@@ -37,7 +37,7 @@ public class FirstLinkageTest {
 		Cluster clusterAlfa = new Cluster(alfa);
 		Cluster clusterBeta = new Cluster(beta);
 		Cluster clusterGamma = new Cluster(gamma);
-		Link link = linkage.link(Arrays.asList(clusterAlfa, clusterBeta, clusterGamma), null);
+		Link link = linkage.link(new ClustersToMerge(Arrays.asList(clusterAlfa, clusterBeta, clusterGamma)), null);
 		assertEquals(clusterAlfa, link.getFirst());
 		assertEquals(clusterBeta, link.getSecond());
 	}
@@ -51,7 +51,7 @@ public class FirstLinkageTest {
 		Cluster clusterBeta = new Cluster(beta);
 		Cluster clusterGamma = new Cluster(gamma);
 		Cluster clusterAlfaBeta = clusterAlfa.merge(clusterBeta);
-		Link link = linkage.link(Arrays.asList(clusterAlfaBeta, clusterGamma), null);
+		Link link = linkage.link(new ClustersToMerge(Arrays.asList(clusterAlfaBeta, clusterGamma)), null);
 		assertEquals(clusterAlfaBeta, link.getFirst());
 		assertEquals(clusterGamma, link.getSecond());
 	}

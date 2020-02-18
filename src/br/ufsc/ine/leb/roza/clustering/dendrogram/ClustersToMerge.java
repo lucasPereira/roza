@@ -1,10 +1,11 @@
 package br.ufsc.ine.leb.roza.clustering.dendrogram;
 
+import java.util.Iterator;
 import java.util.List;
 
 import br.ufsc.ine.leb.roza.exceptions.NoClustersToMergeException;
 
-public class ClustersToMerge {
+public class ClustersToMerge implements Iterable<Cluster> {
 
 	private List<Cluster> clusters;
 
@@ -15,8 +16,9 @@ public class ClustersToMerge {
 		this.clusters = clusters;
 	}
 
-	public List<Cluster> getClusters() {
-		return clusters;
+	@Override
+	public Iterator<Cluster> iterator() {
+		return clusters.iterator();
 	}
 
 }

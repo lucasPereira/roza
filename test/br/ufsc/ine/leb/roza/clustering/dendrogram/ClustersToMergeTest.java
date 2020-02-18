@@ -3,6 +3,7 @@ package br.ufsc.ine.leb.roza.clustering.dendrogram;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Arrays;
+import java.util.Iterator;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -40,9 +41,10 @@ public class ClustersToMergeTest {
 	@Test
 	void twoElements() throws Exception {
 		ClustersToMerge clusters = new ClustersToMerge(Arrays.asList(clusterAlfa, clusterBeta));
-		assertEquals(2, clusters.getClusters().size());
-		assertEquals(clusterAlfa, clusters.getClusters().get(0));
-		assertEquals(clusterBeta, clusters.getClusters().get(1));
+		Iterator<Cluster> iterator = clusters.iterator();
+		assertEquals(clusterAlfa, iterator.next());
+		assertEquals(clusterBeta, iterator.next());
+		assertFalse(iterator.hasNext());
 	}
 
 }

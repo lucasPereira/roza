@@ -27,7 +27,7 @@ class Level {
 			throw new NoNextLevelException();
 		}
 		List<Cluster> newClusters = new ArrayList<>(clusters.size() - 1);
-		Link linkage = linkageMethod.link(clusters, similarityReport);
+		Link linkage = linkageMethod.link(new ClustersToMerge(clusters), similarityReport);
 		Cluster firtClusterToBeMerged = linkage.getFirst();
 		Cluster secondClusterToBeMerged = linkage.getSecond();
 		Cluster mergedCluster = firtClusterToBeMerged.merge(secondClusterToBeMerged);

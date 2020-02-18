@@ -16,7 +16,7 @@ import br.ufsc.ine.leb.roza.exceptions.TiebreakException;
 
 public class CompleteLinkageTest {
 
-	private CompleteLinkage linkage;
+	private Linkage linkage;
 
 	@BeforeEach
 	void setup() {
@@ -51,7 +51,8 @@ public class CompleteLinkageTest {
 		SimilarityAssessment assessmentDeltaGamma = new SimilarityAssessment(delta, gamma, new BigDecimal("0.3"));
 		SimilarityAssessment assessmentDeltaDelta = new SimilarityAssessment(delta, delta, BigDecimal.ONE);
 		SimilarityReport similarityReport = new SimilarityReport(Arrays.asList(assessmentAlfaAlfa, assessmentAlfaBeta, assessmentAlfaGamma, assessmentAlfaDelta, assessmentBetaAlfa, assessmentBetaBeta, assessmentBetaGamma, assessmentBetaDelta, assessmentGammaAlfa, assessmentGammaBeta, assessmentGammaGamma, assessmentGammaDelta, assessmentDeltaAlfa, assessmentDeltaBeta, assessmentDeltaGamma, assessmentDeltaDelta));
-		Link link = linkage.link(Arrays.asList(clusterAlfaGamma, clusterBeta, clusterDelta), similarityReport);
+		ClustersToMerge clusters = new ClustersToMerge(Arrays.asList(clusterAlfaGamma, clusterBeta, clusterDelta));
+		Link link = linkage.link(clusters, similarityReport);
 		assertEquals(clusterBeta, link.getFirst());
 		assertEquals(clusterDelta, link.getSecond());
 	}
@@ -84,7 +85,8 @@ public class CompleteLinkageTest {
 		SimilarityAssessment assessmentDeltaGamma = new SimilarityAssessment(delta, gamma, new BigDecimal("0.3"));
 		SimilarityAssessment assessmentDeltaDelta = new SimilarityAssessment(delta, delta, BigDecimal.ONE);
 		SimilarityReport similarityReport = new SimilarityReport(Arrays.asList(assessmentAlfaAlfa, assessmentAlfaBeta, assessmentAlfaGamma, assessmentAlfaDelta, assessmentBetaAlfa, assessmentBetaBeta, assessmentBetaGamma, assessmentBetaDelta, assessmentGammaAlfa, assessmentGammaBeta, assessmentGammaGamma, assessmentGammaDelta, assessmentDeltaAlfa, assessmentDeltaBeta, assessmentDeltaGamma, assessmentDeltaDelta));
-		Link link = linkage.link(Arrays.asList(clusterAlfaGamma, clusterBeta, clusterDelta), similarityReport);
+		ClustersToMerge clusters = new ClustersToMerge(Arrays.asList(clusterAlfaGamma, clusterBeta, clusterDelta));
+		Link link = linkage.link(clusters, similarityReport);
 		assertEquals(clusterAlfaGamma, link.getFirst());
 		assertEquals(clusterDelta, link.getSecond());
 	}
@@ -107,7 +109,8 @@ public class CompleteLinkageTest {
 		SimilarityAssessment assessmentGammaBeta = new SimilarityAssessment(gamma, beta, new BigDecimal("0.8"));
 		SimilarityAssessment assessmentGammaGamma = new SimilarityAssessment(gamma, gamma, BigDecimal.ONE);
 		SimilarityReport similarityReport = new SimilarityReport(Arrays.asList(assessmentAlfaAlfa, assessmentAlfaBeta, assessmentAlfaGamma, assessmentBetaAlfa, assessmentBetaBeta, assessmentBetaGamma, assessmentGammaAlfa, assessmentGammaBeta, assessmentGammaGamma));
-		Link link = linkage.link(Arrays.asList(clusterAlfa, clusterBeta, clusterGamma), similarityReport);
+		ClustersToMerge clusters = new ClustersToMerge(Arrays.asList(clusterAlfa, clusterBeta, clusterGamma));
+		Link link = linkage.link(clusters, similarityReport);
 		assertEquals(clusterBeta, link.getFirst());
 		assertEquals(clusterAlfa, link.getSecond());
 	}
@@ -130,7 +133,8 @@ public class CompleteLinkageTest {
 		SimilarityAssessment assessmentGammaBeta = new SimilarityAssessment(gamma, beta, new BigDecimal("0.8"));
 		SimilarityAssessment assessmentGammaGamma = new SimilarityAssessment(gamma, gamma, BigDecimal.ONE);
 		SimilarityReport similarityReport = new SimilarityReport(Arrays.asList(assessmentAlfaAlfa, assessmentAlfaBeta, assessmentAlfaGamma, assessmentBetaAlfa, assessmentBetaBeta, assessmentBetaGamma, assessmentGammaAlfa, assessmentGammaBeta, assessmentGammaGamma));
-		Link link = linkage.link(Arrays.asList(clusterGamma, clusterBeta, clusterAlfa), similarityReport);
+		ClustersToMerge clusters = new ClustersToMerge(Arrays.asList(clusterGamma, clusterBeta, clusterAlfa));
+		Link link = linkage.link(clusters, similarityReport);
 		assertEquals(clusterBeta, link.getFirst());
 		assertEquals(clusterAlfa, link.getSecond());
 	}
@@ -153,8 +157,9 @@ public class CompleteLinkageTest {
 		SimilarityAssessment assessmentGammaBeta = new SimilarityAssessment(gamma, beta, new BigDecimal("0.5"));
 		SimilarityAssessment assessmentGammaGamma = new SimilarityAssessment(gamma, gamma, BigDecimal.ONE);
 		SimilarityReport similarityReport = new SimilarityReport(Arrays.asList(assessmentAlfaAlfa, assessmentAlfaBeta, assessmentAlfaGamma, assessmentBetaAlfa, assessmentBetaBeta, assessmentBetaGamma, assessmentGammaAlfa, assessmentGammaBeta, assessmentGammaGamma));
+		ClustersToMerge clusters = new ClustersToMerge(Arrays.asList(clusterAlfa, clusterBeta, clusterGamma));
 		assertThrows(TiebreakException.class, () -> {
-			linkage.link(Arrays.asList(clusterAlfa, clusterBeta, clusterGamma), similarityReport);
+			linkage.link(clusters, similarityReport);
 		});
 	}
 
