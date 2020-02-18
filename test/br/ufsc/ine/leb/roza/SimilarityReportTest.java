@@ -92,19 +92,34 @@ public class SimilarityReportTest {
 	}
 
 	@Test
-	void sort() throws Exception {
-		SimilarityReport report = new SimilarityReport(Arrays.asList(assessmentBB, assessmentAA, assessmentAB, assessmentAC, assessmentBA, assessmentBC, assessmentCA, assessmentCB, assessmentCC));
-		report.sort(new AssessmentScoreAndTestCaseNameComparator());
-		assertEquals(9, report.getAssessments().size());
-		assertEquals(assessmentAA, report.getAssessments().get(0));
-		assertEquals(assessmentBB, report.getAssessments().get(1));
-		assertEquals(assessmentCC, report.getAssessments().get(2));
-		assertEquals(assessmentAC, report.getAssessments().get(3));
-		assertEquals(assessmentCA, report.getAssessments().get(4));
-		assertEquals(assessmentBC, report.getAssessments().get(5));
-		assertEquals(assessmentCB, report.getAssessments().get(6));
-		assertEquals(assessmentBA, report.getAssessments().get(7));
-		assertEquals(assessmentAB, report.getAssessments().get(8));
+	void unsorted() throws Exception {
+		SimilarityReport unsorted = new SimilarityReport(Arrays.asList(assessmentBB, assessmentAA, assessmentAB, assessmentAC, assessmentBA, assessmentBC, assessmentCA, assessmentCB, assessmentCC));
+		assertEquals(9, unsorted.getAssessments().size());
+		assertEquals(assessmentBB, unsorted.getAssessments().get(0));
+		assertEquals(assessmentAA, unsorted.getAssessments().get(1));
+		assertEquals(assessmentAB, unsorted.getAssessments().get(2));
+		assertEquals(assessmentAC, unsorted.getAssessments().get(3));
+		assertEquals(assessmentBA, unsorted.getAssessments().get(4));
+		assertEquals(assessmentBC, unsorted.getAssessments().get(5));
+		assertEquals(assessmentCA, unsorted.getAssessments().get(6));
+		assertEquals(assessmentCB, unsorted.getAssessments().get(7));
+		assertEquals(assessmentCC, unsorted.getAssessments().get(8));
+	}
+
+	@Test
+	void sorted() throws Exception {
+		SimilarityReport unsorted = new SimilarityReport(Arrays.asList(assessmentBB, assessmentAA, assessmentAB, assessmentAC, assessmentBA, assessmentBC, assessmentCA, assessmentCB, assessmentCC));
+		SimilarityReport sorted = unsorted.sort(new AssessmentScoreAndTestCaseNameComparator());
+		assertEquals(9, sorted.getAssessments().size());
+		assertEquals(assessmentAA, sorted.getAssessments().get(0));
+		assertEquals(assessmentBB, sorted.getAssessments().get(1));
+		assertEquals(assessmentCC, sorted.getAssessments().get(2));
+		assertEquals(assessmentAC, sorted.getAssessments().get(3));
+		assertEquals(assessmentCA, sorted.getAssessments().get(4));
+		assertEquals(assessmentBC, sorted.getAssessments().get(5));
+		assertEquals(assessmentCB, sorted.getAssessments().get(6));
+		assertEquals(assessmentBA, sorted.getAssessments().get(7));
+		assertEquals(assessmentAB, sorted.getAssessments().get(8));
 	}
 
 	@Test

@@ -17,8 +17,9 @@ public class SimilarityReport {
 	}
 
 	public SimilarityReport sort(Comparator<SimilarityAssessment> comparator) {
-		Collections.sort(this.assessments, comparator);
-		return this;
+		List<SimilarityAssessment> ordered = new ArrayList<SimilarityAssessment>(assessments);
+		Collections.sort(ordered, comparator);
+		return new SimilarityReport(ordered);
 	}
 
 	public SimilarityReport removeReflexives() {

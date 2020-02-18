@@ -60,8 +60,7 @@ public class SimianSimilarityMeasurerTest {
 		TestCase testCaseA = new TestCase("test", Arrays.asList(fixture), Arrays.asList(assertion));
 		TestCase testCaseB = new TestCase("test", Arrays.asList(fixture), Arrays.asList(assertion));
 		MaterializationReport materializationReport = materializer.materialize(Arrays.asList(testCaseA, testCaseB));
-		SimilarityReport report = measurer.measure(materializationReport);
-		report.sort(new AssessmentScoreAndTestCaseNameComparator());
+		SimilarityReport report = measurer.measure(materializationReport).sort(new AssessmentScoreAndTestCaseNameComparator());
 
 		assertEquals(4, report.getAssessments().size());
 		assertEquals(BigDecimal.ONE, report.getAssessments().get(0).getScore());
@@ -85,8 +84,7 @@ public class SimianSimilarityMeasurerTest {
 		TestCase testCaseA = new TestCase("testA", Arrays.asList(fixture), Arrays.asList(assertion));
 		TestCase testCaseB = new TestCase("testB", Arrays.asList(fixture), Arrays.asList(assertion));
 		MaterializationReport materializationReport = materializer.materialize(Arrays.asList(testCaseA, testCaseB));
-		SimilarityReport report = measurer.measure(materializationReport);
-		report.sort(new AssessmentScoreAndTestCaseNameComparator());
+		SimilarityReport report = measurer.measure(materializationReport).sort(new AssessmentScoreAndTestCaseNameComparator());
 
 		assertEquals(4, report.getAssessments().size());
 		assertEquals(BigDecimal.ONE, report.getAssessments().get(0).getScore());
@@ -110,8 +108,7 @@ public class SimianSimilarityMeasurerTest {
 		TestCase testCaseA = new TestCase("testA", Arrays.asList(fixture), Arrays.asList());
 		TestCase testCaseB = new TestCase("testB", Arrays.asList(), Arrays.asList(assertion));
 		MaterializationReport materializationReport = materializer.materialize(Arrays.asList(testCaseA, testCaseB));
-		SimilarityReport report = measurer.measure(materializationReport);
-		report.sort(new AssessmentScoreAndTestCaseNameComparator());
+		SimilarityReport report = measurer.measure(materializationReport).sort(new AssessmentScoreAndTestCaseNameComparator());
 
 		assertEquals(4, report.getAssessments().size());
 		assertEquals(BigDecimal.ONE, report.getAssessments().get(0).getScore());
