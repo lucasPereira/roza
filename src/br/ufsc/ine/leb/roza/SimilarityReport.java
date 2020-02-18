@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import br.ufsc.ine.leb.roza.exceptions.EmptyReportException;
 import br.ufsc.ine.leb.roza.measurement.report.TestCaseNameComparator;
 
 public class SimilarityReport {
@@ -80,13 +79,6 @@ public class SimilarityReport {
 		return testCases;
 	}
 
-	public SimilarityAssessment getFirst() {
-		if (isEmpty()) {
-			throw new EmptyReportException();
-		}
-		return assessments.get(0);
-	}
-
 	public SimilarityAssessment getPair(TestCase source, TestCase target) {
 		for (SimilarityAssessment assessment : assessments) {
 			if (assessment.getSource().equals(source) && assessment.getTarget().equals(target)) {
@@ -94,10 +86,6 @@ public class SimilarityReport {
 			}
 		}
 		return null;
-	}
-
-	public Boolean isEmpty() {
-		return assessments.isEmpty();
 	}
 
 }

@@ -1,9 +1,6 @@
 package br.ufsc.ine.leb.roza;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -12,7 +9,6 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import br.ufsc.ine.leb.roza.exceptions.EmptyReportException;
 import br.ufsc.ine.leb.roza.measurement.report.AssessmentScoreAndTestCaseNameComparator;
 
 public class SimilarityReportTest {
@@ -129,31 +125,6 @@ public class SimilarityReportTest {
 		assertEquals(2, filtered.size());
 		assertEquals(testCaseA, filtered.get(0));
 		assertEquals(testCaseB, filtered.get(1));
-	}
-
-	@Test
-	void getFirst() throws Exception {
-		SimilarityReport report = new SimilarityReport(Arrays.asList(assessmentAA, assessmentAB, assessmentBA, assessmentBB));
-		assertEquals(assessmentAA, report.getFirst());
-	}
-
-	@Test
-	void getFirstInEmptyReport() throws Exception {
-		assertThrows(EmptyReportException.class, () -> {
-			new SimilarityReport(Arrays.asList()).getFirst();
-		});
-	}
-
-	@Test
-	void isEmpty() throws Exception {
-		SimilarityReport report = new SimilarityReport(Arrays.asList());
-		assertTrue(report.isEmpty());
-	}
-
-	@Test
-	void isNotEmpty() throws Exception {
-		SimilarityReport report = new SimilarityReport(Arrays.asList(assessmentAA));
-		assertFalse(report.isEmpty());
 	}
 
 }
