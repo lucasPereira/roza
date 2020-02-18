@@ -37,6 +37,7 @@ import br.ufsc.ine.leb.roza.retrieval.StandardRecallLevels;
 import br.ufsc.ine.leb.roza.utils.CommaSeparatedValues;
 import br.ufsc.ine.leb.roza.utils.FolderUtils;
 import br.ufsc.ine.leb.roza.utils.FormatterUtils;
+import br.ufsc.ine.leb.roza.utils.ReportUtils;
 
 public class Experiment {
 
@@ -132,6 +133,7 @@ public class Experiment {
 	}
 
 	protected static void averagePrecisionRecallCurve(List<TestCase> testCases, SimilarityReport similarityReport, String fileName) {
+		ReportUtils reportUtils = new ReportUtils();
 		FormatterUtils formatterUtils = new FormatterUtils();
 		CommaSeparatedValues csv = new CommaSeparatedValues();
 		FolderUtils folderUtils = new FolderUtils("experiment-results/a/average-precision-recall-curve");
@@ -141,7 +143,7 @@ public class Experiment {
 		for (RecallLevel recallLevel : standardRecallLevels) {
 			BigDecimal totalPrecision = BigDecimal.ZERO;
 			for (TestCase source : testCases) {
-				List<TestCase> ranking = similarityReport.selectSource(source).removeReflexives().sort(scoreComparator).getTargets();
+				List<TestCase> ranking = reportUtils.getTargets(similarityReport.selectSource(source).removeReflexives().sort(scoreComparator));
 				List<TestCase> relevantSet = groundTruth.getRelevanteElements(testCases, source);
 				PrecisionRecall<TestCase> precisionRecall = new PrecisionRecall<>(ranking, relevantSet);
 				BigDecimal precisionAtRecallLevel = precisionRecall.precisionAtRecallLevel(recallLevel);
@@ -156,13 +158,14 @@ public class Experiment {
 	}
 
 	protected static void precisionRecallCurve(List<TestCase> testCases, SimilarityReport similarityReport, String fileName) {
+		ReportUtils reportUtils = new ReportUtils();
 		FormatterUtils formatterUtils = new FormatterUtils();
 		CommaSeparatedValues csv = new CommaSeparatedValues();
 		FolderUtils folderUtils = new FolderUtils("experiment-results/a/precision-recall-curve");
 		Comparator<SimilarityAssessment> scoreComparator = new AssessmentScoreAndTestCaseNameComparator();
 		StandardRecallLevels standardRecallLevels = new StandardRecallLevels();
 		for (TestCase source : testCases) {
-			List<TestCase> ranking = similarityReport.selectSource(source).removeReflexives().sort(scoreComparator).getTargets();
+			List<TestCase> ranking = reportUtils.getTargets(similarityReport.selectSource(source).removeReflexives().sort(scoreComparator));
 			List<TestCase> relevantSet = groundTruth.getRelevanteElements(testCases, source);
 			PrecisionRecall<TestCase> precisionRecall = new PrecisionRecall<>(ranking, relevantSet);
 			for (RecallLevel recallLevel : standardRecallLevels) {
