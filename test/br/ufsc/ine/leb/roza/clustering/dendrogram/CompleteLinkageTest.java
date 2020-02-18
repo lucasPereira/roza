@@ -1,18 +1,27 @@
-package br.ufsc.ine.leb.roza.clustering;
+package br.ufsc.ine.leb.roza.clustering.dendrogram;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import br.ufsc.ine.leb.roza.SimilarityAssessment;
 import br.ufsc.ine.leb.roza.SimilarityReport;
 import br.ufsc.ine.leb.roza.TestCase;
+import br.ufsc.ine.leb.roza.exceptions.TiebreakException;
 
-public class DendogramCompleteLinkageTest {
+public class CompleteLinkageTest {
+
+	private CompleteLinkage linkage;
+
+	@BeforeEach
+	void setup() {
+		linkage = new CompleteLinkage();
+	}
 
 	@Test
 	void linkSingleElementClusters() {
@@ -20,11 +29,11 @@ public class DendogramCompleteLinkageTest {
 		TestCase beta = new TestCase("beta", Arrays.asList(), Arrays.asList());
 		TestCase gamma = new TestCase("gamma", Arrays.asList(), Arrays.asList());
 		TestCase delta = new TestCase("delta", Arrays.asList(), Arrays.asList());
-		DendogramCluster clusterAlfa = new DendogramCluster(alfa);
-		DendogramCluster clusterBeta = new DendogramCluster(beta);
-		DendogramCluster clusterGamma = new DendogramCluster(gamma);
-		DendogramCluster clusterDelta = new DendogramCluster(delta);
-		DendogramCluster clusterAlfaGamma = clusterAlfa.merge(clusterGamma);
+		Cluster clusterAlfa = new Cluster(alfa);
+		Cluster clusterBeta = new Cluster(beta);
+		Cluster clusterGamma = new Cluster(gamma);
+		Cluster clusterDelta = new Cluster(delta);
+		Cluster clusterAlfaGamma = clusterAlfa.merge(clusterGamma);
 		SimilarityAssessment assessmentAlfaAlfa = new SimilarityAssessment(alfa, alfa, BigDecimal.ONE);
 		SimilarityAssessment assessmentAlfaBeta = new SimilarityAssessment(alfa, beta, new BigDecimal("0.2"));
 		SimilarityAssessment assessmentAlfaGamma = new SimilarityAssessment(alfa, gamma, new BigDecimal("0.8"));
@@ -42,10 +51,9 @@ public class DendogramCompleteLinkageTest {
 		SimilarityAssessment assessmentDeltaGamma = new SimilarityAssessment(delta, gamma, new BigDecimal("0.3"));
 		SimilarityAssessment assessmentDeltaDelta = new SimilarityAssessment(delta, delta, BigDecimal.ONE);
 		SimilarityReport similarityReport = new SimilarityReport(Arrays.asList(assessmentAlfaAlfa, assessmentAlfaBeta, assessmentAlfaGamma, assessmentAlfaDelta, assessmentBetaAlfa, assessmentBetaBeta, assessmentBetaGamma, assessmentBetaDelta, assessmentGammaAlfa, assessmentGammaBeta, assessmentGammaGamma, assessmentGammaDelta, assessmentDeltaAlfa, assessmentDeltaBeta, assessmentDeltaGamma, assessmentDeltaDelta));
-		DendogramLinkageMethod linkageMethod = new DendogramCompleteLinkageMethod();
-		DendogramLinkage linkage = linkageMethod.link(Arrays.asList(clusterAlfaGamma, clusterBeta, clusterDelta), similarityReport);
-		assertEquals(clusterBeta, linkage.getFirst());
-		assertEquals(clusterDelta, linkage.getSecond());
+		Link link = linkage.link(Arrays.asList(clusterAlfaGamma, clusterBeta, clusterDelta), similarityReport);
+		assertEquals(clusterBeta, link.getFirst());
+		assertEquals(clusterDelta, link.getSecond());
 	}
 
 	@Test
@@ -54,11 +62,11 @@ public class DendogramCompleteLinkageTest {
 		TestCase beta = new TestCase("beta", Arrays.asList(), Arrays.asList());
 		TestCase gamma = new TestCase("gamma", Arrays.asList(), Arrays.asList());
 		TestCase delta = new TestCase("delta", Arrays.asList(), Arrays.asList());
-		DendogramCluster clusterAlfa = new DendogramCluster(alfa);
-		DendogramCluster clusterBeta = new DendogramCluster(beta);
-		DendogramCluster clusterGamma = new DendogramCluster(gamma);
-		DendogramCluster clusterDelta = new DendogramCluster(delta);
-		DendogramCluster clusterAlfaGamma = clusterAlfa.merge(clusterGamma);
+		Cluster clusterAlfa = new Cluster(alfa);
+		Cluster clusterBeta = new Cluster(beta);
+		Cluster clusterGamma = new Cluster(gamma);
+		Cluster clusterDelta = new Cluster(delta);
+		Cluster clusterAlfaGamma = clusterAlfa.merge(clusterGamma);
 		SimilarityAssessment assessmentAlfaAlfa = new SimilarityAssessment(alfa, alfa, BigDecimal.ONE);
 		SimilarityAssessment assessmentAlfaBeta = new SimilarityAssessment(alfa, beta, new BigDecimal("0.2"));
 		SimilarityAssessment assessmentAlfaGamma = new SimilarityAssessment(alfa, gamma, new BigDecimal("0.8"));
@@ -76,10 +84,9 @@ public class DendogramCompleteLinkageTest {
 		SimilarityAssessment assessmentDeltaGamma = new SimilarityAssessment(delta, gamma, new BigDecimal("0.3"));
 		SimilarityAssessment assessmentDeltaDelta = new SimilarityAssessment(delta, delta, BigDecimal.ONE);
 		SimilarityReport similarityReport = new SimilarityReport(Arrays.asList(assessmentAlfaAlfa, assessmentAlfaBeta, assessmentAlfaGamma, assessmentAlfaDelta, assessmentBetaAlfa, assessmentBetaBeta, assessmentBetaGamma, assessmentBetaDelta, assessmentGammaAlfa, assessmentGammaBeta, assessmentGammaGamma, assessmentGammaDelta, assessmentDeltaAlfa, assessmentDeltaBeta, assessmentDeltaGamma, assessmentDeltaDelta));
-		DendogramLinkageMethod linkageMethod = new DendogramCompleteLinkageMethod();
-		DendogramLinkage linkage = linkageMethod.link(Arrays.asList(clusterAlfaGamma, clusterBeta, clusterDelta), similarityReport);
-		assertEquals(clusterAlfaGamma, linkage.getFirst());
-		assertEquals(clusterDelta, linkage.getSecond());
+		Link link = linkage.link(Arrays.asList(clusterAlfaGamma, clusterBeta, clusterDelta), similarityReport);
+		assertEquals(clusterAlfaGamma, link.getFirst());
+		assertEquals(clusterDelta, link.getSecond());
 	}
 
 	@Test
@@ -87,9 +94,9 @@ public class DendogramCompleteLinkageTest {
 		TestCase alfa = new TestCase("alpha", Arrays.asList(), Arrays.asList());
 		TestCase beta = new TestCase("beta", Arrays.asList(), Arrays.asList());
 		TestCase gamma = new TestCase("gamma", Arrays.asList(), Arrays.asList());
-		DendogramCluster clusterAlfa = new DendogramCluster(alfa);
-		DendogramCluster clusterBeta = new DendogramCluster(beta);
-		DendogramCluster clusterGamma = new DendogramCluster(gamma);
+		Cluster clusterAlfa = new Cluster(alfa);
+		Cluster clusterBeta = new Cluster(beta);
+		Cluster clusterGamma = new Cluster(gamma);
 		SimilarityAssessment assessmentAlfaAlfa = new SimilarityAssessment(alfa, alfa, BigDecimal.ONE);
 		SimilarityAssessment assessmentAlfaBeta = new SimilarityAssessment(alfa, beta, new BigDecimal("0.7"));
 		SimilarityAssessment assessmentAlfaGamma = new SimilarityAssessment(alfa, gamma, new BigDecimal("0.8"));
@@ -100,15 +107,55 @@ public class DendogramCompleteLinkageTest {
 		SimilarityAssessment assessmentGammaBeta = new SimilarityAssessment(gamma, beta, new BigDecimal("0.8"));
 		SimilarityAssessment assessmentGammaGamma = new SimilarityAssessment(gamma, gamma, BigDecimal.ONE);
 		SimilarityReport similarityReport = new SimilarityReport(Arrays.asList(assessmentAlfaAlfa, assessmentAlfaBeta, assessmentAlfaGamma, assessmentBetaAlfa, assessmentBetaBeta, assessmentBetaGamma, assessmentGammaAlfa, assessmentGammaBeta, assessmentGammaGamma));
-		DendogramLinkageMethod linkageMethod = new DendogramCompleteLinkageMethod();
-		DendogramLinkage linkage = linkageMethod.link(Arrays.asList(clusterAlfa, clusterBeta, clusterGamma), similarityReport);
-		assertEquals(clusterBeta, linkage.getFirst());
-		assertEquals(clusterAlfa, linkage.getSecond());
+		Link link = linkage.link(Arrays.asList(clusterAlfa, clusterBeta, clusterGamma), similarityReport);
+		assertEquals(clusterBeta, link.getFirst());
+		assertEquals(clusterAlfa, link.getSecond());
+	}
+
+	@Test
+	void nonSimetricReversed() {
+		TestCase alfa = new TestCase("alpha", Arrays.asList(), Arrays.asList());
+		TestCase beta = new TestCase("beta", Arrays.asList(), Arrays.asList());
+		TestCase gamma = new TestCase("gamma", Arrays.asList(), Arrays.asList());
+		Cluster clusterAlfa = new Cluster(alfa);
+		Cluster clusterBeta = new Cluster(beta);
+		Cluster clusterGamma = new Cluster(gamma);
+		SimilarityAssessment assessmentAlfaAlfa = new SimilarityAssessment(alfa, alfa, BigDecimal.ONE);
+		SimilarityAssessment assessmentAlfaBeta = new SimilarityAssessment(alfa, beta, new BigDecimal("0.7"));
+		SimilarityAssessment assessmentAlfaGamma = new SimilarityAssessment(alfa, gamma, new BigDecimal("0.8"));
+		SimilarityAssessment assessmentBetaAlfa = new SimilarityAssessment(beta, alfa, new BigDecimal("0.9"));
+		SimilarityAssessment assessmentBetaBeta = new SimilarityAssessment(beta, beta, BigDecimal.ONE);
+		SimilarityAssessment assessmentBetaGamma = new SimilarityAssessment(beta, gamma, new BigDecimal("0.8"));
+		SimilarityAssessment assessmentGammaAlfa = new SimilarityAssessment(gamma, alfa, new BigDecimal("0.8"));
+		SimilarityAssessment assessmentGammaBeta = new SimilarityAssessment(gamma, beta, new BigDecimal("0.8"));
+		SimilarityAssessment assessmentGammaGamma = new SimilarityAssessment(gamma, gamma, BigDecimal.ONE);
+		SimilarityReport similarityReport = new SimilarityReport(Arrays.asList(assessmentAlfaAlfa, assessmentAlfaBeta, assessmentAlfaGamma, assessmentBetaAlfa, assessmentBetaBeta, assessmentBetaGamma, assessmentGammaAlfa, assessmentGammaBeta, assessmentGammaGamma));
+		Link link = linkage.link(Arrays.asList(clusterGamma, clusterBeta, clusterAlfa), similarityReport);
+		assertEquals(clusterBeta, link.getFirst());
+		assertEquals(clusterAlfa, link.getSecond());
 	}
 
 	@Test
 	void multiplePossibilities() {
-		fail("Implement");
+		TestCase alfa = new TestCase("alpha", Arrays.asList(), Arrays.asList());
+		TestCase beta = new TestCase("beta", Arrays.asList(), Arrays.asList());
+		TestCase gamma = new TestCase("gamma", Arrays.asList(), Arrays.asList());
+		Cluster clusterAlfa = new Cluster(alfa);
+		Cluster clusterBeta = new Cluster(beta);
+		Cluster clusterGamma = new Cluster(gamma);
+		SimilarityAssessment assessmentAlfaAlfa = new SimilarityAssessment(alfa, alfa, BigDecimal.ONE);
+		SimilarityAssessment assessmentAlfaBeta = new SimilarityAssessment(alfa, beta, new BigDecimal("0.5"));
+		SimilarityAssessment assessmentAlfaGamma = new SimilarityAssessment(alfa, gamma, new BigDecimal("0.5"));
+		SimilarityAssessment assessmentBetaAlfa = new SimilarityAssessment(beta, alfa, new BigDecimal("0.5"));
+		SimilarityAssessment assessmentBetaBeta = new SimilarityAssessment(beta, beta, BigDecimal.ONE);
+		SimilarityAssessment assessmentBetaGamma = new SimilarityAssessment(beta, gamma, new BigDecimal("0.5"));
+		SimilarityAssessment assessmentGammaAlfa = new SimilarityAssessment(gamma, alfa, new BigDecimal("0.5"));
+		SimilarityAssessment assessmentGammaBeta = new SimilarityAssessment(gamma, beta, new BigDecimal("0.5"));
+		SimilarityAssessment assessmentGammaGamma = new SimilarityAssessment(gamma, gamma, BigDecimal.ONE);
+		SimilarityReport similarityReport = new SimilarityReport(Arrays.asList(assessmentAlfaAlfa, assessmentAlfaBeta, assessmentAlfaGamma, assessmentBetaAlfa, assessmentBetaBeta, assessmentBetaGamma, assessmentGammaAlfa, assessmentGammaBeta, assessmentGammaGamma));
+		assertThrows(TiebreakException.class, () -> {
+			linkage.link(Arrays.asList(clusterAlfa, clusterBeta, clusterGamma), similarityReport);
+		});
 	}
 
 }

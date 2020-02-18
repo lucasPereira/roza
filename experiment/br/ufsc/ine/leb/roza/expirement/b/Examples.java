@@ -33,7 +33,7 @@ import br.ufsc.ine.leb.roza.utils.CommaSeparatedValues;
 import br.ufsc.ine.leb.roza.utils.FolderUtils;
 import br.ufsc.ine.leb.roza.utils.FormatterUtils;
 
-public class Exemples {
+public class Examples {
 
 	public static void main(String[] args) {
 		new FolderUtils("execution/materializer").createEmptyFolder();

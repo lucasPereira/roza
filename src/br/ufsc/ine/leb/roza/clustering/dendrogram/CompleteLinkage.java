@@ -1,14 +1,14 @@
-package br.ufsc.ine.leb.roza.clustering;
+package br.ufsc.ine.leb.roza.clustering.dendrogram;
 
 import java.math.BigDecimal;
 
 import br.ufsc.ine.leb.roza.SimilarityReport;
 import br.ufsc.ine.leb.roza.TestCase;
 
-public class DendogramCompleteLinkageMethod extends DendogramAbstractLinkageMethod implements DendogramLinkageMethod {
+class CompleteLinkage extends AbstractLinkage implements Linkage {
 
 	@Override
-	protected BigDecimal evaluateSimilarity(DendogramCluster first, DendogramCluster second, SimilarityReport similarityReport) {
+	protected BigDecimal evaluateSimilarity(Cluster first, Cluster second, SimilarityReport similarityReport) {
 		BigDecimal mostDisimilar = BigDecimal.ONE;
 		for (TestCase firstTestCase : first.getElements()) {
 			for (TestCase secondTestCase : second.getElements()) {
