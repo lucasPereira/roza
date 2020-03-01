@@ -16,7 +16,7 @@ import br.ufsc.ine.leb.roza.TestCase;
 import br.ufsc.ine.leb.roza.exceptions.TiebreakException;
 import br.ufsc.ine.leb.roza.utils.CollectionUtils;
 
-public class ClusterJoinerWithSingleLinkageInsecureRefereeTest {
+public class ClusterJoinerWithSingleLinkageAndInsecureRefereeTest {
 
 	private TestCase alpha;
 	private TestCase beta;
