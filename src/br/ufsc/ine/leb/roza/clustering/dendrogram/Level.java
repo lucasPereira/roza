@@ -30,8 +30,8 @@ class Level {
 		if (!hasNextLevel()) {
 			throw new NoNextLevelException();
 		}
+		Combination combination = getCombinationToNextLevel();
 		Set<Cluster> next = new HashSet<>(clusters.size() - 1);
-		Combination combination = joiner.join(new ClustersToMerge(clusters));
 		Cluster first = combination.getFirst();
 		Cluster second = combination.getSecond();
 		Cluster merged = first.merge(second);
@@ -42,6 +42,13 @@ class Level {
 
 	public Set<Cluster> getClusters() {
 		return Collections.unmodifiableSet(clusters);
+	}
+
+	public Combination getCombinationToNextLevel() {
+		if (!hasNextLevel()) {
+			return null;
+		}
+		return joiner.join(new ClustersToMerge(clusters));
 	}
 
 }
