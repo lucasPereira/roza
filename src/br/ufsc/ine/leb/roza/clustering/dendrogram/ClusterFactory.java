@@ -10,10 +10,10 @@ import br.ufsc.ine.leb.roza.utils.ReportUtils;
 
 class ClusterFactory {
 
-	public Set<Cluster> create(SimilarityReport similarityReport) {
+	public Set<Cluster> create(SimilarityReport report) {
 		ReportUtils reportUtils = new ReportUtils();
 		Set<Cluster> clusters = new HashSet<>();
-		for (TestCase test : reportUtils.getUniqueTestCases(similarityReport)) {
+		for (TestCase test : reportUtils.getUniqueTestCases(report)) {
 			Cluster cluster = new Cluster(test);
 			clusters.add(cluster);
 		}

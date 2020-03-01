@@ -45,105 +45,105 @@ public class SingleLinkageTest {
 
 	@Test
 	void linkSingleElementClusterWithNonSingleElementCluster() {
-		SimilarityAssessment assessmentAlphaAlpha = new SimilarityAssessment(alpha, alpha, BigDecimal.ONE);
-		SimilarityAssessment assessmentAlphaBeta = new SimilarityAssessment(alpha, beta, new BigDecimal("0.2"));
-		SimilarityAssessment assessmentAlphaGamma = new SimilarityAssessment(alpha, gamma, new BigDecimal("0.8"));
-		SimilarityAssessment assessmentAlphaDelta = new SimilarityAssessment(alpha, delta, new BigDecimal("0.7"));
-		SimilarityAssessment assessmentBetaAlpha = new SimilarityAssessment(beta, alpha, new BigDecimal("0.2"));
-		SimilarityAssessment assessmentBetaBeta = new SimilarityAssessment(beta, beta, BigDecimal.ONE);
-		SimilarityAssessment assessmentBetaGamma = new SimilarityAssessment(beta, gamma, new BigDecimal("0.5"));
-		SimilarityAssessment assessmentBetaDelta = new SimilarityAssessment(beta, delta, new BigDecimal("0.5"));
-		SimilarityAssessment assessmentGammaAlpha = new SimilarityAssessment(gamma, alpha, new BigDecimal("0.8"));
-		SimilarityAssessment assessmentGammaBeta = new SimilarityAssessment(gamma, beta, new BigDecimal("0.5"));
-		SimilarityAssessment assessmentGammaGamma = new SimilarityAssessment(gamma, gamma, BigDecimal.ONE);
-		SimilarityAssessment assessmentGammaDelta = new SimilarityAssessment(gamma, delta, new BigDecimal("0.3"));
-		SimilarityAssessment assessmentDeltaAlpha = new SimilarityAssessment(delta, alpha, new BigDecimal("0.7"));
-		SimilarityAssessment assessmentDeltaBeta = new SimilarityAssessment(delta, beta, new BigDecimal("0.5"));
-		SimilarityAssessment assessmentDeltaGamma = new SimilarityAssessment(delta, gamma, new BigDecimal("0.3"));
-		SimilarityAssessment assessmentDeltaDelta = new SimilarityAssessment(delta, delta, BigDecimal.ONE);
-		SimilarityReport similarityReport = new SimilarityReport(Arrays.asList(assessmentAlphaAlpha, assessmentAlphaBeta, assessmentAlphaGamma, assessmentAlphaDelta, assessmentBetaAlpha, assessmentBetaBeta, assessmentBetaGamma, assessmentBetaDelta, assessmentGammaAlpha, assessmentGammaBeta, assessmentGammaGamma, assessmentGammaDelta, assessmentDeltaAlpha, assessmentDeltaBeta, assessmentDeltaGamma, assessmentDeltaDelta));
+		SimilarityAssessment alphaAlphaAssessment = new SimilarityAssessment(alpha, alpha, BigDecimal.ONE);
+		SimilarityAssessment alphaBetaAssessment = new SimilarityAssessment(alpha, beta, new BigDecimal("0.2"));
+		SimilarityAssessment alphaGammaAssessment = new SimilarityAssessment(alpha, gamma, new BigDecimal("0.8"));
+		SimilarityAssessment alphaDeltaAssessment = new SimilarityAssessment(alpha, delta, new BigDecimal("0.7"));
+		SimilarityAssessment betaAlphaAssessment = new SimilarityAssessment(beta, alpha, new BigDecimal("0.2"));
+		SimilarityAssessment betaBetaAssessment = new SimilarityAssessment(beta, beta, BigDecimal.ONE);
+		SimilarityAssessment betaGammaAssessment = new SimilarityAssessment(beta, gamma, new BigDecimal("0.5"));
+		SimilarityAssessment betaDeltaAssessment = new SimilarityAssessment(beta, delta, new BigDecimal("0.5"));
+		SimilarityAssessment gammaAlphaAssessment = new SimilarityAssessment(gamma, alpha, new BigDecimal("0.8"));
+		SimilarityAssessment gammaBetaAssessment = new SimilarityAssessment(gamma, beta, new BigDecimal("0.5"));
+		SimilarityAssessment gammaGammaAssessment = new SimilarityAssessment(gamma, gamma, BigDecimal.ONE);
+		SimilarityAssessment gammaDeltaAssessment = new SimilarityAssessment(gamma, delta, new BigDecimal("0.3"));
+		SimilarityAssessment deltaAlphaAssessment = new SimilarityAssessment(delta, alpha, new BigDecimal("0.7"));
+		SimilarityAssessment deltaBetaAssessment = new SimilarityAssessment(delta, beta, new BigDecimal("0.5"));
+		SimilarityAssessment deltaGammaAssessment = new SimilarityAssessment(delta, gamma, new BigDecimal("0.3"));
+		SimilarityAssessment deltaDeltaAssessment = new SimilarityAssessment(delta, delta, BigDecimal.ONE);
+		SimilarityReport report = new SimilarityReport(Arrays.asList(alphaAlphaAssessment, alphaBetaAssessment, alphaGammaAssessment, alphaDeltaAssessment, betaAlphaAssessment, betaBetaAssessment, betaGammaAssessment, betaDeltaAssessment, gammaAlphaAssessment, gammaBetaAssessment, gammaGammaAssessment, gammaDeltaAssessment, deltaAlphaAssessment, deltaBetaAssessment, deltaGammaAssessment, deltaDeltaAssessment));
 		ClustersToMerge clusters = new ClustersToMerge(collectionUtils.set(alphaGammaCluster, betaCluster, deltaCluster));
-		Combination combination = new SingleLinkage(similarityReport).link(clusters);
+		Combination combination = new SingleLinkage(report).link(clusters);
 		assertEquals(combination, new Combination(alphaGammaCluster, deltaCluster));
 		assertEquals(combination, new Combination(deltaCluster, alphaGammaCluster));
 	}
 
 	@Test
 	void linkSingleElementClusters() {
-		SimilarityAssessment assessmentAlphaAlpha = new SimilarityAssessment(alpha, alpha, BigDecimal.ONE);
-		SimilarityAssessment assessmentAlphaBeta = new SimilarityAssessment(alpha, beta, new BigDecimal("0.2"));
-		SimilarityAssessment assessmentAlphaGamma = new SimilarityAssessment(alpha, gamma, new BigDecimal("0.8"));
-		SimilarityAssessment assessmentAlphaDelta = new SimilarityAssessment(alpha, delta, new BigDecimal("0.1"));
-		SimilarityAssessment assessmentBetaAlpha = new SimilarityAssessment(beta, alpha, new BigDecimal("0.2"));
-		SimilarityAssessment assessmentBetaBeta = new SimilarityAssessment(beta, beta, BigDecimal.ONE);
-		SimilarityAssessment assessmentBetaGamma = new SimilarityAssessment(beta, gamma, new BigDecimal("0.5"));
-		SimilarityAssessment assessmentBetaDelta = new SimilarityAssessment(beta, delta, new BigDecimal("0.7"));
-		SimilarityAssessment assessmentGammaAlpha = new SimilarityAssessment(gamma, alpha, new BigDecimal("0.8"));
-		SimilarityAssessment assessmentGammaBeta = new SimilarityAssessment(gamma, beta, new BigDecimal("0.5"));
-		SimilarityAssessment assessmentGammaGamma = new SimilarityAssessment(gamma, gamma, BigDecimal.ONE);
-		SimilarityAssessment assessmentGammaDelta = new SimilarityAssessment(gamma, delta, new BigDecimal("0.3"));
-		SimilarityAssessment assessmentDeltaAlpha = new SimilarityAssessment(delta, alpha, new BigDecimal("0.1"));
-		SimilarityAssessment assessmentDeltaBeta = new SimilarityAssessment(delta, beta, new BigDecimal("0.7"));
-		SimilarityAssessment assessmentDeltaGamma = new SimilarityAssessment(delta, gamma, new BigDecimal("0.3"));
-		SimilarityAssessment assessmentDeltaDelta = new SimilarityAssessment(delta, delta, BigDecimal.ONE);
-		SimilarityReport similarityReport = new SimilarityReport(Arrays.asList(assessmentAlphaAlpha, assessmentAlphaBeta, assessmentAlphaGamma, assessmentAlphaDelta, assessmentBetaAlpha, assessmentBetaBeta, assessmentBetaGamma, assessmentBetaDelta, assessmentGammaAlpha, assessmentGammaBeta, assessmentGammaGamma, assessmentGammaDelta, assessmentDeltaAlpha, assessmentDeltaBeta, assessmentDeltaGamma, assessmentDeltaDelta));
+		SimilarityAssessment alphaAlphaAssessment = new SimilarityAssessment(alpha, alpha, BigDecimal.ONE);
+		SimilarityAssessment alphaBetaAssessment = new SimilarityAssessment(alpha, beta, new BigDecimal("0.2"));
+		SimilarityAssessment alphaGammaAssessment = new SimilarityAssessment(alpha, gamma, new BigDecimal("0.8"));
+		SimilarityAssessment alphaDeltaAssessment = new SimilarityAssessment(alpha, delta, new BigDecimal("0.1"));
+		SimilarityAssessment betaAlphaAssessment = new SimilarityAssessment(beta, alpha, new BigDecimal("0.2"));
+		SimilarityAssessment betaBetaAssessment = new SimilarityAssessment(beta, beta, BigDecimal.ONE);
+		SimilarityAssessment betaGammaAssessment = new SimilarityAssessment(beta, gamma, new BigDecimal("0.5"));
+		SimilarityAssessment betaDeltaAssessment = new SimilarityAssessment(beta, delta, new BigDecimal("0.7"));
+		SimilarityAssessment gammaAlphaAssessment = new SimilarityAssessment(gamma, alpha, new BigDecimal("0.8"));
+		SimilarityAssessment gammaBetaAssessment = new SimilarityAssessment(gamma, beta, new BigDecimal("0.5"));
+		SimilarityAssessment gammaGammaAssessment = new SimilarityAssessment(gamma, gamma, BigDecimal.ONE);
+		SimilarityAssessment gammaDeltaAssessment = new SimilarityAssessment(gamma, delta, new BigDecimal("0.3"));
+		SimilarityAssessment deltaAlphaAssessment = new SimilarityAssessment(delta, alpha, new BigDecimal("0.1"));
+		SimilarityAssessment deltaBetaAssessment = new SimilarityAssessment(delta, beta, new BigDecimal("0.7"));
+		SimilarityAssessment deltaGammaAssessment = new SimilarityAssessment(delta, gamma, new BigDecimal("0.3"));
+		SimilarityAssessment deltaDeltaAssessment = new SimilarityAssessment(delta, delta, BigDecimal.ONE);
+		SimilarityReport report = new SimilarityReport(Arrays.asList(alphaAlphaAssessment, alphaBetaAssessment, alphaGammaAssessment, alphaDeltaAssessment, betaAlphaAssessment, betaBetaAssessment, betaGammaAssessment, betaDeltaAssessment, gammaAlphaAssessment, gammaBetaAssessment, gammaGammaAssessment, gammaDeltaAssessment, deltaAlphaAssessment, deltaBetaAssessment, deltaGammaAssessment, deltaDeltaAssessment));
 		ClustersToMerge clusters = new ClustersToMerge(collectionUtils.set(alphaGammaCluster, betaCluster, deltaCluster));
-		Combination combination = new SingleLinkage(similarityReport).link(clusters);
+		Combination combination = new SingleLinkage(report).link(clusters);
 		assertEquals(new Combination(betaCluster, deltaCluster), combination);
 		assertEquals(new Combination(deltaCluster, betaCluster), combination);
 	}
 
 	@Test
 	void nonSimetricAlphaaBeta() {
-		SimilarityAssessment assessmentAlphaAlpha = new SimilarityAssessment(alpha, alpha, BigDecimal.ONE);
-		SimilarityAssessment assessmentAlphaBeta = new SimilarityAssessment(alpha, beta, new BigDecimal("0.7"));
-		SimilarityAssessment assessmentAlphaGamma = new SimilarityAssessment(alpha, gamma, new BigDecimal("0.8"));
-		SimilarityAssessment assessmentBetaAlpha = new SimilarityAssessment(beta, alpha, new BigDecimal("0.9"));
-		SimilarityAssessment assessmentBetaBeta = new SimilarityAssessment(beta, beta, BigDecimal.ONE);
-		SimilarityAssessment assessmentBetaGamma = new SimilarityAssessment(beta, gamma, new BigDecimal("0.8"));
-		SimilarityAssessment assessmentGammaAlpha = new SimilarityAssessment(gamma, alpha, new BigDecimal("0.8"));
-		SimilarityAssessment assessmentGammaBeta = new SimilarityAssessment(gamma, beta, new BigDecimal("0.8"));
-		SimilarityAssessment assessmentGammaGamma = new SimilarityAssessment(gamma, gamma, BigDecimal.ONE);
-		SimilarityReport similarityReport = new SimilarityReport(Arrays.asList(assessmentAlphaAlpha, assessmentAlphaBeta, assessmentAlphaGamma, assessmentBetaAlpha, assessmentBetaBeta, assessmentBetaGamma, assessmentGammaAlpha, assessmentGammaBeta, assessmentGammaGamma));
+		SimilarityAssessment alphaAlphaAssessment = new SimilarityAssessment(alpha, alpha, BigDecimal.ONE);
+		SimilarityAssessment alphaBetaAssessment = new SimilarityAssessment(alpha, beta, new BigDecimal("0.7"));
+		SimilarityAssessment alphaGammaAssessment = new SimilarityAssessment(alpha, gamma, new BigDecimal("0.8"));
+		SimilarityAssessment betaAlphaAssessment = new SimilarityAssessment(beta, alpha, new BigDecimal("0.9"));
+		SimilarityAssessment betaBetaAssessment = new SimilarityAssessment(beta, beta, BigDecimal.ONE);
+		SimilarityAssessment betaGammaAssessment = new SimilarityAssessment(beta, gamma, new BigDecimal("0.8"));
+		SimilarityAssessment gammaAlphaAssessment = new SimilarityAssessment(gamma, alpha, new BigDecimal("0.8"));
+		SimilarityAssessment gammaBetaAssessment = new SimilarityAssessment(gamma, beta, new BigDecimal("0.8"));
+		SimilarityAssessment gammaGammaAssessment = new SimilarityAssessment(gamma, gamma, BigDecimal.ONE);
+		SimilarityReport report = new SimilarityReport(Arrays.asList(alphaAlphaAssessment, alphaBetaAssessment, alphaGammaAssessment, betaAlphaAssessment, betaBetaAssessment, betaGammaAssessment, gammaAlphaAssessment, gammaBetaAssessment, gammaGammaAssessment));
 		ClustersToMerge clusters = new ClustersToMerge(collectionUtils.set(alphaCluster, betaCluster, gammaCluster));
-		Combination combination = new SingleLinkage(similarityReport).link(clusters);
+		Combination combination = new SingleLinkage(report).link(clusters);
 		assertEquals(new Combination(betaCluster, alphaCluster), combination);
 		assertEquals(new Combination(alphaCluster, betaCluster), combination);
 	}
 
 	@Test
 	void nonSimetricBetaAlpha() {
-		SimilarityAssessment assessmentAlphaAlpha = new SimilarityAssessment(alpha, alpha, BigDecimal.ONE);
-		SimilarityAssessment assessmentAlphaBeta = new SimilarityAssessment(alpha, beta, new BigDecimal("0.9"));
-		SimilarityAssessment assessmentAlphaGamma = new SimilarityAssessment(alpha, gamma, new BigDecimal("0.8"));
-		SimilarityAssessment assessmentBetaAlpha = new SimilarityAssessment(beta, alpha, new BigDecimal("0.7"));
-		SimilarityAssessment assessmentBetaBeta = new SimilarityAssessment(beta, beta, BigDecimal.ONE);
-		SimilarityAssessment assessmentBetaGamma = new SimilarityAssessment(beta, gamma, new BigDecimal("0.8"));
-		SimilarityAssessment assessmentGammaAlpha = new SimilarityAssessment(gamma, alpha, new BigDecimal("0.8"));
-		SimilarityAssessment assessmentGammaBeta = new SimilarityAssessment(gamma, beta, new BigDecimal("0.8"));
-		SimilarityAssessment assessmentGammaGamma = new SimilarityAssessment(gamma, gamma, BigDecimal.ONE);
-		SimilarityReport similarityReport = new SimilarityReport(Arrays.asList(assessmentAlphaAlpha, assessmentAlphaBeta, assessmentAlphaGamma, assessmentBetaAlpha, assessmentBetaBeta, assessmentBetaGamma, assessmentGammaAlpha, assessmentGammaBeta, assessmentGammaGamma));
+		SimilarityAssessment alphaAlphaAssessment = new SimilarityAssessment(alpha, alpha, BigDecimal.ONE);
+		SimilarityAssessment alphaBetaAssessment = new SimilarityAssessment(alpha, beta, new BigDecimal("0.9"));
+		SimilarityAssessment alphaGammaAssessment = new SimilarityAssessment(alpha, gamma, new BigDecimal("0.8"));
+		SimilarityAssessment betaAlphaAssessment = new SimilarityAssessment(beta, alpha, new BigDecimal("0.7"));
+		SimilarityAssessment betaBetaAssessment = new SimilarityAssessment(beta, beta, BigDecimal.ONE);
+		SimilarityAssessment betaGammaAssessment = new SimilarityAssessment(beta, gamma, new BigDecimal("0.8"));
+		SimilarityAssessment gammaAlphaAssessment = new SimilarityAssessment(gamma, alpha, new BigDecimal("0.8"));
+		SimilarityAssessment gammaBetaAssessment = new SimilarityAssessment(gamma, beta, new BigDecimal("0.8"));
+		SimilarityAssessment gammaGammaAssessment = new SimilarityAssessment(gamma, gamma, BigDecimal.ONE);
+		SimilarityReport report = new SimilarityReport(Arrays.asList(alphaAlphaAssessment, alphaBetaAssessment, alphaGammaAssessment, betaAlphaAssessment, betaBetaAssessment, betaGammaAssessment, gammaAlphaAssessment, gammaBetaAssessment, gammaGammaAssessment));
 		ClustersToMerge clusters = new ClustersToMerge(collectionUtils.set(alphaCluster, betaCluster, gammaCluster));
-		Combination combination = new SingleLinkage(similarityReport).link(clusters);
+		Combination combination = new SingleLinkage(report).link(clusters);
 		assertEquals(new Combination(betaCluster, alphaCluster), combination);
 		assertEquals(new Combination(alphaCluster, betaCluster), combination);
 	}
 
 	@Test
 	void multiplePossibilities() {
-		SimilarityAssessment assessmentAlphaAlpha = new SimilarityAssessment(alpha, alpha, BigDecimal.ONE);
-		SimilarityAssessment assessmentAlphaBeta = new SimilarityAssessment(alpha, beta, new BigDecimal("0.5"));
-		SimilarityAssessment assessmentAlphaGamma = new SimilarityAssessment(alpha, gamma, new BigDecimal("0.5"));
-		SimilarityAssessment assessmentBetaAlpha = new SimilarityAssessment(beta, alpha, new BigDecimal("0.5"));
-		SimilarityAssessment assessmentBetaBeta = new SimilarityAssessment(beta, beta, BigDecimal.ONE);
-		SimilarityAssessment assessmentBetaGamma = new SimilarityAssessment(beta, gamma, new BigDecimal("0.5"));
-		SimilarityAssessment assessmentGammaAlpha = new SimilarityAssessment(gamma, alpha, new BigDecimal("0.5"));
-		SimilarityAssessment assessmentGammaBeta = new SimilarityAssessment(gamma, beta, new BigDecimal("0.5"));
-		SimilarityAssessment assessmentGammaGamma = new SimilarityAssessment(gamma, gamma, BigDecimal.ONE);
-		SimilarityReport similarityReport = new SimilarityReport(Arrays.asList(assessmentAlphaAlpha, assessmentAlphaBeta, assessmentAlphaGamma, assessmentBetaAlpha, assessmentBetaBeta, assessmentBetaGamma, assessmentGammaAlpha, assessmentGammaBeta, assessmentGammaGamma));
+		SimilarityAssessment alphaAlphaAssessment = new SimilarityAssessment(alpha, alpha, BigDecimal.ONE);
+		SimilarityAssessment alphaBetaAssessment = new SimilarityAssessment(alpha, beta, new BigDecimal("0.5"));
+		SimilarityAssessment alphaGammaAssessment = new SimilarityAssessment(alpha, gamma, new BigDecimal("0.5"));
+		SimilarityAssessment betaAlphaAssessment = new SimilarityAssessment(beta, alpha, new BigDecimal("0.5"));
+		SimilarityAssessment betaBetaAssessment = new SimilarityAssessment(beta, beta, BigDecimal.ONE);
+		SimilarityAssessment betaGammaAssessment = new SimilarityAssessment(beta, gamma, new BigDecimal("0.9"));
+		SimilarityAssessment gammaAlphaAssessment = new SimilarityAssessment(gamma, alpha, new BigDecimal("0.9"));
+		SimilarityAssessment gammaBetaAssessment = new SimilarityAssessment(gamma, beta, new BigDecimal("0.5"));
+		SimilarityAssessment gammaGammaAssessment = new SimilarityAssessment(gamma, gamma, BigDecimal.ONE);
+		SimilarityReport report = new SimilarityReport(Arrays.asList(alphaAlphaAssessment, alphaBetaAssessment, alphaGammaAssessment, betaAlphaAssessment, betaBetaAssessment, betaGammaAssessment, gammaAlphaAssessment, gammaBetaAssessment, gammaGammaAssessment));
 		ClustersToMerge clusters = new ClustersToMerge(collectionUtils.set(alphaCluster, betaCluster, gammaCluster));
 		assertThrows(TiebreakException.class, () -> {
-			new SingleLinkage(similarityReport).link(clusters);
+			new SingleLinkage(report).link(clusters);
 		});
 	}
 

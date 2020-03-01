@@ -42,33 +42,33 @@ public class PairingTest {
 	@Test
 	void pairClusterWithItself() throws Exception {
 		Cluster alphaCluster = new Cluster(alpha);
-		Set<Pair> alphaPairsAlpha = new Pairing(alphaCluster, alphaCluster).getPairs();
-		assertEquals(1, alphaPairsAlpha.size());
-		assertTrue(alphaPairsAlpha.contains(alphaAlphaPair));
+		Set<Pair> alphaPairedAlpha = new Pairing(alphaCluster, alphaCluster).getPairs();
+		assertEquals(1, alphaPairedAlpha.size());
+		assertTrue(alphaPairedAlpha.contains(alphaAlphaPair));
 	}
 
 	@Test
 	void pairClustersWithTheSameElement() throws Exception {
 		Cluster alphaCluster = new Cluster(alpha);
-		Set<Pair> alphaPairsAlpha = new Pairing(alphaCluster, new Cluster(alpha)).getPairs();
-		assertEquals(1, alphaPairsAlpha.size());
-		assertTrue(alphaPairsAlpha.contains(alphaAlphaPair));
+		Set<Pair> alphaPairedAlpha = new Pairing(alphaCluster, new Cluster(alpha)).getPairs();
+		assertEquals(1, alphaPairedAlpha.size());
+		assertTrue(alphaPairedAlpha.contains(alphaAlphaPair));
 	}
 
 	@Test
 	void pairClustersWithDistincElements() throws Exception {
 		Cluster alphaCluster = new Cluster(alpha);
 		Cluster betaCluster = new Cluster(beta);
-		Set<Pair> alphaPairsBeta = new Pairing(alphaCluster, betaCluster).getPairs();
-		Set<Pair> betaPairsAlpha = new Pairing(betaCluster, alphaCluster).getPairs();
+		Set<Pair> alphaPairedBeta = new Pairing(alphaCluster, betaCluster).getPairs();
+		Set<Pair> betaPairedAlpha = new Pairing(betaCluster, alphaCluster).getPairs();
 
-		assertEquals(2, alphaPairsBeta.size());
-		assertTrue(alphaPairsBeta.contains(alphaBetaPair));
-		assertTrue(alphaPairsBeta.contains(betaAlphaPair));
+		assertEquals(2, alphaPairedBeta.size());
+		assertTrue(alphaPairedBeta.contains(alphaBetaPair));
+		assertTrue(alphaPairedBeta.contains(betaAlphaPair));
 
-		assertEquals(2, betaPairsAlpha.size());
-		assertTrue(betaPairsAlpha.contains(alphaBetaPair));
-		assertTrue(betaPairsAlpha.contains(betaAlphaPair));
+		assertEquals(2, betaPairedAlpha.size());
+		assertTrue(betaPairedAlpha.contains(alphaBetaPair));
+		assertTrue(betaPairedAlpha.contains(betaAlphaPair));
 	}
 
 	@Test
@@ -77,19 +77,19 @@ public class PairingTest {
 		Cluster betaCluster = new Cluster(beta);
 		Cluster gammaCluster = new Cluster(gamma);
 		Cluster alphaBetaCluster = alphaCluster.merge(betaCluster);
-		Set<Pair> alphaBetaPairsGamma = new Pairing(alphaBetaCluster, gammaCluster).getPairs();
-		Set<Pair> gammaPairsAlphaBeta = new Pairing(gammaCluster, alphaBetaCluster).getPairs();
+		Set<Pair> alphaBetaPairedGamma = new Pairing(alphaBetaCluster, gammaCluster).getPairs();
+		Set<Pair> gammaPairedAlphaBeta = new Pairing(gammaCluster, alphaBetaCluster).getPairs();
 
-		assertEquals(4, alphaBetaPairsGamma.size());
-		assertTrue(alphaBetaPairsGamma.contains(alphaGammaPair));
-		assertTrue(alphaBetaPairsGamma.contains(betaGammaPair));
-		assertTrue(alphaBetaPairsGamma.contains(gammaAlphaPair));
-		assertTrue(alphaBetaPairsGamma.contains(gammaBetaPair));
+		assertEquals(4, alphaBetaPairedGamma.size());
+		assertTrue(alphaBetaPairedGamma.contains(alphaGammaPair));
+		assertTrue(alphaBetaPairedGamma.contains(betaGammaPair));
+		assertTrue(alphaBetaPairedGamma.contains(gammaAlphaPair));
+		assertTrue(alphaBetaPairedGamma.contains(gammaBetaPair));
 
-		assertEquals(4, gammaPairsAlphaBeta.size());
-		assertTrue(gammaPairsAlphaBeta.contains(alphaGammaPair));
-		assertTrue(gammaPairsAlphaBeta.contains(betaGammaPair));
-		assertTrue(gammaPairsAlphaBeta.contains(gammaAlphaPair));
-		assertTrue(gammaPairsAlphaBeta.contains(gammaBetaPair));
+		assertEquals(4, gammaPairedAlphaBeta.size());
+		assertTrue(gammaPairedAlphaBeta.contains(alphaGammaPair));
+		assertTrue(gammaPairedAlphaBeta.contains(betaGammaPair));
+		assertTrue(gammaPairedAlphaBeta.contains(gammaAlphaPair));
+		assertTrue(gammaPairedAlphaBeta.contains(gammaBetaPair));
 	}
 }

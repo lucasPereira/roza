@@ -18,8 +18,8 @@ public class ClustersToMergeTest {
 
 	private Cluster alphaCluster;
 	private Cluster betaCluster;
-	private CollectionUtils collectionUtils;
 	private Cluster gammaCluster;
+	private CollectionUtils collectionUtils;
 
 	@BeforeEach
 	void setup() {

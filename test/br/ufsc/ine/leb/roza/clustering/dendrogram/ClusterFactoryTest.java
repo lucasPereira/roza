@@ -17,7 +17,7 @@ import br.ufsc.ine.leb.roza.TestCase;
 
 public class ClusterFactoryTest {
 
-	private SimilarityReport similarityReport;
+	private SimilarityReport report;
 	private ClusterFactory factory;
 	private Cluster alphaCluster;
 	private Cluster betaCluster;
@@ -26,11 +26,11 @@ public class ClusterFactoryTest {
 	void setup() {
 		TestCase alpha = new TestCase("alpha", Arrays.asList(), Arrays.asList());
 		TestCase beta = new TestCase("beta", Arrays.asList(), Arrays.asList());
-		SimilarityAssessment assessmentAlphaAlpha = new SimilarityAssessment(alpha, alpha, BigDecimal.ONE);
-		SimilarityAssessment assessmentAlphaBeta = new SimilarityAssessment(alpha, beta, BigDecimal.ONE);
-		SimilarityAssessment assessmentBetaAlpha = new SimilarityAssessment(beta, alpha, BigDecimal.ONE);
-		SimilarityAssessment assessmentBetaBeta = new SimilarityAssessment(beta, beta, BigDecimal.ONE);
-		similarityReport = new SimilarityReport(Arrays.asList(assessmentAlphaAlpha, assessmentAlphaBeta, assessmentBetaAlpha, assessmentBetaBeta));
+		SimilarityAssessment alphaAlphaAssessment = new SimilarityAssessment(alpha, alpha, BigDecimal.ONE);
+		SimilarityAssessment alphaBetaAssessment = new SimilarityAssessment(alpha, beta, BigDecimal.ONE);
+		SimilarityAssessment betaAlphaAssessment = new SimilarityAssessment(beta, alpha, BigDecimal.ONE);
+		SimilarityAssessment betaBetaAssessment = new SimilarityAssessment(beta, beta, BigDecimal.ONE);
+		report = new SimilarityReport(Arrays.asList(alphaAlphaAssessment, alphaBetaAssessment, betaAlphaAssessment, betaBetaAssessment));
 		alphaCluster = new Cluster(alpha);
 		betaCluster = new Cluster(beta);
 		factory = new ClusterFactory();
@@ -38,7 +38,7 @@ public class ClusterFactoryTest {
 
 	@Test
 	void create() throws Exception {
-		Set<Cluster> clusters = factory.create(similarityReport);
+		Set<Cluster> clusters = factory.create(report);
 		assertEquals(2, clusters.size());
 		assertTrue(clusters.contains(alphaCluster));
 		assertTrue(clusters.contains(betaCluster));

@@ -7,6 +7,6 @@ import br.ufsc.ine.leb.roza.SimilarityReport;
 
 public interface TestCaseClusterer {
 
-	Set<Cluster> cluster(SimilarityReport similarityReport);
+	Set<Cluster> cluster(SimilarityReport report);
 
 }

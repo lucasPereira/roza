@@ -125,14 +125,14 @@ public class Experiment {
 		List<TestClass> testClasses = parser.parse(files);
 		List<TestCase> testCases = extractor.extract(testClasses);
 		MaterializationReport materializationReport = materializer.materialize(testCases);
-		SimilarityReport similarityReport = measurer.measure(materializationReport);
+		SimilarityReport report = measurer.measure(materializationReport);
 
-		averagePrecisionRecallCurve(testCases, similarityReport, fileName);
-		precisionRecallCurve(testCases, similarityReport, fileName);
-		matrix(similarityReport, fileName);
+		averagePrecisionRecallCurve(testCases, report, fileName);
+		precisionRecallCurve(testCases, report, fileName);
+		matrix(report, fileName);
 	}
 
-	protected static void averagePrecisionRecallCurve(List<TestCase> testCases, SimilarityReport similarityReport, String fileName) {
+	protected static void averagePrecisionRecallCurve(List<TestCase> testCases, SimilarityReport report, String fileName) {
 		ReportUtils reportUtils = new ReportUtils();
 		FormatterUtils formatterUtils = new FormatterUtils();
 		CommaSeparatedValues csv = new CommaSeparatedValues();
@@ -143,7 +143,7 @@ public class Experiment {
 		for (RecallLevel recallLevel : standardRecallLevels) {
 			BigDecimal totalPrecision = BigDecimal.ZERO;
 			for (TestCase source : testCases) {
-				List<TestCase> ranking = reportUtils.getTargets(similarityReport.selectSource(source).removeReflexives().sort(scoreComparator));
+				List<TestCase> ranking = reportUtils.getTargets(report.selectSource(source).removeReflexives().sort(scoreComparator));
 				List<TestCase> relevantSet = groundTruth.getRelevanteElements(testCases, source);
 				PrecisionRecall<TestCase> precisionRecall = new PrecisionRecall<>(ranking, relevantSet);
 				BigDecimal precisionAtRecallLevel = precisionRecall.precisionAtRecallLevel(recallLevel);
@@ -157,7 +157,7 @@ public class Experiment {
 		folderUtils.writeContetAsString(fileName, csv.getContent());
 	}
 
-	protected static void precisionRecallCurve(List<TestCase> testCases, SimilarityReport similarityReport, String fileName) {
+	protected static void precisionRecallCurve(List<TestCase> testCases, SimilarityReport report, String fileName) {
 		ReportUtils reportUtils = new ReportUtils();
 		FormatterUtils formatterUtils = new FormatterUtils();
 		CommaSeparatedValues csv = new CommaSeparatedValues();
@@ -165,7 +165,7 @@ public class Experiment {
 		Comparator<SimilarityAssessment> scoreComparator = new AssessmentScoreAndTestCaseNameComparator();
 		StandardRecallLevels standardRecallLevels = new StandardRecallLevels();
 		for (TestCase source : testCases) {
-			List<TestCase> ranking = reportUtils.getTargets(similarityReport.selectSource(source).removeReflexives().sort(scoreComparator));
+			List<TestCase> ranking = reportUtils.getTargets(report.selectSource(source).removeReflexives().sort(scoreComparator));
 			List<TestCase> relevantSet = groundTruth.getRelevanteElements(testCases, source);
 			PrecisionRecall<TestCase> precisionRecall = new PrecisionRecall<>(ranking, relevantSet);
 			for (RecallLevel recallLevel : standardRecallLevels) {
@@ -179,13 +179,13 @@ public class Experiment {
 		folderUtils.writeContetAsString(fileName, csv.getContent());
 	}
 
-	protected static void matrix(SimilarityReport similarityReport, String fileName) {
+	protected static void matrix(SimilarityReport report, String fileName) {
 		FormatterUtils formatterUtils = new FormatterUtils();
 		CommaSeparatedValues csv = new CommaSeparatedValues();
 		FolderUtils folderUtils = new FolderUtils("experiment-results/a/matrix");
 		Comparator<SimilarityAssessment> nameComparator = new AssessmentTestCaseNameComparator();
-		similarityReport.sort(nameComparator);
-		List<SimilarityAssessment> assessments = similarityReport.getAssessments();
+		report.sort(nameComparator);
+		List<SimilarityAssessment> assessments = report.getAssessments();
 		for (SimilarityAssessment assessment : assessments) {
 			String sourceName = assessment.getSource().getName();
 			String targetName = assessment.getTarget().getName();

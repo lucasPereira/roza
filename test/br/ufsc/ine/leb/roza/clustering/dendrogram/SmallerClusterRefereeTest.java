@@ -12,9 +12,9 @@ import br.ufsc.ine.leb.roza.TestCase;
 
 public class SmallerClusterRefereeTest {
 
-	private Combination alphaBetaAndDelta;
-	private Combination gammaAndDelta;
-	private Combination deltaAndGamma;
+	private Combination alphaBetaCombinedDelta;
+	private Combination gammaCombinedDelta;
+	private Combination deltaCombinedGamma;
 	private Referee referee;
 
 	@BeforeEach
@@ -28,40 +28,40 @@ public class SmallerClusterRefereeTest {
 		Cluster gammaCluster = new Cluster(gamma);
 		Cluster deltaCluster = new Cluster(delta);
 		Cluster alphaBetaCluster = alphaCluster.merge(betaCluster);
-		alphaBetaAndDelta = new Combination(alphaBetaCluster, deltaCluster);
-		gammaAndDelta = new Combination(gammaCluster, deltaCluster);
-		deltaAndGamma = new Combination(deltaCluster, gammaCluster);
+		alphaBetaCombinedDelta = new Combination(alphaBetaCluster, deltaCluster);
+		gammaCombinedDelta = new Combination(gammaCluster, deltaCluster);
+		deltaCombinedGamma = new Combination(deltaCluster, gammaCluster);
 		referee = new SmallerClusterReferee();
 	}
 
 	@Test
 	void chooseFirst() throws Exception {
-		Combination tiebreak = referee.untie(gammaAndDelta, alphaBetaAndDelta);
-		assertEquals(tiebreak, gammaAndDelta);
+		Combination tiebreak = referee.untie(gammaCombinedDelta, alphaBetaCombinedDelta);
+		assertEquals(tiebreak, gammaCombinedDelta);
 	}
 
 	@Test
 	void chooseSecond() throws Exception {
-		Combination tiebreak = referee.untie(alphaBetaAndDelta, gammaAndDelta);
-		assertEquals(tiebreak, gammaAndDelta);
+		Combination tiebreak = referee.untie(alphaBetaCombinedDelta, gammaCombinedDelta);
+		assertEquals(tiebreak, gammaCombinedDelta);
 	}
 
 	@Test
 	void chooseNone() throws Exception {
-		Combination tiebreak = referee.untie(gammaAndDelta, deltaAndGamma);
+		Combination tiebreak = referee.untie(gammaCombinedDelta, deltaCombinedGamma);
 		assertNull(tiebreak);
 	}
 
 	@Test
 	void firstNull() throws Exception {
-		Combination tiebreak = referee.untie(null, gammaAndDelta);
-		assertEquals(tiebreak, gammaAndDelta);
+		Combination tiebreak = referee.untie(null, gammaCombinedDelta);
+		assertEquals(tiebreak, gammaCombinedDelta);
 	}
 
 	@Test
 	void secondNull() throws Exception {
-		Combination tiebreak = referee.untie(deltaAndGamma, null);
-		assertEquals(tiebreak, deltaAndGamma);
+		Combination tiebreak = referee.untie(deltaCombinedGamma, null);
+		assertEquals(tiebreak, deltaCombinedGamma);
 	}
 
 	@Test

@@ -10,17 +10,17 @@ import br.ufsc.ine.leb.roza.measurement.report.TestCaseNameComparator;
 
 public class ReportUtils {
 
-	public List<TestCase> getTargets(SimilarityReport similarityReport) {
+	public List<TestCase> getTargets(SimilarityReport report) {
 		List<TestCase> targets = new ArrayList<>();
-		for (SimilarityAssessment assessment : similarityReport.getAssessments()) {
+		for (SimilarityAssessment assessment : report.getAssessments()) {
 			targets.add(assessment.getTarget());
 		}
 		return targets;
 	}
 
-	public List<TestCase> getUniqueTestCases(SimilarityReport similarityReport) {
+	public List<TestCase> getUniqueTestCases(SimilarityReport report) {
 		List<TestCase> testCases = new ArrayList<>();
-		for (SimilarityAssessment assessment : similarityReport.getAssessments()) {
+		for (SimilarityAssessment assessment : report.getAssessments()) {
 			TestCase source = assessment.getSource();
 			if (!testCases.contains(source)) {
 				testCases.add(source);

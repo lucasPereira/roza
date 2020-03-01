@@ -8,10 +8,10 @@ import br.ufsc.ine.leb.roza.SimilarityReport;
 
 abstract class AbstractLinkage implements Linkage {
 
-	private SimilarityReport similarityReport;
+	private SimilarityReport report;
 
-	public AbstractLinkage(SimilarityReport similarityReport) {
-		this.similarityReport = similarityReport;
+	public AbstractLinkage(SimilarityReport report) {
+		this.report = report;
 	}
 
 	@Override
@@ -22,7 +22,7 @@ abstract class AbstractLinkage implements Linkage {
 		for (Combination combination : combinations) {
 			Cluster first = combination.getFirst();
 			Cluster second = combination.getSecond();
-			BigDecimal clusterDistance = evaluateSimilarity(first, second, similarityReport);
+			BigDecimal clusterDistance = evaluateSimilarity(first, second, report);
 			if (clusterDistance.compareTo(mostSimilarDistance) > 0) {
 				mostSimilarDistance = clusterDistance;
 				choosed = combination;
@@ -31,6 +31,6 @@ abstract class AbstractLinkage implements Linkage {
 		return choosed;
 	}
 
-	protected abstract BigDecimal evaluateSimilarity(Cluster first, Cluster second, SimilarityReport similarityReport);
+	protected abstract BigDecimal evaluateSimilarity(Cluster first, Cluster second, SimilarityReport report);
 
 }
