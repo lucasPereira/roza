@@ -28,6 +28,7 @@ public class CompleteLinkageTest {
 	private Cluster deltaCluster;
 	private Cluster alphaGammaCluster;
 	private CollectionUtils collectionUtils;
+	private InsecureClusterReferee referee;
 
 	@BeforeEach
 	void setup() {
@@ -41,6 +42,7 @@ public class CompleteLinkageTest {
 		deltaCluster = new Cluster(delta);
 		alphaGammaCluster = alphaCluster.merge(gammaCluster);
 		collectionUtils = new CollectionUtils();
+		referee = new InsecureClusterReferee();
 	}
 
 	@Test
@@ -63,7 +65,7 @@ public class CompleteLinkageTest {
 		SimilarityAssessment deltaDeltaAssessment = new SimilarityAssessment(delta, delta, BigDecimal.ONE);
 		SimilarityReport report = new SimilarityReport(Arrays.asList(alphaAlphaAssessment, alphaBetaAssessment, alphaGammaAssessment, alphaDeltaAssessment, betaAlphaAssessment, betaBetaAssessment, betaGammaAssessment, betaDeltaAssessment, gammaAlphaAssessment, gammaBetaAssessment, gammaGammaAssessment, gammaDeltaAssessment, deltaAlphaAssessment, deltaBetaAssessment, deltaGammaAssessment, deltaDeltaAssessment));
 		ClustersToMerge clusters = new ClustersToMerge(collectionUtils.set(alphaGammaCluster, betaCluster, deltaCluster));
-		Combination combination = new CompleteLinkage(report).link(clusters);
+		Combination combination = new CompleteLinkage(referee, report).link(clusters);
 		assertEquals(new Combination(betaCluster, deltaCluster), combination);
 		assertEquals(new Combination(deltaCluster, betaCluster), combination);
 	}
@@ -88,7 +90,7 @@ public class CompleteLinkageTest {
 		SimilarityAssessment deltaDeltaAssessment = new SimilarityAssessment(delta, delta, BigDecimal.ONE);
 		SimilarityReport report = new SimilarityReport(Arrays.asList(alphaAlphaAssessment, alphaBetaAssessment, alphaGammaAssessment, alphaDeltaAssessment, betaAlphaAssessment, betaBetaAssessment, betaGammaAssessment, betaDeltaAssessment, gammaAlphaAssessment, gammaBetaAssessment, gammaGammaAssessment, gammaDeltaAssessment, deltaAlphaAssessment, deltaBetaAssessment, deltaGammaAssessment, deltaDeltaAssessment));
 		ClustersToMerge clusters = new ClustersToMerge(collectionUtils.set(alphaGammaCluster, betaCluster, deltaCluster));
-		Combination combination = new CompleteLinkage(report).link(clusters);
+		Combination combination = new CompleteLinkage(referee, report).link(clusters);
 		assertEquals(new Combination(alphaGammaCluster, deltaCluster), combination);
 		assertEquals(new Combination(deltaCluster, alphaGammaCluster), combination);
 	}
@@ -106,7 +108,7 @@ public class CompleteLinkageTest {
 		SimilarityAssessment gammaGammaAssessment = new SimilarityAssessment(gamma, gamma, BigDecimal.ONE);
 		SimilarityReport report = new SimilarityReport(Arrays.asList(alphaAlphaAssessment, alphaBetaAssessment, alphaGammaAssessment, betaAlphaAssessment, betaBetaAssessment, betaGammaAssessment, gammaAlphaAssessment, gammaBetaAssessment, gammaGammaAssessment));
 		ClustersToMerge clusters = new ClustersToMerge(collectionUtils.set(alphaCluster, betaCluster, gammaCluster));
-		Combination combination = new CompleteLinkage(report).link(clusters);
+		Combination combination = new CompleteLinkage(referee, report).link(clusters);
 		assertEquals(new Combination(betaCluster, alphaCluster), combination);
 		assertEquals(new Combination(alphaCluster, betaCluster), combination);
 	}
@@ -124,7 +126,7 @@ public class CompleteLinkageTest {
 		SimilarityAssessment gammaGammaAssessment = new SimilarityAssessment(gamma, gamma, BigDecimal.ONE);
 		SimilarityReport report = new SimilarityReport(Arrays.asList(alphaAlphaAssessment, alphaBetaAssessment, alphaGammaAssessment, betaAlphaAssessment, betaBetaAssessment, betaGammaAssessment, gammaAlphaAssessment, gammaBetaAssessment, gammaGammaAssessment));
 		ClustersToMerge clusters = new ClustersToMerge(collectionUtils.set(alphaCluster, betaCluster, gammaCluster));
-		Combination combination = new CompleteLinkage(report).link(clusters);
+		Combination combination = new CompleteLinkage(referee, report).link(clusters);
 		assertEquals(new Combination(betaCluster, alphaCluster), combination);
 		assertEquals(new Combination(alphaCluster, betaCluster), combination);
 	}
@@ -143,7 +145,7 @@ public class CompleteLinkageTest {
 		SimilarityReport report = new SimilarityReport(Arrays.asList(alphaAlphaAssessment, alphaBetaAssessment, alphaGammaAssessment, betaAlphaAssessment, betaBetaAssessment, betaGammaAssessment, gammaAlphaAssessment, gammaBetaAssessment, gammaGammaAssessment));
 		ClustersToMerge clusters = new ClustersToMerge(collectionUtils.set(alphaCluster, betaCluster, gammaCluster));
 		assertThrows(TiebreakException.class, () -> {
-			new CompleteLinkage(report).link(clusters);
+			new CompleteLinkage(referee, report).link(clusters);
 		});
 	}
 

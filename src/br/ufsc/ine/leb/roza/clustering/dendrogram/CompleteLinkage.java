@@ -9,23 +9,23 @@ import br.ufsc.ine.leb.roza.TestCase;
 
 class CompleteLinkage extends AbstractLinkage implements Linkage {
 
-	public CompleteLinkage(SimilarityReport report) {
-		super(report);
+	public CompleteLinkage(Referee referee, SimilarityReport report) {
+		super(referee, report);
 	}
 
 	@Override
 	protected BigDecimal evaluateSimilarity(Cluster first, Cluster second, SimilarityReport report) {
-		BigDecimal mostDisimilar = BigDecimal.ONE;
+		BigDecimal farthestDistance = BigDecimal.ONE;
 		Set<Pair> pairs = new Pairing(first, second).getPairs();
 		for (Pair pair : pairs) {
-			TestCase firstTestCase = pair.getFirst();
-			TestCase secondTestCase = pair.getSecond();
-			BigDecimal assessmentDistance = report.getPair(firstTestCase, secondTestCase).getScore();
-			if (assessmentDistance.compareTo(mostDisimilar) < 0) {
-				mostDisimilar = assessmentDistance;
+			TestCase firstTest = pair.getFirst();
+			TestCase secondTest = pair.getSecond();
+			BigDecimal distance = report.getPair(firstTest, secondTest).getScore();
+			if (distance.compareTo(farthestDistance) < 0) {
+				farthestDistance = distance;
 			}
 		}
-		return mostDisimilar;
+		return farthestDistance;
 	}
 
 }

@@ -1,7 +1,9 @@
 package br.ufsc.ine.leb.roza.clustering.dendrogram;
 
+import java.util.Set;
+
 interface Referee {
 
-	Combination untie(Combination first, Combination second);
+	Set<Combination> untie(Set<Combination> elements);
 
 }
