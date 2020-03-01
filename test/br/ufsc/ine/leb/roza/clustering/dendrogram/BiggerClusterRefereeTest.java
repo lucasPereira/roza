@@ -12,13 +12,13 @@ import br.ufsc.ine.leb.roza.Cluster;
 import br.ufsc.ine.leb.roza.TestCase;
 import br.ufsc.ine.leb.roza.utils.CollectionUtils;
 
-public class InsecureRefereeTest {
+public class BiggerClusterRefereeTest {
 
 	private Referee referee;
 	private Combination alphaBetaCombinedDelta;
 	private Combination gammaCombinedDelta;
-	private Combination deltaCombinedGamma;
-	private Combination alphaCombinedBeta;
+	private Combination deltaCombinedAlphaBeta;
+	private Combination alphaBetaCombinedGamma;
 	private CollectionUtils collectionUtils;
 
 	@BeforeEach
@@ -33,49 +33,54 @@ public class InsecureRefereeTest {
 		Cluster deltaCluster = new Cluster(delta);
 		Cluster alphaBetaCluster = alphaCluster.merge(betaCluster);
 		alphaBetaCombinedDelta = new Combination(alphaBetaCluster, deltaCluster);
+		deltaCombinedAlphaBeta= new Combination(deltaCluster, alphaBetaCluster);
+		alphaBetaCombinedGamma= new Combination(alphaBetaCluster, gammaCluster);
 		gammaCombinedDelta = new Combination(gammaCluster, deltaCluster);
-		deltaCombinedGamma = new Combination(deltaCluster, gammaCluster);
-		alphaCombinedBeta = new Combination(alphaCluster, betaCluster);
 		collectionUtils = new CollectionUtils();
-		referee = new InsecureClusterReferee();
+		referee = new BiggerClusterReferee();
 	}
 
 	@Test
-	void zero() throws Exception {
+	void withoutElements() throws Exception {
 		Set<Combination> tiebreak = referee.untie(collectionUtils.set());
 		assertEquals(0, tiebreak.size());
 	}
 
 	@Test
-	void one() throws Exception {
-		Set<Combination> tiebreak = referee.untie(collectionUtils.set(alphaBetaCombinedDelta));
+	void chooseUnique() throws Exception {
+		Set<Combination> tiebreak = referee.untie(collectionUtils.set(gammaCombinedDelta));
 		assertEquals(1, tiebreak.size());
-		assertTrue(tiebreak.contains(alphaBetaCombinedDelta));
+		assertTrue(tiebreak.contains(gammaCombinedDelta));
 	}
 
 	@Test
-	void two() throws Exception {
+	void chooseFirst() throws Exception {
 		Set<Combination> tiebreak = referee.untie(collectionUtils.set(gammaCombinedDelta, alphaBetaCombinedDelta));
-		assertEquals(2, tiebreak.size());
-		assertTrue(tiebreak.contains(gammaCombinedDelta));
-		assertTrue(tiebreak.contains(alphaBetaCombinedDelta));
-	}
-
-	@Test
-	void twoEquals() throws Exception {
-		Set<Combination> tiebreak = referee.untie(collectionUtils.set(gammaCombinedDelta, deltaCombinedGamma));
 		assertEquals(1, tiebreak.size());
-		assertTrue(tiebreak.contains(gammaCombinedDelta));
-		assertTrue(tiebreak.contains(deltaCombinedGamma));
+		assertTrue(tiebreak.contains(alphaBetaCombinedDelta));
 	}
 
 	@Test
-	void three() throws Exception {
-		Set<Combination> tiebreak = referee.untie(collectionUtils.set(gammaCombinedDelta, alphaBetaCombinedDelta, alphaCombinedBeta));
-		assertEquals(3, tiebreak.size());
-		assertTrue(tiebreak.contains(gammaCombinedDelta));
+	void chooseLast() throws Exception {
+		Set<Combination> tiebreak = referee.untie(collectionUtils.set(alphaBetaCombinedDelta, gammaCombinedDelta));
+		assertEquals(1, tiebreak.size());
 		assertTrue(tiebreak.contains(alphaBetaCombinedDelta));
-		assertTrue(tiebreak.contains(alphaCombinedBeta));
+	}
+
+	@Test
+	void chooseFirstAndLast() throws Exception {
+		Set<Combination> tiebreak = referee.untie(collectionUtils.set(alphaBetaCombinedDelta, gammaCombinedDelta, alphaBetaCombinedGamma));
+		assertEquals(2, tiebreak.size());
+		assertTrue(tiebreak.contains(alphaBetaCombinedDelta));
+		assertTrue(tiebreak.contains(alphaBetaCombinedGamma));
+	}
+
+	@Test
+	void chooseFirstAndLastEquals() throws Exception {
+		Set<Combination> tiebreak = referee.untie(collectionUtils.set(alphaBetaCombinedDelta, gammaCombinedDelta, deltaCombinedAlphaBeta));
+		assertEquals(1, tiebreak.size());
+		assertTrue(tiebreak.contains(alphaBetaCombinedDelta));
+		assertTrue(tiebreak.contains(deltaCombinedAlphaBeta));
 	}
 
 }

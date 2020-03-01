@@ -36,8 +36,8 @@ public class SmallerClusterRefereeTest {
 		gammaCombinedDelta = new Combination(gammaCluster, deltaCluster);
 		deltaCombinedGamma = new Combination(deltaCluster, gammaCluster);
 		alphaCombinedBeta = new Combination(alphaCluster, betaCluster);
-		referee = new SmallerClusterReferee();
 		collectionUtils = new CollectionUtils();
+		referee = new SmallerClusterReferee();
 	}
 
 	@Test
