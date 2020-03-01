@@ -9,11 +9,11 @@ import br.ufsc.ine.leb.roza.exceptions.NoNextLevelException;
 
 class Level {
 
-	private Set<Cluster> clusters;
 	private Linkage linkage;
+	private Set<Cluster> clusters;
 
-	public Level(Linkage linkageMethod, Set<Cluster> clusters) {
-		this.linkage = linkageMethod;
+	public Level(Linkage linkage, Set<Cluster> clusters) {
+		this.linkage = linkage;
 		this.clusters = clusters;
 	}
 
