@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 
 import br.ufsc.ine.leb.roza.TestCase;
 
-public class LowerIdLinkage implements Linkage {
+class LowerIdLinkage implements Linkage {
 
 	@Override
 	public Combination link(ClustersToMerge clusters) {

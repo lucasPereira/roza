@@ -6,7 +6,7 @@ import java.util.Set;
 import br.ufsc.ine.leb.roza.Cluster;
 import br.ufsc.ine.leb.roza.TestCase;
 
-public class Pairing {
+class Pairing {
 
 	private Cluster first;
 	private Cluster second;

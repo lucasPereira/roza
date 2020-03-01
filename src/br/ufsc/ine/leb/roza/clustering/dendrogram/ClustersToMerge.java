@@ -6,7 +6,7 @@ import java.util.Set;
 import br.ufsc.ine.leb.roza.Cluster;
 import br.ufsc.ine.leb.roza.exceptions.NoClustersToMergeException;
 
-public class ClustersToMerge {
+class ClustersToMerge {
 
 	private Set<Cluster> clusters;
 
