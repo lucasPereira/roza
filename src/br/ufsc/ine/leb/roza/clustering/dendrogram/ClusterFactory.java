@@ -1,17 +1,18 @@
 package br.ufsc.ine.leb.roza.clustering.dendrogram;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
+import br.ufsc.ine.leb.roza.Cluster;
 import br.ufsc.ine.leb.roza.SimilarityReport;
 import br.ufsc.ine.leb.roza.TestCase;
 import br.ufsc.ine.leb.roza.utils.ReportUtils;
 
 class ClusterFactory {
 
-	public List<Cluster> create(SimilarityReport similarityReport) {
+	public Set<Cluster> create(SimilarityReport similarityReport) {
 		ReportUtils reportUtils = new ReportUtils();
-		List<Cluster> clusters = new ArrayList<>();
+		Set<Cluster> clusters = new HashSet<>();
 		for (TestCase test : reportUtils.getUniqueTestCases(similarityReport)) {
 			Cluster cluster = new Cluster(test);
 			clusters.add(cluster);

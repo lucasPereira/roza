@@ -1,12 +1,12 @@
 package br.ufsc.ine.leb.roza.clustering;
 
-import java.util.List;
+import java.util.Set;
 
+import br.ufsc.ine.leb.roza.Cluster;
 import br.ufsc.ine.leb.roza.SimilarityReport;
-import br.ufsc.ine.leb.roza.TestCase;
 
 public interface TestCaseClusterer {
 
-	List<List<TestCase>> cluster(SimilarityReport similarityReport);
+	Set<Cluster> cluster(SimilarityReport similarityReport);
 
 }

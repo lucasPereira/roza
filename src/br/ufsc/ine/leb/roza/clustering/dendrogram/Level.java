@@ -1,21 +1,20 @@
 package br.ufsc.ine.leb.roza.clustering.dendrogram;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
-import br.ufsc.ine.leb.roza.SimilarityReport;
+import br.ufsc.ine.leb.roza.Cluster;
 import br.ufsc.ine.leb.roza.exceptions.NoNextLevelException;
 
 class Level {
 
-	private List<Cluster> clusters;
-	private SimilarityReport similarityReport;
-	private Linkage linkageMethod;
+	private Set<Cluster> clusters;
+	private Linkage linkage;
 
-	public Level(Linkage linkageMethod, List<Cluster> clusters, SimilarityReport similarityReport) {
-		this.linkageMethod = linkageMethod;
+	public Level(Linkage linkageMethod, Set<Cluster> clusters) {
+		this.linkage = linkageMethod;
 		this.clusters = clusters;
-		this.similarityReport = similarityReport;
 	}
 
 	public Boolean hasNextLevel() {
@@ -26,22 +25,18 @@ class Level {
 		if (!hasNextLevel()) {
 			throw new NoNextLevelException();
 		}
-		List<Cluster> newClusters = new ArrayList<>(clusters.size() - 1);
-		Link linkage = linkageMethod.link(new ClustersToMerge(clusters), similarityReport);
-		Cluster firtClusterToBeMerged = linkage.getFirst();
-		Cluster secondClusterToBeMerged = linkage.getSecond();
-		Cluster mergedCluster = firtClusterToBeMerged.merge(secondClusterToBeMerged);
-		newClusters.add(mergedCluster);
-		for (Cluster cluster : clusters) {
-			if (!cluster.equals(firtClusterToBeMerged) && !cluster.equals(secondClusterToBeMerged)) {
-				newClusters.add(cluster);
-			}
-		}
-		return new Level(linkageMethod, newClusters, similarityReport);
+		Set<Cluster> next = new HashSet<>(clusters.size() - 1);
+		Combination combination = linkage.link(new ClustersToMerge(clusters));
+		Cluster first = combination.getFirst();
+		Cluster second = combination.getSecond();
+		Cluster merged = first.merge(second);
+		next.add(merged);
+		clusters.stream().filter((cluster) -> !cluster.equals(first) && !cluster.equals(second)).forEach((cluster) -> next.add(cluster));
+		return new Level(linkage, next);
 	}
 
-	public List<Cluster> getClusters() {
-		return clusters;
+	public Set<Cluster> getClusters() {
+		return Collections.unmodifiableSet(clusters);
 	}
 
 }

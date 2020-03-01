@@ -9,7 +9,8 @@ public class TestMethod {
 
 	public TestMethod(String name, List<Statement> statements) {
 		this.name = name;
-		this.statements = statements;}
+		this.statements = statements;
+	}
 
 	public String getName() {
 		return name;
