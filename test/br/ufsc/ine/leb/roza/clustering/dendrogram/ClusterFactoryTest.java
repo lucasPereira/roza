@@ -26,11 +26,11 @@ public class ClusterFactoryTest {
 	void setup() {
 		TestCase alpha = new TestCase("alpha", Arrays.asList(), Arrays.asList());
 		TestCase beta = new TestCase("beta", Arrays.asList(), Arrays.asList());
-		SimilarityAssessment assessmentAlfaAlfa = new SimilarityAssessment(alpha, alpha, BigDecimal.ONE);
-		SimilarityAssessment assessmentAlfaBeta = new SimilarityAssessment(alpha, beta, BigDecimal.ONE);
-		SimilarityAssessment assessmentBetaAlfa = new SimilarityAssessment(beta, alpha, BigDecimal.ONE);
+		SimilarityAssessment assessmentAlphaAlpha = new SimilarityAssessment(alpha, alpha, BigDecimal.ONE);
+		SimilarityAssessment assessmentAlphaBeta = new SimilarityAssessment(alpha, beta, BigDecimal.ONE);
+		SimilarityAssessment assessmentBetaAlpha = new SimilarityAssessment(beta, alpha, BigDecimal.ONE);
 		SimilarityAssessment assessmentBetaBeta = new SimilarityAssessment(beta, beta, BigDecimal.ONE);
-		similarityReport = new SimilarityReport(Arrays.asList(assessmentAlfaAlfa, assessmentAlfaBeta, assessmentBetaAlfa, assessmentBetaBeta));
+		similarityReport = new SimilarityReport(Arrays.asList(assessmentAlphaAlpha, assessmentAlphaBeta, assessmentBetaAlpha, assessmentBetaBeta));
 		alphaCluster = new Cluster(alpha);
 		betaCluster = new Cluster(beta);
 		factory = new ClusterFactory();
