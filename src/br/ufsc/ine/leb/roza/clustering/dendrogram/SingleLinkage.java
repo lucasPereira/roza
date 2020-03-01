@@ -7,14 +7,16 @@ import br.ufsc.ine.leb.roza.Cluster;
 import br.ufsc.ine.leb.roza.SimilarityReport;
 import br.ufsc.ine.leb.roza.TestCase;
 
-class SingleLinkage extends AbstractLinkage implements Linkage {
+class SingleLinkage implements Linkage {
 
-	public SingleLinkage(Referee referee, SimilarityReport report) {
-		super(referee, report);
+	private SimilarityReport report;
+
+	public SingleLinkage(SimilarityReport report) {
+		this.report = report;
 	}
 
 	@Override
-	protected BigDecimal evaluateSimilarity(Cluster first, Cluster second, SimilarityReport report) {
+	public BigDecimal evaluate(Cluster first, Cluster second) {
 		BigDecimal nearestDistance = BigDecimal.ZERO;
 		Set<Pair> pairs = new Pairing(first, second).getPairs();
 		for (Pair pair : pairs) {

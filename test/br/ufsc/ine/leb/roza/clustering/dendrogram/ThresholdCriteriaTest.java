@@ -18,7 +18,7 @@ public class ThresholdCriteriaTest {
 	@BeforeEach
 	void seutp() {
 		levels = new LinkedList<>();
-		level = new Level(new LowerIdLinkage(), new HashSet<>());
+		level = new Level(new SumOfIdsLinkage(), new InsecureReferee(), new HashSet<>());
 	}
 
 	@Test

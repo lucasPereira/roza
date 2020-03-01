@@ -5,28 +5,26 @@ import java.util.HashSet;
 import java.util.Set;
 
 import br.ufsc.ine.leb.roza.Cluster;
-import br.ufsc.ine.leb.roza.SimilarityReport;
 import br.ufsc.ine.leb.roza.exceptions.TiebreakException;
 
-abstract class AbstractLinkage implements Linkage {
+class ClusterJoiner {
 
 	private Referee referee;
-	private SimilarityReport report;
+	private Linkage linkage;
 
-	public AbstractLinkage(Referee referee, SimilarityReport report) {
+	public ClusterJoiner(Linkage linkage, Referee referee) {
+		this.linkage = linkage;
 		this.referee = referee;
-		this.report = report;
 	}
 
-	@Override
-	public final Combination link(ClustersToMerge clusters) {
+	public Combination join(ClustersToMerge clusters) {
 		Set<Combination> choosed = new HashSet<>();
 		BigDecimal nearestDistance = BigDecimal.ZERO;
 		Set<Combination> combinations = clusters.getCombinations();
 		for (Combination combination : combinations) {
 			Cluster first = combination.getFirst();
 			Cluster second = combination.getSecond();
-			BigDecimal distance = evaluateSimilarity(first, second, report);
+			BigDecimal distance = linkage.evaluate(first, second);
 			if (distance.compareTo(nearestDistance) == 0) {
 				choosed.add(combination);
 			} else if (distance.compareTo(nearestDistance) > 0) {
@@ -58,7 +56,5 @@ abstract class AbstractLinkage implements Linkage {
 			throw new TiebreakException();
 		}
 	}
-
-	protected abstract BigDecimal evaluateSimilarity(Cluster first, Cluster second, SimilarityReport report);
 
 }

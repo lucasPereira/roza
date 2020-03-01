@@ -37,7 +37,7 @@ public class InsecureRefereeTest {
 		deltaCombinedGamma = new Combination(deltaCluster, gammaCluster);
 		alphaCombinedBeta = new Combination(alphaCluster, betaCluster);
 		collectionUtils = new CollectionUtils();
-		referee = new InsecureClusterReferee();
+		referee = new InsecureReferee();
 	}
 
 	@Test

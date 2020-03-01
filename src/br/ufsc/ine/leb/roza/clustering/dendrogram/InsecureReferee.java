@@ -2,7 +2,7 @@ package br.ufsc.ine.leb.roza.clustering.dendrogram;
 
 import java.util.Set;
 
-public class InsecureClusterReferee implements Referee {
+public class InsecureReferee implements Referee {
 
 	@Override
 	public Set<Combination> untie(Set<Combination> elements) {

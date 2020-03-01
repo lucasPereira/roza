@@ -1,7 +1,11 @@
 package br.ufsc.ine.leb.roza.clustering.dendrogram;
 
+import java.math.BigDecimal;
+
+import br.ufsc.ine.leb.roza.Cluster;
+
 interface Linkage {
 
-	Combination link(ClustersToMerge clusters);
+	BigDecimal evaluate(Cluster first, Cluster second);
 
 }

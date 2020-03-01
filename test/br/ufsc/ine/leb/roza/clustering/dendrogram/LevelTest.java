@@ -21,11 +21,13 @@ public class LevelTest {
 	private TestCase beta;
 	private TestCase gamma;
 	private Linkage linkage;
+	private InsecureReferee referee;
 	private CollectionUtils collectionUtils;
 
 	@BeforeEach
 	void setup() {
-		linkage = new LowerIdLinkage();
+		linkage = new SumOfIdsLinkage();
+		referee = new InsecureReferee();
 		collectionUtils = new CollectionUtils();
 		alpha = new TestCase("alpha", Arrays.asList(), Arrays.asList());
 		beta = new TestCase("beta", Arrays.asList(), Arrays.asList());
@@ -36,7 +38,7 @@ public class LevelTest {
 	void oneElement() throws Exception {
 		Cluster alphaCluster = new Cluster(alpha);
 
-		Level one = new Level(linkage, collectionUtils.set(alphaCluster));
+		Level one = new Level(linkage, referee, collectionUtils.set(alphaCluster));
 		assertFalse(one.hasNextLevel());
 		assertEquals(1, one.getClusters().size());
 		assertTrue(one.getClusters().contains(alphaCluster));
@@ -48,7 +50,7 @@ public class LevelTest {
 		Cluster betaCluster = new Cluster(beta);
 		Cluster alphaBetaCluster = alphaCluster.merge(betaCluster);
 
-		Level one = new Level(linkage, collectionUtils.set(alphaCluster, betaCluster));
+		Level one = new Level(linkage, referee, collectionUtils.set(alphaCluster, betaCluster));
 		assertTrue(one.hasNextLevel());
 		assertEquals(2, one.getClusters().size());
 		assertTrue(one.getClusters().contains(alphaCluster));
@@ -68,7 +70,7 @@ public class LevelTest {
 		Cluster alphaBetaCluster = alphaCluster.merge(betaCluster);
 		Cluster alphaBetaGammaCluster = alphaBetaCluster.merge(gammaCluster);
 
-		Level one = new Level(linkage, collectionUtils.set(alphaCluster, betaCluster, gammaCluster));
+		Level one = new Level(linkage, referee, collectionUtils.set(alphaCluster, betaCluster, gammaCluster));
 		assertTrue(one.hasNextLevel());
 		assertTrue(one.getClusters().contains(alphaCluster));
 		assertTrue(one.getClusters().contains(betaCluster));
@@ -90,7 +92,7 @@ public class LevelTest {
 	void levelUpWithoutNextLevel() throws Exception {
 		Cluster alphaCluster = new Cluster(alpha);
 		assertThrows(NoNextLevelException.class, () -> {
-			new Level(linkage, collectionUtils.set(alphaCluster)).generateNextLevel();
+			new Level(linkage, referee, collectionUtils.set(alphaCluster)).generateNextLevel();
 		});
 	}
 
