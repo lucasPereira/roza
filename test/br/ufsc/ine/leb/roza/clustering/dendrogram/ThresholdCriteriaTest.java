@@ -12,13 +12,13 @@ import org.junit.jupiter.api.Test;
 
 public class ThresholdCriteriaTest {
 
-	private Level level;
+	private Level empty;
 	private List<Level> levels;
 
 	@BeforeEach
 	void seutp() {
 		levels = new LinkedList<>();
-		level = new Level(new SumOfIdsLinkage(), new InsecureReferee(), new HashSet<>());
+		empty = new Level(new SumOfIdsLinkage(), new InsecureReferee(), new HashSet<>());
 	}
 
 	@Test
@@ -42,15 +42,15 @@ public class ThresholdCriteriaTest {
 	@Test
 	void fixedInterationsCriteriaLevel1StopAt1() throws Exception {
 		ThresholdCriteria threshold = new FixedInterationsCriteria(1);
-		levels.add(level);
+		levels.add(empty);
 		assertTrue(threshold.shoudlStop(levels));
 	}
 
 	@Test
 	void fixedInterationsCriteriaLevel2StopAt1() throws Exception {
 		ThresholdCriteria threshold = new FixedInterationsCriteria(1);
-		levels.add(level);
-		levels.add(level);
+		levels.add(empty);
+		levels.add(empty);
 		assertTrue(threshold.shoudlStop(levels));
 	}
 

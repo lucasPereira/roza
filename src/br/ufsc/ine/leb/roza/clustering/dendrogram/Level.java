@@ -1,5 +1,6 @@
 package br.ufsc.ine.leb.roza.clustering.dendrogram;
 
+import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -9,17 +10,14 @@ import br.ufsc.ine.leb.roza.exceptions.NoNextLevelException;
 
 class Level {
 
+	private Linkage linkage;
+	private Referee referee;
 	private Set<Cluster> clusters;
-	private ClusterJoiner joiner;
 
 	public Level(Linkage linkage, Referee referee, Set<Cluster> clusters) {
-		this(new ClusterJoiner(linkage, referee), clusters);
-	}
-
-	private Level(ClusterJoiner joiner, Set<Cluster> clusters) {
-		this.joiner = joiner;
+		this.linkage = linkage;
+		this.referee = referee;
 		this.clusters = clusters;
-
 	}
 
 	public Boolean hasNextLevel() {
@@ -37,7 +35,7 @@ class Level {
 		Cluster merged = first.merge(second);
 		next.add(merged);
 		clusters.stream().filter((cluster) -> !cluster.equals(first) && !cluster.equals(second)).forEach((cluster) -> next.add(cluster));
-		return new Level(joiner, next);
+		return new Level(linkage, referee, next);
 	}
 
 	public Set<Cluster> getClusters() {
@@ -48,7 +46,15 @@ class Level {
 		if (!hasNextLevel()) {
 			return null;
 		}
-		return joiner.join(new ClustersToMerge(clusters));
+		return new ClusterJoiner(linkage, referee).join(new ClustersToMerge(clusters));
+	}
+
+	public BigDecimal getEvaluationToNextLevel() {
+		if (!hasNextLevel()) {
+			return null;
+		}
+		Combination combination = getCombinationToNextLevel();
+		return linkage.evaluate(combination.getFirst(), combination.getSecond());
 	}
 
 }

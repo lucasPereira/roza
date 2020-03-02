@@ -15,6 +15,7 @@ import br.ufsc.ine.leb.roza.Cluster;
 import br.ufsc.ine.leb.roza.TestCase;
 import br.ufsc.ine.leb.roza.exceptions.NoNextLevelException;
 import br.ufsc.ine.leb.roza.utils.CollectionUtils;
+import br.ufsc.ine.leb.roza.utils.MathUtils;
 
 public class LevelTest {
 
@@ -41,6 +42,7 @@ public class LevelTest {
 		assertFalse(one.hasNextLevel());
 		assertEquals(0, one.getClusters().size());
 		assertNull(one.getCombinationToNextLevel());
+		assertNull(one.getEvaluationToNextLevel());
 	}
 
 	@Test
@@ -52,6 +54,7 @@ public class LevelTest {
 		assertEquals(1, one.getClusters().size());
 		assertTrue(one.getClusters().contains(alphaCluster));
 		assertNull(one.getCombinationToNextLevel());
+		assertNull(one.getEvaluationToNextLevel());
 	}
 
 	@Test
@@ -66,12 +69,14 @@ public class LevelTest {
 		assertTrue(one.getClusters().contains(alphaCluster));
 		assertTrue(one.getClusters().contains(betaCluster));
 		assertEquals(new Combination(alphaCluster, betaCluster), one.getCombinationToNextLevel());
+		assertEquals(new MathUtils().oneOver(alpha.getId(), beta.getId()), one.getEvaluationToNextLevel());
 
 		Level two = one.generateNextLevel();
 		assertFalse(two.hasNextLevel());
 		assertEquals(1, two.getClusters().size());
 		assertTrue(two.getClusters().contains(alphaBetaCluster));
 		assertNull(two.getCombinationToNextLevel());
+		assertNull(two.getEvaluationToNextLevel());
 	}
 
 	@Test
@@ -88,6 +93,7 @@ public class LevelTest {
 		assertTrue(one.getClusters().contains(betaCluster));
 		assertTrue(one.getClusters().contains(gammaCluster));
 		assertEquals(new Combination(alphaCluster, betaCluster), one.getCombinationToNextLevel());
+		assertEquals(new MathUtils().oneOver(alpha.getId(), beta.getId()), one.getEvaluationToNextLevel());
 
 		Level two = one.generateNextLevel();
 		assertTrue(two.hasNextLevel());
@@ -95,12 +101,14 @@ public class LevelTest {
 		assertTrue(two.getClusters().contains(alphaBetaCluster));
 		assertTrue(two.getClusters().contains(gammaCluster));
 		assertEquals(new Combination(alphaCluster.merge(betaCluster), gammaCluster), two.getCombinationToNextLevel());
+		assertEquals(new MathUtils().oneOver(alpha.getId(), beta.getId(), gamma.getId()), two.getEvaluationToNextLevel());
 
 		Level three = two.generateNextLevel();
 		assertFalse(three.hasNextLevel());
 		assertEquals(1, three.getClusters().size());
 		assertTrue(three.getClusters().contains(alphaBetaGammaCluster));
 		assertNull(three.getCombinationToNextLevel());
+		assertNull(three.getEvaluationToNextLevel());
 	}
 
 	@Test
