@@ -1,13 +1,12 @@
 package br.ufsc.ine.leb.roza.measurement.configuration.jplag;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import br.ufsc.ine.leb.roza.exceptions.InvalidConfigurationException;
-import br.ufsc.ine.leb.roza.exceptions.MissingConfigurationException;
-import br.ufsc.ine.leb.roza.measurement.configuration.jplag.JplagConfigurations;
 
 public class JplagConfigurationsTest {
 
@@ -58,8 +57,6 @@ public class JplagConfigurationsTest {
 
 	@Test
 	void defaultValues() throws Exception {
-		configurations.results("my/results").sources("my/sources");
-
 		assertEquals(13, configurations.getAllAsArguments().size());
 
 		assertEquals("-t", configurations.getAllAsArguments().get(0));
@@ -74,18 +71,18 @@ public class JplagConfigurationsTest {
 		assertEquals("-vl", configurations.getAllAsArguments().get(6));
 
 		assertEquals("-o", configurations.getAllAsArguments().get(7));
-		assertEquals("my/results/log.txt", configurations.getAllAsArguments().get(8));
+		assertEquals("main/exec/measurer/log.txt", configurations.getAllAsArguments().get(8));
 
 		assertEquals("-r", configurations.getAllAsArguments().get(9));
-		assertEquals("my/results", configurations.getAllAsArguments().get(10));
+		assertEquals("main/exec/measurer", configurations.getAllAsArguments().get(10));
 
 		assertEquals("-s", configurations.getAllAsArguments().get(11));
-		assertEquals("my/sources", configurations.getAllAsArguments().get(12));
+		assertEquals("main/exec/materializer", configurations.getAllAsArguments().get(12));
 	}
 
 	@Test
 	void changeValues() throws Exception {
-		configurations.sensitivity(2).results("my/results").sources("my/sources");
+		configurations.sensitivity(2);
 
 		assertEquals(13, configurations.getAllAsArguments().size());
 
@@ -101,29 +98,13 @@ public class JplagConfigurationsTest {
 		assertEquals("-vl", configurations.getAllAsArguments().get(6));
 
 		assertEquals("-o", configurations.getAllAsArguments().get(7));
-		assertEquals("my/results/log.txt", configurations.getAllAsArguments().get(8));
+		assertEquals("main/exec/measurer/log.txt", configurations.getAllAsArguments().get(8));
 
 		assertEquals("-r", configurations.getAllAsArguments().get(9));
-		assertEquals("my/results", configurations.getAllAsArguments().get(10));
+		assertEquals("main/exec/measurer", configurations.getAllAsArguments().get(10));
 
 		assertEquals("-s", configurations.getAllAsArguments().get(11));
-		assertEquals("my/sources", configurations.getAllAsArguments().get(12));
-	}
-
-	@Test
-	void shouldSetResults() throws Exception {
-		assertThrows(MissingConfigurationException.class, () -> {
-			configurations.sources("my/sources");
-			configurations.getAllAsArguments();
-		});
-	}
-
-	@Test
-	void shouldSetSources() throws Exception {
-		assertThrows(MissingConfigurationException.class, () -> {
-			configurations.results("my/results");
-			configurations.getAllAsArguments();
-		});
+		assertEquals("main/exec/materializer", configurations.getAllAsArguments().get(12));
 	}
 
 	@Test
@@ -140,23 +121,8 @@ public class JplagConfigurationsTest {
 	}
 
 	@Test
-	void resultsShoudNotBeNull() throws Exception {
-		assertThrows(InvalidConfigurationException.class, () -> {
-			configurations.results(null);
-		});
-	}
-
-	@Test
-	void sourcesShoudNotBeNull() throws Exception {
-		assertThrows(InvalidConfigurationException.class, () -> {
-			configurations.sources(null);
-		});
-	}
-
-	@Test
 	void getConfigurations() throws Exception {
-		configurations.results("my/results").sources("my/sources");
-		assertEquals("my/results", configurations.results());
+		assertEquals("main/exec/measurer", configurations.results());
 	}
 
 }

@@ -53,13 +53,13 @@ public class Examples {
 		List<TestCase> tests = extractor.extract(classes);
 		MaterializationReport materializations = materializer.materialize(tests);
 
-		JplagConfigurations jplagSettings = new JplagConfigurations().sensitivity(1).sources("main/exec/materializer").results("main/exec/measurer");
+		JplagConfigurations jplagSettings = new JplagConfigurations().sensitivity(1);
 		SimianConfigurations simianSettings = new SimianConfigurations().threshold(2);
-		DeckardConfigurations deckardSettings = new DeckardConfigurations().minTokens(1).stride(Integer.MAX_VALUE).similarity(1.0).srcDir("main/exec/materializer").results("main/exec/measurer");
+		DeckardConfigurations deckardSettings = new DeckardConfigurations().minTokens(1).stride(Integer.MAX_VALUE).similarity(1.0);
 		includeMetric(csv, materializations, "LCS", new LcsSimilarityMeasurer());
 		includeMetric(csv, materializations, "LCCSS", new LccssSimilarityMeasurer());
 		includeMetric(csv, materializations, "JPlag", new JplagSimilarityMeasurer(jplagSettings));
-		includeMetric(csv, materializations, "Simian", new SimianSimilarityMeasurer(simianSettings, "main/exec/measurer"));
+		includeMetric(csv, materializations, "Simian", new SimianSimilarityMeasurer(simianSettings));
 		includeMetric(csv, materializations, "Deckard", new DeckardSimilarityMeasurer(deckardSettings));
 		folderUtils.writeContetAsString("examples.csv", csv.getContent());
 	}

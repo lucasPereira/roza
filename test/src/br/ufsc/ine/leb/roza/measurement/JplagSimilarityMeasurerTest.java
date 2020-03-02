@@ -30,7 +30,7 @@ public class JplagSimilarityMeasurerTest {
 		new FolderUtils("main/exec/materializer").createEmptyFolder();
 		new FolderUtils("main/exec/measurer").createEmptyFolder();
 		materializer = new Junit4WithAssertionsTestCaseMaterializer("main/exec/materializer");
-		measurer = new JplagSimilarityMeasurer(new JplagConfigurations().sensitivity(5).sources("main/exec/materializer").results("main/exec/measurer"));
+		measurer = new JplagSimilarityMeasurer(new JplagConfigurations().sensitivity(5));
 	}
 
 	@Test

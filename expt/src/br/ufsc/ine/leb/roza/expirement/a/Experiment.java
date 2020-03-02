@@ -95,20 +95,20 @@ public class Experiment {
 	private static void simian(Integer threshold) {
 		String fileName = String.format("simian-%d.csv", threshold);
 		SimianConfigurations configurations = new SimianConfigurations().threshold(threshold);
-		SimilarityMeasurer measurer = new SimianSimilarityMeasurer(configurations, "main/exec/measurer");
+		SimilarityMeasurer measurer = new SimianSimilarityMeasurer(configurations);
 		evaluateMeasure(fileName, measurer);
 	}
 
 	private static void jplag(Integer sensitivity) {
 		String fileName = String.format("jplag-%d.csv", sensitivity);
-		JplagConfigurations configurations = new JplagConfigurations().sensitivity(sensitivity).sources("main/exec/materializer").results("main/exec/measurer");
+		JplagConfigurations configurations = new JplagConfigurations().sensitivity(sensitivity);
 		SimilarityMeasurer measurer = new JplagSimilarityMeasurer(configurations);
 		evaluateMeasure(fileName, measurer);
 	}
 
 	private static void deckard(Integer minTokens, Integer stride, Double similarity) {
 		String fileName = String.format("deckard-%d-%d-%.1f.csv", minTokens, stride, similarity);
-		DeckardConfigurations configurations = new DeckardConfigurations().minTokens(minTokens).stride(stride).similarity(similarity).srcDir("main/exec/materializer").results("main/exec/measurer");
+		DeckardConfigurations configurations = new DeckardConfigurations().minTokens(minTokens).stride(stride).similarity(similarity);
 		SimilarityMeasurer measurer = new DeckardSimilarityMeasurer(configurations);
 		evaluateMeasure(fileName, measurer);
 	}

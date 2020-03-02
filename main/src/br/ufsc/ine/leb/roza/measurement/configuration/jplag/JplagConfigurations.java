@@ -20,6 +20,8 @@ public class JplagConfigurations extends AbstractConfigurations implements Confi
 		results = new JplagStringConfiguration("r", null, "Name of directory in which the web pages will be stored");
 		log = new JplagStringConfiguration("o", null, "Output file of the parser log");
 		sources = new JplagStringConfiguration("s", null, "Look at files in subdirs too");
+		sources("main/exec/materializer");
+		results("main/exec/measurer");
 	}
 
 	@Override
@@ -51,14 +53,14 @@ public class JplagConfigurations extends AbstractConfigurations implements Confi
 		return this;
 	}
 
-	public JplagConfigurations results(String value) {
+	private JplagConfigurations results(String value) {
 		ensureThat(value != null);
 		results.setValue(value);
 		log.setValue(new File(value, "log.txt").getPath());
 		return this;
 	}
 
-	public JplagConfigurations sources(String value) {
+	private JplagConfigurations sources(String value) {
 		ensureThat(value != null);
 		sources.setValue(value);
 		return this;

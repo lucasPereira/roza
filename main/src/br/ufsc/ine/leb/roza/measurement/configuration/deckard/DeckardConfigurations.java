@@ -26,6 +26,8 @@ public class DeckardConfigurations extends AbstractConfigurations implements Con
 		vectorDir = new DeckardStringConfiguration("VECTOR_DIR", null, "Where to output detected clone clusters");
 		clusterDir = new DeckardStringConfiguration("CLUSTER_DIR", null, "Where to output detected clone clusters");
 		timeDir = new DeckardStringConfiguration("TIME_DIR", null, "Where to output timing/debugging info");
+		srcDir("main/exec/materializer");
+		results("main/exec/measurer");
 	}
 
 	@Override
@@ -77,13 +79,13 @@ public class DeckardConfigurations extends AbstractConfigurations implements Con
 		return this;
 	}
 
-	public DeckardConfigurations srcDir(String value) {
+	private DeckardConfigurations srcDir(String value) {
 		ensureThat(value != null);
 		srcDir.setValue(new File(value).getAbsolutePath());
 		return this;
 	}
 
-	public DeckardConfigurations results(String value) {
+	private DeckardConfigurations results(String value) {
 		ensureThat(value != null);
 		vectorDir.setValue(new File(value, "vectors").getAbsolutePath());
 		clusterDir.setValue(new File(value, "cluster").getAbsolutePath());

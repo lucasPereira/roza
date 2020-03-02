@@ -30,7 +30,7 @@ public class SimianSimilarityMeasurerTest {
 		new FolderUtils("main/exec/materializer").createEmptyFolder();
 		new FolderUtils("main/exec/measurer").createEmptyFolder();
 		materializer = new Junit4WithAssertionsTestCaseMaterializer("main/exec/materializer");
-		measurer = new SimianSimilarityMeasurer(new SimianConfigurations().threshold(2), "main/exec/measurer");
+		measurer = new SimianSimilarityMeasurer(new SimianConfigurations().threshold(2));
 	}
 
 	@Test

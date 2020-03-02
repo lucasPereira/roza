@@ -31,9 +31,9 @@ public class SimianSimilarityMeasurer implements SimilarityMeasurer {
 	private SimianConfigurations configurations;
 	private String resultsFolder;
 
-	public SimianSimilarityMeasurer(SimianConfigurations configurations, String resultsFolder) {
+	public SimianSimilarityMeasurer(SimianConfigurations configurations) {
 		this.configurations = configurations;
-		this.resultsFolder = resultsFolder;
+		this.resultsFolder = "main/exec/measurer";
 	}
 
 	@Override
