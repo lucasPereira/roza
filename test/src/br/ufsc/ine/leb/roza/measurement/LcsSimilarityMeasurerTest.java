@@ -14,23 +14,22 @@ import br.ufsc.ine.leb.roza.Statement;
 import br.ufsc.ine.leb.roza.TestCase;
 import br.ufsc.ine.leb.roza.materialization.Junit4WithAssertionsTestCaseMaterializer;
 import br.ufsc.ine.leb.roza.materialization.TestCaseMaterializer;
-import br.ufsc.ine.leb.roza.measurement.DeckardSimilarityMeasurer;
+import br.ufsc.ine.leb.roza.measurement.LcsSimilarityMeasurer;
 import br.ufsc.ine.leb.roza.measurement.SimilarityMeasurer;
-import br.ufsc.ine.leb.roza.measurement.configuration.deckard.DeckardConfigurations;
 import br.ufsc.ine.leb.roza.measurement.report.AssessmentScoreAndTestCaseNameComparator;
 import br.ufsc.ine.leb.roza.utils.FolderUtils;
 
-public class DeckardSimilarityMeasurerTest {
+public class LcsSimilarityMeasurerTest {
 
 	private TestCaseMaterializer materializer;
 	private SimilarityMeasurer measurer;
 
 	@BeforeEach
 	void setup() {
-		new FolderUtils("execution/materializer").createEmptyFolder();
-		new FolderUtils("execution/measurer").createEmptyFolder();
-		materializer = new Junit4WithAssertionsTestCaseMaterializer("execution/materializer");
-		measurer = new DeckardSimilarityMeasurer(new DeckardConfigurations().srcDir("execution/materializer").results("execution/measurer"));
+		new FolderUtils("main/exec/materializer").createEmptyFolder();
+		new FolderUtils("main/exec/measurer").createEmptyFolder();
+		materializer = new Junit4WithAssertionsTestCaseMaterializer("main/exec/materializer");
+		measurer = new LcsSimilarityMeasurer();
 	}
 
 	@Test
@@ -117,10 +116,10 @@ public class DeckardSimilarityMeasurerTest {
 		assertEquals(BigDecimal.ONE, report.getAssessments().get(1).getScore());
 		assertEquals(testCaseB, report.getAssessments().get(1).getSource());
 		assertEquals(testCaseB, report.getAssessments().get(1).getTarget());
-		assertEquals(new BigDecimal("0.1428571"), report.getAssessments().get(2).getScore());
+		assertEquals(BigDecimal.ZERO, report.getAssessments().get(2).getScore());
 		assertEquals(testCaseA, report.getAssessments().get(2).getSource());
 		assertEquals(testCaseB, report.getAssessments().get(2).getTarget());
-		assertEquals(new BigDecimal("0.1428571"), report.getAssessments().get(3).getScore());
+		assertEquals(BigDecimal.ZERO, report.getAssessments().get(3).getScore());
 		assertEquals(testCaseB, report.getAssessments().get(3).getSource());
 		assertEquals(testCaseA, report.getAssessments().get(3).getTarget());
 	}

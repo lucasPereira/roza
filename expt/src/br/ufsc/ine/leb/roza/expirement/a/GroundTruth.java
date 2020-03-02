@@ -28,7 +28,7 @@ public class GroundTruth {
 	private List<TestCase> testCases;
 
 	public GroundTruth() {
-		TextFileLoader loader = new RecursiveTextFileLoader("experiment-resources/a");
+		TextFileLoader loader = new RecursiveTextFileLoader("expt/resources/a");
 		TestClassParser parser = new Junit5TestClassParser();
 		List<String> assercoes = Arrays.asList("assegurarTexto", "assegurarValor", "assegurarQuantidadeDeElementos", "assegurarConteudoDeArquivoBaixado", "assegurarNaoMarcado", "assegurarMarcado", "assegurarMarcacao");
 		TestCaseExtractor extractor = new JunitTestCaseExtractor(assercoes);

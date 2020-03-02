@@ -46,9 +46,9 @@ public class Experiment {
 	public static void main(String[] args) {
 		groundTruth = new GroundTruth();
 		groundTruth.findInconsistences();
-		new FolderUtils("experiment-results/a/average-precision-recall-curve").createEmptyFolder();
-		new FolderUtils("experiment-results/a/precision-recall-curve").createEmptyFolder();
-		new FolderUtils("experiment-results/a/matrix").createEmptyFolder();
+		new FolderUtils("expt/results/a/average-precision-recall-curve").createEmptyFolder();
+		new FolderUtils("expt/results/a/precision-recall-curve").createEmptyFolder();
+		new FolderUtils("expt/results/a/matrix").createEmptyFolder();
 		lcs();
 		lccss();
 		simian();
@@ -95,32 +95,32 @@ public class Experiment {
 	private static void simian(Integer threshold) {
 		String fileName = String.format("simian-%d.csv", threshold);
 		SimianConfigurations configurations = new SimianConfigurations().threshold(threshold);
-		SimilarityMeasurer measurer = new SimianSimilarityMeasurer(configurations, "execution/measurer");
+		SimilarityMeasurer measurer = new SimianSimilarityMeasurer(configurations, "main/exec/measurer");
 		evaluateMeasure(fileName, measurer);
 	}
 
 	private static void jplag(Integer sensitivity) {
 		String fileName = String.format("jplag-%d.csv", sensitivity);
-		JplagConfigurations configurations = new JplagConfigurations().sensitivity(sensitivity).sources("execution/materializer").results("execution/measurer");
+		JplagConfigurations configurations = new JplagConfigurations().sensitivity(sensitivity).sources("main/exec/materializer").results("main/exec/measurer");
 		SimilarityMeasurer measurer = new JplagSimilarityMeasurer(configurations);
 		evaluateMeasure(fileName, measurer);
 	}
 
 	private static void deckard(Integer minTokens, Integer stride, Double similarity) {
 		String fileName = String.format("deckard-%d-%d-%.1f.csv", minTokens, stride, similarity);
-		DeckardConfigurations configurations = new DeckardConfigurations().minTokens(minTokens).stride(stride).similarity(similarity).srcDir("execution/materializer").results("execution/measurer");
+		DeckardConfigurations configurations = new DeckardConfigurations().minTokens(minTokens).stride(stride).similarity(similarity).srcDir("main/exec/materializer").results("main/exec/measurer");
 		SimilarityMeasurer measurer = new DeckardSimilarityMeasurer(configurations);
 		evaluateMeasure(fileName, measurer);
 	}
 
 	private static void evaluateMeasure(String fileName, SimilarityMeasurer measurer) {
-		new FolderUtils("execution/materializer").createEmptyFolder();
-		new FolderUtils("execution/measurer").createEmptyFolder();
+		new FolderUtils("main/exec/materializer").createEmptyFolder();
+		new FolderUtils("main/exec/measurer").createEmptyFolder();
 
-		TextFileLoader loader = new RecursiveTextFileLoader("experiment-resources/a");
+		TextFileLoader loader = new RecursiveTextFileLoader("expt/resources/a");
 		TestClassParser parser = new Junit5TestClassParser();
 		TestCaseExtractor extractor = new JunitTestCaseExtractor(Arrays.asList("assegurarTexto", "assegurarValor", "assegurarQuantidadeDeElementos", "assegurarConteudoDeArquivoBaixado", "assegurarNaoMarcado", "assegurarMarcado", "assegurarMarcacao"));
-		TestCaseMaterializer materializer = new Junit4WithoutAssertionsTestCaseMaterializer("execution/materializer");
+		TestCaseMaterializer materializer = new Junit4WithoutAssertionsTestCaseMaterializer("main/exec/materializer");
 		List<TextFile> files = loader.load();
 		List<TestClass> testClasses = parser.parse(files);
 		List<TestCase> testCases = extractor.extract(testClasses);
@@ -136,7 +136,7 @@ public class Experiment {
 		ReportUtils reportUtils = new ReportUtils();
 		FormatterUtils formatterUtils = new FormatterUtils();
 		CommaSeparatedValues csv = new CommaSeparatedValues();
-		FolderUtils folderUtils = new FolderUtils("experiment-results/a/average-precision-recall-curve");
+		FolderUtils folderUtils = new FolderUtils("expt/results/a/average-precision-recall-curve");
 		Comparator<SimilarityAssessment> scoreComparator = new AssessmentScoreAndTestCaseNameComparator();
 		StandardRecallLevels standardRecallLevels = new StandardRecallLevels();
 		csv.addLine("Precisão/Revocação", fileName);
@@ -161,7 +161,7 @@ public class Experiment {
 		ReportUtils reportUtils = new ReportUtils();
 		FormatterUtils formatterUtils = new FormatterUtils();
 		CommaSeparatedValues csv = new CommaSeparatedValues();
-		FolderUtils folderUtils = new FolderUtils("experiment-results/a/precision-recall-curve");
+		FolderUtils folderUtils = new FolderUtils("expt/results/a/precision-recall-curve");
 		Comparator<SimilarityAssessment> scoreComparator = new AssessmentScoreAndTestCaseNameComparator();
 		StandardRecallLevels standardRecallLevels = new StandardRecallLevels();
 		for (TestCase source : testCases) {
@@ -182,7 +182,7 @@ public class Experiment {
 	protected static void matrix(SimilarityReport report, String fileName) {
 		FormatterUtils formatterUtils = new FormatterUtils();
 		CommaSeparatedValues csv = new CommaSeparatedValues();
-		FolderUtils folderUtils = new FolderUtils("experiment-results/a/matrix");
+		FolderUtils folderUtils = new FolderUtils("expt/results/a/matrix");
 		Comparator<SimilarityAssessment> nameComparator = new AssessmentTestCaseNameComparator();
 		report.sort(nameComparator);
 		List<SimilarityAssessment> assessments = report.getAssessments();

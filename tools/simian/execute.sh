@@ -21,4 +21,4 @@ java -jar tool/simian-2.5.10.jar \
 	-ignoreModifiers+ \
 	-balanceParentheses+ \
 	-balanceSquareBrackets+ \
-	../../execution/materializer/*.java
+	../../main/exec/materializer/*.java

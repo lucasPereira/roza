@@ -8,15 +8,15 @@ echo "export STRIDE=0" >> config
 
 echo "export SIMILARITY=1" >> config
 
-echo "export SRC_DIR=../../execution/materializer" >> config
+echo "export SRC_DIR=../../main/exec/materializer" >> config
 
 echo "export FILE_PATTERN=*.java" >> config
 
-echo "export VECTOR_DIR=../../execution/measurer/vectors" >> config
+echo "export VECTOR_DIR=../../main/exec/measurer/vectors" >> config
 
-echo "export CLUSTER_DIR=../../execution/measurer/cluster" >> config
+echo "export CLUSTER_DIR=../../main/exec/measurer/cluster" >> config
 
-echo "export TIME_DIR=../../execution/measurer/times" >> config
+echo "export TIME_DIR=../../main/exec/measurer/times" >> config
 
 echo "export DECKARD_DIR=tool" >> config
 

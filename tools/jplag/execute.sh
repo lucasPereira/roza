@@ -5,7 +5,7 @@ java -jar tool/jplag-2.11.9.jar \
 	-l java17 \
 	-m 0% \
 	-vl \
-	-o ../../execution/measurer/log.txt \
-	-r ../../execution/measurer \
+	-o ../../main/exec/measurer/log.txt \
+	-r ../../main/exec/measurer \
 	-s \
-	../../execution/materializer
+	../../main/exec/materializer

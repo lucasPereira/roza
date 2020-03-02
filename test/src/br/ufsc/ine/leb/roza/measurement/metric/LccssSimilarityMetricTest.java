@@ -38,9 +38,9 @@ public class LccssSimilarityMetricTest {
 
 	@BeforeEach
 	void setup() {
-		new FolderUtils("execution/materializer").createEmptyFolder();
-		new FolderUtils("execution/measurer").createEmptyFolder();
-		materializer = new Junit4WithAssertionsTestCaseMaterializer("execution/materializer");
+		new FolderUtils("main/exec/materializer").createEmptyFolder();
+		new FolderUtils("main/exec/measurer").createEmptyFolder();
+		materializer = new Junit4WithAssertionsTestCaseMaterializer("main/exec/materializer");
 		measurer = new LccssSimilarityMeasurer();
 		oneOfTwo = new BigDecimal(1).divide(new BigDecimal(2), MathContext.DECIMAL32);
 		oneOfThree = new BigDecimal(1).divide(new BigDecimal(3), MathContext.DECIMAL32);

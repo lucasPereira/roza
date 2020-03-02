@@ -36,16 +36,16 @@ import br.ufsc.ine.leb.roza.utils.FormatterUtils;
 public class Examples {
 
 	public static void main(String[] args) {
-		new FolderUtils("execution/materializer").createEmptyFolder();
-		FolderUtils folderUtils = new FolderUtils("experiment-results/b");
+		new FolderUtils("main/exec/materializer").createEmptyFolder();
+		FolderUtils folderUtils = new FolderUtils("expt/results/b");
 		folderUtils.createEmptyFolder();
 		CommaSeparatedValues csv = new CommaSeparatedValues();
 
-		TextFileLoader loader = new RecursiveTextFileLoader("experiment-resources/b");
+		TextFileLoader loader = new RecursiveTextFileLoader("expt/resources/b");
 		TextFileSelector selector = new JavaExtensionTextFileSelector();
 		TestClassParser parser = new Junit4TestClassParser();
 		TestCaseExtractor extractor = new Junit4TestCaseExtractor();
-		TestCaseMaterializer materializer = new Junit4WithoutAssertionsTestCaseMaterializer("execution/materializer");
+		TestCaseMaterializer materializer = new Junit4WithoutAssertionsTestCaseMaterializer("main/exec/materializer");
 
 		List<TextFile> files = loader.load();
 		List<TextFile> selected = selector.select(files);
@@ -53,19 +53,19 @@ public class Examples {
 		List<TestCase> tests = extractor.extract(classes);
 		MaterializationReport materializations = materializer.materialize(tests);
 
-		JplagConfigurations jplagSettings = new JplagConfigurations().sensitivity(1).sources("execution/materializer").results("execution/measurer");
+		JplagConfigurations jplagSettings = new JplagConfigurations().sensitivity(1).sources("main/exec/materializer").results("main/exec/measurer");
 		SimianConfigurations simianSettings = new SimianConfigurations().threshold(2);
-		DeckardConfigurations deckardSettings = new DeckardConfigurations().minTokens(1).stride(Integer.MAX_VALUE).similarity(1.0).srcDir("execution/materializer").results("execution/measurer");
+		DeckardConfigurations deckardSettings = new DeckardConfigurations().minTokens(1).stride(Integer.MAX_VALUE).similarity(1.0).srcDir("main/exec/materializer").results("main/exec/measurer");
 		includeMetric(csv, materializations, "LCS", new LcsSimilarityMeasurer());
 		includeMetric(csv, materializations, "LCCSS", new LccssSimilarityMeasurer());
 		includeMetric(csv, materializations, "JPlag", new JplagSimilarityMeasurer(jplagSettings));
-		includeMetric(csv, materializations, "Simian", new SimianSimilarityMeasurer(simianSettings, "execution/measurer"));
+		includeMetric(csv, materializations, "Simian", new SimianSimilarityMeasurer(simianSettings, "main/exec/measurer"));
 		includeMetric(csv, materializations, "Deckard", new DeckardSimilarityMeasurer(deckardSettings));
 		folderUtils.writeContetAsString("examples.csv", csv.getContent());
 	}
 
 	private static void includeMetric(CommaSeparatedValues csv, MaterializationReport materializations, String metric, SimilarityMeasurer measurer) {
-		new FolderUtils("execution/measurer").createEmptyFolder();
+		new FolderUtils("main/exec/measurer").createEmptyFolder();
 		FormatterUtils formatterUtils = new FormatterUtils();
 		Comparator<SimilarityAssessment> comparator = new AssessmentTestCaseNameComparator();
 		SimilarityReport report = measurer.measure(materializations).sort(comparator).removeReflexives();
