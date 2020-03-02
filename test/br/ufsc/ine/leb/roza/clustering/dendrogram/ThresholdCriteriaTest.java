@@ -28,6 +28,12 @@ public class ThresholdCriteriaTest {
 	}
 
 	@Test
+	void neverStopCriteria() throws Exception {
+		ThresholdCriteria threshold = new NeverStopCriteria();
+		assertFalse(threshold.shoudlStop(levels));
+	}
+
+	@Test
 	void fixedInterationsCriteriaLevel0StopAt0() throws Exception {
 		ThresholdCriteria threshold = new FixedInterationsCriteria(0);
 		assertTrue(threshold.shoudlStop(levels));

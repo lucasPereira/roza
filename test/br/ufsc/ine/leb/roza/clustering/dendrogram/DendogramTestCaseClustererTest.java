@@ -2,7 +2,6 @@ package br.ufsc.ine.leb.roza.clustering.dendrogram;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -23,7 +22,8 @@ public class DendogramTestCaseClustererTest {
 		SimilarityReport report = new SimilarityReport(Arrays.asList());
 		Referee referee = new InsecureReferee();
 		Linkage linkage = new SingleLinkage(report);
-		TestCaseClusterer clusterer = new DendogramTestCaseClusterer(linkage, referee);
+		ThresholdCriteria criteria = new NeverStopCriteria();
+		TestCaseClusterer clusterer = new DendogramTestCaseClusterer(linkage, referee, criteria);
 
 		assertEquals(0, clusterer.cluster(report).size());
 	}
@@ -35,7 +35,8 @@ public class DendogramTestCaseClustererTest {
 		SimilarityReport report = new SimilarityReport(Arrays.asList(assessmentAA));
 		Referee referee = new InsecureReferee();
 		Linkage linkage = new SingleLinkage(report);
-		TestCaseClusterer clusterer = new DendogramTestCaseClusterer(linkage, referee);
+		ThresholdCriteria criteria = new NeverStopCriteria();
+		TestCaseClusterer clusterer = new DendogramTestCaseClusterer(linkage, referee, criteria);
 
 		Set<Cluster> clusters = clusterer.cluster(report);
 		assertEquals(1, clusters.size());
@@ -43,8 +44,7 @@ public class DendogramTestCaseClustererTest {
 	}
 
 	@Test
-	void twoDistinctTests() throws Exception {
-		fail("Integrates with threshold criteria");
+	void twoDistinctTestsStopingInZero() throws Exception {
 		TestCase testA = new TestCase("testA", Arrays.asList(), Arrays.asList());
 		TestCase testB = new TestCase("testB", Arrays.asList(), Arrays.asList());
 		SimilarityAssessment assessmentAA = new SimilarityAssessment(testA, testA, BigDecimal.ONE);
@@ -54,7 +54,8 @@ public class DendogramTestCaseClustererTest {
 		SimilarityReport report = new SimilarityReport(Arrays.asList(assessmentAA, assessmentAB, assessmentBA, assessmentBB));
 		Referee referee = new InsecureReferee();
 		Linkage linkage = new SingleLinkage(report);
-		TestCaseClusterer clusterer = new DendogramTestCaseClusterer(linkage, referee);
+		ThresholdCriteria criteria = new EvaluationBasedCriteria(BigDecimal.ZERO);
+		TestCaseClusterer clusterer = new DendogramTestCaseClusterer(linkage, referee, criteria);
 		Set<Cluster> clusters = clusterer.cluster(report);
 
 		assertEquals(2, clusters.size());
@@ -63,7 +64,7 @@ public class DendogramTestCaseClustererTest {
 	}
 
 	@Test
-	void twosSimilarTests() throws Exception {
+	void twosSimilarTestsStopingInZero() throws Exception {
 		TestCase testA = new TestCase("testA", Arrays.asList(), Arrays.asList());
 		TestCase testB = new TestCase("testB", Arrays.asList(), Arrays.asList());
 		Cluster clusterA = new Cluster(testA);
@@ -76,11 +77,31 @@ public class DendogramTestCaseClustererTest {
 		SimilarityReport report = new SimilarityReport(Arrays.asList(assessmentAA, assessmentAB, assessmentBA, assessmentBB));
 		Referee referee = new InsecureReferee();
 		Linkage linkage = new SingleLinkage(report);
-		TestCaseClusterer clusterer = new DendogramTestCaseClusterer(linkage, referee);
+		ThresholdCriteria criteria = new EvaluationBasedCriteria(BigDecimal.ZERO);
+		TestCaseClusterer clusterer = new DendogramTestCaseClusterer(linkage, referee, criteria);
 
 		Set<Cluster> clusters = clusterer.cluster(report);
 		assertEquals(1, clusters.size());
 		assertTrue(clusters.contains(clusterAB));
+	}
+
+	@Test
+	void twoDistinctTestsDoesNotStopAtAll() throws Exception {
+		TestCase testA = new TestCase("testA", Arrays.asList(), Arrays.asList());
+		TestCase testB = new TestCase("testB", Arrays.asList(), Arrays.asList());
+		SimilarityAssessment assessmentAA = new SimilarityAssessment(testA, testA, BigDecimal.ONE);
+		SimilarityAssessment assessmentAB = new SimilarityAssessment(testA, testB, BigDecimal.ZERO);
+		SimilarityAssessment assessmentBA = new SimilarityAssessment(testB, testA, BigDecimal.ZERO);
+		SimilarityAssessment assessmentBB = new SimilarityAssessment(testB, testA, BigDecimal.ONE);
+		SimilarityReport report = new SimilarityReport(Arrays.asList(assessmentAA, assessmentAB, assessmentBA, assessmentBB));
+		Referee referee = new InsecureReferee();
+		Linkage linkage = new SingleLinkage(report);
+		ThresholdCriteria criteria = new NeverStopCriteria();
+		TestCaseClusterer clusterer = new DendogramTestCaseClusterer(linkage, referee, criteria);
+		Set<Cluster> clusters = clusterer.cluster(report);
+
+		assertEquals(1, clusters.size());
+		assertTrue(clusters.contains(new Cluster(testA).merge(new Cluster(testB))));
 	}
 
 }
