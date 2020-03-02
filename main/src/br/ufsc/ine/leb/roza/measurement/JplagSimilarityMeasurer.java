@@ -92,7 +92,7 @@ public class JplagSimilarityMeasurer implements SimilarityMeasurer {
 		List<String> arguments = new LinkedList<String>();
 		arguments.add("java");
 		arguments.add("-jar");
-		arguments.add("tools/jplag/tool/jplag-2.11.9.jar");
+		arguments.add("main/tools/jplag/jplag-2.11.9.jar");
 		arguments.addAll(configurations.getAllAsArguments());
 		processUtils.execute(arguments);
 	}

@@ -83,12 +83,13 @@ public class DeckardSimilarityMeasurer implements SimilarityMeasurer {
 	}
 
 	private void run(MaterializationReport materializationReport) {
-		FolderUtils folderUtils = new FolderUtils("tools/deckard");
+		FolderUtils folderUtils = new FolderUtils("main/tools/deckard");
 		String argumentsText = configurations.getAllAsArguments().stream().collect(Collectors.joining(System.lineSeparator()));
 		String argumentsScript = String.format("#!/bin/sh\n%s", argumentsText);
 		folderUtils.writeContetAsString("config", argumentsScript);
 		ProcessUtils processUtils = new ProcessUtils(true, true, true, false);
-		processUtils.execute(new File("tools/deckard"), "./tool/scripts/clonedetect/deckard.sh");
+		processUtils.execute(new File("main/tools/deckard"), "./tool/scripts/clonedetect/deckard.sh");
+		folderUtils.removeFile("config");
 	}
 
 }

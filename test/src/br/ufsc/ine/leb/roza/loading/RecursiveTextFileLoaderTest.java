@@ -17,7 +17,7 @@ public class RecursiveTextFileLoaderTest {
 
 	@BeforeEach
 	void setup() {
-		loader = new RecursiveTextFileLoader("test-resources/loader");
+		loader = new RecursiveTextFileLoader("test/resources/loader");
 	}
 
 	@Test

@@ -1,3 +1,0 @@
-[submodule "tools/deckard/tool"]
-	path = tools/deckard/tool
-	url = git@github.com:skyhover/Deckard.git

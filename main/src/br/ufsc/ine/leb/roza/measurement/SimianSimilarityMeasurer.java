@@ -88,7 +88,7 @@ public class SimianSimilarityMeasurer implements SimilarityMeasurer {
 		List<String> arguments = new LinkedList<String>();
 		arguments.add("java");
 		arguments.add("-jar");
-		arguments.add("tools/simian/tool/simian-2.5.10.jar");
+		arguments.add("main/tools/simian/simian-2.5.10.jar");
 		arguments.addAll(configurations.getAllAsArguments());
 		arguments.add(new File(materializationReport.getBaseFolder(), "*.java").getPath());
 		processUtils.execute(fileReport,arguments);

@@ -94,6 +94,11 @@ public class FolderUtils {
 		}
 	}
 
+	public void removeFile(String path) {
+		File file = new File(baseFolder, path);
+		file.delete();
+	}
+
 	public String getBaseFolder() {
 		return baseFolder;
 	}
