@@ -2,7 +2,7 @@ package br.ufsc.ine.leb.roza.clustering.dendrogram;
 
 import java.util.List;
 
-public class FixedInterationsCriteria implements ThresholdCriteria {
+class FixedInterationsCriteria implements ThresholdCriteria {
 
 	private Integer threshold;
 

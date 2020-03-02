@@ -3,7 +3,7 @@ package br.ufsc.ine.leb.roza.clustering.dendrogram;
 import java.math.BigDecimal;
 import java.util.List;
 
-public class EvaluationBasedCriteria implements ThresholdCriteria {
+class EvaluationBasedCriteria implements ThresholdCriteria {
 
 	private BigDecimal stop;
 
