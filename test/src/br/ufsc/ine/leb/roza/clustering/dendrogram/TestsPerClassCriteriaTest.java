@@ -75,7 +75,7 @@ public class TestsPerClassCriteriaTest {
 	}
 
 	@Test
-	void levelOneWithTwoClustersNotExeedingThreshold() throws Exception {
+	void levelOneWithTwoClustersNotExceedingThreshold() throws Exception {
 		Set<Cluster> clusters = new HashSet<>(Arrays.asList(alphaBetaCluster, alphaGammaCluster));
 		Level level = new Level(linkage, referee, clusters);
 		List<Level> levels = Arrays.asList(level);
@@ -84,7 +84,7 @@ public class TestsPerClassCriteriaTest {
 	}
 
 	@Test
-	void levelOneWithFourClustersWithTheTwoOddClustersExeedingThreshold() throws Exception {
+	void levelOneWithFourClustersWithTheTwoOddClustersExceedingThreshold() throws Exception {
 		Set<Cluster> clusters = new HashSet<>(Arrays.asList(betaCluster, alphaBetaCluster, gammaCluster, alphaGammaCluster));
 		Level level = new Level(linkage, referee, clusters);
 		List<Level> levels = Arrays.asList(level);
