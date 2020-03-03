@@ -3,11 +3,11 @@ package br.ufsc.ine.leb.roza.clustering.dendrogram;
 import java.math.BigDecimal;
 import java.util.List;
 
-class SimilarityCriteria implements ThresholdCriteria {
+class SimilarityBasedCriteria implements ThresholdCriteria {
 
 	private BigDecimal stop;
 
-	public SimilarityCriteria(BigDecimal stop) {
+	public SimilarityBasedCriteria(BigDecimal stop) {
 		this.stop = stop;
 	}
 
