@@ -54,7 +54,7 @@ public class DendogramTestCaseClustererTest {
 		SimilarityReport report = new SimilarityReport(Arrays.asList(assessmentAA, assessmentAB, assessmentBA, assessmentBB));
 		Referee referee = new InsecureReferee();
 		Linkage linkage = new SingleLinkage(report);
-		ThresholdCriteria criteria = new EvaluationBasedCriteria(BigDecimal.ZERO);
+		ThresholdCriteria criteria = new SimilarityCriteria(BigDecimal.ZERO);
 		TestCaseClusterer clusterer = new DendogramTestCaseClusterer(linkage, referee, criteria);
 		Set<Cluster> clusters = clusterer.cluster(report);
 
@@ -77,7 +77,7 @@ public class DendogramTestCaseClustererTest {
 		SimilarityReport report = new SimilarityReport(Arrays.asList(assessmentAA, assessmentAB, assessmentBA, assessmentBB));
 		Referee referee = new InsecureReferee();
 		Linkage linkage = new SingleLinkage(report);
-		ThresholdCriteria criteria = new EvaluationBasedCriteria(BigDecimal.ZERO);
+		ThresholdCriteria criteria = new SimilarityCriteria(BigDecimal.ZERO);
 		TestCaseClusterer clusterer = new DendogramTestCaseClusterer(linkage, referee, criteria);
 
 		Set<Cluster> clusters = clusterer.cluster(report);

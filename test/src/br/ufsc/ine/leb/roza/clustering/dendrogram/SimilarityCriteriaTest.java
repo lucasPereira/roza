@@ -15,7 +15,7 @@ import br.ufsc.ine.leb.roza.SimilarityAssessment;
 import br.ufsc.ine.leb.roza.SimilarityReport;
 import br.ufsc.ine.leb.roza.TestCase;
 
-public class EvaluationBasedCriteriaTest {
+public class SimilarityCriteriaTest {
 
 	private TestCase testA;
 	private TestCase testB;
@@ -27,13 +27,13 @@ public class EvaluationBasedCriteriaTest {
 	}
 
 	@Test
-	void evaluationBasedCriteriaNoLevels() throws Exception {
-		ThresholdCriteria threshold = new EvaluationBasedCriteria(BigDecimal.ZERO);
+	void noLevels() throws Exception {
+		ThresholdCriteria threshold = new SimilarityCriteria(BigDecimal.ZERO);
 		assertTrue(threshold.shoudlStop(new LinkedList<>()));
 	}
 
 	@Test
-	void evaluationBasedCriteriaZeroEvaluation() throws Exception {
+	void zeroSimilarity() throws Exception {
 		SimilarityAssessment assessmentAA = new SimilarityAssessment(testA, testA, BigDecimal.ONE);
 		SimilarityAssessment assessmentAB = new SimilarityAssessment(testA, testB, BigDecimal.ZERO);
 		SimilarityAssessment assessmentBA = new SimilarityAssessment(testB, testA, BigDecimal.ZERO);
@@ -41,13 +41,13 @@ public class EvaluationBasedCriteriaTest {
 		SimilarityReport report = new SimilarityReport(Arrays.asList(assessmentAA, assessmentAB, assessmentBA, assessmentBB));
 		Level level = new Level(new SingleLinkage(report), new InsecureReferee(), new ClusterFactory().create(report));
 		List<Level> levels = Arrays.asList(level);
-		assertFalse(new EvaluationBasedCriteria(new BigDecimal("-0.1")).shoudlStop(levels));
-		assertTrue(new EvaluationBasedCriteria(BigDecimal.ZERO).shoudlStop(levels));
-		assertTrue(new EvaluationBasedCriteria(new BigDecimal("0.1")).shoudlStop(levels));
+		assertFalse(new SimilarityCriteria(new BigDecimal("-0.1")).shoudlStop(levels));
+		assertTrue(new SimilarityCriteria(BigDecimal.ZERO).shoudlStop(levels));
+		assertTrue(new SimilarityCriteria(new BigDecimal("0.1")).shoudlStop(levels));
 	}
 
 	@Test
-	void evaluationBasedCriteriaOneEvaluation() throws Exception {
+	void oneSimilarity() throws Exception {
 		SimilarityAssessment assessmentAA = new SimilarityAssessment(testA, testA, BigDecimal.ONE);
 		SimilarityAssessment assessmentAB = new SimilarityAssessment(testA, testB, BigDecimal.ONE);
 		SimilarityAssessment assessmentBA = new SimilarityAssessment(testB, testA, BigDecimal.ONE);
@@ -55,13 +55,13 @@ public class EvaluationBasedCriteriaTest {
 		SimilarityReport report = new SimilarityReport(Arrays.asList(assessmentAA, assessmentAB, assessmentBA, assessmentBB));
 		Level level = new Level(new SingleLinkage(report), new InsecureReferee(), new ClusterFactory().create(report));
 		List<Level> levels = Arrays.asList(level);
-		assertFalse(new EvaluationBasedCriteria(new BigDecimal("0.9")).shoudlStop(levels));
-		assertTrue(new EvaluationBasedCriteria(BigDecimal.ONE).shoudlStop(levels));
-		assertTrue(new EvaluationBasedCriteria(new BigDecimal("1.1")).shoudlStop(levels));
+		assertFalse(new SimilarityCriteria(new BigDecimal("0.9")).shoudlStop(levels));
+		assertTrue(new SimilarityCriteria(BigDecimal.ONE).shoudlStop(levels));
+		assertTrue(new SimilarityCriteria(new BigDecimal("1.1")).shoudlStop(levels));
 	}
 
 	@Test
-	void evaluationBasedCriteriaZeroPointFiveEvaluation() throws Exception {
+	void zeroPointFiveSimilarity() throws Exception {
 		SimilarityAssessment assessmentAA = new SimilarityAssessment(testA, testA, BigDecimal.ONE);
 		SimilarityAssessment assessmentAB = new SimilarityAssessment(testA, testB, new BigDecimal("0.5"));
 		SimilarityAssessment assessmentBA = new SimilarityAssessment(testB, testA, new BigDecimal("0.5"));
@@ -69,9 +69,9 @@ public class EvaluationBasedCriteriaTest {
 		SimilarityReport report = new SimilarityReport(Arrays.asList(assessmentAA, assessmentAB, assessmentBA, assessmentBB));
 		Level level = new Level(new SingleLinkage(report), new InsecureReferee(), new ClusterFactory().create(report));
 		List<Level> levels = Arrays.asList(level);
-		assertFalse(new EvaluationBasedCriteria(new BigDecimal("0.4")).shoudlStop(levels));
-		assertTrue(new EvaluationBasedCriteria(new BigDecimal("0.5")).shoudlStop(levels));
-		assertTrue(new EvaluationBasedCriteria(new BigDecimal("0.6")).shoudlStop(levels));
+		assertFalse(new SimilarityCriteria(new BigDecimal("0.4")).shoudlStop(levels));
+		assertTrue(new SimilarityCriteria(new BigDecimal("0.5")).shoudlStop(levels));
+		assertTrue(new SimilarityCriteria(new BigDecimal("0.6")).shoudlStop(levels));
 	}
 
 }
