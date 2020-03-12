@@ -3,12 +3,16 @@ package br.ufsc.ine.leb.roza.clustering.dendrogram;
 import java.util.List;
 
 import br.ufsc.ine.leb.roza.Cluster;
+import br.ufsc.ine.leb.roza.exceptions.InvalidThresholdException;
 
 public class TestsPerClassCriteria implements ThresholdCriteria {
 
 	private Integer threshold;
 
 	public TestsPerClassCriteria(Integer threshold) {
+		if (threshold < 1) {
+			throw new InvalidThresholdException();
+		}
 		this.threshold = threshold;
 	}
 
@@ -17,10 +21,11 @@ public class TestsPerClassCriteria implements ThresholdCriteria {
 		if (levels.isEmpty()) {
 			return false;
 		}
-		Level level = levels.get(0);
-		for (Cluster cluster : level.getClusters()) {
-			if (cluster.getTestCases().size() >= threshold) {
-				return true;
+		for (Level level : levels) {
+			for (Cluster cluster : level.getClusters()) {
+				if (cluster.getTestCases().size() >= threshold) {
+					return true;
+				}
 			}
 		}
 		return false;
