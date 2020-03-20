@@ -18,11 +18,15 @@ class SimilarityBasedCriteria implements ThresholdCriteria {
 
 	@Override
 	public Boolean shoudlStop(List<Level> levels) {
-		if (levels.isEmpty()) {
-			return false;
+		for (Level level : levels) {
+			if (level.hasNextLevel()) {
+				BigDecimal evaluationToNextLevel = level.getEvaluationToNextLevel();
+				if (threshold.compareTo(evaluationToNextLevel) >= 0) {
+					return true;
+				}
+			}
 		}
-		BigDecimal evaluationToNextLevel = levels.get(levels.size() - 1).getEvaluationToNextLevel();
-		return threshold.compareTo(evaluationToNextLevel) >= 0;
+		return false;
 	}
 
 }

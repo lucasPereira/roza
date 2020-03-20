@@ -15,63 +15,127 @@ import br.ufsc.ine.leb.roza.SimilarityAssessment;
 import br.ufsc.ine.leb.roza.SimilarityReport;
 import br.ufsc.ine.leb.roza.TestCase;
 import br.ufsc.ine.leb.roza.exceptions.InvalidThresholdException;
+import br.ufsc.ine.leb.roza.measurement.report.SimilarityReportBuilder;
 
 public class SimilarityBasedCriteriaTest {
 
 	private TestCase testA;
 	private TestCase testB;
+	private TestCase testC;
+	private BigDecimal dotOne;
+	private BigDecimal dotFour;
+	private BigDecimal dotFive;
+	private BigDecimal dotSix;
+	private BigDecimal dotNine;
 
 	@BeforeEach
 	void setup() {
 		testA = new TestCase("testA", Arrays.asList(), Arrays.asList());
 		testB = new TestCase("testB", Arrays.asList(), Arrays.asList());
+		testC = new TestCase("testC", Arrays.asList(), Arrays.asList());
+		dotOne = new BigDecimal("0.1");
+		dotFour = new BigDecimal("0.4");
+		dotFive = new BigDecimal("0.5");
+		dotSix = new BigDecimal("0.6");
+		dotNine = new BigDecimal("0.9");
 	}
 
 	@Test
-	void noLevels() throws Exception {
-		ThresholdCriteria threshold = new SimilarityBasedCriteria(BigDecimal.ZERO);
+	void noLevel() throws Exception {
 		List<Level> levels = Arrays.asList();
-		assertFalse(threshold.shoudlStop(levels));
+		ThresholdCriteria criteria = new SimilarityBasedCriteria(BigDecimal.ZERO);
+		assertFalse(criteria.shoudlStop(levels));
+	}
+
+	@Test
+	void levelOneEmpty() throws Exception {
+		SimilarityReport report = new SimilarityReport(Arrays.asList());
+		Level level = new Level(new SingleLinkage(report), new InsecureReferee(), new ClusterFactory().create(report));
+		List<Level> levels = Arrays.asList(level);
+		ThresholdCriteria criteria = new SimilarityBasedCriteria(BigDecimal.ZERO);
+		assertFalse(criteria.shoudlStop(levels));
+	}
+
+	@Test
+	void levelOneWithOneTest() throws Exception {
+		SimilarityAssessment assessmentAA = new SimilarityAssessment(testA, testA, BigDecimal.ONE);
+		SimilarityReport report = new SimilarityReport(Arrays.asList(assessmentAA));
+		Level level = new Level(new SingleLinkage(report), new InsecureReferee(), new ClusterFactory().create(report));
+		List<Level> levels = Arrays.asList(level);
+		ThresholdCriteria criteria = new SimilarityBasedCriteria(BigDecimal.ZERO);
+		assertFalse(criteria.shoudlStop(levels));
 	}
 
 	@Test
 	void zeroSimilarity() throws Exception {
-		SimilarityAssessment assessmentAA = new SimilarityAssessment(testA, testA, BigDecimal.ONE);
-		SimilarityAssessment assessmentAB = new SimilarityAssessment(testA, testB, BigDecimal.ZERO);
-		SimilarityAssessment assessmentBA = new SimilarityAssessment(testB, testA, BigDecimal.ZERO);
-		SimilarityAssessment assessmentBB = new SimilarityAssessment(testB, testA, BigDecimal.ONE);
-		SimilarityReport report = new SimilarityReport(Arrays.asList(assessmentAA, assessmentAB, assessmentBA, assessmentBB));
+		SimilarityReport report = new SimilarityReportBuilder().add(testA).add(testB).build();
 		Level level = new Level(new SingleLinkage(report), new InsecureReferee(), new ClusterFactory().create(report));
 		List<Level> levels = Arrays.asList(level);
 		assertTrue(new SimilarityBasedCriteria(BigDecimal.ZERO).shoudlStop(levels));
-		assertTrue(new SimilarityBasedCriteria(new BigDecimal("0.1")).shoudlStop(levels));
+		assertTrue(new SimilarityBasedCriteria(dotOne).shoudlStop(levels));
 	}
 
 	@Test
 	void oneSimilarity() throws Exception {
-		SimilarityAssessment assessmentAA = new SimilarityAssessment(testA, testA, BigDecimal.ONE);
-		SimilarityAssessment assessmentAB = new SimilarityAssessment(testA, testB, BigDecimal.ONE);
-		SimilarityAssessment assessmentBA = new SimilarityAssessment(testB, testA, BigDecimal.ONE);
-		SimilarityAssessment assessmentBB = new SimilarityAssessment(testB, testA, BigDecimal.ONE);
-		SimilarityReport report = new SimilarityReport(Arrays.asList(assessmentAA, assessmentAB, assessmentBA, assessmentBB));
+		SimilarityReport report = new SimilarityReportBuilder().add(testA, testB, BigDecimal.ONE).build();
 		Level level = new Level(new SingleLinkage(report), new InsecureReferee(), new ClusterFactory().create(report));
 		List<Level> levels = Arrays.asList(level);
-		assertFalse(new SimilarityBasedCriteria(new BigDecimal("0.9")).shoudlStop(levels));
+		assertFalse(new SimilarityBasedCriteria(dotNine).shoudlStop(levels));
 		assertTrue(new SimilarityBasedCriteria(BigDecimal.ONE).shoudlStop(levels));
 	}
 
 	@Test
 	void zeroPointFiveSimilarity() throws Exception {
-		SimilarityAssessment assessmentAA = new SimilarityAssessment(testA, testA, BigDecimal.ONE);
-		SimilarityAssessment assessmentAB = new SimilarityAssessment(testA, testB, new BigDecimal("0.5"));
-		SimilarityAssessment assessmentBA = new SimilarityAssessment(testB, testA, new BigDecimal("0.5"));
-		SimilarityAssessment assessmentBB = new SimilarityAssessment(testB, testA, BigDecimal.ONE);
-		SimilarityReport report = new SimilarityReport(Arrays.asList(assessmentAA, assessmentAB, assessmentBA, assessmentBB));
+		SimilarityReport report = new SimilarityReportBuilder().add(testA, testB, dotFive).build();
 		Level level = new Level(new SingleLinkage(report), new InsecureReferee(), new ClusterFactory().create(report));
 		List<Level> levels = Arrays.asList(level);
-		assertFalse(new SimilarityBasedCriteria(new BigDecimal("0.4")).shoudlStop(levels));
-		assertTrue(new SimilarityBasedCriteria(new BigDecimal("0.5")).shoudlStop(levels));
-		assertTrue(new SimilarityBasedCriteria(new BigDecimal("0.6")).shoudlStop(levels));
+		assertFalse(new SimilarityBasedCriteria(dotFour).shoudlStop(levels));
+		assertTrue(new SimilarityBasedCriteria(dotFive).shoudlStop(levels));
+		assertTrue(new SimilarityBasedCriteria(dotSix).shoudlStop(levels));
+	}
+
+	@Test
+	void zeroPointFiveSimilarityInLevelTwoSingleLinkage() throws Exception {
+		SimilarityReport report = new SimilarityReportBuilder().add(testA, testB, dotSix).add(testA, testC, dotFour).add(testB, testC, dotFive).build();
+		Level one = new Level(new SingleLinkage(report), new InsecureReferee(), new ClusterFactory().create(report));
+		Level two = one.generateNextLevel();
+		List<Level> levels = Arrays.asList(one, two);
+		assertFalse(new SimilarityBasedCriteria(dotFour).shoudlStop(levels));
+		assertTrue(new SimilarityBasedCriteria(dotFive).shoudlStop(levels));
+		assertTrue(new SimilarityBasedCriteria(dotSix).shoudlStop(levels));
+	}
+
+	@Test
+	void zeroPointFiveSimilarityInLevelTwoCompleteLinkage() throws Exception {
+		SimilarityReport report = new SimilarityReportBuilder().add(testA, testB, dotSix).add(testA, testC, dotFour).add(testB, testC, dotFive).build();
+		Level one = new Level(new CompleteLinkage(report), new InsecureReferee(), new ClusterFactory().create(report));
+		Level two = one.generateNextLevel();
+		List<Level> levels = Arrays.asList(one, two);
+		assertTrue(new SimilarityBasedCriteria(dotFour).shoudlStop(levels));
+		assertTrue(new SimilarityBasedCriteria(dotFive).shoudlStop(levels));
+		assertTrue(new SimilarityBasedCriteria(dotSix).shoudlStop(levels));
+	}
+
+	@Test
+	void zeroPointFiveSimilarityInLevelTwoSingleLinkageOrderOfLevelsReversed() throws Exception {
+		SimilarityReport report = new SimilarityReportBuilder().add(testA, testB, dotSix).add(testA, testC, dotFour).add(testB, testC, dotFive).build();
+		Level one = new Level(new SingleLinkage(report), new InsecureReferee(), new ClusterFactory().create(report));
+		Level two = one.generateNextLevel();
+		List<Level> levels = Arrays.asList(two, one);
+		assertFalse(new SimilarityBasedCriteria(dotFour).shoudlStop(levels));
+		assertTrue(new SimilarityBasedCriteria(dotFive).shoudlStop(levels));
+		assertTrue(new SimilarityBasedCriteria(dotSix).shoudlStop(levels));
+	}
+
+	@Test
+	void zeroPointFiveSimilarityInLevelTwoCompleteLinkageOrderOfLevelsReversed() throws Exception {
+		SimilarityReport report = new SimilarityReportBuilder().add(testA, testB, dotSix).add(testA, testC, dotFour).add(testB, testC, dotFive).build();
+		Level one = new Level(new CompleteLinkage(report), new InsecureReferee(), new ClusterFactory().create(report));
+		Level two = one.generateNextLevel();
+		List<Level> levels = Arrays.asList(two, one);
+		assertTrue(new SimilarityBasedCriteria(dotFour).shoudlStop(levels));
+		assertTrue(new SimilarityBasedCriteria(dotFive).shoudlStop(levels));
+		assertTrue(new SimilarityBasedCriteria(dotSix).shoudlStop(levels));
 	}
 
 	@Test
