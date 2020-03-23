@@ -11,7 +11,7 @@ public class SimilarityReport {
 
 	private List<SimilarityAssessment> assessments;
 
-	public SimilarityReport(List<SimilarityAssessment> assessments) {
+	SimilarityReport(List<SimilarityAssessment> assessments) {
 		this.assessments = new ArrayList<>(assessments);
 	}
 

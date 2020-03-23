@@ -12,8 +12,8 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import br.ufsc.ine.leb.roza.MaterializationReport;
-import br.ufsc.ine.leb.roza.SimilarityAssessment;
 import br.ufsc.ine.leb.roza.SimilarityReport;
+import br.ufsc.ine.leb.roza.SimilarityReportBuilder;
 import br.ufsc.ine.leb.roza.TestCase;
 import br.ufsc.ine.leb.roza.TestCaseMaterialization;
 import br.ufsc.ine.leb.roza.measurement.configuration.simian.SimianConfigurations;
@@ -42,21 +42,24 @@ public class SimianSimilarityMeasurer implements SimilarityMeasurer {
 		MatrixElementToKeyConverter<TestCaseMaterialization, String> converter = new SimianMatrixElementToKeyConverter();
 		MatrixValueFactory<TestCaseMaterialization, Intersector> factory = new SimianMatrixValueFactory();
 		Matrix<TestCaseMaterialization, String, Intersector> matrix = new Matrix<>(materializations, converter, factory);
-		if (materializations.size() > 1) {
-			File fileReport = new File(resultsFolder, "report.xml");
-			run(materializationReport, fileReport);
-			parse(matrix, fileReport);
+		SimilarityReportBuilder builder = new SimilarityReportBuilder(false);
+		if (materializations.size() == 0) {
+			return builder.build();
 		}
-		List<SimilarityAssessment> assessments = new LinkedList<>();
-		for (MatrixPair<TestCaseMaterialization, Intersector> pair : matrix.getPairs()) {
+		if (materializations.size() == 1) {
+			return builder.add(materializations.iterator().next().getTestCase()).build();
+		}
+		File fileReport = new File(resultsFolder, "report.xml");
+		run(materializationReport, fileReport);
+		parse(matrix, fileReport);
+		for (MatrixPair<TestCaseMaterialization, Intersector> pair : matrix.getNonReflexivePairs()) {
 			TestCase source = pair.getSource().getTestCase();
 			TestCase target = pair.getTarget().getTestCase();
 			Intersector intersector = pair.getValue();
 			BigDecimal evaluation = intersector.evaluate();
-			SimilarityAssessment assessment = new SimilarityAssessment(source, target, evaluation);
-			assessments.add(assessment);
+			builder.add(source, target, evaluation);
 		}
-		return new SimilarityReport(assessments);
+		return builder.build();
 	}
 
 	private void parse(Matrix<TestCaseMaterialization, String, Intersector> matrix, File fileReport) {

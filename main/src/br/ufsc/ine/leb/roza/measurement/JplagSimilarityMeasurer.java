@@ -12,8 +12,8 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import br.ufsc.ine.leb.roza.MaterializationReport;
-import br.ufsc.ine.leb.roza.SimilarityAssessment;
 import br.ufsc.ine.leb.roza.SimilarityReport;
+import br.ufsc.ine.leb.roza.SimilarityReportBuilder;
 import br.ufsc.ine.leb.roza.TestCase;
 import br.ufsc.ine.leb.roza.TestCaseMaterialization;
 import br.ufsc.ine.leb.roza.measurement.configuration.jplag.JplagConfigurations;
@@ -40,22 +40,25 @@ public class JplagSimilarityMeasurer implements SimilarityMeasurer {
 		MatrixElementToKeyConverter<TestCaseMaterialization, String> converter = new JplagMatrixElementToKeyConverter();
 		MatrixValueFactory<TestCaseMaterialization, BigDecimal> factory = new JplagMatrixValueFactory();
 		Matrix<TestCaseMaterialization, String, BigDecimal> matrix = new Matrix<>(materializations, converter, factory);
-		if (materializations.size() > 1) {
-			run(materializationReport);
-			parse(matrix, materializations);
+		SimilarityReportBuilder builder = new SimilarityReportBuilder(false);
+		if (materializations.size() == 0) {
+			return builder.build();
 		}
-		List<SimilarityAssessment> assessments = new LinkedList<>();
-		for (MatrixPair<TestCaseMaterialization, BigDecimal> pair : matrix.getPairs()) {
+		if (materializations.size() == 1) {
+			return builder.add(materializations.iterator().next().getTestCase()).build();
+		}
+		run(materializationReport);
+		parse(matrix);
+		for (MatrixPair<TestCaseMaterialization, BigDecimal> pair : matrix.getNonReflexivePairs()) {
 			TestCase source = pair.getSource().getTestCase();
 			TestCase target = pair.getTarget().getTestCase();
 			BigDecimal evaluation = pair.getValue();
-			SimilarityAssessment assessment = new SimilarityAssessment(source, target, evaluation);
-			assessments.add(assessment);
+			builder.add(source, target, evaluation);
 		}
-		return new SimilarityReport(assessments);
+		return builder.build();
 	}
 
-	private void parse(Matrix<TestCaseMaterialization, String, BigDecimal> matrix, List<TestCaseMaterialization> materializations) {
+	private void parse(Matrix<TestCaseMaterialization, String, BigDecimal> matrix) {
 		try {
 			List<File> results = new FolderUtils(configurations.results()).listFilesRecursively("match[0-9]+-top.html");
 			for (File result : results) {

@@ -10,8 +10,8 @@ import java.util.Set;
 import org.junit.jupiter.api.Test;
 
 import br.ufsc.ine.leb.roza.Cluster;
-import br.ufsc.ine.leb.roza.SimilarityAssessment;
 import br.ufsc.ine.leb.roza.SimilarityReport;
+import br.ufsc.ine.leb.roza.SimilarityReportBuilder;
 import br.ufsc.ine.leb.roza.TestCase;
 import br.ufsc.ine.leb.roza.clustering.TestCaseClusterer;
 
@@ -19,25 +19,22 @@ public class DendogramTestCaseClustererTest {
 
 	@Test
 	void zeroTests() throws Exception {
-		SimilarityReport report = new SimilarityReport(Arrays.asList());
+		SimilarityReport report = new SimilarityReportBuilder(true).build();
 		Referee referee = new InsecureReferee();
 		Linkage linkage = new SingleLinkage(report);
 		ThresholdCriteria criteria = new NeverStopCriteria();
 		TestCaseClusterer clusterer = new DendogramTestCaseClusterer(linkage, referee, criteria);
-
 		assertEquals(0, clusterer.cluster(report).size());
 	}
 
 	@Test
 	void oneTest() throws Exception {
 		TestCase testA = new TestCase("testA", Arrays.asList(), Arrays.asList());
-		SimilarityAssessment assessmentAA = new SimilarityAssessment(testA, testA, BigDecimal.ONE);
-		SimilarityReport report = new SimilarityReport(Arrays.asList(assessmentAA));
+		SimilarityReport report = new SimilarityReportBuilder(true).add(testA).build();
 		Referee referee = new InsecureReferee();
 		Linkage linkage = new SingleLinkage(report);
 		ThresholdCriteria criteria = new NeverStopCriteria();
 		TestCaseClusterer clusterer = new DendogramTestCaseClusterer(linkage, referee, criteria);
-
 		Set<Cluster> clusters = clusterer.cluster(report);
 		assertEquals(1, clusters.size());
 		assertTrue(clusters.contains(new Cluster(testA)));
@@ -47,17 +44,12 @@ public class DendogramTestCaseClustererTest {
 	void twoDistinctTestsStopingInZero() throws Exception {
 		TestCase testA = new TestCase("testA", Arrays.asList(), Arrays.asList());
 		TestCase testB = new TestCase("testB", Arrays.asList(), Arrays.asList());
-		SimilarityAssessment assessmentAA = new SimilarityAssessment(testA, testA, BigDecimal.ONE);
-		SimilarityAssessment assessmentAB = new SimilarityAssessment(testA, testB, BigDecimal.ZERO);
-		SimilarityAssessment assessmentBA = new SimilarityAssessment(testB, testA, BigDecimal.ZERO);
-		SimilarityAssessment assessmentBB = new SimilarityAssessment(testB, testA, BigDecimal.ONE);
-		SimilarityReport report = new SimilarityReport(Arrays.asList(assessmentAA, assessmentAB, assessmentBA, assessmentBB));
+		SimilarityReport report = new SimilarityReportBuilder(true).add(testA).add(testB).complete().build();
 		Referee referee = new InsecureReferee();
 		Linkage linkage = new SingleLinkage(report);
 		ThresholdCriteria criteria = new SimilarityBasedCriteria(BigDecimal.ZERO);
 		TestCaseClusterer clusterer = new DendogramTestCaseClusterer(linkage, referee, criteria);
 		Set<Cluster> clusters = clusterer.cluster(report);
-
 		assertEquals(2, clusters.size());
 		assertTrue(clusters.contains(new Cluster(testA)));
 		assertTrue(clusters.contains(new Cluster(testB)));
@@ -70,16 +62,11 @@ public class DendogramTestCaseClustererTest {
 		Cluster clusterA = new Cluster(testA);
 		Cluster clusterB = new Cluster(testB);
 		Cluster clusterAB = clusterA.merge(clusterB);
-		SimilarityAssessment assessmentAA = new SimilarityAssessment(testA, testA, BigDecimal.ONE);
-		SimilarityAssessment assessmentAB = new SimilarityAssessment(testA, testB, new BigDecimal("0.5"));
-		SimilarityAssessment assessmentBA = new SimilarityAssessment(testB, testA, new BigDecimal("0.5"));
-		SimilarityAssessment assessmentBB = new SimilarityAssessment(testB, testA, BigDecimal.ONE);
-		SimilarityReport report = new SimilarityReport(Arrays.asList(assessmentAA, assessmentAB, assessmentBA, assessmentBB));
+		SimilarityReport report = new SimilarityReportBuilder(true).add(testA, testB, new BigDecimal("0.5")).build();
 		Referee referee = new InsecureReferee();
 		Linkage linkage = new SingleLinkage(report);
 		ThresholdCriteria criteria = new SimilarityBasedCriteria(BigDecimal.ZERO);
 		TestCaseClusterer clusterer = new DendogramTestCaseClusterer(linkage, referee, criteria);
-
 		Set<Cluster> clusters = clusterer.cluster(report);
 		assertEquals(1, clusters.size());
 		assertTrue(clusters.contains(clusterAB));
@@ -89,17 +76,12 @@ public class DendogramTestCaseClustererTest {
 	void twoDistinctTestsDoesNotStopAtAll() throws Exception {
 		TestCase testA = new TestCase("testA", Arrays.asList(), Arrays.asList());
 		TestCase testB = new TestCase("testB", Arrays.asList(), Arrays.asList());
-		SimilarityAssessment assessmentAA = new SimilarityAssessment(testA, testA, BigDecimal.ONE);
-		SimilarityAssessment assessmentAB = new SimilarityAssessment(testA, testB, BigDecimal.ZERO);
-		SimilarityAssessment assessmentBA = new SimilarityAssessment(testB, testA, BigDecimal.ZERO);
-		SimilarityAssessment assessmentBB = new SimilarityAssessment(testB, testA, BigDecimal.ONE);
-		SimilarityReport report = new SimilarityReport(Arrays.asList(assessmentAA, assessmentAB, assessmentBA, assessmentBB));
+		SimilarityReport report = new SimilarityReportBuilder(true).add(testA).add(testB).complete().build();
 		Referee referee = new InsecureReferee();
 		Linkage linkage = new SingleLinkage(report);
 		ThresholdCriteria criteria = new NeverStopCriteria();
 		TestCaseClusterer clusterer = new DendogramTestCaseClusterer(linkage, referee, criteria);
 		Set<Cluster> clusters = clusterer.cluster(report);
-
 		assertEquals(1, clusters.size());
 		assertTrue(clusters.contains(new Cluster(testA).merge(new Cluster(testB))));
 	}

@@ -10,7 +10,7 @@ public class SimilarityAssessment {
 	private TestCase target;
 	private BigDecimal score;
 
-	public SimilarityAssessment(TestCase source, TestCase target, BigDecimal score) {
+	SimilarityAssessment(TestCase source, TestCase target, BigDecimal score) {
 		this.source = source;
 		this.target = target;
 		this.score = score;

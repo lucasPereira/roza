@@ -11,11 +11,10 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import br.ufsc.ine.leb.roza.SimilarityAssessment;
 import br.ufsc.ine.leb.roza.SimilarityReport;
+import br.ufsc.ine.leb.roza.SimilarityReportBuilder;
 import br.ufsc.ine.leb.roza.TestCase;
 import br.ufsc.ine.leb.roza.exceptions.InvalidThresholdException;
-import br.ufsc.ine.leb.roza.measurement.report.SimilarityReportBuilder;
 
 public class SimilarityBasedCriteriaTest {
 
@@ -49,7 +48,7 @@ public class SimilarityBasedCriteriaTest {
 
 	@Test
 	void levelOneEmpty() throws Exception {
-		SimilarityReport report = new SimilarityReport(Arrays.asList());
+		SimilarityReport report = new SimilarityReportBuilder(true).build();
 		Level level = new Level(new SingleLinkage(report), new InsecureReferee(), new ClusterFactory().create(report));
 		List<Level> levels = Arrays.asList(level);
 		ThresholdCriteria criteria = new SimilarityBasedCriteria(BigDecimal.ZERO);
@@ -58,8 +57,7 @@ public class SimilarityBasedCriteriaTest {
 
 	@Test
 	void levelOneWithOneTest() throws Exception {
-		SimilarityAssessment assessmentAA = new SimilarityAssessment(testA, testA, BigDecimal.ONE);
-		SimilarityReport report = new SimilarityReport(Arrays.asList(assessmentAA));
+		SimilarityReport report =new SimilarityReportBuilder(true).add(testA).build();
 		Level level = new Level(new SingleLinkage(report), new InsecureReferee(), new ClusterFactory().create(report));
 		List<Level> levels = Arrays.asList(level);
 		ThresholdCriteria criteria = new SimilarityBasedCriteria(BigDecimal.ZERO);

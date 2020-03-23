@@ -38,6 +38,21 @@ public class Matrix<T, K, V> {
 		return pairs;
 	}
 
+	public List<MatrixPair<T, V>> getNonReflexivePairs() {
+		List<MatrixPair<T, V>> pairs = new LinkedList<>();
+		for (Map.Entry<T, Map<T, V>> entrySource : matrix.entrySet()) {
+			for (Map.Entry<T, V> entryTarget : entrySource.getValue().entrySet()) {
+				T source = entrySource.getKey();
+				T target = entryTarget.getKey();
+				if (!source.equals(target)) {
+					MatrixPair<T, V> pair = new MatrixPair<>(source, target, entryTarget.getValue());
+					pairs.add(pair);
+				}
+			}
+		}
+		return pairs;
+	}
+
 	public V get(K sourceKey, K targetKey) {
 		T source = keys.get(sourceKey);
 		T target = keys.get(targetKey);

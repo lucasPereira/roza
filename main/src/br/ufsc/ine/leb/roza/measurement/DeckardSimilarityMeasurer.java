@@ -4,13 +4,12 @@ import java.io.File;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import br.ufsc.ine.leb.roza.MaterializationReport;
-import br.ufsc.ine.leb.roza.SimilarityAssessment;
 import br.ufsc.ine.leb.roza.SimilarityReport;
+import br.ufsc.ine.leb.roza.SimilarityReportBuilder;
 import br.ufsc.ine.leb.roza.TestCase;
 import br.ufsc.ine.leb.roza.TestCaseMaterialization;
 import br.ufsc.ine.leb.roza.measurement.configuration.deckard.DeckardConfigurations;
@@ -39,23 +38,26 @@ public class DeckardSimilarityMeasurer implements SimilarityMeasurer {
 		MatrixElementToKeyConverter<TestCaseMaterialization, String> converter = new DeckardMatrixElementToKeyConverter();
 		MatrixValueFactory<TestCaseMaterialization, Intersector> factory = new DeckardMatrixValueFactory();
 		Matrix<TestCaseMaterialization, String, Intersector> matrix = new Matrix<>(materializations, converter, factory);
-		if (materializations.size() > 1) {
-			run(materializationReport);
-			parse(matrix, materializations);
+		SimilarityReportBuilder builder = new SimilarityReportBuilder(false);
+		if (materializations.size() == 0) {
+			return builder.build();
 		}
-		List<SimilarityAssessment> assessments = new LinkedList<>();
-		for (MatrixPair<TestCaseMaterialization, Intersector> pair : matrix.getPairs()) {
+		if (materializations.size() == 1) {
+			return builder.add(materializations.iterator().next().getTestCase()).build();
+		}
+		run(materializationReport);
+		parse(matrix);
+		for (MatrixPair<TestCaseMaterialization, Intersector> pair : matrix.getNonReflexivePairs()) {
 			TestCase source = pair.getSource().getTestCase();
 			TestCase target = pair.getTarget().getTestCase();
 			Intersector intersector = pair.getValue();
 			BigDecimal evaluation = intersector.evaluate();
-			SimilarityAssessment assessment = new SimilarityAssessment(source, target, evaluation);
-			assessments.add(assessment);
+			builder.add(source, target, evaluation);
 		}
-		return new SimilarityReport(assessments);
+		return builder.build();
 	}
 
-	private void parse(Matrix<TestCaseMaterialization, String, Intersector> matrix, List<TestCaseMaterialization> materializations) {
+	private void parse(Matrix<TestCaseMaterialization, String, Intersector> matrix) {
 		List<File> reports = new FolderUtils(configurations.clusterDir()).listFilesRecursively("post_cluster_vdb_.*");
 		for (File reportFile : reports) {
 			String reportContent = new FileUtils().readContetAsString(reportFile).trim();

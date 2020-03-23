@@ -1,4 +1,4 @@
-package br.ufsc.ine.leb.roza.measurement.report;
+package br.ufsc.ine.leb.roza;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -13,6 +13,7 @@ import br.ufsc.ine.leb.roza.SimilarityReport;
 import br.ufsc.ine.leb.roza.TestCase;
 import br.ufsc.ine.leb.roza.exceptions.MissingAssessmentException;
 import br.ufsc.ine.leb.roza.exceptions.PotentialErrorProneOperationException;
+import br.ufsc.ine.leb.roza.measurement.report.AssessmentTestCaseNameComparator;
 
 public class SimilarityReportBuilderTest {
 
@@ -21,7 +22,7 @@ public class SimilarityReportBuilderTest {
 	private BigDecimal dotFive;
 	private BigDecimal dotSix;
 	private SimilarityReportBuilder symmetric;
-	private SimilarityReportBuilder assymmetric;
+	private SimilarityReportBuilder asymmetric;
 
 	@BeforeEach
 	void setup() {
@@ -30,7 +31,7 @@ public class SimilarityReportBuilderTest {
 		dotFive = new BigDecimal("0.5");
 		dotSix = new BigDecimal("0.6");
 		symmetric = new SimilarityReportBuilder(true);
-		assymmetric = new SimilarityReportBuilder(false);
+		asymmetric = new SimilarityReportBuilder(false);
 	}
 
 	@Test
@@ -40,8 +41,8 @@ public class SimilarityReportBuilderTest {
 	}
 
 	@Test
-	void emptyAssymmetric() throws Exception {
-		SimilarityReport report = assymmetric.build();
+	void emptyAsymmetric() throws Exception {
+		SimilarityReport report = asymmetric.build();
 		assertEquals(0, report.getAssessments().size());
 	}
 
@@ -55,8 +56,8 @@ public class SimilarityReportBuilderTest {
 	}
 
 	@Test
-	void addOneTestAssymmetric() throws Exception {
-		SimilarityReport report = assymmetric.add(testA).build();
+	void addOneTestAsymmetric() throws Exception {
+		SimilarityReport report = asymmetric.add(testA).build();
 		assertEquals(1, report.getAssessments().size());
 		assertEquals(testA, report.getAssessments().get(0).getSource());
 		assertEquals(testA, report.getAssessments().get(0).getTarget());
@@ -82,8 +83,8 @@ public class SimilarityReportBuilderTest {
 	}
 
 	@Test
-	void addTwoTestsAssymmetric() throws Exception {
-		SimilarityReport report = assymmetric.add(testA).add(testB).complete().build().sort(new AssessmentTestCaseNameComparator());
+	void addTwoTestsAsymmetric() throws Exception {
+		SimilarityReport report = asymmetric.add(testA).add(testB).complete().build().sort(new AssessmentTestCaseNameComparator());
 		assertEquals(4, report.getAssessments().size());
 		assertEquals(testA, report.getAssessments().get(0).getSource());
 		assertEquals(testA, report.getAssessments().get(0).getTarget());
@@ -118,8 +119,8 @@ public class SimilarityReportBuilderTest {
 	}
 
 	@Test
-	void addPairOfTwoTestsAssymmetric() throws Exception {
-		SimilarityReport report = assymmetric.add(testA, testB, dotFive).add(testB, testA, dotSix).build().sort(new AssessmentTestCaseNameComparator());
+	void addPairOfTwoTestsAsymmetric() throws Exception {
+		SimilarityReport report = asymmetric.add(testA, testB, dotFive).add(testB, testA, dotSix).build().sort(new AssessmentTestCaseNameComparator());
 		assertEquals(4, report.getAssessments().size());
 		assertEquals(testA, report.getAssessments().get(0).getSource());
 		assertEquals(testA, report.getAssessments().get(0).getTarget());
@@ -141,7 +142,7 @@ public class SimilarityReportBuilderTest {
 			symmetric.add(testA).add(testA);
 		});
 		assertThrows(PotentialErrorProneOperationException.class, () -> {
-			assymmetric.add(testA).add(testA);
+			asymmetric.add(testA).add(testA);
 		});
 	}
 
@@ -151,7 +152,7 @@ public class SimilarityReportBuilderTest {
 			symmetric.add(testA, testA, dotFive);
 		});
 		assertThrows(PotentialErrorProneOperationException.class, () -> {
-			assymmetric.add(testA, testA, dotFive);
+			asymmetric.add(testA, testA, dotFive);
 		});
 	}
 
@@ -164,10 +165,10 @@ public class SimilarityReportBuilderTest {
 			symmetric.add(testA, testB, dotFive).add(testB);
 		});
 		assertThrows(PotentialErrorProneOperationException.class, () -> {
-			assymmetric.add(testA).add(testA, testB, dotFive);
+			asymmetric.add(testA).add(testA, testB, dotFive);
 		});
 		assertThrows(PotentialErrorProneOperationException.class, () -> {
-			assymmetric.add(testA, testB, dotFive).add(testB);
+			asymmetric.add(testA, testB, dotFive).add(testB);
 		});
 	}
 
@@ -180,7 +181,7 @@ public class SimilarityReportBuilderTest {
 			symmetric.add(testA, testB, dotFive).add(testB, testA, dotSix);
 		});
 		assertThrows(PotentialErrorProneOperationException.class, () -> {
-			assymmetric.add(testA, testB, dotFive).add(testA, testB, dotSix);
+			asymmetric.add(testA, testB, dotFive).add(testA, testB, dotSix);
 		});
 	}
 
@@ -192,9 +193,9 @@ public class SimilarityReportBuilderTest {
 	}
 
 	@Test
-	void addTwoTestsAssymmetricWithoutComplete() throws Exception {
+	void addTwoTestsAsymmetricWithoutComplete() throws Exception {
 		assertThrows(MissingAssessmentException.class, () -> {
-			assymmetric.add(testA).add(testB).build();
+			asymmetric.add(testA).add(testB).build();
 		});
 	}
 
