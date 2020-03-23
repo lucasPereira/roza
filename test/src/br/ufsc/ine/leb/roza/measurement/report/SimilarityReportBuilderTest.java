@@ -1,6 +1,7 @@
 package br.ufsc.ine.leb.roza.measurement.report;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -10,32 +11,43 @@ import org.junit.jupiter.api.Test;
 
 import br.ufsc.ine.leb.roza.SimilarityReport;
 import br.ufsc.ine.leb.roza.TestCase;
-import br.ufsc.ine.leb.roza.measurement.report.AssessmentTestCaseNameComparator;
+import br.ufsc.ine.leb.roza.exceptions.MissingAssessmentException;
+import br.ufsc.ine.leb.roza.exceptions.PotentialErrorProneOperationException;
 
 public class SimilarityReportBuilderTest {
 
 	private TestCase testA;
 	private TestCase testB;
-	private BigDecimal zeroPointFive;
-	private BigDecimal zeroPointSix;
+	private BigDecimal dotFive;
+	private BigDecimal dotSix;
+	private SimilarityReportBuilder symmetric;
+	private SimilarityReportBuilder assymmetric;
 
 	@BeforeEach
 	void setup() {
 		testA = new TestCase("testA", Arrays.asList(), Arrays.asList());
 		testB = new TestCase("testB", Arrays.asList(), Arrays.asList());
-		zeroPointFive = new BigDecimal("0.5");
-		zeroPointSix = new BigDecimal("0.6");
+		dotFive = new BigDecimal("0.5");
+		dotSix = new BigDecimal("0.6");
+		symmetric = new SimilarityReportBuilder(true);
+		assymmetric = new SimilarityReportBuilder(false);
 	}
 
 	@Test
-	void empty() throws Exception {
-		SimilarityReport report = new SimilarityReportBuilder().build();
+	void emptySymmetric() throws Exception {
+		SimilarityReport report = symmetric.build();
 		assertEquals(0, report.getAssessments().size());
 	}
 
 	@Test
-	void addOneTest() throws Exception {
-		SimilarityReport report = new SimilarityReportBuilder().add(testA).build();
+	void emptyAssymmetric() throws Exception {
+		SimilarityReport report = assymmetric.build();
+		assertEquals(0, report.getAssessments().size());
+	}
+
+	@Test
+	void addOneTestSymmetric() throws Exception {
+		SimilarityReport report = symmetric.add(testA).build();
 		assertEquals(1, report.getAssessments().size());
 		assertEquals(testA, report.getAssessments().get(0).getSource());
 		assertEquals(testA, report.getAssessments().get(0).getTarget());
@@ -43,8 +55,8 @@ public class SimilarityReportBuilderTest {
 	}
 
 	@Test
-	void addOneTestTwice() throws Exception {
-		SimilarityReport report = new SimilarityReportBuilder().add(testA).add(testA).build();
+	void addOneTestAssymmetric() throws Exception {
+		SimilarityReport report = assymmetric.add(testA).build();
 		assertEquals(1, report.getAssessments().size());
 		assertEquals(testA, report.getAssessments().get(0).getSource());
 		assertEquals(testA, report.getAssessments().get(0).getTarget());
@@ -52,35 +64,8 @@ public class SimilarityReportBuilderTest {
 	}
 
 	@Test
-	void addTheSameTestWithoutScore() throws Exception {
-		SimilarityReport report = new SimilarityReportBuilder().add(testA, testA).build();
-		assertEquals(1, report.getAssessments().size());
-		assertEquals(testA, report.getAssessments().get(0).getSource());
-		assertEquals(testA, report.getAssessments().get(0).getTarget());
-		assertEquals(BigDecimal.ONE, report.getAssessments().get(0).getScore());
-	}
-
-	@Test
-	void addTheSameTestWithSymmetricScore() throws Exception {
-		SimilarityReport report = new SimilarityReportBuilder().add(testA, testA, zeroPointFive).build();
-		assertEquals(1, report.getAssessments().size());
-		assertEquals(testA, report.getAssessments().get(0).getSource());
-		assertEquals(testA, report.getAssessments().get(0).getTarget());
-		assertEquals(BigDecimal.ONE, report.getAssessments().get(0).getScore());
-	}
-
-	@Test
-	void addTheSameTestWithAssymmetricScore() throws Exception {
-		SimilarityReport report = new SimilarityReportBuilder().add(testA, zeroPointSix, testA, zeroPointFive).build();
-		assertEquals(1, report.getAssessments().size());
-		assertEquals(testA, report.getAssessments().get(0).getSource());
-		assertEquals(testA, report.getAssessments().get(0).getTarget());
-		assertEquals(BigDecimal.ONE, report.getAssessments().get(0).getScore());
-	}
-
-	@Test
-	void addTwoDistinctTestsWithoutScore() throws Exception {
-		SimilarityReport report = new SimilarityReportBuilder().add(testA, testB).build().sort(new AssessmentTestCaseNameComparator());
+	void addTwoTestsSymmetric() throws Exception {
+		SimilarityReport report = symmetric.add(testA).add(testB).complete().build().sort(new AssessmentTestCaseNameComparator());
 		assertEquals(4, report.getAssessments().size());
 		assertEquals(testA, report.getAssessments().get(0).getSource());
 		assertEquals(testA, report.getAssessments().get(0).getTarget());
@@ -97,8 +82,8 @@ public class SimilarityReportBuilderTest {
 	}
 
 	@Test
-	void addTestAndAddTwoDistinctTestsWithoutScore() throws Exception {
-		SimilarityReport report = new SimilarityReportBuilder().add(testA).add(testA, testB).build().sort(new AssessmentTestCaseNameComparator());
+	void addTwoTestsAssymmetric() throws Exception {
+		SimilarityReport report = assymmetric.add(testA).add(testB).complete().build().sort(new AssessmentTestCaseNameComparator());
 		assertEquals(4, report.getAssessments().size());
 		assertEquals(testA, report.getAssessments().get(0).getSource());
 		assertEquals(testA, report.getAssessments().get(0).getTarget());
@@ -115,129 +100,102 @@ public class SimilarityReportBuilderTest {
 	}
 
 	@Test
-	void addTwoDistinctTestsWithoutScoreAndAddTest() throws Exception {
-		SimilarityReport report = new SimilarityReportBuilder().add(testA, testB).add(testB).build().sort(new AssessmentTestCaseNameComparator());
+	void addPairOfTwoTestsSymmetric() throws Exception {
+		SimilarityReport report = symmetric.add(testA, testB, dotFive).build().sort(new AssessmentTestCaseNameComparator());
 		assertEquals(4, report.getAssessments().size());
 		assertEquals(testA, report.getAssessments().get(0).getSource());
 		assertEquals(testA, report.getAssessments().get(0).getTarget());
 		assertEquals(BigDecimal.ONE, report.getAssessments().get(0).getScore());
 		assertEquals(testA, report.getAssessments().get(1).getSource());
 		assertEquals(testB, report.getAssessments().get(1).getTarget());
-		assertEquals(BigDecimal.ZERO, report.getAssessments().get(1).getScore());
+		assertEquals(dotFive, report.getAssessments().get(1).getScore());
 		assertEquals(testB, report.getAssessments().get(2).getSource());
 		assertEquals(testA, report.getAssessments().get(2).getTarget());
-		assertEquals(BigDecimal.ZERO, report.getAssessments().get(2).getScore());
+		assertEquals(dotFive, report.getAssessments().get(2).getScore());
 		assertEquals(testB, report.getAssessments().get(3).getSource());
 		assertEquals(testB, report.getAssessments().get(3).getTarget());
 		assertEquals(BigDecimal.ONE, report.getAssessments().get(3).getScore());
 	}
 
 	@Test
-	void addTwoDistinctTestsIndividually() throws Exception {
-		SimilarityReport report = new SimilarityReportBuilder().add(testA).add(testB).build().sort(new AssessmentTestCaseNameComparator());
+	void addPairOfTwoTestsAssymmetric() throws Exception {
+		SimilarityReport report = assymmetric.add(testA, testB, dotFive).add(testB, testA, dotSix).build().sort(new AssessmentTestCaseNameComparator());
 		assertEquals(4, report.getAssessments().size());
 		assertEquals(testA, report.getAssessments().get(0).getSource());
 		assertEquals(testA, report.getAssessments().get(0).getTarget());
 		assertEquals(BigDecimal.ONE, report.getAssessments().get(0).getScore());
 		assertEquals(testA, report.getAssessments().get(1).getSource());
 		assertEquals(testB, report.getAssessments().get(1).getTarget());
-		assertEquals(BigDecimal.ZERO, report.getAssessments().get(1).getScore());
+		assertEquals(dotFive, report.getAssessments().get(1).getScore());
 		assertEquals(testB, report.getAssessments().get(2).getSource());
 		assertEquals(testA, report.getAssessments().get(2).getTarget());
-		assertEquals(BigDecimal.ZERO, report.getAssessments().get(2).getScore());
+		assertEquals(dotSix, report.getAssessments().get(2).getScore());
 		assertEquals(testB, report.getAssessments().get(3).getSource());
 		assertEquals(testB, report.getAssessments().get(3).getTarget());
 		assertEquals(BigDecimal.ONE, report.getAssessments().get(3).getScore());
 	}
 
 	@Test
-	void addTwoDistinctTestsWithSymmetricScore() throws Exception {
-		SimilarityReport report = new SimilarityReportBuilder().add(testA, testB, zeroPointFive).build().sort(new AssessmentTestCaseNameComparator());
-		assertEquals(4, report.getAssessments().size());
-		assertEquals(testA, report.getAssessments().get(0).getSource());
-		assertEquals(testA, report.getAssessments().get(0).getTarget());
-		assertEquals(BigDecimal.ONE, report.getAssessments().get(0).getScore());
-		assertEquals(testA, report.getAssessments().get(1).getSource());
-		assertEquals(testB, report.getAssessments().get(1).getTarget());
-		assertEquals(zeroPointFive, report.getAssessments().get(1).getScore());
-		assertEquals(testB, report.getAssessments().get(2).getSource());
-		assertEquals(testA, report.getAssessments().get(2).getTarget());
-		assertEquals(zeroPointFive, report.getAssessments().get(2).getScore());
-		assertEquals(testB, report.getAssessments().get(3).getSource());
-		assertEquals(testB, report.getAssessments().get(3).getTarget());
-		assertEquals(BigDecimal.ONE, report.getAssessments().get(3).getScore());
+	void addTestTwice() throws Exception {
+		assertThrows(PotentialErrorProneOperationException.class, () -> {
+			symmetric.add(testA).add(testA);
+		});
+		assertThrows(PotentialErrorProneOperationException.class, () -> {
+			assymmetric.add(testA).add(testA);
+		});
 	}
 
 	@Test
-	void addTwoDistinctTestsWithAssymmetricScore() throws Exception {
-		SimilarityReport report = new SimilarityReportBuilder().add(testA, zeroPointFive, testB, zeroPointSix).build().sort(new AssessmentTestCaseNameComparator());
-		assertEquals(4, report.getAssessments().size());
-		assertEquals(testA, report.getAssessments().get(0).getSource());
-		assertEquals(testA, report.getAssessments().get(0).getTarget());
-		assertEquals(BigDecimal.ONE, report.getAssessments().get(0).getScore());
-		assertEquals(testA, report.getAssessments().get(1).getSource());
-		assertEquals(testB, report.getAssessments().get(1).getTarget());
-		assertEquals(zeroPointFive, report.getAssessments().get(1).getScore());
-		assertEquals(testB, report.getAssessments().get(2).getSource());
-		assertEquals(testA, report.getAssessments().get(2).getTarget());
-		assertEquals(zeroPointSix, report.getAssessments().get(2).getScore());
-		assertEquals(testB, report.getAssessments().get(3).getSource());
-		assertEquals(testB, report.getAssessments().get(3).getTarget());
-		assertEquals(BigDecimal.ONE, report.getAssessments().get(3).getScore());
+	void addTestWithItself() throws Exception {
+		assertThrows(PotentialErrorProneOperationException.class, () -> {
+			symmetric.add(testA, testA, dotFive);
+		});
+		assertThrows(PotentialErrorProneOperationException.class, () -> {
+			assymmetric.add(testA, testA, dotFive);
+		});
 	}
 
 	@Test
-	void addTwoDistinctTestsWithAssymmetricScoreReversed() throws Exception {
-		SimilarityReport report = new SimilarityReportBuilder().add(testB, zeroPointFive, testA, zeroPointSix).build().sort(new AssessmentTestCaseNameComparator());
-		assertEquals(4, report.getAssessments().size());
-		assertEquals(testA, report.getAssessments().get(0).getSource());
-		assertEquals(testA, report.getAssessments().get(0).getTarget());
-		assertEquals(BigDecimal.ONE, report.getAssessments().get(0).getScore());
-		assertEquals(testA, report.getAssessments().get(1).getSource());
-		assertEquals(testB, report.getAssessments().get(1).getTarget());
-		assertEquals(zeroPointSix, report.getAssessments().get(1).getScore());
-		assertEquals(testB, report.getAssessments().get(2).getSource());
-		assertEquals(testA, report.getAssessments().get(2).getTarget());
-		assertEquals(zeroPointFive, report.getAssessments().get(2).getScore());
-		assertEquals(testB, report.getAssessments().get(3).getSource());
-		assertEquals(testB, report.getAssessments().get(3).getTarget());
-		assertEquals(BigDecimal.ONE, report.getAssessments().get(3).getScore());
+	void addTestAndPairWithItseflAndAnotherTest() throws Exception {
+		assertThrows(PotentialErrorProneOperationException.class, () -> {
+			symmetric.add(testA).add(testA, testB, dotFive);
+		});
+		assertThrows(PotentialErrorProneOperationException.class, () -> {
+			symmetric.add(testA, testB, dotFive).add(testB);
+		});
+		assertThrows(PotentialErrorProneOperationException.class, () -> {
+			assymmetric.add(testA).add(testA, testB, dotFive);
+		});
+		assertThrows(PotentialErrorProneOperationException.class, () -> {
+			assymmetric.add(testA, testB, dotFive).add(testB);
+		});
 	}
 
 	@Test
-	void addTwoDistinctTestsWithSymmetricScoreReplacedByNoScore() throws Exception {
-		SimilarityReport report = new SimilarityReportBuilder().add(testA, testB, zeroPointFive).add(testA, testB).build().sort(new AssessmentTestCaseNameComparator());
-		assertEquals(4, report.getAssessments().size());
-		assertEquals(testA, report.getAssessments().get(0).getSource());
-		assertEquals(testA, report.getAssessments().get(0).getTarget());
-		assertEquals(BigDecimal.ONE, report.getAssessments().get(0).getScore());
-		assertEquals(testA, report.getAssessments().get(1).getSource());
-		assertEquals(testB, report.getAssessments().get(1).getTarget());
-		assertEquals(BigDecimal.ZERO, report.getAssessments().get(1).getScore());
-		assertEquals(testB, report.getAssessments().get(2).getSource());
-		assertEquals(testA, report.getAssessments().get(2).getTarget());
-		assertEquals(BigDecimal.ZERO, report.getAssessments().get(2).getScore());
-		assertEquals(testB, report.getAssessments().get(3).getSource());
-		assertEquals(testB, report.getAssessments().get(3).getTarget());
-		assertEquals(BigDecimal.ONE, report.getAssessments().get(3).getScore());
+	void addSamePairTwice() throws Exception {
+		assertThrows(PotentialErrorProneOperationException.class, () -> {
+			symmetric.add(testA, testB, dotFive).add(testA, testB, dotSix);
+		});
+		assertThrows(PotentialErrorProneOperationException.class, () -> {
+			symmetric.add(testA, testB, dotFive).add(testB, testA, dotSix);
+		});
+		assertThrows(PotentialErrorProneOperationException.class, () -> {
+			assymmetric.add(testA, testB, dotFive).add(testA, testB, dotSix);
+		});
 	}
 
 	@Test
-	void addTwoDistinctTestsWithAssymmetricScoreReplacedBySymmetricScore() throws Exception {
-		SimilarityReport report = new SimilarityReportBuilder().add(testA, zeroPointFive, testB, zeroPointSix).add(testA, testB, zeroPointFive).build().sort(new AssessmentTestCaseNameComparator());
-		assertEquals(4, report.getAssessments().size());
-		assertEquals(testA, report.getAssessments().get(0).getSource());
-		assertEquals(testA, report.getAssessments().get(0).getTarget());
-		assertEquals(BigDecimal.ONE, report.getAssessments().get(0).getScore());
-		assertEquals(testA, report.getAssessments().get(1).getSource());
-		assertEquals(testB, report.getAssessments().get(1).getTarget());
-		assertEquals(zeroPointFive, report.getAssessments().get(1).getScore());
-		assertEquals(testB, report.getAssessments().get(2).getSource());
-		assertEquals(testA, report.getAssessments().get(2).getTarget());
-		assertEquals(zeroPointFive, report.getAssessments().get(2).getScore());
-		assertEquals(testB, report.getAssessments().get(3).getSource());
-		assertEquals(testB, report.getAssessments().get(3).getTarget());
-		assertEquals(BigDecimal.ONE, report.getAssessments().get(3).getScore());
+	void addTwoTestsSymmetricWithoutComplete() throws Exception {
+		assertThrows(MissingAssessmentException.class, () -> {
+			symmetric.add(testA).add(testB).build();
+		});
+	}
+
+	@Test
+	void addTwoTestsAssymmetricWithoutComplete() throws Exception {
+		assertThrows(MissingAssessmentException.class, () -> {
+			assymmetric.add(testA).add(testB).build();
+		});
 	}
 
 }

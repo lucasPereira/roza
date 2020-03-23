@@ -68,7 +68,7 @@ public class SimilarityBasedCriteriaTest {
 
 	@Test
 	void zeroSimilarity() throws Exception {
-		SimilarityReport report = new SimilarityReportBuilder().add(testA).add(testB).build();
+		SimilarityReport report = new SimilarityReportBuilder(true).add(testA).add(testB).complete().build();
 		Level level = new Level(new SingleLinkage(report), new InsecureReferee(), new ClusterFactory().create(report));
 		List<Level> levels = Arrays.asList(level);
 		assertTrue(new SimilarityBasedCriteria(BigDecimal.ZERO).shoudlStop(levels));
@@ -77,7 +77,7 @@ public class SimilarityBasedCriteriaTest {
 
 	@Test
 	void oneSimilarity() throws Exception {
-		SimilarityReport report = new SimilarityReportBuilder().add(testA, testB, BigDecimal.ONE).build();
+		SimilarityReport report = new SimilarityReportBuilder(true).add(testA, testB, BigDecimal.ONE).build();
 		Level level = new Level(new SingleLinkage(report), new InsecureReferee(), new ClusterFactory().create(report));
 		List<Level> levels = Arrays.asList(level);
 		assertFalse(new SimilarityBasedCriteria(dotNine).shoudlStop(levels));
@@ -86,7 +86,7 @@ public class SimilarityBasedCriteriaTest {
 
 	@Test
 	void zeroPointFiveSimilarity() throws Exception {
-		SimilarityReport report = new SimilarityReportBuilder().add(testA, testB, dotFive).build();
+		SimilarityReport report = new SimilarityReportBuilder(true).add(testA, testB, dotFive).build();
 		Level level = new Level(new SingleLinkage(report), new InsecureReferee(), new ClusterFactory().create(report));
 		List<Level> levels = Arrays.asList(level);
 		assertFalse(new SimilarityBasedCriteria(dotFour).shoudlStop(levels));
@@ -96,7 +96,7 @@ public class SimilarityBasedCriteriaTest {
 
 	@Test
 	void zeroPointFiveSimilarityInLevelTwoSingleLinkage() throws Exception {
-		SimilarityReport report = new SimilarityReportBuilder().add(testA, testB, dotSix).add(testA, testC, dotFour).add(testB, testC, dotFive).build();
+		SimilarityReport report = new SimilarityReportBuilder(true).add(testA, testB, dotSix).add(testA, testC, dotFour).add(testB, testC, dotFive).build();
 		Level one = new Level(new SingleLinkage(report), new InsecureReferee(), new ClusterFactory().create(report));
 		Level two = one.generateNextLevel();
 		List<Level> levels = Arrays.asList(one, two);
@@ -107,7 +107,7 @@ public class SimilarityBasedCriteriaTest {
 
 	@Test
 	void zeroPointFiveSimilarityInLevelTwoCompleteLinkage() throws Exception {
-		SimilarityReport report = new SimilarityReportBuilder().add(testA, testB, dotSix).add(testA, testC, dotFour).add(testB, testC, dotFive).build();
+		SimilarityReport report = new SimilarityReportBuilder(true).add(testA, testB, dotSix).add(testA, testC, dotFour).add(testB, testC, dotFive).build();
 		Level one = new Level(new CompleteLinkage(report), new InsecureReferee(), new ClusterFactory().create(report));
 		Level two = one.generateNextLevel();
 		List<Level> levels = Arrays.asList(one, two);
@@ -118,7 +118,7 @@ public class SimilarityBasedCriteriaTest {
 
 	@Test
 	void zeroPointFiveSimilarityInLevelTwoSingleLinkageOrderOfLevelsReversed() throws Exception {
-		SimilarityReport report = new SimilarityReportBuilder().add(testA, testB, dotSix).add(testA, testC, dotFour).add(testB, testC, dotFive).build();
+		SimilarityReport report = new SimilarityReportBuilder(true).add(testA, testB, dotSix).add(testA, testC, dotFour).add(testB, testC, dotFive).build();
 		Level one = new Level(new SingleLinkage(report), new InsecureReferee(), new ClusterFactory().create(report));
 		Level two = one.generateNextLevel();
 		List<Level> levels = Arrays.asList(two, one);
@@ -129,7 +129,7 @@ public class SimilarityBasedCriteriaTest {
 
 	@Test
 	void zeroPointFiveSimilarityInLevelTwoCompleteLinkageOrderOfLevelsReversed() throws Exception {
-		SimilarityReport report = new SimilarityReportBuilder().add(testA, testB, dotSix).add(testA, testC, dotFour).add(testB, testC, dotFive).build();
+		SimilarityReport report = new SimilarityReportBuilder(true).add(testA, testB, dotSix).add(testA, testC, dotFour).add(testB, testC, dotFive).build();
 		Level one = new Level(new CompleteLinkage(report), new InsecureReferee(), new ClusterFactory().create(report));
 		Level two = one.generateNextLevel();
 		List<Level> levels = Arrays.asList(two, one);
