@@ -24,7 +24,7 @@ import br.ufsc.ine.leb.roza.utils.FileUtils;
 import br.ufsc.ine.leb.roza.utils.FolderUtils;
 import br.ufsc.ine.leb.roza.utils.ProcessUtils;
 
-public class DeckardSimilarityMeasurer implements SimilarityMeasurer {
+public class DeckardSimilarityMeasurer extends AbstractSimilarityMeasurer implements SimilarityMeasurer {
 
 	private DeckardConfigurations configurations;
 
@@ -33,18 +33,11 @@ public class DeckardSimilarityMeasurer implements SimilarityMeasurer {
 	}
 
 	@Override
-	public SimilarityReport measure(MaterializationReport materializationReport) {
+	public SimilarityReport measureMoreTheOneTest(MaterializationReport materializationReport, SimilarityReportBuilder builder) {
 		List<TestCaseMaterialization> materializations = materializationReport.getMaterializations();
 		MatrixElementToKeyConverter<TestCaseMaterialization, String> converter = new DeckardMatrixElementToKeyConverter();
 		MatrixValueFactory<TestCaseMaterialization, Intersector> factory = new DeckardMatrixValueFactory();
 		Matrix<TestCaseMaterialization, String, Intersector> matrix = new Matrix<>(materializations, converter, factory);
-		SimilarityReportBuilder builder = new SimilarityReportBuilder(false);
-		if (materializations.size() == 0) {
-			return builder.build();
-		}
-		if (materializations.size() == 1) {
-			return builder.add(materializations.iterator().next().getTestCase()).build();
-		}
 		run(materializationReport);
 		parse(matrix);
 		for (MatrixPair<TestCaseMaterialization, Intersector> pair : matrix.getNonReflexivePairs()) {

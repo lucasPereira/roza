@@ -26,7 +26,7 @@ import br.ufsc.ine.leb.roza.measurement.matrix.jplag.JplagMatrixValueFactory;
 import br.ufsc.ine.leb.roza.utils.FolderUtils;
 import br.ufsc.ine.leb.roza.utils.ProcessUtils;
 
-public class JplagSimilarityMeasurer implements SimilarityMeasurer {
+public class JplagSimilarityMeasurer extends AbstractSimilarityMeasurer implements SimilarityMeasurer {
 
 	private JplagConfigurations configurations;
 
@@ -35,18 +35,11 @@ public class JplagSimilarityMeasurer implements SimilarityMeasurer {
 	}
 
 	@Override
-	public SimilarityReport measure(MaterializationReport materializationReport) {
+	public SimilarityReport measureMoreTheOneTest(MaterializationReport materializationReport, SimilarityReportBuilder builder) {
 		List<TestCaseMaterialization> materializations = materializationReport.getMaterializations();
 		MatrixElementToKeyConverter<TestCaseMaterialization, String> converter = new JplagMatrixElementToKeyConverter();
 		MatrixValueFactory<TestCaseMaterialization, BigDecimal> factory = new JplagMatrixValueFactory();
 		Matrix<TestCaseMaterialization, String, BigDecimal> matrix = new Matrix<>(materializations, converter, factory);
-		SimilarityReportBuilder builder = new SimilarityReportBuilder(false);
-		if (materializations.size() == 0) {
-			return builder.build();
-		}
-		if (materializations.size() == 1) {
-			return builder.add(materializations.iterator().next().getTestCase()).build();
-		}
 		run(materializationReport);
 		parse(matrix);
 		for (MatrixPair<TestCaseMaterialization, BigDecimal> pair : matrix.getNonReflexivePairs()) {

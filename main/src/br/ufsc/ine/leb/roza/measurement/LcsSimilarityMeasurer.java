@@ -11,18 +11,11 @@ import br.ufsc.ine.leb.roza.Statement;
 import br.ufsc.ine.leb.roza.TestCase;
 import br.ufsc.ine.leb.roza.TestCaseMaterialization;
 
-public class LcsSimilarityMeasurer implements SimilarityMeasurer {
+public class LcsSimilarityMeasurer extends AbstractSimilarityMeasurer implements SimilarityMeasurer {
 
 	@Override
-	public SimilarityReport measure(MaterializationReport materializationReport) {
+	public SimilarityReport measureMoreTheOneTest(MaterializationReport materializationReport, SimilarityReportBuilder builder) {
 		List<TestCaseMaterialization> materializations = materializationReport.getMaterializations();
-		SimilarityReportBuilder builder = new SimilarityReportBuilder(false);
-		if (materializations.size() == 0) {
-			return builder.build();
-		}
-		if (materializations.size() == 1) {
-			return builder.add(materializations.iterator().next().getTestCase()).build();
-		}
 		for (TestCaseMaterialization sourceMaterialization : materializations) {
 			TestCase source = sourceMaterialization.getTestCase();
 			List<Statement> sourceFixtures = source.getFixtures();

@@ -26,7 +26,7 @@ import br.ufsc.ine.leb.roza.measurement.matrix.simian.SimianMatrixElementToKeyCo
 import br.ufsc.ine.leb.roza.measurement.matrix.simian.SimianMatrixValueFactory;
 import br.ufsc.ine.leb.roza.utils.ProcessUtils;
 
-public class SimianSimilarityMeasurer implements SimilarityMeasurer {
+public class SimianSimilarityMeasurer extends AbstractSimilarityMeasurer implements SimilarityMeasurer {
 
 	private SimianConfigurations configurations;
 	private String resultsFolder;
@@ -37,18 +37,11 @@ public class SimianSimilarityMeasurer implements SimilarityMeasurer {
 	}
 
 	@Override
-	public SimilarityReport measure(MaterializationReport materializationReport) {
+	public SimilarityReport measureMoreTheOneTest(MaterializationReport materializationReport, SimilarityReportBuilder builder) {
 		List<TestCaseMaterialization> materializations = materializationReport.getMaterializations();
 		MatrixElementToKeyConverter<TestCaseMaterialization, String> converter = new SimianMatrixElementToKeyConverter();
 		MatrixValueFactory<TestCaseMaterialization, Intersector> factory = new SimianMatrixValueFactory();
 		Matrix<TestCaseMaterialization, String, Intersector> matrix = new Matrix<>(materializations, converter, factory);
-		SimilarityReportBuilder builder = new SimilarityReportBuilder(false);
-		if (materializations.size() == 0) {
-			return builder.build();
-		}
-		if (materializations.size() == 1) {
-			return builder.add(materializations.iterator().next().getTestCase()).build();
-		}
 		File fileReport = new File(resultsFolder, "report.xml");
 		run(materializationReport, fileReport);
 		parse(matrix, fileReport);
@@ -94,7 +87,7 @@ public class SimianSimilarityMeasurer implements SimilarityMeasurer {
 		arguments.add("main/tools/simian/simian-2.5.10.jar");
 		arguments.addAll(configurations.getAllAsArguments());
 		arguments.add(new File(materializationReport.getBaseFolder(), "*.java").getPath());
-		processUtils.execute(fileReport,arguments);
+		processUtils.execute(fileReport, arguments);
 	}
 
 }
