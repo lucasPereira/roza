@@ -2,15 +2,13 @@ package br.ufsc.ine.leb.roza.measurement.configuration.simian;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.LinkedList;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import br.ufsc.ine.leb.roza.measurement.configuration.simian.SimianBooleanConfiguration;
 
 public class SimianBooleanConfigurationTest {
 

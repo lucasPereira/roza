@@ -1,6 +1,9 @@
 package br.ufsc.ine.leb.roza.measurement.intersector;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigDecimal;
 
@@ -8,7 +11,6 @@ import org.junit.jupiter.api.Test;
 
 import br.ufsc.ine.leb.roza.exceptions.IntervalWithoutOverlapForConcatenationException;
 import br.ufsc.ine.leb.roza.exceptions.InvalidIntervalException;
-import br.ufsc.ine.leb.roza.measurement.intersector.Interval;
 
 public class IntervalTest {
 

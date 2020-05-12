@@ -10,8 +10,6 @@ import org.junit.jupiter.api.Test;
 
 import br.ufsc.ine.leb.roza.TestClass;
 import br.ufsc.ine.leb.roza.TextFile;
-import br.ufsc.ine.leb.roza.parsing.Junit5TestClassParser;
-import br.ufsc.ine.leb.roza.parsing.TestClassParser;
 
 public class Junit5TestClassParserTest {
 

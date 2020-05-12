@@ -8,8 +8,6 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import br.ufsc.ine.leb.roza.measurement.configuration.jplag.JplagStringConfiguration;
-
 public class JplagStringConfigurationTest {
 
 	private JplagStringConfiguration configuration;

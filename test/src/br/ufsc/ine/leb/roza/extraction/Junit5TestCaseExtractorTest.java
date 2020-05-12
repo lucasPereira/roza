@@ -14,8 +14,6 @@ import br.ufsc.ine.leb.roza.Statement;
 import br.ufsc.ine.leb.roza.TestCase;
 import br.ufsc.ine.leb.roza.TestClass;
 import br.ufsc.ine.leb.roza.TestMethod;
-import br.ufsc.ine.leb.roza.extraction.Junit5TestCaseExtractor;
-import br.ufsc.ine.leb.roza.extraction.TestCaseExtractor;
 
 public class Junit5TestCaseExtractorTest {
 

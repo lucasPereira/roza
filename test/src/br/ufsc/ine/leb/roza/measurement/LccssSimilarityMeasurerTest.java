@@ -14,8 +14,6 @@ import br.ufsc.ine.leb.roza.Statement;
 import br.ufsc.ine.leb.roza.TestCase;
 import br.ufsc.ine.leb.roza.materialization.Junit4WithAssertionsTestCaseMaterializer;
 import br.ufsc.ine.leb.roza.materialization.TestCaseMaterializer;
-import br.ufsc.ine.leb.roza.measurement.LccssSimilarityMeasurer;
-import br.ufsc.ine.leb.roza.measurement.SimilarityMeasurer;
 import br.ufsc.ine.leb.roza.measurement.report.AssessmentScoreAndTestCaseNameComparator;
 import br.ufsc.ine.leb.roza.utils.FolderUtils;
 

@@ -7,9 +7,6 @@ import java.math.BigDecimal;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import br.ufsc.ine.leb.roza.measurement.intersector.Intersector;
-import br.ufsc.ine.leb.roza.measurement.intersector.Interval;
-
 public class IntersectorTest {
 
 	private Interval oneToTen;

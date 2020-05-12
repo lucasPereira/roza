@@ -7,7 +7,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import br.ufsc.ine.leb.roza.exceptions.InvalidConfigurationException;
-import br.ufsc.ine.leb.roza.measurement.configuration.simian.SimianConfigurations;
 
 public class SimianConfigurationsTest {
 

@@ -9,8 +9,6 @@ import java.util.Arrays;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import br.ufsc.ine.leb.roza.SimilarityReport;
-import br.ufsc.ine.leb.roza.TestCase;
 import br.ufsc.ine.leb.roza.exceptions.MissingAssessmentException;
 import br.ufsc.ine.leb.roza.exceptions.PotentialErrorProneOperationException;
 import br.ufsc.ine.leb.roza.measurement.report.AssessmentTestCaseNameComparator;

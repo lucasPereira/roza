@@ -1,6 +1,6 @@
 package br.ufsc.ine.leb.roza.selection;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Arrays;
 import java.util.List;
@@ -9,7 +9,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import br.ufsc.ine.leb.roza.TextFile;
-import br.ufsc.ine.leb.roza.selection.JavaExtensionTextFileSelector;
 
 public class JavaExtensionTextFileSelectorTest {
 

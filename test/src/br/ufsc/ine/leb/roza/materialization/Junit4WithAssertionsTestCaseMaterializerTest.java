@@ -12,8 +12,6 @@ import br.ufsc.ine.leb.roza.MaterializationReport;
 import br.ufsc.ine.leb.roza.Statement;
 import br.ufsc.ine.leb.roza.TestCase;
 import br.ufsc.ine.leb.roza.TestCaseMaterialization;
-import br.ufsc.ine.leb.roza.materialization.Junit4WithAssertionsTestCaseMaterializer;
-import br.ufsc.ine.leb.roza.materialization.TestCaseMaterializer;
 import br.ufsc.ine.leb.roza.utils.FileUtils;
 import br.ufsc.ine.leb.roza.utils.FolderUtils;
 

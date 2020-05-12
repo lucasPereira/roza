@@ -8,8 +8,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import br.ufsc.ine.leb.roza.TextFile;
-import br.ufsc.ine.leb.roza.loading.RecursiveTextFileLoader;
-import br.ufsc.ine.leb.roza.loading.TextFileLoader;
 
 public class RecursiveTextFileLoaderTest {
 

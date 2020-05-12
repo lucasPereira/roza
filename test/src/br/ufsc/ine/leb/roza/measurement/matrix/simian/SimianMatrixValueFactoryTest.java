@@ -1,6 +1,6 @@
 package br.ufsc.ine.leb.roza.measurement.matrix.simian;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.File;
 import java.math.BigDecimal;
@@ -13,7 +13,6 @@ import br.ufsc.ine.leb.roza.TestCase;
 import br.ufsc.ine.leb.roza.TestCaseMaterialization;
 import br.ufsc.ine.leb.roza.measurement.intersector.Intersector;
 import br.ufsc.ine.leb.roza.measurement.matrix.MatrixValueFactory;
-import br.ufsc.ine.leb.roza.measurement.matrix.simian.SimianMatrixValueFactory;
 
 public class SimianMatrixValueFactoryTest {
 

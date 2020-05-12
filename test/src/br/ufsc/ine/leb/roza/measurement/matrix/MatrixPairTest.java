@@ -1,13 +1,12 @@
 package br.ufsc.ine.leb.roza.measurement.matrix;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Arrays;
 
 import org.junit.jupiter.api.Test;
 
 import br.ufsc.ine.leb.roza.TestCase;
-import br.ufsc.ine.leb.roza.measurement.matrix.MatrixPair;
 
 public class MatrixPairTest {
 
