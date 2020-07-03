@@ -5,7 +5,7 @@ import java.util.Set;
 
 import br.ufsc.ine.leb.roza.Cluster;
 
-public class BiggerClusterReferee implements Referee {
+public class BiggestClusterReferee implements Referee {
 
 	@Override
 	public Set<Combination> untie(Set<Combination> elements) {

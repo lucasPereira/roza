@@ -13,7 +13,7 @@ import br.ufsc.ine.leb.roza.Cluster;
 import br.ufsc.ine.leb.roza.TestCase;
 import br.ufsc.ine.leb.roza.utils.CollectionUtils;
 
-public class BiggerClusterRefereeTest {
+public class BiggestClusterRefereeTest {
 
 	private Referee referee;
 	private Combination alphaBetaCombinedDelta;
@@ -38,7 +38,7 @@ public class BiggerClusterRefereeTest {
 		alphaBetaCombinedGamma= new Combination(alphaBetaCluster, gammaCluster);
 		gammaCombinedDelta = new Combination(gammaCluster, deltaCluster);
 		collectionUtils = new CollectionUtils();
-		referee = new BiggerClusterReferee();
+		referee = new BiggestClusterReferee();
 	}
 
 	@Test

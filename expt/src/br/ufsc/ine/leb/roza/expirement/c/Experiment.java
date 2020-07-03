@@ -14,7 +14,7 @@ import br.ufsc.ine.leb.roza.TestClass;
 import br.ufsc.ine.leb.roza.TextFile;
 import br.ufsc.ine.leb.roza.clustering.TestCaseClusterer;
 import br.ufsc.ine.leb.roza.clustering.dendrogram.AverageLinkage;
-import br.ufsc.ine.leb.roza.clustering.dendrogram.BiggerClusterReferee;
+import br.ufsc.ine.leb.roza.clustering.dendrogram.BiggestClusterReferee;
 import br.ufsc.ine.leb.roza.clustering.dendrogram.CompleteLinkage;
 import br.ufsc.ine.leb.roza.clustering.dendrogram.DendogramTestCaseClusterer;
 import br.ufsc.ine.leb.roza.clustering.dendrogram.InsecureReferee;
@@ -23,7 +23,7 @@ import br.ufsc.ine.leb.roza.clustering.dendrogram.Linkage;
 import br.ufsc.ine.leb.roza.clustering.dendrogram.Referee;
 import br.ufsc.ine.leb.roza.clustering.dendrogram.SimilarityBasedCriteria;
 import br.ufsc.ine.leb.roza.clustering.dendrogram.SingleLinkage;
-import br.ufsc.ine.leb.roza.clustering.dendrogram.SmallerClusterReferee;
+import br.ufsc.ine.leb.roza.clustering.dendrogram.SmallestClusterReferee;
 import br.ufsc.ine.leb.roza.clustering.dendrogram.TestsPerClassCriteria;
 import br.ufsc.ine.leb.roza.clustering.dendrogram.ThresholdCriteria;
 import br.ufsc.ine.leb.roza.extraction.Junit4TestCaseExtractor;
@@ -74,8 +74,8 @@ public class Experiment {
 
 	private static List<Referee> createReferees() {
 		InsecureReferee insecure = new InsecureReferee();
-		BiggerClusterReferee biggest = new BiggerClusterReferee();
-		SmallerClusterReferee smallest = new SmallerClusterReferee();
+		BiggestClusterReferee biggest = new BiggestClusterReferee();
+		SmallestClusterReferee smallest = new SmallestClusterReferee();
 		List<Referee> referees = Arrays.asList(insecure, biggest, smallest);
 		return referees;
 	}
