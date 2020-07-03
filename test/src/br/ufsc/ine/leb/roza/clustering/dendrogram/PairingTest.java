@@ -92,4 +92,23 @@ public class PairingTest {
 		assertTrue(gammaPairedAlphaBeta.contains(gammaAlphaPair));
 		assertTrue(gammaPairedAlphaBeta.contains(gammaBetaPair));
 	}
+
+	@Test
+	void pairClustersWithDistincElementsAndDistinctSizesWithoutRepetition() throws Exception {
+		Cluster alphaCluster = new Cluster(alpha);
+		Cluster betaCluster = new Cluster(beta);
+		Cluster gammaCluster = new Cluster(gamma);
+		Cluster alphaBetaCluster = alphaCluster.merge(betaCluster);
+		Set<Pair> alphaBetaPairedGamma = new Pairing(alphaBetaCluster, gammaCluster).getPairsWithoutRepetition();
+		Set<Pair> gammaPairedAlphaBeta = new Pairing(gammaCluster, alphaBetaCluster).getPairsWithoutRepetition();
+
+		assertEquals(2, alphaBetaPairedGamma.size());
+		assertTrue(alphaBetaPairedGamma.contains(alphaGammaPair));
+		assertTrue(alphaBetaPairedGamma.contains(betaGammaPair));
+
+		assertEquals(2, gammaPairedAlphaBeta.size());
+		assertTrue(gammaPairedAlphaBeta.contains(gammaAlphaPair));
+		assertTrue(gammaPairedAlphaBeta.contains(gammaBetaPair));
+	}
+
 }

@@ -27,4 +27,14 @@ class Pairing {
 		return pairs;
 	}
 
+	public Set<Pair> getPairsWithoutRepetition() {
+		Set<Pair> pairs = new HashSet<>();
+		for (TestCase firstTestCase : first.getTestCases()) {
+			for (TestCase secondTestCase : second.getTestCases()) {
+				pairs.add(new Pair(firstTestCase, secondTestCase));
+			}
+		}
+		return pairs;
+	}
+
 }
