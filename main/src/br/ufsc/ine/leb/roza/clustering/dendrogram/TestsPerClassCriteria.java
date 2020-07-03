@@ -31,4 +31,9 @@ public class TestsPerClassCriteria implements ThresholdCriteria {
 		return false;
 	}
 
+	@Override
+	public String toString() {
+		return String.format("%s(%d)", getClass().getSimpleName(), threshold);
+	}
+
 }

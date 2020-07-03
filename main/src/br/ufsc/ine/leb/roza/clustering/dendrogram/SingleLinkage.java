@@ -7,7 +7,7 @@ import br.ufsc.ine.leb.roza.Cluster;
 import br.ufsc.ine.leb.roza.SimilarityReport;
 import br.ufsc.ine.leb.roza.TestCase;
 
-class SingleLinkage implements Linkage {
+public class SingleLinkage implements Linkage {
 
 	private SimilarityReport report;
 
@@ -28,6 +28,11 @@ class SingleLinkage implements Linkage {
 			}
 		}
 		return nearestDistance;
+	}
+
+	@Override
+	public String toString() {
+		return getClass().getSimpleName();
 	}
 
 }

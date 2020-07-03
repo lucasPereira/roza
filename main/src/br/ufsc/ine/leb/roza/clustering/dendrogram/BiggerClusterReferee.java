@@ -5,7 +5,7 @@ import java.util.Set;
 
 import br.ufsc.ine.leb.roza.Cluster;
 
-class BiggerClusterReferee implements Referee {
+public class BiggerClusterReferee implements Referee {
 
 	@Override
 	public Set<Combination> untie(Set<Combination> elements) {
@@ -24,6 +24,11 @@ class BiggerClusterReferee implements Referee {
 			}
 		}
 		return choosed;
+	}
+
+	@Override
+	public String toString() {
+		return getClass().getSimpleName();
 	}
 
 }

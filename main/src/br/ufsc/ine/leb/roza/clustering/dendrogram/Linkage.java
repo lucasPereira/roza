@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 
 import br.ufsc.ine.leb.roza.Cluster;
 
-interface Linkage {
+public interface Linkage {
 
 	BigDecimal evaluate(Cluster first, Cluster second);
 

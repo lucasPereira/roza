@@ -5,7 +5,7 @@ import java.util.List;
 
 import br.ufsc.ine.leb.roza.exceptions.InvalidThresholdException;
 
-class SimilarityBasedCriteria implements ThresholdCriteria {
+public class SimilarityBasedCriteria implements ThresholdCriteria {
 
 	private BigDecimal threshold;
 
@@ -27,6 +27,11 @@ class SimilarityBasedCriteria implements ThresholdCriteria {
 			}
 		}
 		return false;
+	}
+
+	@Override
+	public String toString() {
+		return String.format("%s(%d)", getClass().getSimpleName(), threshold);
 	}
 
 }

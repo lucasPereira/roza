@@ -32,4 +32,9 @@ public class AverageLinkage implements Linkage {
 		return dimension.multiply(averageDistance);
 	}
 
+	@Override
+	public String toString() {
+		return getClass().getSimpleName();
+	}
+
 }

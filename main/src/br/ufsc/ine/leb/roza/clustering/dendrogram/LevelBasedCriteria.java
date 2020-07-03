@@ -4,7 +4,7 @@ import java.util.List;
 
 import br.ufsc.ine.leb.roza.exceptions.InvalidThresholdException;
 
-class LevelBasedCriteria implements ThresholdCriteria {
+public class LevelBasedCriteria implements ThresholdCriteria {
 
 	private Integer threshold;
 
@@ -18,6 +18,11 @@ class LevelBasedCriteria implements ThresholdCriteria {
 	@Override
 	public Boolean shoudlStop(List<Level> levels) {
 		return levels.size() >= threshold;
+	}
+
+	@Override
+	public String toString() {
+		return String.format("%s(%d)", getClass().getSimpleName(), threshold);
 	}
 
 }
