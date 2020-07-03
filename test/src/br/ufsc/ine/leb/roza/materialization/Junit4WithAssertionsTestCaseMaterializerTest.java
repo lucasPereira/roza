@@ -15,7 +15,7 @@ import br.ufsc.ine.leb.roza.TestCaseMaterialization;
 import br.ufsc.ine.leb.roza.utils.FileUtils;
 import br.ufsc.ine.leb.roza.utils.FolderUtils;
 
-public class Junit4WithAssertionsTestCaseMaterializerTest {
+class Junit4WithAssertionsTestCaseMaterializerTest {
 
 	private TestCaseMaterializer materializer;
 	private FileUtils fileUtils;

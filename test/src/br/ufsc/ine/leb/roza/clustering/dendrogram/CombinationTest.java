@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 import br.ufsc.ine.leb.roza.Cluster;
 import br.ufsc.ine.leb.roza.TestCase;
 
-public class CombinationTest {
+class CombinationTest {
 
 	private Cluster alphaCluster;
 	private Cluster betaCluster;

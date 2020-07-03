@@ -7,7 +7,7 @@ import java.util.Iterator;
 
 import org.junit.jupiter.api.Test;
 
-public class StandardRecallLevelsTest {
+class StandardRecallLevelsTest {
 
 	@Test
 	void iterator() throws Exception {

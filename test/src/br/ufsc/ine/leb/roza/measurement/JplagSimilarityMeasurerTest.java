@@ -18,7 +18,7 @@ import br.ufsc.ine.leb.roza.measurement.configuration.jplag.JplagConfigurations;
 import br.ufsc.ine.leb.roza.measurement.report.AssessmentScoreAndTestCaseNameComparator;
 import br.ufsc.ine.leb.roza.utils.FolderUtils;
 
-public class JplagSimilarityMeasurerTest {
+class JplagSimilarityMeasurerTest {
 
 	private SimilarityMeasurer measurer;
 	private TestCaseMaterializer materializer;

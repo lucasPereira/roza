@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 import br.ufsc.ine.leb.roza.exceptions.IntervalWithoutOverlapForConcatenationException;
 import br.ufsc.ine.leb.roza.exceptions.InvalidIntervalException;
 
-public class IntervalTest {
+class IntervalTest {
 
 	@Test
 	void oneToTen() throws Exception {

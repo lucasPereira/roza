@@ -17,7 +17,7 @@ import br.ufsc.ine.leb.roza.exceptions.NoNextLevelException;
 import br.ufsc.ine.leb.roza.utils.CollectionUtils;
 import br.ufsc.ine.leb.roza.utils.MathUtils;
 
-public class LevelTest {
+class LevelTest {
 
 	private TestCase alpha;
 	private TestCase beta;

@@ -18,7 +18,7 @@ import br.ufsc.ine.leb.roza.measurement.configuration.deckard.DeckardConfigurati
 import br.ufsc.ine.leb.roza.measurement.report.AssessmentScoreAndTestCaseNameComparator;
 import br.ufsc.ine.leb.roza.utils.FolderUtils;
 
-public class DeckardSimilarityMeasurerTest {
+class DeckardSimilarityMeasurerTest {
 
 	private TestCaseMaterializer materializer;
 	private SimilarityMeasurer measurer;

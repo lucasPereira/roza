@@ -11,7 +11,7 @@ import br.ufsc.ine.leb.roza.TestCase;
 import br.ufsc.ine.leb.roza.TestCaseMaterialization;
 import br.ufsc.ine.leb.roza.measurement.matrix.MatrixElementToKeyConverter;
 
-public class DeckardElementToKeyConverterTest {
+class DeckardElementToKeyConverterTest {
 
 	@Test
 	void testCaseMaterializationToString() throws Exception {

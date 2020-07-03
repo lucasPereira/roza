@@ -14,7 +14,7 @@ import br.ufsc.ine.leb.roza.SimilarityReport;
 import br.ufsc.ine.leb.roza.SimilarityReportBuilder;
 import br.ufsc.ine.leb.roza.TestCase;
 
-public class ClusterFactoryTest {
+class ClusterFactoryTest {
 
 	private SimilarityReport report;
 	private ClusterFactory factory;

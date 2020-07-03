@@ -12,7 +12,7 @@ import br.ufsc.ine.leb.roza.Cluster;
 import br.ufsc.ine.leb.roza.SimilarityReportBuilder;
 import br.ufsc.ine.leb.roza.TestCase;
 
-public class CompleteLinkageTest {
+class CompleteLinkageTest {
 
 	private BigDecimal dotTwo;
 	private BigDecimal dotThree;

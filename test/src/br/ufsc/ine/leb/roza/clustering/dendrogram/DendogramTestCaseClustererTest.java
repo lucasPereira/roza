@@ -15,7 +15,7 @@ import br.ufsc.ine.leb.roza.SimilarityReportBuilder;
 import br.ufsc.ine.leb.roza.TestCase;
 import br.ufsc.ine.leb.roza.clustering.TestCaseClusterer;
 
-public class DendogramTestCaseClustererTest {
+class DendogramTestCaseClustererTest {
 
 	@Test
 	void zeroTests() throws Exception {

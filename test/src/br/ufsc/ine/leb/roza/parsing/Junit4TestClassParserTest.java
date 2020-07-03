@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 import br.ufsc.ine.leb.roza.TestClass;
 import br.ufsc.ine.leb.roza.TextFile;
 
-public class Junit4TestClassParserTest {
+class Junit4TestClassParserTest {
 
 	private TestClassParser parser;
 	private TextFile oneMethod;

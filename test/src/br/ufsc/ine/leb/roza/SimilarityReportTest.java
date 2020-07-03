@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 import br.ufsc.ine.leb.roza.exceptions.MissingPairException;
 import br.ufsc.ine.leb.roza.measurement.report.AssessmentScoreAndTestCaseNameComparator;
 
-public class SimilarityReportTest {
+class SimilarityReportTest {
 
 	private SimilarityAssessment assessmentAA;
 	private SimilarityAssessment assessmentAB;

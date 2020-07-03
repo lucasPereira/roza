@@ -10,7 +10,7 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class SimianBooleanConfigurationTest {
+class SimianBooleanConfigurationTest {
 
 	private SimianBooleanConfiguration configurationTrue;
 	private SimianBooleanConfiguration configurationFalse;

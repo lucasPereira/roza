@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import br.ufsc.ine.leb.roza.exceptions.InvalidConfigurationException;
 
-public class JplagConfigurationsTest {
+class JplagConfigurationsTest {
 
 	private JplagConfigurations configurations;
 

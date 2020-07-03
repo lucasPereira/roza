@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 
 import br.ufsc.ine.leb.roza.exceptions.InvalidSimilarityScoreException;
 
-public class SimilarityAssessmentTest {
+class SimilarityAssessmentTest {
 
 	private TestCase testCaseA;
 	private TestCase testCaseB;

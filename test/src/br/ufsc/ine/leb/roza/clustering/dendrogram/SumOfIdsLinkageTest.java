@@ -12,7 +12,7 @@ import br.ufsc.ine.leb.roza.Cluster;
 import br.ufsc.ine.leb.roza.TestCase;
 import br.ufsc.ine.leb.roza.utils.MathUtils;
 
-public class SumOfIdsLinkageTest {
+class SumOfIdsLinkageTest {
 
 	private TestCase alpha;
 	private TestCase beta;

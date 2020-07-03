@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 
 import br.ufsc.ine.leb.roza.exceptions.InvalidThresholdException;
 
-public class LevelBasedCriteriaTest {
+class LevelBasedCriteriaTest {
 
 	private Level empty;
 	private List<Level> levels;

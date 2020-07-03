@@ -7,7 +7,7 @@ import java.util.Arrays;
 
 import org.junit.jupiter.api.Test;
 
-public class MaterializationReportTest {
+class MaterializationReportTest {
 
 	@Test
 	void create() throws Exception {

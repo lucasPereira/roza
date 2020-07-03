@@ -23,7 +23,7 @@ import br.ufsc.ine.leb.roza.measurement.SimilarityMeasurer;
 import br.ufsc.ine.leb.roza.measurement.report.AssessmentScoreAndTestCaseNameComparator;
 import br.ufsc.ine.leb.roza.utils.FolderUtils;
 
-public class LcsSimilarityMetricTest {
+class LcsSimilarityMetricTest {
 
 	private BigDecimal oneOfTwo;
 	private BigDecimal twoOfThree;

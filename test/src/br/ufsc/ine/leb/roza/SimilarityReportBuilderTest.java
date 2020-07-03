@@ -13,7 +13,7 @@ import br.ufsc.ine.leb.roza.exceptions.MissingAssessmentException;
 import br.ufsc.ine.leb.roza.exceptions.PotentialErrorProneOperationException;
 import br.ufsc.ine.leb.roza.measurement.report.AssessmentTestCaseNameComparator;
 
-public class SimilarityReportBuilderTest {
+class SimilarityReportBuilderTest {
 
 	private TestCase testA;
 	private TestCase testB;

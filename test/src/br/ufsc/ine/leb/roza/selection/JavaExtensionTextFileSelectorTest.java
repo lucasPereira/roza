@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 
 import br.ufsc.ine.leb.roza.TextFile;
 
-public class JavaExtensionTextFileSelectorTest {
+class JavaExtensionTextFileSelectorTest {
 
 	private JavaExtensionTextFileSelector selector;
 

@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import br.ufsc.ine.leb.roza.TestCase;
 
-public class MatrixPairTest {
+class MatrixPairTest {
 
 	@Test
 	void create() throws Exception {

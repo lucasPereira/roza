@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 
 import br.ufsc.ine.leb.roza.TestCase;
 
-public class PairTest {
+class PairTest {
 
 	private Pair alphaBetaPair;
 	private Pair betaAlphaPair;

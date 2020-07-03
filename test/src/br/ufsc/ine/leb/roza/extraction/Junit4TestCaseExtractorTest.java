@@ -15,7 +15,7 @@ import br.ufsc.ine.leb.roza.TestCase;
 import br.ufsc.ine.leb.roza.TestClass;
 import br.ufsc.ine.leb.roza.TestMethod;
 
-public class Junit4TestCaseExtractorTest {
+class Junit4TestCaseExtractorTest {
 
 	private TestCaseExtractor extractor;
 

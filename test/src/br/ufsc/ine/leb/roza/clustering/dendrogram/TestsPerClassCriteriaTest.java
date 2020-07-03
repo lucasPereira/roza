@@ -16,7 +16,7 @@ import br.ufsc.ine.leb.roza.Cluster;
 import br.ufsc.ine.leb.roza.TestCase;
 import br.ufsc.ine.leb.roza.exceptions.InvalidThresholdException;
 
-public class TestsPerClassCriteriaTest {
+class TestsPerClassCriteriaTest {
 
 	private SumOfIdsLinkage linkage;
 	private InsecureReferee referee;

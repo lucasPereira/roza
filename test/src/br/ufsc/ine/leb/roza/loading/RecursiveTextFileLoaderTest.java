@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import br.ufsc.ine.leb.roza.TextFile;
 
-public class RecursiveTextFileLoaderTest {
+class RecursiveTextFileLoaderTest {
 
 	private TextFileLoader loader;
 

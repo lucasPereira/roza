@@ -14,7 +14,7 @@ import br.ufsc.ine.leb.roza.TestCase;
 import br.ufsc.ine.leb.roza.exceptions.NoClustersToMergeException;
 import br.ufsc.ine.leb.roza.utils.CollectionUtils;
 
-public class ClustersToMergeTest {
+class ClustersToMergeTest {
 
 	private Cluster alphaCluster;
 	private Cluster betaCluster;

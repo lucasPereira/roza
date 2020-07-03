@@ -6,7 +6,7 @@ import java.util.Arrays;
 
 import org.junit.jupiter.api.Test;
 
-public class TestMethodTest {
+class TestMethodTest {
 
 	@Test
 	void create() throws Exception {

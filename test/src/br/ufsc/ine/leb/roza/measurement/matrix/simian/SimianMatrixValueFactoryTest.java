@@ -14,7 +14,7 @@ import br.ufsc.ine.leb.roza.TestCaseMaterialization;
 import br.ufsc.ine.leb.roza.measurement.intersector.Intersector;
 import br.ufsc.ine.leb.roza.measurement.matrix.MatrixValueFactory;
 
-public class SimianMatrixValueFactoryTest {
+class SimianMatrixValueFactoryTest {
 
 	private MatrixValueFactory<TestCaseMaterialization, Intersector> factory;
 

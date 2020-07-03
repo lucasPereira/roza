@@ -16,7 +16,7 @@ import br.ufsc.ine.leb.roza.SimilarityReportBuilder;
 import br.ufsc.ine.leb.roza.TestCase;
 import br.ufsc.ine.leb.roza.exceptions.InvalidThresholdException;
 
-public class SimilarityBasedCriteriaTest {
+class SimilarityBasedCriteriaTest {
 
 	private TestCase testA;
 	private TestCase testB;

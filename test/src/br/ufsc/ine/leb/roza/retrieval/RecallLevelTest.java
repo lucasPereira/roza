@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import br.ufsc.ine.leb.roza.exceptions.NegativeRelevantSetSizeException;
 import br.ufsc.ine.leb.roza.exceptions.RecallLevelOutOfBoundsException;
 
-public class RecallLevelTest {
+class RecallLevelTest {
 
 	@Test
 	void tenPercentLevel() throws Exception {

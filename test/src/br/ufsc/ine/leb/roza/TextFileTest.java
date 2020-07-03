@@ -4,7 +4,7 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.jupiter.api.Test;
 
-public class TextFileTest {
+class TextFileTest {
 
 	@Test
 	void create() throws Exception {

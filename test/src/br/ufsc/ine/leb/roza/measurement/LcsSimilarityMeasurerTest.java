@@ -17,7 +17,7 @@ import br.ufsc.ine.leb.roza.materialization.TestCaseMaterializer;
 import br.ufsc.ine.leb.roza.measurement.report.AssessmentScoreAndTestCaseNameComparator;
 import br.ufsc.ine.leb.roza.utils.FolderUtils;
 
-public class LcsSimilarityMeasurerTest {
+class LcsSimilarityMeasurerTest {
 
 	private TestCaseMaterializer materializer;
 	private SimilarityMeasurer measurer;

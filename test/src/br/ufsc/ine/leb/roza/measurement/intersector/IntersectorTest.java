@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class IntersectorTest {
+class IntersectorTest {
 
 	private Interval oneToTen;
 	private Interval oneToFive;

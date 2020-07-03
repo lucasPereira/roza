@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import br.ufsc.ine.leb.roza.exceptions.NoTestMethodException;
 
-public class TestClassTest {
+class TestClassTest {
 
 	@Test
 	void withOneTestMethod() throws Exception {

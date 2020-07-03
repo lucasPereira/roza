@@ -8,7 +8,7 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class JplagStringConfigurationTest {
+class JplagStringConfigurationTest {
 
 	private JplagStringConfiguration configuration;
 	private List<String> arguments;

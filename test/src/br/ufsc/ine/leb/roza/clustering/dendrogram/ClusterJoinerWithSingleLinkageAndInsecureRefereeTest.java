@@ -16,7 +16,7 @@ import br.ufsc.ine.leb.roza.TestCase;
 import br.ufsc.ine.leb.roza.exceptions.TiebreakException;
 import br.ufsc.ine.leb.roza.utils.CollectionUtils;
 
-public class ClusterJoinerWithSingleLinkageAndInsecureRefereeTest {
+class ClusterJoinerWithSingleLinkageAndInsecureRefereeTest {
 
 	private BigDecimal dotOne;
 	private BigDecimal dotTwo;

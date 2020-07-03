@@ -15,7 +15,7 @@ import br.ufsc.ine.leb.roza.measurement.intersector.Intersector;
 import br.ufsc.ine.leb.roza.measurement.matrix.simian.SimianMatrixElementToKeyConverter;
 import br.ufsc.ine.leb.roza.measurement.matrix.simian.SimianMatrixValueFactory;
 
-public class MatrixTest {
+class MatrixTest {
 
 	@Test
 	void zeroTestCaseMaterializations() throws Exception {

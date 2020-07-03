@@ -7,7 +7,7 @@ import java.util.Arrays;
 
 import org.junit.jupiter.api.Test;
 
-public class TestCaseTest {
+class TestCaseTest {
 
 	@Test
 	void create() throws Exception {

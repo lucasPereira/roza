@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 
 import br.ufsc.ine.leb.roza.exceptions.InvalidConfigurationException;
 
-public class DeckardConfigurationsTest {
+class DeckardConfigurationsTest {
 
 	private DeckardConfigurations configurations;
 
