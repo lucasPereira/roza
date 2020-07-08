@@ -7,20 +7,20 @@ import java.util.function.Consumer;
 
 public class Hub {
 
-	private List<Consumer<List<File>>> classesLoadedListeners;
+	private List<Consumer<List<File>>> loadClassesListeners;
 
 	public Hub() {
-		classesLoadedListeners = new LinkedList<>();
+		loadClassesListeners = new LinkedList<>();
 	}
 
-	public void classesLoadedPublish(List<File> classes) {
-		for (Consumer<List<File>> listener : classesLoadedListeners) {
+	public void loadClassesPublish(List<File> classes) {
+		for (Consumer<List<File>> listener : loadClassesListeners) {
 			listener.accept(classes);
 		}
 	}
 
-	public void classesLoadedSubscribe(Consumer<List<File>> listener) {
-		classesLoadedListeners.add(listener);
+	public void loadClassesSubscribe(Consumer<List<File>> listener) {
+		loadClassesListeners.add(listener);
 	}
 
 }

@@ -25,7 +25,7 @@ public class Toolbar implements UiComponent {
 
 	@Override
 	public void createChilds() {
-		new ClassLoaderButton(hub, this);
+		new LoadClassesButton(hub, this);
 	}
 
 	public void addComponent(Component component) {

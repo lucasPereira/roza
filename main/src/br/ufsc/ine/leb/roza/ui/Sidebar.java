@@ -1,15 +1,15 @@
 package br.ufsc.ine.leb.roza.ui;
 
-import java.awt.Color;
-import java.io.File;
-import java.util.List;
+import java.awt.Component;
 
+import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 
 public class Sidebar implements UiComponent {
 
 	private Hub hub;
 	private Content content;
+	private JPanel panel;
 
 	public Sidebar(Hub hub, Content content) {
 		this.hub = hub;
@@ -20,15 +20,20 @@ public class Sidebar implements UiComponent {
 
 	@Override
 	public void init() {
-		JPanel panel = new JPanel();
-		panel.setBackground(Color.ORANGE);
+		panel = new JPanel();
+		BoxLayout layout = new BoxLayout(panel, BoxLayout.Y_AXIS);
+		panel.setLayout(layout);
+		panel.setMaximumSize(panel.getPreferredSize());
 		content.addRightComponent(panel);
-		hub.classesLoadedSubscribe((List<File> classes) -> {
-			System.out.println(classes);
-		});
 	}
 
 	@Override
-	public void createChilds() {}
+	public void createChilds() {
+		new ClassList(hub, this);
+	}
+
+	public void addComponent(Component component) {
+		panel.add(component);
+	}
 
 }

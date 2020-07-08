@@ -8,13 +8,13 @@ import javax.swing.JFileChooser;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-public class ClassLoaderButton implements UiComponent {
+public class LoadClassesButton implements UiComponent {
 
 	private Hub hub;
 	private Toolbar toolbar;
 	private JButton button;
 
-	public ClassLoaderButton(Hub hub, Toolbar toolbar) {
+	public LoadClassesButton(Hub hub, Toolbar toolbar) {
 		this.hub = hub;
 		this.toolbar = toolbar;
 		init();
@@ -23,7 +23,7 @@ public class ClassLoaderButton implements UiComponent {
 
 	@Override
 	public void init() {
-		button = new JButton("Load classes");
+		button = new JButton("Load Classes");
 		toolbar.addComponent(button);
 		button.addActionListener(event -> {
 			JFileChooser chooser = new JFileChooser();
@@ -32,7 +32,7 @@ public class ClassLoaderButton implements UiComponent {
 			Integer result = chooser.showOpenDialog(SwingUtilities.getRoot(button));
 			if (result == JFileChooser.APPROVE_OPTION) {
 				File[] files = chooser.getSelectedFiles();
-				hub.classesLoadedPublish(Arrays.asList(files));
+				hub.loadClassesPublish(Arrays.asList(files));
 			}
 		});
 	}
