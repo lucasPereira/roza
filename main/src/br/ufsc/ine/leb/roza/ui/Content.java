@@ -6,10 +6,12 @@ import javax.swing.JSplitPane;
 
 public class Content implements UiComponent {
 
+	private Hub hub;
 	private Window window;
 	private JSplitPane panel;
 
-	public Content(Window window) {
+	public Content(Hub hub, Window window) {
+		this.hub = hub;
 		this.window = window;
 		init();
 		createChilds();
@@ -25,7 +27,7 @@ public class Content implements UiComponent {
 	@Override
 	public void createChilds() {
 		new GraphCanvas(this);
-		new Sidebar(this);
+		new Sidebar(hub, this);
 	}
 
 	public void addLeftComponent(Component component) {

@@ -7,10 +7,12 @@ import javax.swing.JSplitPane;
 
 public class Window implements UiComponent {
 
+	private Hub hub;
 	private JFrame frame;
 	private JSplitPane pane;
 
-	public Window() {
+	public Window(Hub hub) {
+		this.hub = hub;
 		init();
 		createChilds();
 	}
@@ -25,8 +27,8 @@ public class Window implements UiComponent {
 
 	@Override
 	public void createChilds() {
-		new Toolbar(this);
-		new Content(this);
+		new Toolbar(hub, this);
+		new Content(hub, this);
 	}
 
 	public void addComponent(Component component) {

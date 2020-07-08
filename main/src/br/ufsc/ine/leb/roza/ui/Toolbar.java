@@ -6,10 +6,12 @@ import javax.swing.JToolBar;
 
 public class Toolbar implements UiComponent {
 
+	private Hub hub;
 	private Window window;
 	private JToolBar bar;
 
-	public Toolbar(Window window) {
+	public Toolbar(Hub hub, Window window) {
+		this.hub = hub;
 		this.window = window;
 		init();
 		createChilds();
@@ -23,7 +25,7 @@ public class Toolbar implements UiComponent {
 
 	@Override
 	public void createChilds() {
-		new LoaderButton(this);
+		new ClassLoaderButton(hub, this);
 	}
 
 	public void addComponent(Component component) {
