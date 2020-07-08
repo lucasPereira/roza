@@ -6,9 +6,18 @@ import org.graphstream.graph.Graph;
 import org.graphstream.graph.implementations.SingleGraph;
 import org.graphstream.ui.view.Viewer;
 
-public class GraphCanvas {
+public class GraphCanvas implements UiComponent {
+
+	private Content content;
 
 	public GraphCanvas(Content content) {
+		this.content = content;
+		init();
+		createChilds();
+	}
+
+	@Override
+	public void init() {
 		System.setProperty("org.graphstream.ui.renderer", "org.graphstream.ui.j2dviewer.J2DGraphRenderer");
 		Graph graph = new SingleGraph("roza");
 		graph.addNode("A");
@@ -22,5 +31,8 @@ public class GraphCanvas {
 		viewer.enableAutoLayout();
 		content.addLeftComponent(view);
 	}
+
+	@Override
+	public void createChilds() {}
 
 }
