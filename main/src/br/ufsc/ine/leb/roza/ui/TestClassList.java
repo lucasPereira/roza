@@ -8,14 +8,14 @@ import javax.swing.JList;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 
-public class ClassList implements UiComponent {
+public class TestClassList implements UiComponent {
 
 	private Hub hub;
-	private Sidebar sidebar;
+	private TestClassesTab testClassesTab;
 
-	public ClassList(Hub hub, Sidebar sidebar) {
+	public TestClassList(Hub hub, TestClassesTab testClassesTab) {
 		this.hub = hub;
-		this.sidebar = sidebar;
+		this.testClassesTab = testClassesTab;
 		init();
 		createChilds();
 	}
@@ -33,7 +33,7 @@ public class ClassList implements UiComponent {
 				model.addElement(file.getName());
 			}
 		});
-		sidebar.addComponent(scroller);
+		testClassesTab.addTopComponent(scroller);
 	}
 
 	@Override

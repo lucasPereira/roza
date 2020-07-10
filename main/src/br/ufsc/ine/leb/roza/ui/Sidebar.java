@@ -29,7 +29,7 @@ public class Sidebar implements UiComponent {
 
 	@Override
 	public void createChilds() {
-		new ClassList(hub, this);
+		new TestClassesTab(hub, this);
 	}
 
 	public void addComponent(Component component) {

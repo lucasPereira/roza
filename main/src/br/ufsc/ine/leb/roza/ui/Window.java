@@ -1,6 +1,8 @@
 package br.ufsc.ine.leb.roza.ui;
 
 import java.awt.Component;
+import java.io.File;
+import java.util.List;
 
 import javax.swing.JFrame;
 import javax.swing.JSplitPane;
@@ -23,6 +25,9 @@ public class Window implements UiComponent {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		pane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 		frame.add(pane);
+		hub.loadClassesSubscribe((List<File> files) -> {
+			show();
+		});
 	}
 
 	@Override
