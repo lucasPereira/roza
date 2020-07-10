@@ -6,17 +6,20 @@ import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 
 import br.ufsc.ine.leb.roza.ui.Hub;
+import br.ufsc.ine.leb.roza.ui.Manager;
 import br.ufsc.ine.leb.roza.ui.UiComponent;
 import br.ufsc.ine.leb.roza.ui.window.content.Content;
 
 public class Sidebar implements UiComponent {
 
 	private Hub hub;
+	private Manager manager;
 	private Content content;
 	private JPanel panel;
 
-	public Sidebar(Hub hub, Content content) {
+	public Sidebar(Hub hub, Manager manager, Content content) {
 		this.hub = hub;
+		this.manager = manager;
 		this.content = content;
 		init();
 		createChilds();
@@ -33,7 +36,7 @@ public class Sidebar implements UiComponent {
 
 	@Override
 	public void createChilds() {
-		new TestClassesTab(hub, this);
+		new TestClassesTab(hub, manager, this);
 	}
 
 	public void addComponent(Component component) {

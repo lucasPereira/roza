@@ -1,6 +1,5 @@
 package br.ufsc.ine.leb.roza.ui.window.content.sidebar;
 
-import java.io.File;
 import java.util.List;
 
 import javax.swing.DefaultListModel;
@@ -8,6 +7,7 @@ import javax.swing.JList;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 
+import br.ufsc.ine.leb.roza.TestClass;
 import br.ufsc.ine.leb.roza.ui.Hub;
 import br.ufsc.ine.leb.roza.ui.UiComponent;
 
@@ -29,11 +29,11 @@ public class TestClassList implements UiComponent {
 		JScrollPane scroller = new JScrollPane(list);
 		list.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
 		list.setLayoutOrientation(JList.HORIZONTAL_WRAP);
-		hub.loadClassesSubscribe((List<File> classes) -> {
+		hub.loadClassesSubscribe((List<TestClass> classes) -> {
 			DefaultListModel<String> model = new DefaultListModel<>();
 			list.setModel(model);
-			for (File file : classes) {
-				model.addElement(file.getName());
+			for (TestClass testClass : classes) {
+				model.addElement(testClass.getName());
 			}
 		});
 		testClassesTab.addTopComponent(scroller);

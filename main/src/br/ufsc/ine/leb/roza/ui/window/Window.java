@@ -1,13 +1,14 @@
 package br.ufsc.ine.leb.roza.ui.window;
 
 import java.awt.Component;
-import java.io.File;
 import java.util.List;
 
 import javax.swing.JFrame;
 import javax.swing.JSplitPane;
 
+import br.ufsc.ine.leb.roza.TestClass;
 import br.ufsc.ine.leb.roza.ui.Hub;
+import br.ufsc.ine.leb.roza.ui.Manager;
 import br.ufsc.ine.leb.roza.ui.UiComponent;
 import br.ufsc.ine.leb.roza.ui.window.content.Content;
 import br.ufsc.ine.leb.roza.ui.window.toolbar.Toolbar;
@@ -15,11 +16,13 @@ import br.ufsc.ine.leb.roza.ui.window.toolbar.Toolbar;
 public class Window implements UiComponent {
 
 	private Hub hub;
+	private Manager manager;
 	private JFrame frame;
 	private JSplitPane pane;
 
-	public Window(Hub hub) {
+	public Window(Hub hub, Manager manager) {
 		this.hub = hub;
+		this.manager = manager;
 		init();
 		createChilds();
 	}
@@ -30,15 +33,15 @@ public class Window implements UiComponent {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		pane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 		frame.add(pane);
-		hub.loadClassesSubscribe((List<File> files) -> {
+		hub.loadClassesSubscribe((List<TestClass> files) -> {
 			show();
 		});
 	}
 
 	@Override
 	public void createChilds() {
-		new Toolbar(hub, this);
-		new Content(hub, this);
+		new Toolbar(hub, manager, this);
+		new Content(hub, manager, this);
 	}
 
 	public void addComponent(Component component) {

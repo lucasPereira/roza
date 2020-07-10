@@ -5,6 +5,7 @@ import java.awt.Component;
 import javax.swing.JSplitPane;
 
 import br.ufsc.ine.leb.roza.ui.Hub;
+import br.ufsc.ine.leb.roza.ui.Manager;
 import br.ufsc.ine.leb.roza.ui.UiComponent;
 
 public class TestClassesTab implements UiComponent {
@@ -13,7 +14,7 @@ public class TestClassesTab implements UiComponent {
 	private Sidebar sidebar;
 	private JSplitPane panel;
 
-	public TestClassesTab(Hub hub, Sidebar sidebar) {
+	public TestClassesTab(Hub hub, Manager manager, Sidebar sidebar) {
 		this.hub = hub;
 		this.sidebar = sidebar;
 		init();

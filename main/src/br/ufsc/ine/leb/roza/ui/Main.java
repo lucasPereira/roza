@@ -6,7 +6,8 @@ public class Main {
 
 	public static void main(String[] args) throws Exception {
 		Hub hub = new Hub();
-		Window window = new Window(hub);
+		Manager manager = new Manager();
+		Window window = new Window(hub, manager);
 		window.show();
 	}
 

@@ -2,23 +2,28 @@ package br.ufsc.ine.leb.roza.ui.window.toolbar;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import br.ufsc.ine.leb.roza.TestClass;
 import br.ufsc.ine.leb.roza.ui.Hub;
+import br.ufsc.ine.leb.roza.ui.Manager;
 import br.ufsc.ine.leb.roza.ui.UiComponent;
 
 public class LoadClassesButton implements UiComponent {
 
 	private Hub hub;
+	private Manager manager;
 	private Toolbar toolbar;
 	private JButton button;
 
-	public LoadClassesButton(Hub hub, Toolbar toolbar) {
+	public LoadClassesButton(Hub hub, Manager manager, Toolbar toolbar) {
 		this.hub = hub;
+		this.manager = manager;
 		this.toolbar = toolbar;
 		init();
 		createChilds();
@@ -35,7 +40,8 @@ public class LoadClassesButton implements UiComponent {
 			Integer result = chooser.showOpenDialog(SwingUtilities.getRoot(button));
 			if (result == JFileChooser.APPROVE_OPTION) {
 				File[] files = chooser.getSelectedFiles();
-				hub.loadClassesPublish(Arrays.asList(files));
+				List<TestClass> classes = manager.loadClasses(Arrays.asList(files));
+				hub.loadClassesPublish(classes);
 			}
 		});
 	}
