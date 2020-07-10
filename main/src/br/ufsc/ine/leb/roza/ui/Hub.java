@@ -8,20 +8,32 @@ import br.ufsc.ine.leb.roza.TestClass;
 
 public class Hub {
 
-	private List<Consumer<List<TestClass>>> loadClassesListeners;
+	private List<Consumer<List<TestClass>>> loadTestClassesListeners;
+	private List<Consumer<TestClass>> selectTestClassListeners;
 
 	public Hub() {
-		loadClassesListeners = new LinkedList<>();
+		loadTestClassesListeners = new LinkedList<>();
+		selectTestClassListeners = new LinkedList<>();
 	}
 
-	public void loadClassesPublish(List<TestClass> classes) {
-		for (Consumer<List<TestClass>> listener : loadClassesListeners) {
+	public void loadTestClassesPublish(List<TestClass> classes) {
+		for (Consumer<List<TestClass>> listener : loadTestClassesListeners) {
 			listener.accept(classes);
 		}
 	}
 
-	public void loadClassesSubscribe(Consumer<List<TestClass>> listener) {
-		loadClassesListeners.add(listener);
+	public void loadTestClassesSubscribe(Consumer<List<TestClass>> listener) {
+		loadTestClassesListeners.add(listener);
+	}
+
+	public void selectTestClassPublish(TestClass testClass) {
+		for (Consumer<TestClass> listener : selectTestClassListeners) {
+			listener.accept(testClass);
+		}
+	}
+
+	public void selectTestClassSubscribe(Consumer<TestClass> listener) {
+		selectTestClassListeners.add(listener);
 	}
 
 }

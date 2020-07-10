@@ -1,12 +1,10 @@
 package br.ufsc.ine.leb.roza.ui.window;
 
 import java.awt.Component;
-import java.util.List;
 
 import javax.swing.JFrame;
 import javax.swing.JSplitPane;
 
-import br.ufsc.ine.leb.roza.TestClass;
 import br.ufsc.ine.leb.roza.ui.Hub;
 import br.ufsc.ine.leb.roza.ui.Manager;
 import br.ufsc.ine.leb.roza.ui.UiComponent;
@@ -33,9 +31,6 @@ public class Window implements UiComponent {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		pane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 		frame.add(pane);
-		hub.loadClassesSubscribe((List<TestClass> files) -> {
-			show();
-		});
 	}
 
 	@Override

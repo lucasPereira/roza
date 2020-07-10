@@ -37,4 +37,9 @@ public class TestClass {
 		return testMethods;
 	}
 
+	@Override
+	public String toString() {
+		return name;
+	}
+
 }

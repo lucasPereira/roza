@@ -41,7 +41,7 @@ public class LoadClassesButton implements UiComponent {
 			if (result == JFileChooser.APPROVE_OPTION) {
 				File[] files = chooser.getSelectedFiles();
 				List<TestClass> classes = manager.loadClasses(Arrays.asList(files));
-				hub.loadClassesPublish(classes);
+				hub.loadTestClassesPublish(classes);
 			}
 		});
 	}
