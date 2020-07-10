@@ -1,4 +1,4 @@
-package br.ufsc.ine.leb.roza.ui;
+package br.ufsc.ine.leb.roza.ui.window.content.sidebar;
 
 import java.io.File;
 import java.util.List;
@@ -7,6 +7,9 @@ import javax.swing.DefaultListModel;
 import javax.swing.JList;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
+
+import br.ufsc.ine.leb.roza.ui.Hub;
+import br.ufsc.ine.leb.roza.ui.UiComponent;
 
 public class TestClassList implements UiComponent {
 

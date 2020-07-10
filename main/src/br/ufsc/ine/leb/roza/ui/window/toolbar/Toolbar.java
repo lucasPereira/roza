@@ -1,8 +1,12 @@
-package br.ufsc.ine.leb.roza.ui;
+package br.ufsc.ine.leb.roza.ui.window.toolbar;
 
 import java.awt.Component;
 
 import javax.swing.JToolBar;
+
+import br.ufsc.ine.leb.roza.ui.Hub;
+import br.ufsc.ine.leb.roza.ui.UiComponent;
+import br.ufsc.ine.leb.roza.ui.window.Window;
 
 public class Toolbar implements UiComponent {
 

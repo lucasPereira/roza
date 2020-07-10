@@ -1,10 +1,13 @@
-package br.ufsc.ine.leb.roza.ui;
+package br.ufsc.ine.leb.roza.ui.window.content.graphCanvas;
 
 import java.awt.Component;
 
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.implementations.SingleGraph;
 import org.graphstream.ui.view.Viewer;
+
+import br.ufsc.ine.leb.roza.ui.UiComponent;
+import br.ufsc.ine.leb.roza.ui.window.content.Content;
 
 public class GraphCanvas implements UiComponent {
 

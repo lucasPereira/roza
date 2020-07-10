@@ -1,8 +1,11 @@
-package br.ufsc.ine.leb.roza.ui;
+package br.ufsc.ine.leb.roza.ui.window.content.sidebar;
 
 import java.awt.Component;
 
 import javax.swing.JSplitPane;
+
+import br.ufsc.ine.leb.roza.ui.Hub;
+import br.ufsc.ine.leb.roza.ui.UiComponent;
 
 public class TestClassesTab implements UiComponent {
 

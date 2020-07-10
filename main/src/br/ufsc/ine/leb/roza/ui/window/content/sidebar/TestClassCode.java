@@ -1,7 +1,9 @@
-package br.ufsc.ine.leb.roza.ui;
+package br.ufsc.ine.leb.roza.ui.window.content.sidebar;
 
 import javax.swing.JTextPane;
 import javax.swing.text.BadLocationException;
+
+import br.ufsc.ine.leb.roza.ui.UiComponent;
 
 public class TestClassCode implements UiComponent {
 

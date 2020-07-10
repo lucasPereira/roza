@@ -1,8 +1,14 @@
-package br.ufsc.ine.leb.roza.ui;
+package br.ufsc.ine.leb.roza.ui.window.content;
 
 import java.awt.Component;
 
 import javax.swing.JSplitPane;
+
+import br.ufsc.ine.leb.roza.ui.Hub;
+import br.ufsc.ine.leb.roza.ui.UiComponent;
+import br.ufsc.ine.leb.roza.ui.window.Window;
+import br.ufsc.ine.leb.roza.ui.window.content.graphCanvas.GraphCanvas;
+import br.ufsc.ine.leb.roza.ui.window.content.sidebar.Sidebar;
 
 public class Content implements UiComponent {
 

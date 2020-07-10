@@ -1,4 +1,4 @@
-package br.ufsc.ine.leb.roza.ui;
+package br.ufsc.ine.leb.roza.ui.window.toolbar;
 
 import java.io.File;
 import java.util.Arrays;
@@ -7,6 +7,9 @@ import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileNameExtensionFilter;
+
+import br.ufsc.ine.leb.roza.ui.Hub;
+import br.ufsc.ine.leb.roza.ui.UiComponent;
 
 public class LoadClassesButton implements UiComponent {
 

@@ -1,4 +1,4 @@
-package br.ufsc.ine.leb.roza.ui;
+package br.ufsc.ine.leb.roza.ui.window;
 
 import java.awt.Component;
 import java.io.File;
@@ -6,6 +6,11 @@ import java.util.List;
 
 import javax.swing.JFrame;
 import javax.swing.JSplitPane;
+
+import br.ufsc.ine.leb.roza.ui.Hub;
+import br.ufsc.ine.leb.roza.ui.UiComponent;
+import br.ufsc.ine.leb.roza.ui.window.content.Content;
+import br.ufsc.ine.leb.roza.ui.window.toolbar.Toolbar;
 
 public class Window implements UiComponent {
 

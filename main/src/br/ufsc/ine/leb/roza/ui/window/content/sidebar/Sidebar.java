@@ -1,9 +1,13 @@
-package br.ufsc.ine.leb.roza.ui;
+package br.ufsc.ine.leb.roza.ui.window.content.sidebar;
 
 import java.awt.Component;
 
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
+
+import br.ufsc.ine.leb.roza.ui.Hub;
+import br.ufsc.ine.leb.roza.ui.UiComponent;
+import br.ufsc.ine.leb.roza.ui.window.content.Content;
 
 public class Sidebar implements UiComponent {
 
