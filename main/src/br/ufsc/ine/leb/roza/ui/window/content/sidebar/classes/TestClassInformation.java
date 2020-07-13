@@ -1,4 +1,4 @@
-package br.ufsc.ine.leb.roza.ui.window.content.sidebar;
+package br.ufsc.ine.leb.roza.ui.window.content.sidebar.classes;
 
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;

@@ -1,4 +1,4 @@
-package br.ufsc.ine.leb.roza.ui.window.content.sidebar;
+package br.ufsc.ine.leb.roza.ui.window.content.sidebar.classes;
 
 import java.awt.Component;
 
@@ -7,6 +7,7 @@ import javax.swing.JSplitPane;
 import br.ufsc.ine.leb.roza.ui.Hub;
 import br.ufsc.ine.leb.roza.ui.Manager;
 import br.ufsc.ine.leb.roza.ui.UiComponent;
+import br.ufsc.ine.leb.roza.ui.window.content.sidebar.Sidebar;
 
 public class TestClassesTab implements UiComponent {
 
@@ -26,7 +27,7 @@ public class TestClassesTab implements UiComponent {
 		panel = new JSplitPane();
 		panel.setOrientation(JSplitPane.VERTICAL_SPLIT);
 		panel.setResizeWeight(0.5);
-		sidebar.addComponent(panel);
+		sidebar.addComponent("Test Classes", panel);
 	}
 
 	@Override
