@@ -10,12 +10,12 @@ import br.ufsc.ine.leb.roza.ui.Hub;
 import br.ufsc.ine.leb.roza.ui.UiComponent;
 import br.ufsc.ine.leb.roza.ui.model.TestCaseRenderer;
 
-public class TestList implements UiComponent {
+public class TestCaseList implements UiComponent {
 
 	private Hub hub;
-	private TestsTab testsTab;
+	private TestCasesTab testsTab;
 
-	public TestList(Hub hub, TestsTab testsTab) {
+	public TestCaseList(Hub hub, TestCasesTab testsTab) {
 		this.hub = hub;
 		this.testsTab = testsTab;
 		init();

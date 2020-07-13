@@ -9,13 +9,13 @@ import br.ufsc.ine.leb.roza.ui.Manager;
 import br.ufsc.ine.leb.roza.ui.UiComponent;
 import br.ufsc.ine.leb.roza.ui.window.content.sidebar.Sidebar;
 
-public class TestsTab implements UiComponent {
+public class TestCasesTab implements UiComponent {
 
 	private Hub hub;
 	private JSplitPane panel;
 	private Sidebar sidebar;
 
-	public TestsTab(Hub hub, Manager manager, Sidebar sidebar) {
+	public TestCasesTab(Hub hub, Manager manager, Sidebar sidebar) {
 		this.hub = hub;
 		this.sidebar = sidebar;
 		init();
@@ -27,12 +27,12 @@ public class TestsTab implements UiComponent {
 		panel = new JSplitPane();
 		panel.setOrientation(JSplitPane.VERTICAL_SPLIT);
 		panel.setResizeWeight(0.5);
-		sidebar.addComponent("Tests", panel);
+		sidebar.addComponent("Test Cases", panel);
 	}
 
 	@Override
 	public void createChilds() {
-		new TestList(hub, this);
+		new TestCaseList(hub, this);
 	}
 
 	public void addTopComponent(Component component) {
