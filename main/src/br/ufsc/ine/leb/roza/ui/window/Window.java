@@ -31,6 +31,8 @@ public class Window implements UiComponent {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		pane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 		frame.add(pane);
+		hub.loadTestClassesSubscribe(classes -> show());
+		hub.selectTestClassSubscribe(testClass -> show());
 	}
 
 	@Override

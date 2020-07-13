@@ -29,7 +29,7 @@ public class Content implements UiComponent {
 	@Override
 	public void init() {
 		panel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-		panel.setResizeWeight(0.8);
+		panel.setResizeWeight(1);
 		window.addComponent(panel);
 	}
 
