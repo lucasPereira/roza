@@ -39,8 +39,6 @@ public class TestClassList implements UiComponent {
 			public void valueChanged(ListSelectionEvent event) {
 				TestClass testClass = list.getSelectedValue();
 				if (testClass != null && !event.getValueIsAdjusting()) {
-					System.out.println(testClass);
-					System.out.println(event.getValueIsAdjusting());
 					hub.selectTestClassPublish(testClass);
 				}
 			}

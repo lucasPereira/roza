@@ -32,7 +32,7 @@ public class TestClassesTab implements UiComponent {
 	@Override
 	public void createChilds() {
 		new TestClassList(hub, this);
-		new TestClassCode(hub, this);
+		new TestClassInformation(hub, this);
 	}
 
 	public void addTopComponent(Component component) {

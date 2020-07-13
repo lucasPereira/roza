@@ -9,12 +9,12 @@ import br.ufsc.ine.leb.roza.TestClass;
 import br.ufsc.ine.leb.roza.ui.Hub;
 import br.ufsc.ine.leb.roza.ui.UiComponent;
 
-public class TestClassCode implements UiComponent {
+public class TestClassInformation implements UiComponent {
 
 	private Hub hub;
 	private TestClassesTab testClassesTab;
 
-	public TestClassCode(Hub hub, TestClassesTab testClassesTab) {
+	public TestClassInformation(Hub hub, TestClassesTab testClassesTab) {
 		this.hub = hub;
 		this.testClassesTab = testClassesTab;
 		init();
