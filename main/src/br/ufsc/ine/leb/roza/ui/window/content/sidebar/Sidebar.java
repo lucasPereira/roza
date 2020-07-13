@@ -9,6 +9,7 @@ import br.ufsc.ine.leb.roza.ui.Manager;
 import br.ufsc.ine.leb.roza.ui.UiComponent;
 import br.ufsc.ine.leb.roza.ui.window.content.Content;
 import br.ufsc.ine.leb.roza.ui.window.content.sidebar.classes.TestClassesTab;
+import br.ufsc.ine.leb.roza.ui.window.content.sidebar.tests.TestsTab;
 
 public class Sidebar implements UiComponent {
 
@@ -35,6 +36,7 @@ public class Sidebar implements UiComponent {
 	@Override
 	public void createChilds() {
 		new TestClassesTab(hub, manager, this);
+		new TestsTab(hub, manager, this);
 	}
 
 	public void addComponent(String title, Component component) {

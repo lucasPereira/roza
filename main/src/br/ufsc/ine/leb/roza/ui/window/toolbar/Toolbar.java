@@ -32,7 +32,8 @@ public class Toolbar implements UiComponent {
 
 	@Override
 	public void createChilds() {
-		new LoadClassesButton(hub, manager, this);
+		new LoadTestClassesButton(hub, manager, this);
+		new ExtractTestCasesButton(hub, manager, this);
 	}
 
 	public void addComponent(Component component) {

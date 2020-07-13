@@ -14,14 +14,14 @@ import br.ufsc.ine.leb.roza.ui.Hub;
 import br.ufsc.ine.leb.roza.ui.Manager;
 import br.ufsc.ine.leb.roza.ui.UiComponent;
 
-public class LoadClassesButton implements UiComponent {
+public class LoadTestClassesButton implements UiComponent {
 
 	private Hub hub;
 	private Manager manager;
 	private Toolbar toolbar;
 	private JButton button;
 
-	public LoadClassesButton(Hub hub, Manager manager, Toolbar toolbar) {
+	public LoadTestClassesButton(Hub hub, Manager manager, Toolbar toolbar) {
 		this.hub = hub;
 		this.manager = manager;
 		this.toolbar = toolbar;
@@ -31,7 +31,7 @@ public class LoadClassesButton implements UiComponent {
 
 	@Override
 	public void init() {
-		button = new JButton("Load Classes");
+		button = new JButton("Load Test Classes");
 		toolbar.addComponent(button);
 		button.addActionListener(event -> {
 			JFileChooser chooser = new JFileChooser();

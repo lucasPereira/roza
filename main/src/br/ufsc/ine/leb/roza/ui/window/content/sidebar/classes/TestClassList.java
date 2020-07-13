@@ -30,6 +30,7 @@ public class TestClassList implements UiComponent {
 		JList<TestClass> list = new JList<>();
 		JScrollPane scroller = new JScrollPane(list);
 		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		testClassesTab.addTopComponent(scroller);
 		hub.loadTestClassesSubscribe((List<TestClass> classes) -> {
 			listLoadedClasses(list, classes);
 		});
@@ -44,7 +45,6 @@ public class TestClassList implements UiComponent {
 			}
 
 		});
-		testClassesTab.addTopComponent(scroller);
 	}
 
 	@Override
