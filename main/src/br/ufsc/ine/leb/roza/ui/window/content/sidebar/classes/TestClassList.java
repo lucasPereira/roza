@@ -12,6 +12,7 @@ import javax.swing.event.ListSelectionListener;
 import br.ufsc.ine.leb.roza.TestClass;
 import br.ufsc.ine.leb.roza.ui.Hub;
 import br.ufsc.ine.leb.roza.ui.UiComponent;
+import br.ufsc.ine.leb.roza.ui.model.TestClassRenderer;
 
 public class TestClassList implements UiComponent {
 
@@ -32,7 +33,10 @@ public class TestClassList implements UiComponent {
 		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		testClassesTab.addTopComponent(scroller);
 		hub.loadTestClassesSubscribe((List<TestClass> classes) -> {
-			listLoadedClasses(list, classes);
+			DefaultListModel<TestClass> model = new DefaultListModel<>();
+			classes.forEach(testClass -> model.addElement(testClass));
+			list.setModel(model);
+			list.setCellRenderer(new TestClassRenderer());
 		});
 		list.addListSelectionListener(new ListSelectionListener() {
 
@@ -49,13 +53,5 @@ public class TestClassList implements UiComponent {
 
 	@Override
 	public void createChilds() {}
-
-	private void listLoadedClasses(JList<TestClass> list, List<TestClass> classes) {
-		DefaultListModel<TestClass> model = new DefaultListModel<>();
-		list.setModel(model);
-		for (TestClass testClass : classes) {
-			model.addElement(testClass);
-		}
-	}
 
 }

@@ -31,6 +31,7 @@ public class Sidebar implements UiComponent {
 		panel = new JTabbedPane();
 		panel.setMaximumSize(panel.getPreferredSize());
 		content.addRightComponent(panel);
+		hub.extractTestCasesSubscribe(tests -> panel.setSelectedIndex(panel.getTabCount() - 1));
 	}
 
 	@Override

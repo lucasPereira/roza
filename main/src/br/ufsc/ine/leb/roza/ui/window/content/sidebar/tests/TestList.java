@@ -8,6 +8,7 @@ import javax.swing.ListSelectionModel;
 import br.ufsc.ine.leb.roza.TestCase;
 import br.ufsc.ine.leb.roza.ui.Hub;
 import br.ufsc.ine.leb.roza.ui.UiComponent;
+import br.ufsc.ine.leb.roza.ui.model.TestCaseRenderer;
 
 public class TestList implements UiComponent {
 
@@ -30,6 +31,7 @@ public class TestList implements UiComponent {
 		hub.extractTestCasesSubscribe(testCases -> {
 			DefaultListModel<TestCase> model = new DefaultListModel<>();
 			list.setModel(model);
+			list.setCellRenderer(new TestCaseRenderer());
 			testCases.forEach(testCase -> model.addElement(testCase));
 		});
 	}

@@ -20,9 +20,7 @@ public class Hub {
 	}
 
 	public void loadTestClassesPublish(List<TestClass> classes) {
-		for (Consumer<List<TestClass>> listener : loadTestClassesListeners) {
-			listener.accept(classes);
-		}
+		loadTestClassesListeners.forEach(listener -> listener.accept(classes));
 	}
 
 	public void loadTestClassesSubscribe(Consumer<List<TestClass>> listener) {
@@ -30,9 +28,7 @@ public class Hub {
 	}
 
 	public void selectTestClassPublish(TestClass testClass) {
-		for (Consumer<TestClass> listener : selectTestClassListeners) {
-			listener.accept(testClass);
-		}
+		selectTestClassListeners.forEach(listener -> listener.accept(testClass));
 	}
 
 	public void selectTestClassSubscribe(Consumer<TestClass> listener) {

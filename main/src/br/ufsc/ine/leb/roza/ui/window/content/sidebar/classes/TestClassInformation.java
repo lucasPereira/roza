@@ -29,8 +29,11 @@ public class TestClassInformation implements UiComponent {
 		JTabbedPane panel = new JTabbedPane();
 		testClassesTab.addBottomComponent(panel);
 		hub.loadTestClassesSubscribe(classes -> reset(panel));
-		hub.selectTestClassSubscribe((testClass -> showTestClassInformation(panel, testClass)));
+		hub.selectTestClassSubscribe((testClass -> showClass(panel, testClass)));
 	}
+
+	@Override
+	public void createChilds() {}
 
 	private void reset(JTabbedPane panel) {
 		while (panel.getTabCount() > 0) {
@@ -38,22 +41,19 @@ public class TestClassInformation implements UiComponent {
 		}
 	}
 
-	private void showTestClassInformation(JTabbedPane panel, TestClass testClass) {
+	private void showClass(JTabbedPane panel, TestClass testClass) {
 		reset(panel);
-		addFieldsInformation(panel, "Fields", new TestClassFieldsModel(testClass));
-		addFieldsInformation(panel, "Setups", new TestClassSetupsModel(testClass));
-		addFieldsInformation(panel, "Tests", new TestClassTestsModel(testClass));
+		addInformation(panel, "Fields", new TestClassFieldsModel(testClass));
+		addInformation(panel, "Setups", new TestClassSetupsModel(testClass));
+		addInformation(panel, "Tests", new TestClassTestsModel(testClass));
 		panel.setSelectedIndex(panel.getTabCount() - 1);
 	}
 
-	private void addFieldsInformation(JTabbedPane panel, String title, TableModel model) {
+	private void addInformation(JTabbedPane panel, String title, TableModel model) {
 		JTable table = new JTable();
 		JScrollPane scroller = new JScrollPane(table);
 		table.setModel(model);
 		panel.addTab(title, scroller);
 	}
-
-	@Override
-	public void createChilds() {}
 
 }
