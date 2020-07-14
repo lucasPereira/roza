@@ -12,11 +12,13 @@ public class Hub {
 	private List<Consumer<List<TestClass>>> loadTestClassesListeners;
 	private List<Consumer<TestClass>> selectTestClassListeners;
 	private List<Consumer<List<TestCase>>> extractTestCasesListeners;
+	private List<Consumer<TestCase>> selectTestCaseListeners;
 
 	public Hub() {
 		loadTestClassesListeners = new LinkedList<>();
 		selectTestClassListeners = new LinkedList<>();
 		extractTestCasesListeners = new LinkedList<>();
+		selectTestCaseListeners = new LinkedList<>();
 	}
 
 	public void loadTestClassesPublish(List<TestClass> classes) {
@@ -41,6 +43,14 @@ public class Hub {
 
 	public void extractTestCasesSubscribe(Consumer<List<TestCase>> listener) {
 		extractTestCasesListeners.add(listener);
+	}
+
+	public void selectTestCasePublish(TestCase testCase) {
+		selectTestCaseListeners.forEach(listener -> listener.accept(testCase));
+	}
+
+	public void selectTestCaseSubscribe(Consumer<TestCase> listener) {
+		selectTestCaseListeners.add(listener);
 	}
 
 }

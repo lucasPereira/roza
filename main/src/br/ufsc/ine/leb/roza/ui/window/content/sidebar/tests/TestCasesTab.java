@@ -33,10 +33,15 @@ public class TestCasesTab implements UiComponent {
 	@Override
 	public void createChilds() {
 		new TestCaseList(hub, this);
+		new TestCaseCode(hub, this);
 	}
 
 	public void addTopComponent(Component component) {
 		panel.setTopComponent(component);
+	}
+
+	public void addBottomComponent(Component component) {
+		panel.setBottomComponent(component);
 	}
 
 }

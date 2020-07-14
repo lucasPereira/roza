@@ -4,6 +4,8 @@ import javax.swing.DefaultListModel;
 import javax.swing.JList;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 import br.ufsc.ine.leb.roza.TestCase;
 import br.ufsc.ine.leb.roza.ui.Hub;
@@ -33,6 +35,17 @@ public class TestCaseList implements UiComponent {
 			list.setModel(model);
 			list.setCellRenderer(new TestCaseRenderer());
 			testCases.forEach(testCase -> model.addElement(testCase));
+		});
+		list.addListSelectionListener(new ListSelectionListener() {
+
+			@Override
+			public void valueChanged(ListSelectionEvent event) {
+				TestCase testCase = list.getSelectedValue();
+				if (testCase != null && !event.getValueIsAdjusting()) {
+					hub.selectTestCasePublish(testCase);
+				}
+			}
+
 		});
 	}
 
