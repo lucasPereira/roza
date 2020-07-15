@@ -32,7 +32,9 @@ public class Toolbar implements UiComponent {
 
 	@Override
 	public void createChilds() {
+		new ParserComboBox(manager, this);
 		new LoadTestClassesButton(hub, manager, this);
+		addComponent(new JToolBar.Separator());
 		new ExtractTestCasesButton(hub, manager, this);
 	}
 

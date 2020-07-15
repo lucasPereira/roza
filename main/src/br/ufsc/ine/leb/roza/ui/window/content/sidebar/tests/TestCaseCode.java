@@ -46,10 +46,10 @@ public class TestCaseCode implements UiComponent {
 		addStyle(sheet, "li", "color", "#444444");
 		addStyle(sheet, "li.even-fixture", "background-color", "#F0F0F0");
 		addStyle(sheet, "li.even-assert", "background-color", "#F0F0F0");
-		addStyle(sheet, "li.odd-fixture", "background-color", "#FFFFFF");
+		addStyle(sheet, "li.odd-fixture", "sbackground-color", "#FFFFFF");
 		addStyle(sheet, "li.odd-assert", "background-color", "#FFFFFF");
-		 addStyle(sheet, "li.even-assert", "color", "#999999");
-		 addStyle(sheet, "li.odd-assert", "color", "999999");
+		addStyle(sheet, "li.even-assert", "color", "#999999");
+		addStyle(sheet, "li.odd-assert", "color", "999999");
 		testCasesTab.addBottomComponent(scroller);
 		hub.selectTestCaseSubscribe(testCase -> {
 			line = 1;
@@ -83,7 +83,6 @@ public class TestCaseCode implements UiComponent {
 
 	private void addStyle(StyleSheet sheet, String selector, String property, String value) {
 		String rule = String.format("%s { %s: %s; }", selector, property, value);
-		System.out.println(rule);
 		sheet.addRule(rule);
 	}
 
