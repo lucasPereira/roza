@@ -35,6 +35,7 @@ public class Toolbar implements UiComponent {
 		new ParserComboBox(manager, this);
 		new LoadTestClassesButton(hub, manager, this);
 		addComponent(new JToolBar.Separator());
+		new ExtractorComboBox(manager, this);
 		new ExtractTestCasesButton(hub, manager, this);
 	}
 

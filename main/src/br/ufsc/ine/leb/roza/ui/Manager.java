@@ -1,13 +1,12 @@
 package br.ufsc.ine.leb.roza.ui;
 
 import java.io.File;
-import java.util.Arrays;
 import java.util.List;
 
 import br.ufsc.ine.leb.roza.TestCase;
 import br.ufsc.ine.leb.roza.TestClass;
 import br.ufsc.ine.leb.roza.TextFile;
-import br.ufsc.ine.leb.roza.extraction.JunitTestCaseExtractor;
+import br.ufsc.ine.leb.roza.extraction.Junit4TestCaseExtractor;
 import br.ufsc.ine.leb.roza.extraction.TestCaseExtractor;
 import br.ufsc.ine.leb.roza.loading.ProgramaticTextFileLoader;
 import br.ufsc.ine.leb.roza.loading.TextFileLoader;
@@ -21,9 +20,11 @@ public class Manager {
 
 	private List<TestClass> classes;
 	private TestClassParser parser;
+	private TestCaseExtractor extractor;
 
 	public Manager() {
 		parser = new Junit4TestClassParser();
+		extractor = new Junit4TestCaseExtractor();
 	}
 
 	public List<TestClass> loadClasses(List<File> files) {
@@ -41,12 +42,15 @@ public class Manager {
 	}
 
 	public List<TestCase> extractTestCases(List<TestClass> classes) {
-		TestCaseExtractor extractor = new JunitTestCaseExtractor(Arrays.asList("assegurarTexto", "assegurarValor", "assegurarQuantidadeDeElementos", "assegurarConteudoDeArquivoBaixado", "assegurarNaoMarcado", "assegurarMarcado", "assegurarMarcacao"));
 		return extractor.extract(classes);
 	}
 
 	public void setTestClassParser(TestClassParser parser) {
 		this.parser = parser;
+	}
+
+	public void setTestCaseExtractor(TestCaseExtractor extractor) {
+		this.extractor = extractor;
 	}
 
 }

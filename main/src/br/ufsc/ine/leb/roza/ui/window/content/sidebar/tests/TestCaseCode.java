@@ -51,6 +51,12 @@ public class TestCaseCode implements UiComponent {
 		addStyle(sheet, "li.even-assert", "color", "#999999");
 		addStyle(sheet, "li.odd-assert", "color", "999999");
 		testCasesTab.addBottomComponent(scroller);
+		hub.loadTestClassesSubscribe(testClasses -> {
+			pane.setText("");
+		});
+		hub.extractTestCasesSubscribe(testCases -> {
+			pane.setText("");
+		});
 		hub.selectTestCaseSubscribe(testCase -> {
 			line = 1;
 			StringBuilder code = new StringBuilder();

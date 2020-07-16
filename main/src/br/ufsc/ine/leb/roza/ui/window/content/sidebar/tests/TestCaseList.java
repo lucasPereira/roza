@@ -15,11 +15,11 @@ import br.ufsc.ine.leb.roza.ui.model.TestCaseRenderer;
 public class TestCaseList implements UiComponent {
 
 	private Hub hub;
-	private TestCasesTab testsTab;
+	private TestCasesTab testCasesTab;
 
 	public TestCaseList(Hub hub, TestCasesTab testsTab) {
 		this.hub = hub;
-		this.testsTab = testsTab;
+		this.testCasesTab = testsTab;
 		init();
 		createChilds();
 	}
@@ -29,7 +29,10 @@ public class TestCaseList implements UiComponent {
 		JList<TestCase> list = new JList<>();
 		JScrollPane scroller = new JScrollPane(list);
 		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		testsTab.addTopComponent(scroller);
+		testCasesTab.addTopComponent(scroller);
+		hub.loadTestClassesSubscribe(testClasses -> {
+			list.setModel(new DefaultListModel<>());
+		});
 		hub.extractTestCasesSubscribe(testCases -> {
 			DefaultListModel<TestCase> model = new DefaultListModel<>();
 			list.setModel(model);

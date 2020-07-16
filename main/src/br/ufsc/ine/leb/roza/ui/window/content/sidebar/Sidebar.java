@@ -31,13 +31,24 @@ public class Sidebar implements UiComponent {
 		panel = new JTabbedPane();
 		panel.setMaximumSize(panel.getPreferredSize());
 		content.addRightComponent(panel);
-		hub.extractTestCasesSubscribe(tests -> panel.setSelectedIndex(panel.getTabCount() - 1));
+		hub.loadTestClassesSubscribe(classes -> {
+			panel.setSelectedIndex(0);
+			panel.setEnabledAt(0, true);
+			panel.setEnabledAt(1, false);
+		});
+		hub.extractTestCasesSubscribe(tests -> {
+			panel.setSelectedIndex(1);
+			panel.setEnabledAt(1, true);
+		});
+
 	}
 
 	@Override
 	public void createChilds() {
 		new TestClassesTab(hub, manager, this);
 		new TestCasesTab(hub, manager, this);
+		panel.setEnabledAt(0, false);
+		panel.setEnabledAt(1, false);
 	}
 
 	public void addComponent(String title, Component component) {
