@@ -33,6 +33,7 @@ public class Window implements UiComponent {
 		frame.add(pane);
 		hub.loadTestClassesSubscribe(classes -> show());
 		hub.selectTestClassSubscribe(testClass -> show());
+		hub.selectDeckardMetricSubscribe(settings -> show());
 	}
 
 	@Override

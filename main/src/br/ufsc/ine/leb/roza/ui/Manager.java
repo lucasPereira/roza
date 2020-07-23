@@ -10,6 +10,8 @@ import br.ufsc.ine.leb.roza.extraction.Junit4TestCaseExtractor;
 import br.ufsc.ine.leb.roza.extraction.TestCaseExtractor;
 import br.ufsc.ine.leb.roza.loading.ProgramaticTextFileLoader;
 import br.ufsc.ine.leb.roza.loading.TextFileLoader;
+import br.ufsc.ine.leb.roza.measurement.LccssSimilarityMeasurer;
+import br.ufsc.ine.leb.roza.measurement.SimilarityMeasurer;
 import br.ufsc.ine.leb.roza.parsing.Junit4TestClassParser;
 import br.ufsc.ine.leb.roza.parsing.TestClassParser;
 import br.ufsc.ine.leb.roza.selection.JavaExtensionTextFileSelector;
@@ -21,10 +23,12 @@ public class Manager {
 	private List<TestClass> classes;
 	private TestClassParser parser;
 	private TestCaseExtractor extractor;
+	private SimilarityMeasurer measurer;
 
 	public Manager() {
 		parser = new Junit4TestClassParser();
 		extractor = new Junit4TestCaseExtractor();
+		measurer = new LccssSimilarityMeasurer();
 	}
 
 	public List<TestClass> loadClasses(List<File> files) {
@@ -51,6 +55,10 @@ public class Manager {
 
 	public void setTestCaseExtractor(TestCaseExtractor extractor) {
 		this.extractor = extractor;
+	}
+
+	public void setSimilarityMeasurer(SimilarityMeasurer measurer) {
+		this.measurer = measurer;
 	}
 
 }

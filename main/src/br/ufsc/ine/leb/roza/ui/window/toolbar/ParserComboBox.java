@@ -26,6 +26,7 @@ public class ParserComboBox implements UiComponent {
 	@Override
 	public void init() {
 		JComboBox<String> combo = new JComboBox<String>();
+		combo.setToolTipText("Parser");
 		combo.addItem("JUnit 4");
 		combo.addItem("JUnit 5");
 		combo.setMaximumSize(combo.getPreferredSize());

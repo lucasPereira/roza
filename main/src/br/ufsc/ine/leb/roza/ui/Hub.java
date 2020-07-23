@@ -6,6 +6,7 @@ import java.util.function.Consumer;
 
 import br.ufsc.ine.leb.roza.TestCase;
 import br.ufsc.ine.leb.roza.TestClass;
+import br.ufsc.ine.leb.roza.measurement.configuration.deckard.DeckardConfigurations;
 
 public class Hub {
 
@@ -13,12 +14,14 @@ public class Hub {
 	private List<Consumer<TestClass>> selectTestClassListeners;
 	private List<Consumer<List<TestCase>>> extractTestCasesListeners;
 	private List<Consumer<TestCase>> selectTestCaseListeners;
+	private List<Consumer<DeckardConfigurations>> selectDeckardMetricListeners;
 
 	public Hub() {
 		loadTestClassesListeners = new LinkedList<>();
 		selectTestClassListeners = new LinkedList<>();
 		extractTestCasesListeners = new LinkedList<>();
 		selectTestCaseListeners = new LinkedList<>();
+		selectDeckardMetricListeners = new LinkedList<>();
 	}
 
 	public void loadTestClassesPublish(List<TestClass> classes) {
@@ -51,6 +54,14 @@ public class Hub {
 
 	public void selectTestCaseSubscribe(Consumer<TestCase> listener) {
 		selectTestCaseListeners.add(listener);
+	}
+
+	public void selectDeckardMetricPublish(DeckardConfigurations settings) {
+		selectDeckardMetricListeners.forEach(listener -> listener.accept(settings));
+	}
+
+	public void selectDeckardMetricSubscribe(Consumer<DeckardConfigurations> listener) {
+		selectDeckardMetricListeners.add(listener);
 	}
 
 }
