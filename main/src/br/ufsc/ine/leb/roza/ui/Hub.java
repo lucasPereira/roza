@@ -4,9 +4,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Consumer;
 
+import br.ufsc.ine.leb.roza.SimilarityReport;
 import br.ufsc.ine.leb.roza.TestCase;
 import br.ufsc.ine.leb.roza.TestClass;
-import br.ufsc.ine.leb.roza.measurement.configuration.deckard.DeckardConfigurations;
+import br.ufsc.ine.leb.roza.ui.model.DeckardSettingsConsumer;
 
 public class Hub {
 
@@ -14,7 +15,8 @@ public class Hub {
 	private List<Consumer<TestClass>> selectTestClassListeners;
 	private List<Consumer<List<TestCase>>> extractTestCasesListeners;
 	private List<Consumer<TestCase>> selectTestCaseListeners;
-	private List<Consumer<DeckardConfigurations>> selectDeckardMetricListeners;
+	private List<Runnable> selectDeckardMetricListeners;
+	private List<DeckardSettingsConsumer> changeDeckardSettingsListeners;
 
 	public Hub() {
 		loadTestClassesListeners = new LinkedList<>();
@@ -22,6 +24,7 @@ public class Hub {
 		extractTestCasesListeners = new LinkedList<>();
 		selectTestCaseListeners = new LinkedList<>();
 		selectDeckardMetricListeners = new LinkedList<>();
+		changeDeckardSettingsListeners = new LinkedList<>();
 	}
 
 	public void loadTestClassesPublish(List<TestClass> classes) {
@@ -56,12 +59,22 @@ public class Hub {
 		selectTestCaseListeners.add(listener);
 	}
 
-	public void selectDeckardMetricPublish(DeckardConfigurations settings) {
-		selectDeckardMetricListeners.forEach(listener -> listener.accept(settings));
+	public void selectDeckardMetricPublish() {
+		selectDeckardMetricListeners.forEach(listener -> listener.run());
 	}
 
-	public void selectDeckardMetricSubscribe(Consumer<DeckardConfigurations> listener) {
+	public void selectDeckardMetricSubscribe(Runnable listener) {
 		selectDeckardMetricListeners.add(listener);
 	}
+
+	public void changeDeckardSettingsPublish(Integer minTokens, Integer stride, Double similarity) {
+		changeDeckardSettingsListeners.forEach(listener -> listener.accept(minTokens, stride, similarity));
+	}
+
+	public void changeDeckardSettingsSubscribe(DeckardSettingsConsumer listener) {
+		changeDeckardSettingsListeners.add(listener);
+	}
+
+	public void measureTestsPublish(SimilarityReport similarityReort) {}
 
 }

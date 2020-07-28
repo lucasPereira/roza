@@ -29,7 +29,9 @@ public class ParserComboBox implements UiComponent {
 		combo.setToolTipText("Parser");
 		combo.addItem("JUnit 4");
 		combo.addItem("JUnit 5");
+		combo.setSelectedIndex(1);
 		combo.setMaximumSize(combo.getPreferredSize());
+		manager.setTestClassParser(new Junit5TestClassParser());
 		combo.addActionListener(new ActionListener() {
 
 			@Override

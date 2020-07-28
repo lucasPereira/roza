@@ -20,4 +20,14 @@ public class MaterializationReport {
 		return materializations;
 	}
 
+	@Override
+	public String toString() {
+		StringBuilder text = new StringBuilder();
+		materializations.forEach(materialization -> {
+			text.append(materialization.toString());
+			text.append(System.lineSeparator());
+		});
+		return text.toString();
+	}
+
 }

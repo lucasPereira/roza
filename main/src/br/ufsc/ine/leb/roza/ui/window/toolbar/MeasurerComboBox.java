@@ -40,6 +40,7 @@ public class MeasurerComboBox implements UiComponent {
 		combo.setEnabled(false);
 		hub.loadTestClassesSubscribe(classes -> combo.setEnabled(false));
 		hub.extractTestCasesSubscribe(tests -> combo.setEnabled(true));
+		manager.setSimilarityMeasurer(new LccssSimilarityMeasurer());
 		combo.addActionListener(new ActionListener() {
 
 			@Override
@@ -52,7 +53,12 @@ public class MeasurerComboBox implements UiComponent {
 				} else if (selected == 2) {
 					DeckardConfigurations settings = new DeckardConfigurations();
 					manager.setSimilarityMeasurer(new DeckardSimilarityMeasurer(settings));
-					hub.selectDeckardMetricPublish(settings);
+					hub.selectDeckardMetricPublish();
+					hub.changeDeckardSettingsSubscribe((minTokens, stride, similarity) -> {
+						settings.minTokens(minTokens);
+						settings.stride(stride);
+						settings.similarity(similarity);
+					});
 				}
 			}
 

@@ -33,11 +33,14 @@ public class ExtractorComboBox implements UiComponent {
 		JComboBox<String> combo = new JComboBox<String>();
 		combo.setToolTipText("Extractor");
 		combo.addItem("JUnit 4");
-		combo.addItem("JUnit 4 - OMP/CAPES Project");
+		combo.addItem("JUnit 5 - OMP/CAPES Project");
 		combo.addItem("JUnit 5");
 		combo.setMaximumSize(combo.getPreferredSize());
 		combo.setEnabled(false);
+		combo.setSelectedIndex(1);
+		List<String> assertions = Arrays.asList("assegurarTexto", "assegurarValor", "assegurarQuantidadeDeElementos", "assegurarConteudoDeArquivoBaixado", "assegurarNaoMarcado", "assegurarMarcado", "assegurarMarcacao");
 		hub.loadTestClassesSubscribe(classes -> combo.setEnabled(true));
+		manager.setTestCaseExtractor(new JunitTestCaseExtractor(assertions));
 		combo.addActionListener(new ActionListener() {
 
 			@Override
@@ -48,7 +51,6 @@ public class ExtractorComboBox implements UiComponent {
 						manager.setTestCaseExtractor(new Junit4TestCaseExtractor());
 						break;
 					case 1:
-						List<String> assertions = Arrays.asList("assegurarTexto", "assegurarValor", "assegurarQuantidadeDeElementos", "assegurarConteudoDeArquivoBaixado", "assegurarNaoMarcado", "assegurarMarcado", "assegurarMarcacao");
 						manager.setTestCaseExtractor(new JunitTestCaseExtractor(assertions));
 						break;
 					case 2:

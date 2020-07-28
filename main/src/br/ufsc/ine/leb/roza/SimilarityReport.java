@@ -64,4 +64,14 @@ public class SimilarityReport {
 		throw new MissingPairException(source, target);
 	}
 
+	@Override
+	public String toString() {
+		StringBuilder text = new StringBuilder();
+		assessments.forEach(assessment -> {
+			text.append(assessment.toString());
+			text.append(System.lineSeparator());
+		});
+		return text.toString();
+	}
+
 }

@@ -40,7 +40,7 @@ public class TestCaseMaterialization {
 
 	@Override
 	public String toString() {
-		return getFilePath();
+		return String.format("%s -> %s", testCase.getName(), file.getName());
 	}
 
 }
