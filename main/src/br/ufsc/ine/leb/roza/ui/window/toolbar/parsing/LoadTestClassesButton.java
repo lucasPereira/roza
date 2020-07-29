@@ -1,4 +1,4 @@
-package br.ufsc.ine.leb.roza.ui.window.toolbar;
+package br.ufsc.ine.leb.roza.ui.window.toolbar.parsing;
 
 import java.io.File;
 import java.util.Arrays;
@@ -13,6 +13,7 @@ import br.ufsc.ine.leb.roza.TestClass;
 import br.ufsc.ine.leb.roza.ui.Hub;
 import br.ufsc.ine.leb.roza.ui.Manager;
 import br.ufsc.ine.leb.roza.ui.UiComponent;
+import br.ufsc.ine.leb.roza.ui.window.toolbar.Toolbar;
 
 public class LoadTestClassesButton implements UiComponent {
 

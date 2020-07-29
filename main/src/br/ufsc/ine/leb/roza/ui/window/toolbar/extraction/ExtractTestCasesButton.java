@@ -1,4 +1,4 @@
-package br.ufsc.ine.leb.roza.ui.window.toolbar;
+package br.ufsc.ine.leb.roza.ui.window.toolbar.extraction;
 
 import java.util.List;
 
@@ -8,6 +8,7 @@ import br.ufsc.ine.leb.roza.TestCase;
 import br.ufsc.ine.leb.roza.ui.Hub;
 import br.ufsc.ine.leb.roza.ui.Manager;
 import br.ufsc.ine.leb.roza.ui.UiComponent;
+import br.ufsc.ine.leb.roza.ui.window.toolbar.Toolbar;
 
 public class ExtractTestCasesButton implements UiComponent {
 

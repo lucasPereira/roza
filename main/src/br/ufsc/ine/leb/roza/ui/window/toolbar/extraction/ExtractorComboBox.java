@@ -1,4 +1,4 @@
-package br.ufsc.ine.leb.roza.ui.window.toolbar;
+package br.ufsc.ine.leb.roza.ui.window.toolbar.extraction;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -13,6 +13,7 @@ import br.ufsc.ine.leb.roza.extraction.JunitTestCaseExtractor;
 import br.ufsc.ine.leb.roza.ui.Hub;
 import br.ufsc.ine.leb.roza.ui.Manager;
 import br.ufsc.ine.leb.roza.ui.UiComponent;
+import br.ufsc.ine.leb.roza.ui.window.toolbar.Toolbar;
 
 public class ExtractorComboBox implements UiComponent {
 

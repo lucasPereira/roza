@@ -1,4 +1,4 @@
-package br.ufsc.ine.leb.roza.ui.window.toolbar;
+package br.ufsc.ine.leb.roza.ui.window.toolbar.measuring;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -16,6 +16,7 @@ import br.ufsc.ine.leb.roza.measurement.configuration.simian.SimianConfiguration
 import br.ufsc.ine.leb.roza.ui.Hub;
 import br.ufsc.ine.leb.roza.ui.Manager;
 import br.ufsc.ine.leb.roza.ui.UiComponent;
+import br.ufsc.ine.leb.roza.ui.window.toolbar.Toolbar;
 
 public class MeasurerComboBox implements UiComponent {
 

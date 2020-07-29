@@ -8,6 +8,15 @@ import br.ufsc.ine.leb.roza.ui.Hub;
 import br.ufsc.ine.leb.roza.ui.Manager;
 import br.ufsc.ine.leb.roza.ui.UiComponent;
 import br.ufsc.ine.leb.roza.ui.window.Window;
+import br.ufsc.ine.leb.roza.ui.window.toolbar.extraction.ExtractTestCasesButton;
+import br.ufsc.ine.leb.roza.ui.window.toolbar.extraction.ExtractorComboBox;
+import br.ufsc.ine.leb.roza.ui.window.toolbar.measuring.DeckardConfigurationInputs;
+import br.ufsc.ine.leb.roza.ui.window.toolbar.measuring.JplagConfigurationInputs;
+import br.ufsc.ine.leb.roza.ui.window.toolbar.measuring.MeasureTestCasesButton;
+import br.ufsc.ine.leb.roza.ui.window.toolbar.measuring.MeasurerComboBox;
+import br.ufsc.ine.leb.roza.ui.window.toolbar.measuring.SimianConfigurationInputs;
+import br.ufsc.ine.leb.roza.ui.window.toolbar.parsing.LoadTestClassesButton;
+import br.ufsc.ine.leb.roza.ui.window.toolbar.parsing.ParserComboBox;
 
 public class Toolbar implements UiComponent {
 

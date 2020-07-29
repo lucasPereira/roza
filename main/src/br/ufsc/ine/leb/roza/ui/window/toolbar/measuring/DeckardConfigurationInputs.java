@@ -1,4 +1,4 @@
-package br.ufsc.ine.leb.roza.ui.window.toolbar;
+package br.ufsc.ine.leb.roza.ui.window.toolbar.measuring;
 
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
@@ -11,6 +11,7 @@ import br.ufsc.ine.leb.roza.ui.Hub;
 import br.ufsc.ine.leb.roza.ui.UiComponent;
 import br.ufsc.ine.leb.roza.ui.model.OnlyNumbersAndDots;
 import br.ufsc.ine.leb.roza.ui.model.OnlyNumbersFilter;
+import br.ufsc.ine.leb.roza.ui.window.toolbar.Toolbar;
 
 public class DeckardConfigurationInputs implements UiComponent {
 

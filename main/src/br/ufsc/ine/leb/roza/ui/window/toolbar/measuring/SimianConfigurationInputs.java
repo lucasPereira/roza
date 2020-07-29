@@ -1,4 +1,4 @@
-package br.ufsc.ine.leb.roza.ui.window.toolbar;
+package br.ufsc.ine.leb.roza.ui.window.toolbar.measuring;
 
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
@@ -10,14 +10,15 @@ import javax.swing.text.PlainDocument;
 import br.ufsc.ine.leb.roza.ui.Hub;
 import br.ufsc.ine.leb.roza.ui.UiComponent;
 import br.ufsc.ine.leb.roza.ui.model.OnlyNumbersFilter;
+import br.ufsc.ine.leb.roza.ui.window.toolbar.Toolbar;
 
-public class JplagConfigurationInputs implements UiComponent {
+public class SimianConfigurationInputs implements UiComponent {
 
 	private Hub hub;
 	private Toolbar toolbar;
-	private JTextField sensitivityInput;
+	private JTextField thresholdInput;
 
-	public JplagConfigurationInputs(Hub hub, Toolbar toolbar) {
+	public SimianConfigurationInputs(Hub hub, Toolbar toolbar) {
 		this.hub = hub;
 		this.toolbar = toolbar;
 		init();
@@ -26,13 +27,13 @@ public class JplagConfigurationInputs implements UiComponent {
 
 	@Override
 	public void init() {
-		sensitivityInput = createInput("1", "t: sensitivity of the comparison", "^[1-9][0-9]*$", new OnlyNumbersFilter());
-		toolbar.addComponent(sensitivityInput);
-		hub.selectJplagMetricSubscribe(() -> {
-			sensitivityInput.setVisible(true);
+		thresholdInput = createInput("6", "threshold: matches will contain at least the specified number of lines", "^([1-2][0-9]+)|([3-9][0-9]*)$", new OnlyNumbersFilter());
+		toolbar.addComponent(thresholdInput);
+		hub.selectSimianMetricSubscribe(() -> {
+			thresholdInput.setVisible(true);
 		});
-		hub.unselectJplagMetricSubscribe(() -> {
-			sensitivityInput.setVisible(false);
+		hub.unselectSimianMetricSubscribe(() -> {
+			thresholdInput.setVisible(false);
 		});
 	}
 
@@ -49,8 +50,8 @@ public class JplagConfigurationInputs implements UiComponent {
 				if (!input.getText().matches(regex)) {
 					input.setText(original);
 				}
-				Integer sensitivity = Integer.parseInt(sensitivityInput.getText());
-				hub.changeJplagSettingsPublish(sensitivity);
+				Integer threshold = Integer.parseInt(thresholdInput.getText());
+				hub.changeJplagSettingsPublish(threshold);
 			}
 
 			@Override
