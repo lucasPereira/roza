@@ -40,6 +40,8 @@ public class Toolbar implements UiComponent {
 		addComponent(new JToolBar.Separator());
 		new MeasurerComboBox(hub, manager, this);
 		new DeckardConfigurationInputs(hub, this);
+		new JplagConfigurationInputs(hub, this);
+		new SimianConfigurationInputs(hub, this);
 		new MeasureTestCasesButton(hub, manager, this);
 	}
 

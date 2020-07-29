@@ -34,6 +34,8 @@ public class Window implements UiComponent {
 		hub.loadTestClassesSubscribe(classes -> show());
 		hub.selectTestClassSubscribe(testClass -> show());
 		hub.selectDeckardMetricSubscribe(() -> show());
+		hub.selectJplagMetricSubscribe(() -> show());
+		hub.selectSimianMetricSubscribe(() -> show());
 	}
 
 	@Override

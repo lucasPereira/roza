@@ -16,7 +16,14 @@ public class Hub {
 	private List<Consumer<List<TestCase>>> extractTestCasesListeners;
 	private List<Consumer<TestCase>> selectTestCaseListeners;
 	private List<Runnable> selectDeckardMetricListeners;
+	private List<Runnable> unselectDeckardMetricListeners;
 	private List<DeckardSettingsConsumer> changeDeckardSettingsListeners;
+	private List<Runnable> selectJplagMetricListeners;
+	private List<Runnable> unselectJplagMetricListeners;
+	private List<Consumer<Integer>> changeJplagSettingsListeners;
+	private List<Runnable> selectSimianMetricListeners;
+	private List<Runnable> unselectSimianMetricListeners;
+	private List<Consumer<Integer>> changeSimianSettingsListeners;
 
 	public Hub() {
 		loadTestClassesListeners = new LinkedList<>();
@@ -24,7 +31,14 @@ public class Hub {
 		extractTestCasesListeners = new LinkedList<>();
 		selectTestCaseListeners = new LinkedList<>();
 		selectDeckardMetricListeners = new LinkedList<>();
+		unselectDeckardMetricListeners = new LinkedList<>();
 		changeDeckardSettingsListeners = new LinkedList<>();
+		selectJplagMetricListeners = new LinkedList<>();
+		unselectJplagMetricListeners = new LinkedList<>();
+		changeJplagSettingsListeners = new LinkedList<>();
+		selectSimianMetricListeners = new LinkedList<>();
+		unselectSimianMetricListeners = new LinkedList<>();
+		changeSimianSettingsListeners = new LinkedList<>();
 	}
 
 	public void loadTestClassesPublish(List<TestClass> classes) {
@@ -67,12 +81,68 @@ public class Hub {
 		selectDeckardMetricListeners.add(listener);
 	}
 
+	public void unselectDeckardMetricPublish() {
+		unselectDeckardMetricListeners.forEach(listener -> listener.run());
+	}
+
+	public void unselectDeckardMetricSubscribe(Runnable listener) {
+		unselectDeckardMetricListeners.add(listener);
+	}
+
 	public void changeDeckardSettingsPublish(Integer minTokens, Integer stride, Double similarity) {
 		changeDeckardSettingsListeners.forEach(listener -> listener.accept(minTokens, stride, similarity));
 	}
 
 	public void changeDeckardSettingsSubscribe(DeckardSettingsConsumer listener) {
 		changeDeckardSettingsListeners.add(listener);
+	}
+
+	public void selectJplagMetricPublish() {
+		selectJplagMetricListeners.forEach(listener -> listener.run());
+	}
+
+	public void selectJplagMetricSubscribe(Runnable listener) {
+		selectJplagMetricListeners.add(listener);
+	}
+
+	public void unselectJplagMetricPublish() {
+		unselectJplagMetricListeners.forEach(listener -> listener.run());
+	}
+
+	public void unselectJplagMetricSubscribe(Runnable listener) {
+		unselectJplagMetricListeners.add(listener);
+	}
+
+	public void changeJplagSettingsPublish(Integer sensitivity) {
+		changeJplagSettingsListeners.forEach(listener -> listener.accept(sensitivity));
+	}
+
+	public void changeJplagSettingsSubscribe(Consumer<Integer> listener) {
+		changeJplagSettingsListeners.add(listener);
+	}
+
+	public void selectSimianMetricPublish() {
+		selectSimianMetricListeners.forEach(listener -> listener.run());
+	}
+
+	public void selectSimianMetricSubscribe(Runnable listener) {
+		selectSimianMetricListeners.add(listener);
+	}
+
+	public void unselectSimianMetricPublish() {
+		unselectSimianMetricListeners.forEach(listener -> listener.run());
+	}
+
+	public void unselectSimianMetricSubscribe(Runnable listener) {
+		unselectSimianMetricListeners.add(listener);
+	}
+
+	public void changeSimianSettingsPublish(Integer threshold) {
+		changeSimianSettingsListeners.forEach(listener -> listener.accept(threshold));
+	}
+
+	public void changeSimianSettingsSubscribe(Consumer<Integer> listener) {
+		changeSimianSettingsListeners.add(listener);
 	}
 
 	public void measureTestsPublish(SimilarityReport similarityReort) {}

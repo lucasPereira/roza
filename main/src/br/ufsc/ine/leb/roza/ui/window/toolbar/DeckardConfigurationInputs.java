@@ -40,6 +40,11 @@ public class DeckardConfigurationInputs implements UiComponent {
 			strideInput.setVisible(true);
 			similarityInput.setVisible(true);
 		});
+		hub.unselectDeckardMetricSubscribe(() -> {
+			minTokensInput.setVisible(false);
+			strideInput.setVisible(false);
+			similarityInput.setVisible(false);
+		});
 	}
 
 	private JTextField createInput(String value, String tip, String regex, DocumentFilter filter) {
