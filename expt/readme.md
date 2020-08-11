@@ -1,5 +1,7 @@
 # Experiments
 
+Each letter identify an experiment. The description of each experiment is defined bellow.
+
 ## `a`: similarity measurement experiment
 
 Uses distinct similarity metrics to evaluate the capability of each metric to identify refactoring candidates by the implicit setup strategy. The metrics used are: JPlag, Siman, Deckard, LCS and LCCSS.
