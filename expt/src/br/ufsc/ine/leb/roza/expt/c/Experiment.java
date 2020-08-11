@@ -1,4 +1,4 @@
-package br.ufsc.ine.leb.roza.expirement.c;
+package br.ufsc.ine.leb.roza.expt.c;
 
 import java.math.BigDecimal;
 import java.util.Arrays;

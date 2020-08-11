@@ -1,4 +1,4 @@
-package br.ufsc.ine.leb.roza.expirement.a;
+package br.ufsc.ine.leb.roza.expt.a;
 
 import java.util.ArrayList;
 import java.util.Arrays;

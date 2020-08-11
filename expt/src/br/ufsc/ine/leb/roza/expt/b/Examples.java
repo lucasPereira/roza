@@ -1,4 +1,4 @@
-package br.ufsc.ine.leb.roza.expirement.b;
+package br.ufsc.ine.leb.roza.expt.b;
 
 import java.util.Comparator;
 import java.util.List;
