@@ -24,6 +24,7 @@ public class Hub {
 	private List<Runnable> selectSimianMetricListeners;
 	private List<Runnable> unselectSimianMetricListeners;
 	private List<Consumer<Integer>> changeSimianSettingsListeners;
+	private List<Consumer<SimilarityReport>> measureTestCaseListeners;
 
 	public Hub() {
 		loadTestClassesListeners = new LinkedList<>();
@@ -39,6 +40,7 @@ public class Hub {
 		selectSimianMetricListeners = new LinkedList<>();
 		unselectSimianMetricListeners = new LinkedList<>();
 		changeSimianSettingsListeners = new LinkedList<>();
+		measureTestCaseListeners = new LinkedList<>();
 	}
 
 	public void loadTestClassesPublish(List<TestClass> classes) {
@@ -145,6 +147,12 @@ public class Hub {
 		changeSimianSettingsListeners.add(listener);
 	}
 
-	public void measureTestsPublish(SimilarityReport similarityReort) {}
+	public void measureTestsPublish(SimilarityReport similarityReort) {
+		measureTestCaseListeners.forEach(listeners -> listeners.accept(similarityReort));
+	}
+
+	public void measureTestsSubscribe(Consumer<SimilarityReport> listener) {
+		measureTestCaseListeners.add(listener);
+	}
 
 }

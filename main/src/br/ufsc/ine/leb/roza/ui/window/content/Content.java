@@ -1,8 +1,9 @@
 package br.ufsc.ine.leb.roza.ui.window.content;
 
 import java.awt.Component;
+import java.awt.GridLayout;
 
-import javax.swing.JSplitPane;
+import javax.swing.JPanel;
 
 import br.ufsc.ine.leb.roza.ui.Hub;
 import br.ufsc.ine.leb.roza.ui.Manager;
@@ -16,7 +17,7 @@ public class Content implements UiComponent {
 	private Hub hub;
 	private Manager manager;
 	private Window window;
-	private JSplitPane panel;
+	private JPanel panel;
 
 	public Content(Hub hub, Manager manager, Window window) {
 		this.hub = hub;
@@ -28,8 +29,7 @@ public class Content implements UiComponent {
 
 	@Override
 	public void init() {
-		panel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-		panel.setResizeWeight(1);
+		panel = new JPanel(new GridLayout(1, 2));
 		window.addComponent(panel);
 	}
 
@@ -40,11 +40,11 @@ public class Content implements UiComponent {
 	}
 
 	public void addLeftComponent(Component component) {
-		panel.setLeftComponent(component);
+		panel.add(component);
 	}
 
 	public void addRightComponent(Component component) {
-		panel.setRightComponent(component);
+		panel.add(component);
 	}
 
 }
