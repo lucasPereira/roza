@@ -1,6 +1,5 @@
 package br.ufsc.ine.leb.roza.ui.window.content.sidebar.measurements;
 
-import java.awt.Color;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -23,7 +22,7 @@ import br.ufsc.ine.leb.roza.ui.model.TestCaseRenderer;
 import br.ufsc.ine.leb.roza.utils.FormatterUtils;
 import br.ufsc.ine.leb.roza.utils.ReportUtils;
 
-public class CompareTestCasesPanel implements UiComponent {
+public class SelectTestCasesMeasurementPanel implements UiComponent {
 
 	private static final String DEFAULT_SCORE = "---------";
 
@@ -31,7 +30,7 @@ public class CompareTestCasesPanel implements UiComponent {
 	private MeasurementsTab measurementsTab;
 	private SimilarityReport similarityReport;
 
-	public CompareTestCasesPanel(Hub hub, MeasurementsTab measurementsTab) {
+	public SelectTestCasesMeasurementPanel(Hub hub, MeasurementsTab measurementsTab) {
 		this.hub = hub;
 		this.measurementsTab = measurementsTab;
 		init();

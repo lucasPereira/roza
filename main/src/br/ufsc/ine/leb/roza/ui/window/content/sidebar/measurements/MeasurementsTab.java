@@ -29,7 +29,7 @@ public class MeasurementsTab implements UiComponent {
 
 	@Override
 	public void createChilds() {
-		new CompareTestCasesPanel(hub, this);
+		new SelectTestCasesMeasurementPanel(hub, this);
 	}
 
 	public void addComponent(Component component) {
