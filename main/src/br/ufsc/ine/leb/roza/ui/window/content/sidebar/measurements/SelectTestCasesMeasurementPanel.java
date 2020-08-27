@@ -39,6 +39,7 @@ public class SelectTestCasesMeasurementPanel implements UiComponent {
 
 	@Override
 	public void init() {
+		JPanel parent = new JPanel();
 		JPanel panel = new JPanel();
 		panel.setLayout(new GridLayout(3, 1));
 		JComboBox<TestCase> sourceCombo = new JComboBox<>();
@@ -78,8 +79,9 @@ public class SelectTestCasesMeasurementPanel implements UiComponent {
 		panel.add(new JScrollPane(sourceCombo));
 		panel.add(new JScrollPane(targetCombo));
 		panel.add(scoreLabel);
+		parent.add(panel);
 		updateScore(scoreLabel, sourceCombo, targetCombo);
-		measurementsTab.addComponent(panel);
+		measurementsTab.addTopComponent(parent);
 	}
 
 	private ActionListener createListenerToTestSelection(JLabel scoreLabel, JComboBox<TestCase> sourceCombo, JComboBox<TestCase> targetCombo) {
@@ -100,6 +102,7 @@ public class SelectTestCasesMeasurementPanel implements UiComponent {
 			SimilarityAssessment measure = similarityReport.getPair(source, target);
 			String score = new FormatterUtils().bigDecimal(measure.getScore());
 			scoreLabel.setText(score);
+			hub.compareTestCasePublish(source, target);
 		} else {
 			scoreLabel.setText(DEFAULT_SCORE);
 		}
