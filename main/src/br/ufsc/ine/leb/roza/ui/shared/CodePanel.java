@@ -11,13 +11,13 @@ import javax.swing.text.html.StyleSheet;
 import br.ufsc.ine.leb.roza.Statement;
 import br.ufsc.ine.leb.roza.TestCase;
 
-public class TestCodePanel extends JScrollPane {
+public class CodePanel extends JScrollPane {
 
 	private static final long serialVersionUID = 1L;
 
 	private JEditorPane pane;
 
-	public TestCodePanel() {
+	public CodePanel() {
 		super(new JEditorPane());
 		pane = (JEditorPane) getViewport().getView();
 		HTMLEditorKit editor = new HTMLEditorKit();
@@ -77,7 +77,7 @@ public class TestCodePanel extends JScrollPane {
 	}
 
 	private void updateScroll() {
-		TestCodePanel scroller = this;
+		CodePanel scroller = this;
 		SwingUtilities.invokeLater(new Runnable() {
 
 			@Override

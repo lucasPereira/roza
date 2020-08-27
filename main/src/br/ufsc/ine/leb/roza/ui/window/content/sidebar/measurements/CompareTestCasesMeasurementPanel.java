@@ -4,7 +4,7 @@ import javax.swing.JSplitPane;
 
 import br.ufsc.ine.leb.roza.ui.Hub;
 import br.ufsc.ine.leb.roza.ui.UiComponent;
-import br.ufsc.ine.leb.roza.ui.shared.TestCodePanel;
+import br.ufsc.ine.leb.roza.ui.shared.CodePanel;
 
 public class CompareTestCasesMeasurementPanel implements UiComponent {
 
@@ -22,8 +22,8 @@ public class CompareTestCasesMeasurementPanel implements UiComponent {
 	@Override
 	public void init() {
 		panel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-		TestCodePanel sourcePanel = new TestCodePanel();
-		TestCodePanel targetPanel = new TestCodePanel();
+		CodePanel sourcePanel = new CodePanel();
+		CodePanel targetPanel = new CodePanel();
 		panel.setResizeWeight(0.5);
 		panel.setLeftComponent(sourcePanel);
 		panel.setRightComponent(targetPanel);

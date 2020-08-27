@@ -2,7 +2,7 @@ package br.ufsc.ine.leb.roza.ui.window.content.sidebar.tests;
 
 import br.ufsc.ine.leb.roza.ui.Hub;
 import br.ufsc.ine.leb.roza.ui.UiComponent;
-import br.ufsc.ine.leb.roza.ui.shared.TestCodePanel;
+import br.ufsc.ine.leb.roza.ui.shared.CodePanel;
 
 public class TestCaseCode implements UiComponent {
 
@@ -18,7 +18,7 @@ public class TestCaseCode implements UiComponent {
 
 	@Override
 	public void init() {
-		TestCodePanel testCodePanel = new TestCodePanel();
+		CodePanel testCodePanel = new CodePanel();
 		testCasesTab.addBottomComponent(testCodePanel);
 		hub.loadTestClassesSubscribe(testClasses -> {
 			testCodePanel.clearTestCase();

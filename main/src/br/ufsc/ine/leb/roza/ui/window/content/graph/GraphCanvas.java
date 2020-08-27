@@ -1,4 +1,4 @@
-package br.ufsc.ine.leb.roza.ui.window.content.graphCanvas;
+package br.ufsc.ine.leb.roza.ui.window.content.graph;
 
 import java.awt.Component;
 
