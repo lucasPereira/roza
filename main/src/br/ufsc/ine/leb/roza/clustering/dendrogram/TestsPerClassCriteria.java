@@ -18,12 +18,11 @@ public class TestsPerClassCriteria implements ThresholdCriteria {
 
 	@Override
 	public Boolean shoudlStop(List<Level> levels) {
-		if (levels.isEmpty()) {
-			return false;
-		}
 		for (Level level : levels) {
-			for (Cluster cluster : level.getClusters()) {
-				if (cluster.getTestCases().size() >= threshold) {
+			if (level.hasNextLevel()) {
+				Combination next = level.getCombinationToNextLevel();
+				Integer nextSize = next.getFirst().getTestCases().size() + next.getSecond().getTestCases().size();
+				if (nextSize > threshold) {
 					return true;
 				}
 			}

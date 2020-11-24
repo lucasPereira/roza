@@ -22,9 +22,14 @@ class TestsPerClassCriteriaTest {
 	private InsecureReferee referee;
 	private TestCase alpha;
 	private TestCase beta;
+	private TestCase gamma;
+	private TestCase delta;
 	private Cluster alphaCluster;
 	private Cluster betaCluster;
+	private Cluster gammaCluster;
+	private Cluster deltaCluster;
 	private Cluster alphaBetaCluster;
+	private Cluster gammaDeltaCluster;
 
 	@BeforeEach
 	void setup() {
@@ -32,9 +37,14 @@ class TestsPerClassCriteriaTest {
 		referee = new InsecureReferee();
 		alpha = new TestCase("alpha", Arrays.asList(), Arrays.asList());
 		beta = new TestCase("beta", Arrays.asList(), Arrays.asList());
+		gamma = new TestCase("gamma", Arrays.asList(), Arrays.asList());
+		delta = new TestCase("delta", Arrays.asList(), Arrays.asList());
 		alphaCluster = new Cluster(alpha);
 		betaCluster = new Cluster(beta);
+		gammaCluster = new Cluster(gamma);
+		deltaCluster = new Cluster(delta);
 		alphaBetaCluster = alphaCluster.merge(betaCluster);
+		gammaDeltaCluster = gammaCluster.merge(deltaCluster);
 	}
 
 	@Test
@@ -55,7 +65,7 @@ class TestsPerClassCriteriaTest {
 
 	@Test
 	void levelOneExceedingThreshold() throws Exception {
-		Set<Cluster> clusters = new HashSet<>(Arrays.asList(alphaCluster));
+		Set<Cluster> clusters = new HashSet<>(Arrays.asList(alphaCluster, betaCluster, gammaCluster, deltaCluster));
 		Level level = new Level(linkage, referee, clusters);
 		List<Level> levels = Arrays.asList(level);
 		ThresholdCriteria criteria = new TestsPerClassCriteria(1);
@@ -64,7 +74,7 @@ class TestsPerClassCriteriaTest {
 
 	@Test
 	void levelOneNotExceedingThreshold() throws Exception {
-		Set<Cluster> clusters = new HashSet<>(Arrays.asList(alphaCluster));
+		Set<Cluster> clusters = new HashSet<>(Arrays.asList(alphaCluster, betaCluster, gammaCluster, deltaCluster));
 		Level level = new Level(linkage, referee, clusters);
 		List<Level> levels = Arrays.asList(level);
 		ThresholdCriteria criteria = new TestsPerClassCriteria(2);
@@ -73,8 +83,8 @@ class TestsPerClassCriteriaTest {
 
 	@Test
 	void levelTwoExceedingThreshold() throws Exception {
-		Level one = new Level(linkage, referee, new HashSet<>(Arrays.asList(alphaCluster, betaCluster)));
-		Level two = new Level(linkage, referee, new HashSet<>(Arrays.asList(alphaBetaCluster)));
+		Level one = new Level(linkage, referee, new HashSet<>(Arrays.asList(alphaCluster, betaCluster, gammaCluster)));
+		Level two = new Level(linkage, referee, new HashSet<>(Arrays.asList(alphaBetaCluster, gammaCluster)));
 		List<Level> levels = Arrays.asList(one, two);
 		ThresholdCriteria criteria = new TestsPerClassCriteria(2);
 		assertTrue(criteria.shoudlStop(levels));
@@ -82,8 +92,8 @@ class TestsPerClassCriteriaTest {
 
 	@Test
 	void levelTwoNotExceedingThreshold() throws Exception {
-		Level one = new Level(linkage, referee, new HashSet<>(Arrays.asList(alphaCluster, betaCluster)));
-		Level two = new Level(linkage, referee, new HashSet<>(Arrays.asList(alphaBetaCluster)));
+		Level one = new Level(linkage, referee, new HashSet<>(Arrays.asList(alphaCluster, betaCluster, gammaCluster)));
+		Level two = new Level(linkage, referee, new HashSet<>(Arrays.asList(alphaBetaCluster, gammaCluster)));
 		List<Level> levels = Arrays.asList(one, two);
 		ThresholdCriteria criteria = new TestsPerClassCriteria(3);
 		assertFalse(criteria.shoudlStop(levels));
@@ -91,11 +101,31 @@ class TestsPerClassCriteriaTest {
 
 	@Test
 	void levelTwoExceedingThresholdLevelsReversed() throws Exception {
-		Level one = new Level(linkage, referee, new HashSet<>(Arrays.asList(alphaCluster, betaCluster)));
-		Level two = new Level(linkage, referee, new HashSet<>(Arrays.asList(alphaBetaCluster)));
+		Level one = new Level(linkage, referee, new HashSet<>(Arrays.asList(alphaCluster, betaCluster, gammaCluster)));
+		Level two = new Level(linkage, referee, new HashSet<>(Arrays.asList(alphaBetaCluster, gammaCluster)));
 		List<Level> levels = Arrays.asList(two, one);
 		ThresholdCriteria criteria = new TestsPerClassCriteria(2);
 		assertTrue(criteria.shoudlStop(levels));
+	}
+
+	@Test
+	void levelThreeExceedingThreshold() throws Exception {
+		Level one = new Level(linkage, referee, new HashSet<>(Arrays.asList(alphaCluster, betaCluster, gammaCluster, deltaCluster)));
+		Level two = new Level(linkage, referee, new HashSet<>(Arrays.asList(alphaBetaCluster, gammaCluster, deltaCluster)));
+		Level three = new Level(linkage, referee, new HashSet<>(Arrays.asList(alphaBetaCluster, gammaDeltaCluster)));
+		List<Level> levels = Arrays.asList(one, two, three);
+		ThresholdCriteria criteria = new TestsPerClassCriteria(3);
+		assertTrue(criteria.shoudlStop(levels));
+	}
+
+	@Test
+	void levelThreeNotExceedingThreshold() throws Exception {
+		Level one = new Level(linkage, referee, new HashSet<>(Arrays.asList(alphaCluster, betaCluster, gammaCluster, deltaCluster)));
+		Level two = new Level(linkage, referee, new HashSet<>(Arrays.asList(alphaBetaCluster, gammaCluster, deltaCluster)));
+		Level three = new Level(linkage, referee, new HashSet<>(Arrays.asList(alphaBetaCluster, gammaDeltaCluster)));
+		List<Level> levels = Arrays.asList(one, two, three);
+		ThresholdCriteria criteria = new TestsPerClassCriteria(4);
+		assertFalse(criteria.shoudlStop(levels));
 	}
 
 	@Test
