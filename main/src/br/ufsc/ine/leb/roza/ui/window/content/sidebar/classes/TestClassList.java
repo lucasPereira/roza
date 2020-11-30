@@ -11,23 +11,20 @@ import javax.swing.event.ListSelectionListener;
 
 import br.ufsc.ine.leb.roza.TestClass;
 import br.ufsc.ine.leb.roza.ui.Hub;
+import br.ufsc.ine.leb.roza.ui.Manager;
 import br.ufsc.ine.leb.roza.ui.UiComponent;
 import br.ufsc.ine.leb.roza.ui.model.TestClassRenderer;
 
 public class TestClassList implements UiComponent {
 
-	private Hub hub;
 	private TestClassesTab testClassesTab;
 
-	public TestClassList(Hub hub, TestClassesTab testClassesTab) {
-		this.hub = hub;
+	public TestClassList(TestClassesTab testClassesTab) {
 		this.testClassesTab = testClassesTab;
-		init();
-		createChilds();
 	}
 
 	@Override
-	public void init() {
+	public void init(Hub hub, Manager manager) {
 		JList<TestClass> list = new JList<>();
 		JScrollPane scroller = new JScrollPane(list);
 		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -52,6 +49,9 @@ public class TestClassList implements UiComponent {
 	}
 
 	@Override
-	public void createChilds() {}
+	public void addChilds(List<UiComponent> childs) {}
+
+	@Override
+	public void start() {}
 
 }

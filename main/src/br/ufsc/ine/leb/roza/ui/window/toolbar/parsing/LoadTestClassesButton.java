@@ -16,21 +16,15 @@ import br.ufsc.ine.leb.roza.ui.UiComponent;
 
 public class LoadTestClassesButton implements UiComponent {
 
-	private Hub hub;
-	private Manager manager;
 	private ParsingTab toolbar;
 	private JButton button;
 
-	public LoadTestClassesButton(Hub hub, Manager manager, ParsingTab toolbar) {
-		this.hub = hub;
-		this.manager = manager;
+	public LoadTestClassesButton(ParsingTab toolbar) {
 		this.toolbar = toolbar;
-		init();
-		createChilds();
 	}
 
 	@Override
-	public void init() {
+	public void init(Hub hub, Manager manager) {
 		button = new JButton("Load Test Classes");
 		toolbar.addComponent(button);
 		button.addActionListener(event -> {
@@ -44,9 +38,13 @@ public class LoadTestClassesButton implements UiComponent {
 				hub.loadTestClassesPublish(classes);
 			}
 		});
+
 	}
 
 	@Override
-	public void createChilds() {}
+	public void addChilds(List<UiComponent> childs) {}
+
+	@Override
+	public void start() {}
 
 }

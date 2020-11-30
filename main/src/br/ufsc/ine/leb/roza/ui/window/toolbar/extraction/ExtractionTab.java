@@ -1,6 +1,7 @@
 package br.ufsc.ine.leb.roza.ui.window.toolbar.extraction;
 
 import java.awt.Component;
+import java.util.List;
 
 import javax.swing.JPanel;
 
@@ -11,30 +12,27 @@ import br.ufsc.ine.leb.roza.ui.window.toolbar.Toolbar;
 
 public class ExtractionTab implements UiComponent {
 
-	private Hub hub;
-	private Manager manager;
 	private Toolbar toolbar;
 	private JPanel panel;
 
-	public ExtractionTab(Hub hub, Manager manager, Toolbar toolbar) {
-		this.hub = hub;
-		this.manager = manager;
+	public ExtractionTab(Toolbar toolbar) {
 		this.toolbar = toolbar;
-		init();
-		createChilds();
 	}
 
 	@Override
-	public void init() {
+	public void init(Hub hub, Manager manager) {
 		panel = new JPanel();
 		toolbar.addComponent("Extraction", panel);
 	}
 
 	@Override
-	public void createChilds() {
-		new ExtractorComboBox(hub, manager, this);
-		new ExtractTestCasesButton(hub, manager, this);
+	public void addChilds(List<UiComponent> childs) {
+		childs.add(new ExtractorComboBox(this));
+		childs.add(new ExtractTestCasesButton(this));
 	}
+
+	@Override
+	public void start() {}
 
 	public void addComponent(Component component) {
 		panel.add(component);

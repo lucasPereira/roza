@@ -1,11 +1,14 @@
 package br.ufsc.ine.leb.roza.ui.window.content.graph;
 
 import java.awt.Component;
+import java.util.List;
 
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.implementations.SingleGraph;
 import org.graphstream.ui.view.Viewer;
 
+import br.ufsc.ine.leb.roza.ui.Hub;
+import br.ufsc.ine.leb.roza.ui.Manager;
 import br.ufsc.ine.leb.roza.ui.UiComponent;
 import br.ufsc.ine.leb.roza.ui.window.content.Content;
 
@@ -15,12 +18,10 @@ public class GraphCanvas implements UiComponent {
 
 	public GraphCanvas(Content content) {
 		this.content = content;
-		init();
-		createChilds();
 	}
 
 	@Override
-	public void init() {
+	public void init(Hub hub, Manager manager) {
 		System.setProperty("org.graphstream.ui.renderer", "org.graphstream.ui.j2dviewer.J2DGraphRenderer");
 		Graph graph = new SingleGraph("roza");
 		graph.addNode("A");
@@ -36,6 +37,9 @@ public class GraphCanvas implements UiComponent {
 	}
 
 	@Override
-	public void createChilds() {}
+	public void addChilds(List<UiComponent> childs) {}
+
+	@Override
+	public void start() {}
 
 }

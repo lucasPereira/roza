@@ -1,6 +1,7 @@
 package br.ufsc.ine.leb.roza.ui.window.toolbar.clustering;
 
 import java.awt.Component;
+import java.util.List;
 
 import javax.swing.JPanel;
 
@@ -11,36 +12,32 @@ import br.ufsc.ine.leb.roza.ui.window.toolbar.Toolbar;
 
 public class ClusteringTab implements UiComponent {
 
-	private Hub hub;
-	private Manager manager;
 	private Toolbar toolbar;
 	private JPanel panel;
 
-	public ClusteringTab(Hub hub, Manager manager, Toolbar toolbar) {
-		this.hub = hub;
-		this.manager = manager;
+	public ClusteringTab(Toolbar toolbar) {
 		this.toolbar = toolbar;
-		init();
-		createChilds();
 	}
 
 	@Override
-	public void init() {
+	public void init(Hub hub, Manager manager) {
 		panel = new JPanel();
 		toolbar.addComponent("Clustering", panel);
 	}
 
 	@Override
-	public void createChilds() {
-		new LinkageComboBox(hub, manager, this);
-		new RefereeComboBox(hub, manager, this);
-		new ThresholdCriteriaComboBox(hub, this);
-		new ThresholdCriteriaInputs(hub, this);
-		new StartTestsDistributionButton(hub, manager, this);
+	public void addChilds(List<UiComponent> childs) {
+		childs.add(new LinkageComboBox(this));
+		childs.add(new RefereeComboBox(this));
+		childs.add(new ThresholdCriteriaComboBox(this));
+		childs.add(new ThresholdCriteriaInputs(this));
+		childs.add(new StartTestsDistributionButton(this));
 	}
+
+	@Override
+	public void start() {}
 
 	public void addComponent(Component component) {
 		panel.add(component);
 	}
-
 }

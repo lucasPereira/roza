@@ -2,6 +2,7 @@ package br.ufsc.ine.leb.roza.ui.window.content;
 
 import java.awt.Component;
 import java.awt.GridLayout;
+import java.util.List;
 
 import javax.swing.JPanel;
 
@@ -14,30 +15,28 @@ import br.ufsc.ine.leb.roza.ui.window.content.sidebar.Sidebar;
 
 public class Content implements UiComponent {
 
-	private Hub hub;
-	private Manager manager;
 	private Window window;
 	private JPanel panel;
 
-	public Content(Hub hub, Manager manager, Window window) {
-		this.hub = hub;
-		this.manager = manager;
+	public Content(Window window) {
 		this.window = window;
-		init();
-		createChilds();
 	}
 
 	@Override
-	public void init() {
+	public void init(Hub hub, Manager manager) {
 		panel = new JPanel(new GridLayout(1, 2));
 		window.addComponent(panel);
+
 	}
 
 	@Override
-	public void createChilds() {
-		new GraphCanvas(this);
-		new Sidebar(hub, manager, this);
+	public void addChilds(List<UiComponent> childs) {
+		childs.add(new GraphCanvas(this));
+		childs.add(new Sidebar(this));
 	}
+
+	@Override
+	public void start() {}
 
 	public void addLeftComponent(Component component) {
 		panel.add(component);

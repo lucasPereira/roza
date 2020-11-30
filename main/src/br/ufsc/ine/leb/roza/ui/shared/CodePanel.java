@@ -40,7 +40,6 @@ public class CodePanel extends JScrollPane {
 		addStyle(sheet, "li.odd-assert", "background-color", "#FFFFFF");
 		addStyle(sheet, "li.even-assert", "color", "#999999");
 		addStyle(sheet, "li.odd-assert", "color", "999999");
-		
 	}
 
 	public void clearTestCase() {

@@ -1,25 +1,24 @@
 package br.ufsc.ine.leb.roza.ui.window.toolbar.clustering;
 
+import java.util.List;
+
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 
 import br.ufsc.ine.leb.roza.ui.Hub;
+import br.ufsc.ine.leb.roza.ui.Manager;
 import br.ufsc.ine.leb.roza.ui.UiComponent;
 
 public class ThresholdCriteriaInputs implements UiComponent {
 
-	private Hub hub;
 	private ClusteringTab toolbar;
 
-	public ThresholdCriteriaInputs(Hub hub, ClusteringTab toolbar) {
-		this.hub = hub;
+	public ThresholdCriteriaInputs(ClusteringTab toolbar) {
 		this.toolbar = toolbar;
-		init();
-		createChilds();
 	}
 
 	@Override
-	public void init() {
+	public void init(Hub hub, Manager manager) {
 		JSpinner levelBaseInput = new JSpinner(new SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 1));
 		JSpinner testsPerClassInput = new JSpinner(new SpinnerNumberModel(1, 1, Integer.MAX_VALUE, 1));
 		JSpinner similarityBaseInput = new JSpinner(new SpinnerNumberModel(0.5, 0.0, 1.0, 0.1));
@@ -27,6 +26,9 @@ public class ThresholdCriteriaInputs implements UiComponent {
 		levelBaseInput.setVisible(false);
 		testsPerClassInput.setVisible(false);
 		similarityBaseInput.setVisible(false);
+		toolbar.addComponent(levelBaseInput);
+		toolbar.addComponent(testsPerClassInput);
+		toolbar.addComponent(similarityBaseInput);
 		hub.selectLevelBasedCriteriaSubscribe(() -> {
 			levelBaseInput.setVisible(true);
 			testsPerClassInput.setVisible(false);
@@ -42,12 +44,12 @@ public class ThresholdCriteriaInputs implements UiComponent {
 			testsPerClassInput.setVisible(false);
 			similarityBaseInput.setVisible(true);
 		});
-		toolbar.addComponent(levelBaseInput);
-		toolbar.addComponent(testsPerClassInput);
-		toolbar.addComponent(similarityBaseInput);
 	}
 
 	@Override
-	public void createChilds() {}
+	public void addChilds(List<UiComponent> childs) {}
+
+	@Override
+	public void start() {}
 
 }

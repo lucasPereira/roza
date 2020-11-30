@@ -1,5 +1,7 @@
 package br.ufsc.ine.leb.roza.ui.window.toolbar.measuring;
 
+import java.util.List;
+
 import javax.swing.JButton;
 
 import br.ufsc.ine.leb.roza.SimilarityReport;
@@ -9,20 +11,14 @@ import br.ufsc.ine.leb.roza.ui.UiComponent;
 
 public class MeasureTestCasesButton implements UiComponent {
 
-	private Hub hub;
-	private Manager manager;
 	private MeasuringTab toolbar;
 
-	public MeasureTestCasesButton(Hub hub, Manager manager, MeasuringTab toolbar) {
-		this.hub = hub;
-		this.manager = manager;
+	public MeasureTestCasesButton(MeasuringTab toolbar) {
 		this.toolbar = toolbar;
-		init();
-		createChilds();
 	}
 
 	@Override
-	public void init() {
+	public void init(Hub hub, Manager manager) {
 		JButton button = new JButton("Measure Tests");
 		button.setEnabled(false);
 		toolbar.addComponent(button);
@@ -35,6 +31,9 @@ public class MeasureTestCasesButton implements UiComponent {
 	}
 
 	@Override
-	public void createChilds() {}
+	public void addChilds(List<UiComponent> childs) {}
+
+	@Override
+	public void start() {}
 
 }

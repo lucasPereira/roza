@@ -1,5 +1,7 @@
 package br.ufsc.ine.leb.roza.ui.window.toolbar.measuring;
 
+import java.util.List;
+
 import javax.swing.JComboBox;
 
 import br.ufsc.ine.leb.roza.measurement.DeckardSimilarityMeasurer;
@@ -17,21 +19,16 @@ import br.ufsc.ine.leb.roza.ui.shared.ComboBoxBuilder;
 
 public class MeasurerComboBox implements UiComponent {
 
-	private Hub hub;
-	private Manager manager;
 	private MeasuringTab toolbar;
+	private JComboBox<String> combo;
 
-	public MeasurerComboBox(Hub hub, Manager manager, MeasuringTab toolbar) {
-		this.hub = hub;
-		this.manager = manager;
+	public MeasurerComboBox(MeasuringTab toolbar) {
 		this.toolbar = toolbar;
-		init();
-		createChilds();
 	}
 
 	@Override
-	public void init() {
-		JComboBox<String> combo = new ComboBoxBuilder("Measurer").add("LCCSS", () -> {
+	public void init(Hub hub, Manager manager) {
+		combo = new ComboBoxBuilder("Measurer").add("LCCSS", () -> {
 			manager.setSimilarityMeasurer(new LccssSimilarityMeasurer());
 			hub.unselectDeckardMetricPublish();
 			hub.unselectJplagMetricPublish();
@@ -68,13 +65,17 @@ public class MeasurerComboBox implements UiComponent {
 				settings.threshold(threshold);
 			});
 		}).build();
-		combo.setSelectedIndex(0);
 		hub.loadTestClassesSubscribe(classes -> combo.setEnabled(false));
 		hub.extractTestCasesSubscribe(tests -> combo.setEnabled(true));
 		toolbar.addComponent(combo);
 	}
 
 	@Override
-	public void createChilds() {}
+	public void addChilds(List<UiComponent> childs) {}
+
+	@Override
+	public void start() {
+		combo.setSelectedIndex(0);
+	}
 
 }

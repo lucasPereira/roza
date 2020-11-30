@@ -15,21 +15,16 @@ import br.ufsc.ine.leb.roza.ui.shared.ComboBoxBuilder;
 
 public class ExtractorComboBox implements UiComponent {
 
-	private Hub hub;
-	private Manager manager;
 	private ExtractionTab toolbar;
+	private JComboBox<String> combo;
 
-	public ExtractorComboBox(Hub hub, Manager manager, ExtractionTab toolbar) {
-		this.hub = hub;
-		this.manager = manager;
+	public ExtractorComboBox(ExtractionTab toolbar) {
 		this.toolbar = toolbar;
-		init();
-		createChilds();
 	}
 
 	@Override
-	public void init() {
-		JComboBox<String> combo = new ComboBoxBuilder("Extractor").add("JUnit 4", () -> {
+	public void init(Hub hub, Manager manager) {
+		combo = new ComboBoxBuilder("Extractor").add("JUnit 4", () -> {
 			manager.setTestCaseExtractor(new Junit4TestCaseExtractor());
 		}).add("JUnit 5", () -> {
 			manager.setTestCaseExtractor(new Junit5TestCaseExtractor());
@@ -37,12 +32,16 @@ public class ExtractorComboBox implements UiComponent {
 			List<String> assertions = Arrays.asList("assegurarTexto", "assegurarValor", "assegurarQuantidadeDeElementos", "assegurarConteudoDeArquivoBaixado", "assegurarNaoMarcado", "assegurarMarcado", "assegurarMarcacao");
 			manager.setTestCaseExtractor(new JunitTestCaseExtractor(assertions));
 		}).build();
-		combo.setSelectedIndex(2);
-		hub.loadTestClassesSubscribe(classes -> combo.setEnabled(true));
 		toolbar.addComponent(combo);
+		hub.loadTestClassesSubscribe(classes -> combo.setEnabled(true));
 	}
 
 	@Override
-	public void createChilds() {}
+	public void addChilds(List<UiComponent> childs) {}
+
+	@Override
+	public void start() {
+		combo.setSelectedIndex(2);
+	}
 
 }

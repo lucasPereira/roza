@@ -17,6 +17,7 @@ import br.ufsc.ine.leb.roza.SimilarityAssessment;
 import br.ufsc.ine.leb.roza.SimilarityReport;
 import br.ufsc.ine.leb.roza.TestCase;
 import br.ufsc.ine.leb.roza.ui.Hub;
+import br.ufsc.ine.leb.roza.ui.Manager;
 import br.ufsc.ine.leb.roza.ui.UiComponent;
 import br.ufsc.ine.leb.roza.ui.model.TestCaseRenderer;
 import br.ufsc.ine.leb.roza.utils.FormatterUtils;
@@ -24,21 +25,17 @@ import br.ufsc.ine.leb.roza.utils.ReportUtils;
 
 public class SelectTestCasesMeasurementPanel implements UiComponent {
 
-	private static final String DEFAULT_SCORE = "---------";
+	private static final String DEFAULT_SCORE = "0";
 
-	private Hub hub;
 	private MeasurementsTab measurementsTab;
 	private SimilarityReport similarityReport;
 
-	public SelectTestCasesMeasurementPanel(Hub hub, MeasurementsTab measurementsTab) {
-		this.hub = hub;
+	public SelectTestCasesMeasurementPanel(MeasurementsTab measurementsTab) {
 		this.measurementsTab = measurementsTab;
-		init();
-		createChilds();
 	}
 
 	@Override
-	public void init() {
+	public void init(Hub hub, Manager manager) {
 		JPanel parent = new JPanel();
 		JPanel panel = new JPanel();
 		panel.setLayout(new GridLayout(3, 1));
@@ -74,28 +71,34 @@ public class SelectTestCasesMeasurementPanel implements UiComponent {
 			sourceCombo.setMaximumSize(sourceCombo.getPreferredSize());
 			targetCombo.setMaximumSize(targetCombo.getPreferredSize());
 		});
-		sourceCombo.addActionListener(createListenerToTestSelection(scoreLabel, sourceCombo, targetCombo));
-		targetCombo.addActionListener(createListenerToTestSelection(scoreLabel, sourceCombo, targetCombo));
+		sourceCombo.addActionListener(createListenerToTestSelection(hub, scoreLabel, sourceCombo, targetCombo));
+		targetCombo.addActionListener(createListenerToTestSelection(hub, scoreLabel, sourceCombo, targetCombo));
 		panel.add(new JScrollPane(sourceCombo));
 		panel.add(new JScrollPane(targetCombo));
 		panel.add(scoreLabel);
 		parent.add(panel);
-		updateScore(scoreLabel, sourceCombo, targetCombo);
+		updateScore(hub, scoreLabel, sourceCombo, targetCombo);
 		measurementsTab.addTopComponent(parent);
 	}
 
-	private ActionListener createListenerToTestSelection(JLabel scoreLabel, JComboBox<TestCase> sourceCombo, JComboBox<TestCase> targetCombo) {
+	@Override
+	public void addChilds(List<UiComponent> childs) {}
+
+	@Override
+	public void start() {}
+
+	private ActionListener createListenerToTestSelection(Hub hub, JLabel scoreLabel, JComboBox<TestCase> sourceCombo, JComboBox<TestCase> targetCombo) {
 		return new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent event) {
-				updateScore(scoreLabel, sourceCombo, targetCombo);
+				updateScore(hub, scoreLabel, sourceCombo, targetCombo);
 			}
 
 		};
 	}
 
-	private void updateScore(JLabel scoreLabel, JComboBox<TestCase> sourceCombo, JComboBox<TestCase> targetCombo) {
+	private void updateScore(Hub hub, JLabel scoreLabel, JComboBox<TestCase> sourceCombo, JComboBox<TestCase> targetCombo) {
 		TestCase source = (TestCase) sourceCombo.getSelectedItem();
 		TestCase target = (TestCase) targetCombo.getSelectedItem();
 		if (source != null && target != null) {
@@ -107,8 +110,5 @@ public class SelectTestCasesMeasurementPanel implements UiComponent {
 			scoreLabel.setText(DEFAULT_SCORE);
 		}
 	}
-
-	@Override
-	public void createChilds() {}
 
 }

@@ -2,31 +2,29 @@ package br.ufsc.ine.leb.roza.ui.window.toolbar.measuring;
 
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.util.List;
 
 import javax.swing.JTextField;
 import javax.swing.text.DocumentFilter;
 import javax.swing.text.PlainDocument;
 
 import br.ufsc.ine.leb.roza.ui.Hub;
+import br.ufsc.ine.leb.roza.ui.Manager;
 import br.ufsc.ine.leb.roza.ui.UiComponent;
 import br.ufsc.ine.leb.roza.ui.model.OnlyNumbersFilter;
 
 public class JplagConfigurationInputs implements UiComponent {
 
-	private Hub hub;
 	private MeasuringTab toolbar;
 	private JTextField sensitivityInput;
 
-	public JplagConfigurationInputs(Hub hub, MeasuringTab toolbar) {
-		this.hub = hub;
+	public JplagConfigurationInputs(MeasuringTab toolbar) {
 		this.toolbar = toolbar;
-		init();
-		createChilds();
 	}
 
 	@Override
-	public void init() {
-		sensitivityInput = createInput("1", "t: sensitivity of the comparison", "^[1-9][0-9]*$", new OnlyNumbersFilter());
+	public void init(Hub hub, Manager manager) {
+		sensitivityInput = createInput(hub, "1", "t: sensitivity of the comparison", "^[1-9][0-9]*$", new OnlyNumbersFilter());
 		toolbar.addComponent(sensitivityInput);
 		hub.selectJplagMetricSubscribe(() -> {
 			sensitivityInput.setVisible(true);
@@ -36,7 +34,13 @@ public class JplagConfigurationInputs implements UiComponent {
 		});
 	}
 
-	private JTextField createInput(String value, String tip, String regex, DocumentFilter filter) {
+	@Override
+	public void addChilds(List<UiComponent> childs) {}
+
+	@Override
+	public void start() {}
+
+	private JTextField createInput(Hub hub, String value, String tip, String regex, DocumentFilter filter) {
 		JTextField input = new JTextField();
 		input.setText(value);
 		input.setToolTipText(tip);
@@ -61,8 +65,5 @@ public class JplagConfigurationInputs implements UiComponent {
 		document.setDocumentFilter(filter);
 		return input;
 	}
-
-	@Override
-	public void createChilds() {}
 
 }

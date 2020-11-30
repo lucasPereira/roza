@@ -1,6 +1,7 @@
 package br.ufsc.ine.leb.roza.ui.window.content.sidebar;
 
 import java.awt.Component;
+import java.util.List;
 
 import javax.swing.JTabbedPane;
 
@@ -15,21 +16,15 @@ import br.ufsc.ine.leb.roza.ui.window.content.sidebar.tests.TestCasesTab;
 
 public class Sidebar implements UiComponent {
 
-	private Hub hub;
-	private Manager manager;
 	private Content content;
 	private JTabbedPane panel;
 
-	public Sidebar(Hub hub, Manager manager, Content content) {
-		this.hub = hub;
-		this.manager = manager;
+	public Sidebar(Content content) {
 		this.content = content;
-		init();
-		createChilds();
 	}
 
 	@Override
-	public void init() {
+	public void init(Hub hub, Manager manager) {
 		panel = new JTabbedPane();
 		panel.setMaximumSize(panel.getPreferredSize());
 		content.addRightComponent(panel);
@@ -51,22 +46,22 @@ public class Sidebar implements UiComponent {
 			panel.setEnabledAt(2, true);
 			panel.setEnabledAt(3, false);
 		});
-
 	}
 
 	@Override
-	public void createChilds() {
-		new TestClassesTab(hub, manager, this);
-		new TestCasesTab(hub, manager, this);
-		new MeasurementsTab(hub, this);
-		new ClusteringTab(this);
-		panel.setEnabledAt(0, false);
-		panel.setEnabledAt(1, false);
-		panel.setEnabledAt(2, false);
+	public void addChilds(List<UiComponent> childs) {
+		childs.add(new TestClassesTab(this));
+		childs.add(new TestCasesTab(this));
+		childs.add(new MeasurementsTab(this));
+		childs.add(new ClusteringTab(this));
 	}
+
+	@Override
+	public void start() {}
 
 	public void addComponent(String title, Component component) {
 		panel.addTab(title, component);
+		panel.setEnabledAt(panel.getTabCount() - 1, false);
 	}
 
 }

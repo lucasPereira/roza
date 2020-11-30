@@ -2,36 +2,34 @@ package br.ufsc.ine.leb.roza.ui.window.toolbar.measuring;
 
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.util.List;
 
 import javax.swing.JTextField;
 import javax.swing.text.DocumentFilter;
 import javax.swing.text.PlainDocument;
 
 import br.ufsc.ine.leb.roza.ui.Hub;
+import br.ufsc.ine.leb.roza.ui.Manager;
 import br.ufsc.ine.leb.roza.ui.UiComponent;
 import br.ufsc.ine.leb.roza.ui.model.OnlyNumbersAndDots;
 import br.ufsc.ine.leb.roza.ui.model.OnlyNumbersFilter;
 
 public class DeckardConfigurationInputs implements UiComponent {
 
-	private Hub hub;
 	private MeasuringTab toolbar;
 	private JTextField minTokensInput;
 	private JTextField strideInput;
 	private JTextField similarityInput;
 
-	public DeckardConfigurationInputs(Hub hub, MeasuringTab toolbar) {
-		this.hub = hub;
+	public DeckardConfigurationInputs(MeasuringTab toolbar) {
 		this.toolbar = toolbar;
-		init();
-		createChilds();
 	}
 
 	@Override
-	public void init() {
-		minTokensInput = createInput("1", "MIN_TOKENS: minimum token count to suppress vectors for small sub-trees", "^[1-9][0-9]*$", new OnlyNumbersFilter());
-		strideInput = createInput("0", "STRIDE: width of the sliding window and how far it moves in each step", "^[0-9]+$", new OnlyNumbersFilter());
-		similarityInput = createInput("1.0", "SIMILARITY: similarity thresold based on editing distance", "^(0[.][0-9]+)|(1[.]0)$", new OnlyNumbersAndDots());
+	public void init(Hub hub, Manager manager) {
+		minTokensInput = createInput(hub, "1", "MIN_TOKENS: minimum token count to suppress vectors for small sub-trees", "^[1-9][0-9]*$", new OnlyNumbersFilter());
+		strideInput = createInput(hub, "0", "STRIDE: width of the sliding window and how far it moves in each step", "^[0-9]+$", new OnlyNumbersFilter());
+		similarityInput = createInput(hub, "1.0", "SIMILARITY: similarity thresold based on editing distance", "^(0[.][0-9]+)|(1[.]0)$", new OnlyNumbersAndDots());
 		toolbar.addComponent(minTokensInput);
 		toolbar.addComponent(strideInput);
 		toolbar.addComponent(similarityInput);
@@ -45,9 +43,16 @@ public class DeckardConfigurationInputs implements UiComponent {
 			strideInput.setVisible(false);
 			similarityInput.setVisible(false);
 		});
+
 	}
 
-	private JTextField createInput(String value, String tip, String regex, DocumentFilter filter) {
+	@Override
+	public void addChilds(List<UiComponent> childs) {}
+
+	@Override
+	public void start() {}
+
+	private JTextField createInput(Hub hub, String value, String tip, String regex, DocumentFilter filter) {
 		JTextField input = new JTextField();
 		input.setText(value);
 		input.setToolTipText(tip);
@@ -74,8 +79,5 @@ public class DeckardConfigurationInputs implements UiComponent {
 		document.setDocumentFilter(filter);
 		return input;
 	}
-
-	@Override
-	public void createChilds() {}
 
 }

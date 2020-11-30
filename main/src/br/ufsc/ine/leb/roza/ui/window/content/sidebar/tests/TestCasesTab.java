@@ -1,6 +1,7 @@
 package br.ufsc.ine.leb.roza.ui.window.content.sidebar.tests;
 
 import java.awt.Component;
+import java.util.List;
 
 import javax.swing.JSplitPane;
 
@@ -11,19 +12,15 @@ import br.ufsc.ine.leb.roza.ui.window.content.sidebar.Sidebar;
 
 public class TestCasesTab implements UiComponent {
 
-	private Hub hub;
 	private JSplitPane panel;
 	private Sidebar sidebar;
 
-	public TestCasesTab(Hub hub, Manager manager, Sidebar sidebar) {
-		this.hub = hub;
+	public TestCasesTab(Sidebar sidebar) {
 		this.sidebar = sidebar;
-		init();
-		createChilds();
 	}
 
 	@Override
-	public void init() {
+	public void init(Hub hub, Manager manager) {
 		panel = new JSplitPane();
 		panel.setOrientation(JSplitPane.VERTICAL_SPLIT);
 		panel.setResizeWeight(0.5);
@@ -31,10 +28,13 @@ public class TestCasesTab implements UiComponent {
 	}
 
 	@Override
-	public void createChilds() {
-		new TestCaseList(hub, this);
-		new TestCaseCode(hub, this);
+	public void addChilds(List<UiComponent> childs) {
+		childs.add(new TestCaseList(this));
+		childs.add(new TestCaseCode(this));
 	}
+
+	@Override
+	public void start() {}
 
 	public void addTopComponent(Component component) {
 		panel.setTopComponent(component);

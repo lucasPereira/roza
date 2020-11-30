@@ -1,23 +1,22 @@
 package br.ufsc.ine.leb.roza.ui.window.content.sidebar.tests;
 
+import java.util.List;
+
 import br.ufsc.ine.leb.roza.ui.Hub;
+import br.ufsc.ine.leb.roza.ui.Manager;
 import br.ufsc.ine.leb.roza.ui.UiComponent;
 import br.ufsc.ine.leb.roza.ui.shared.CodePanel;
 
 public class TestCaseCode implements UiComponent {
 
-	private Hub hub;
 	private TestCasesTab testCasesTab;
 
-	public TestCaseCode(Hub hub, TestCasesTab testCasesTab) {
-		this.hub = hub;
+	public TestCaseCode(TestCasesTab testCasesTab) {
 		this.testCasesTab = testCasesTab;
-		init();
-		createChilds();
 	}
 
 	@Override
-	public void init() {
+	public void init(Hub hub, Manager manager) {
 		CodePanel testCodePanel = new CodePanel();
 		testCasesTab.addBottomComponent(testCodePanel);
 		hub.loadTestClassesSubscribe(testClasses -> {
@@ -32,6 +31,9 @@ public class TestCaseCode implements UiComponent {
 	}
 
 	@Override
-	public void createChilds() {}
+	public void addChilds(List<UiComponent> childs) {}
+
+	@Override
+	public void start() {}
 
 }

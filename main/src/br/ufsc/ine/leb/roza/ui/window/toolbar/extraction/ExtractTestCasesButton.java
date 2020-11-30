@@ -11,31 +11,29 @@ import br.ufsc.ine.leb.roza.ui.UiComponent;
 
 public class ExtractTestCasesButton implements UiComponent {
 
-	private Hub hub;
-	private Manager manager;
 	private ExtractionTab toolbar;
+	private JButton button;
 
-	public ExtractTestCasesButton(Hub hub, Manager manager, ExtractionTab toolbar) {
-		this.hub = hub;
-		this.manager = manager;
+	public ExtractTestCasesButton(ExtractionTab toolbar) {
 		this.toolbar = toolbar;
-		init();
-		createChilds();
 	}
 
 	@Override
-	public void init() {
-		JButton button = new JButton("Extract Test Cases");
+	public void init(Hub hub, Manager manager) {
+		button = new JButton("Extract Test Cases");
 		button.setEnabled(false);
 		toolbar.addComponent(button);
-		hub.loadTestClassesSubscribe(classes -> button.setEnabled(true));
 		button.addActionListener(listner -> {
 			List<TestCase> testCases = manager.extractTestCases();
 			hub.extractTestCasesPublish(testCases);
 		});
+		hub.loadTestClassesSubscribe(classes -> button.setEnabled(true));
 	}
 
 	@Override
-	public void createChilds() {}
+	public void addChilds(List<UiComponent> childs) {}
+
+	@Override
+	public void start() {}
 
 }

@@ -1,6 +1,7 @@
 package br.ufsc.ine.leb.roza.ui.window.toolbar.measuring;
 
 import java.awt.Component;
+import java.util.List;
 
 import javax.swing.JPanel;
 
@@ -11,33 +12,30 @@ import br.ufsc.ine.leb.roza.ui.window.toolbar.Toolbar;
 
 public class MeasuringTab implements UiComponent {
 
-	private Hub hub;
-	private Manager manager;
 	private Toolbar toolbar;
 	private JPanel panel;
 
-	public MeasuringTab(Hub hub, Manager manager, Toolbar toolbar) {
-		this.hub = hub;
-		this.manager = manager;
+	public MeasuringTab(Toolbar toolbar) {
 		this.toolbar = toolbar;
-		init();
-		createChilds();
 	}
 
 	@Override
-	public void init() {
+	public void init(Hub hub, Manager manager) {
 		panel = new JPanel();
 		toolbar.addComponent("Measuring", panel);
 	}
 
 	@Override
-	public void createChilds() {
-		new MeasurerComboBox(hub, manager, this);
-		new DeckardConfigurationInputs(hub, this);
-		new JplagConfigurationInputs(hub, this);
-		new SimianConfigurationInputs(hub, this);
-		new MeasureTestCasesButton(hub, manager, this);
+	public void addChilds(List<UiComponent> childs) {
+		childs.add(new MeasurerComboBox(this));
+		childs.add(new DeckardConfigurationInputs(this));
+		childs.add(new JplagConfigurationInputs(this));
+		childs.add(new SimianConfigurationInputs(this));
+		childs.add(new MeasureTestCasesButton(this));
 	}
+
+	@Override
+	public void start() {}
 
 	public void addComponent(Component component) {
 		panel.add(component);
