@@ -14,8 +14,10 @@ public class Hub {
 
 	private List<Consumer<List<TestClass>>> loadTestClassesListeners;
 	private List<Consumer<TestClass>> selectTestClassListeners;
+
 	private List<Consumer<List<TestCase>>> extractTestCasesListeners;
 	private List<Consumer<TestCase>> selectTestCaseListeners;
+
 	private List<Runnable> selectDeckardMetricListeners;
 	private List<Runnable> unselectDeckardMetricListeners;
 	private List<DeckardSettingsConsumer> changeDeckardSettingsListeners;
@@ -28,11 +30,17 @@ public class Hub {
 	private List<Consumer<SimilarityReport>> measureTestCaseListeners;
 	private List<BiConsumer<TestCase, TestCase>> compareTestCaseListeners;
 
+	private List<Runnable> selectLevelBasedCriteriaListeners;
+	private List<Runnable> selectTestsPerClassCriteriaListeners;
+	private List<Runnable> selectSimilarityBasedCriteriaListeners;
+
 	public Hub() {
 		loadTestClassesListeners = new LinkedList<>();
 		selectTestClassListeners = new LinkedList<>();
+
 		extractTestCasesListeners = new LinkedList<>();
 		selectTestCaseListeners = new LinkedList<>();
+
 		selectDeckardMetricListeners = new LinkedList<>();
 		unselectDeckardMetricListeners = new LinkedList<>();
 		changeDeckardSettingsListeners = new LinkedList<>();
@@ -44,6 +52,10 @@ public class Hub {
 		changeSimianSettingsListeners = new LinkedList<>();
 		measureTestCaseListeners = new LinkedList<>();
 		compareTestCaseListeners = new LinkedList<>();
+
+		selectLevelBasedCriteriaListeners = new LinkedList<>();
+		selectTestsPerClassCriteriaListeners = new LinkedList<>();
+		selectSimilarityBasedCriteriaListeners = new LinkedList<>();
 	}
 
 	public void loadTestClassesPublish(List<TestClass> classes) {
@@ -164,6 +176,30 @@ public class Hub {
 
 	public void compareTestCaseSubscribe(BiConsumer<TestCase, TestCase> listener) {
 		compareTestCaseListeners.add(listener);
+	}
+
+	public void selectLevelBasedCriteriaPublish() {
+		selectLevelBasedCriteriaListeners.forEach(listener -> listener.run());
+	}
+
+	public void selectLevelBasedCriteriaSubscribe(Runnable listener) {
+		selectLevelBasedCriteriaListeners.add(listener);
+	}
+
+	public void selectTestsPerClassCriteriaPublish() {
+		selectTestsPerClassCriteriaListeners.forEach(listener -> listener.run());
+	}
+
+	public void selectTestsPerClassCriteriaSubscribe(Runnable listener) {
+		selectTestsPerClassCriteriaListeners.add(listener);
+	}
+
+	public void selectSimilarityBasedCriteriaPublish() {
+		selectSimilarityBasedCriteriaListeners.forEach(listener -> listener.run());
+	}
+
+	public void selectSimilarityBasedCriteriaSubscribe(Runnable listener) {
+		selectSimilarityBasedCriteriaListeners.add(listener);
 	}
 
 }

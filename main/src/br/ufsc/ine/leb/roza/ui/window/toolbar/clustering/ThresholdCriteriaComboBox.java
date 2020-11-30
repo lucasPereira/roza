@@ -4,6 +4,7 @@ import javax.swing.JComboBox;
 
 import br.ufsc.ine.leb.roza.ui.Hub;
 import br.ufsc.ine.leb.roza.ui.UiComponent;
+import br.ufsc.ine.leb.roza.ui.shared.ComboBoxBuilder;
 
 public class ThresholdCriteriaComboBox implements UiComponent {
 
@@ -19,13 +20,14 @@ public class ThresholdCriteriaComboBox implements UiComponent {
 
 	@Override
 	public void init() {
-		JComboBox<String> combo = new JComboBox<>();
-		combo.setToolTipText("Threshold Criteria");
-		combo.addItem("Similarity Based Criteria");
-		combo.addItem("Level Based Criteria");
-		combo.addItem("Test Per Class Criteria");
-		combo.setMaximumSize(combo.getPreferredSize());
-		combo.setEnabled(false);
+		JComboBox<String> combo = new ComboBoxBuilder("Theshold Criteria").add("Level Based Criteria", () -> {
+			hub.selectLevelBasedCriteriaPublish();
+		}).add("Test Per Class Criteria", () -> {
+			hub.selectTestsPerClassCriteriaPublish();
+		}).add("Similarity Based Criteria", () -> {
+			hub.selectSimilarityBasedCriteriaPublish();
+		}).build();
+		combo.setSelectedIndex(2);
 		hub.loadTestClassesSubscribe(classes -> combo.setEnabled(false));
 		hub.extractTestCasesSubscribe(testCases -> combo.setEnabled(false));
 		hub.measureTestsSubscribe(similarityReport -> combo.setEnabled(true));

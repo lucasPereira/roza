@@ -35,7 +35,7 @@ public class ClusteringTab implements UiComponent {
 		new LinkageComboBox(hub, manager, this);
 		new RefereeComboBox(hub, manager, this);
 		new ThresholdCriteriaComboBox(hub, this);
-		new ThresholdCriteriaInputs(this);
+		new ThresholdCriteriaInputs(hub, this);
 		new StartTestsDistributionButton(hub, manager, this);
 	}
 

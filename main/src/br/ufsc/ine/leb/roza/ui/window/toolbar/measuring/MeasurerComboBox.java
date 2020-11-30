@@ -68,9 +68,9 @@ public class MeasurerComboBox implements UiComponent {
 				settings.threshold(threshold);
 			});
 		}).build();
+		combo.setSelectedIndex(0);
 		hub.loadTestClassesSubscribe(classes -> combo.setEnabled(false));
 		hub.extractTestCasesSubscribe(tests -> combo.setEnabled(true));
-		manager.setSimilarityMeasurer(new LccssSimilarityMeasurer());
 		toolbar.addComponent(combo);
 	}
 
