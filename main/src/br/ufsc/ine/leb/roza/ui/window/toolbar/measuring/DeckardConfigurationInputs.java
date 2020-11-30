@@ -11,17 +11,16 @@ import br.ufsc.ine.leb.roza.ui.Hub;
 import br.ufsc.ine.leb.roza.ui.UiComponent;
 import br.ufsc.ine.leb.roza.ui.model.OnlyNumbersAndDots;
 import br.ufsc.ine.leb.roza.ui.model.OnlyNumbersFilter;
-import br.ufsc.ine.leb.roza.ui.window.toolbar.Toolbar;
 
 public class DeckardConfigurationInputs implements UiComponent {
 
 	private Hub hub;
-	private Toolbar toolbar;
+	private MeasuringTab toolbar;
 	private JTextField minTokensInput;
 	private JTextField strideInput;
 	private JTextField similarityInput;
 
-	public DeckardConfigurationInputs(Hub hub, Toolbar toolbar) {
+	public DeckardConfigurationInputs(Hub hub, MeasuringTab toolbar) {
 		this.hub = hub;
 		this.toolbar = toolbar;
 		init();

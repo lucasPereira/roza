@@ -3,13 +3,12 @@ package br.ufsc.ine.leb.roza.ui.window.toolbar.clustering;
 import javax.swing.JTextField;
 
 import br.ufsc.ine.leb.roza.ui.UiComponent;
-import br.ufsc.ine.leb.roza.ui.window.toolbar.Toolbar;
 
 public class ThresholdCriteriaInput implements UiComponent {
 
-	private Toolbar toolbar;
+	private ClusteringTab toolbar;
 
-	public ThresholdCriteriaInput(Toolbar toolbar) {
+	public ThresholdCriteriaInput(ClusteringTab toolbar) {
 		this.toolbar = toolbar;
 		init();
 		createChilds();

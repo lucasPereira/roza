@@ -7,14 +7,13 @@ import br.ufsc.ine.leb.roza.parsing.Junit5TestClassParser;
 import br.ufsc.ine.leb.roza.ui.Manager;
 import br.ufsc.ine.leb.roza.ui.UiComponent;
 import br.ufsc.ine.leb.roza.ui.shared.ComboBoxBuilder;
-import br.ufsc.ine.leb.roza.ui.window.toolbar.Toolbar;
 
 public class ParserComboBox implements UiComponent {
 
 	private Manager manager;
-	private Toolbar toolbar;
+	private ParsingTab toolbar;
 
-	public ParserComboBox(Manager manager, Toolbar toolbar) {
+	public ParserComboBox(Manager manager, ParsingTab toolbar) {
 		this.manager = manager;
 		this.toolbar = toolbar;
 		init();

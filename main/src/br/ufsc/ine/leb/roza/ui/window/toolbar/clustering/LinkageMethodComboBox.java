@@ -4,14 +4,13 @@ import javax.swing.JComboBox;
 
 import br.ufsc.ine.leb.roza.ui.Hub;
 import br.ufsc.ine.leb.roza.ui.UiComponent;
-import br.ufsc.ine.leb.roza.ui.window.toolbar.Toolbar;
 
 public class LinkageMethodComboBox implements UiComponent {
 
 	private Hub hub;
-	private Toolbar toolbar;
+	private ClusteringTab toolbar;
 
-	public LinkageMethodComboBox(Hub hub, Toolbar toolbar) {
+	public LinkageMethodComboBox(Hub hub, ClusteringTab toolbar) {
 		this.hub = hub;
 		this.toolbar = toolbar;
 		init();

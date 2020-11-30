@@ -4,14 +4,13 @@ import javax.swing.JComboBox;
 
 import br.ufsc.ine.leb.roza.ui.Hub;
 import br.ufsc.ine.leb.roza.ui.UiComponent;
-import br.ufsc.ine.leb.roza.ui.window.toolbar.Toolbar;
 
 public class RefereeComboBox implements UiComponent {
 
 	private Hub hub;
-	private Toolbar toolbar;
+	private ClusteringTab toolbar;
 
-	public RefereeComboBox(Hub hub, Toolbar toolbar) {
+	public RefereeComboBox(Hub hub, ClusteringTab toolbar) {
 		this.hub = hub;
 		this.toolbar = toolbar;
 		init();

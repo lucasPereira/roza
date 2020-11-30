@@ -13,16 +13,15 @@ import br.ufsc.ine.leb.roza.TestClass;
 import br.ufsc.ine.leb.roza.ui.Hub;
 import br.ufsc.ine.leb.roza.ui.Manager;
 import br.ufsc.ine.leb.roza.ui.UiComponent;
-import br.ufsc.ine.leb.roza.ui.window.toolbar.Toolbar;
 
 public class LoadTestClassesButton implements UiComponent {
 
 	private Hub hub;
 	private Manager manager;
-	private Toolbar toolbar;
+	private ParsingTab toolbar;
 	private JButton button;
 
-	public LoadTestClassesButton(Hub hub, Manager manager, Toolbar toolbar) {
+	public LoadTestClassesButton(Hub hub, Manager manager, ParsingTab toolbar) {
 		this.hub = hub;
 		this.manager = manager;
 		this.toolbar = toolbar;

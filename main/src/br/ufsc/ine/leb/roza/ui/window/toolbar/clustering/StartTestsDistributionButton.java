@@ -5,15 +5,14 @@ import javax.swing.JButton;
 import br.ufsc.ine.leb.roza.ui.Hub;
 import br.ufsc.ine.leb.roza.ui.Manager;
 import br.ufsc.ine.leb.roza.ui.UiComponent;
-import br.ufsc.ine.leb.roza.ui.window.toolbar.Toolbar;
 
 public class StartTestsDistributionButton implements UiComponent {
 
 	private Hub hub;
 	private Manager manager;
-	private Toolbar toolbar;
+	private ClusteringTab toolbar;
 
-	public StartTestsDistributionButton(Hub hub, Manager manager, Toolbar toolbar) {
+	public StartTestsDistributionButton(Hub hub, Manager manager, ClusteringTab toolbar) {
 		this.hub = hub;
 		this.manager = manager;
 		this.toolbar = toolbar;

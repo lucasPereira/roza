@@ -14,15 +14,14 @@ import br.ufsc.ine.leb.roza.ui.Hub;
 import br.ufsc.ine.leb.roza.ui.Manager;
 import br.ufsc.ine.leb.roza.ui.UiComponent;
 import br.ufsc.ine.leb.roza.ui.shared.ComboBoxBuilder;
-import br.ufsc.ine.leb.roza.ui.window.toolbar.Toolbar;
 
 public class MeasurerComboBox implements UiComponent {
 
 	private Hub hub;
 	private Manager manager;
-	private Toolbar toolbar;
+	private MeasuringTab toolbar;
 
-	public MeasurerComboBox(Hub hub, Manager manager, Toolbar toolbar) {
+	public MeasurerComboBox(Hub hub, Manager manager, MeasuringTab toolbar) {
 		this.hub = hub;
 		this.manager = manager;
 		this.toolbar = toolbar;

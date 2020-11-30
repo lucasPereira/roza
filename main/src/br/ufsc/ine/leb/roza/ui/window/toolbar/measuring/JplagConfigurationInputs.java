@@ -10,15 +10,14 @@ import javax.swing.text.PlainDocument;
 import br.ufsc.ine.leb.roza.ui.Hub;
 import br.ufsc.ine.leb.roza.ui.UiComponent;
 import br.ufsc.ine.leb.roza.ui.model.OnlyNumbersFilter;
-import br.ufsc.ine.leb.roza.ui.window.toolbar.Toolbar;
 
 public class JplagConfigurationInputs implements UiComponent {
 
 	private Hub hub;
-	private Toolbar toolbar;
+	private MeasuringTab toolbar;
 	private JTextField sensitivityInput;
 
-	public JplagConfigurationInputs(Hub hub, Toolbar toolbar) {
+	public JplagConfigurationInputs(Hub hub, MeasuringTab toolbar) {
 		this.hub = hub;
 		this.toolbar = toolbar;
 		init();
