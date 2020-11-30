@@ -8,15 +8,14 @@ import br.ufsc.ine.leb.roza.SimilarityReport;
 import br.ufsc.ine.leb.roza.TestCase;
 import br.ufsc.ine.leb.roza.TestClass;
 import br.ufsc.ine.leb.roza.TextFile;
-import br.ufsc.ine.leb.roza.extraction.Junit4TestCaseExtractor;
+import br.ufsc.ine.leb.roza.clustering.dendrogram.LinkageFactory;
+import br.ufsc.ine.leb.roza.clustering.dendrogram.Referee;
 import br.ufsc.ine.leb.roza.extraction.TestCaseExtractor;
 import br.ufsc.ine.leb.roza.loading.ProgramaticTextFileLoader;
 import br.ufsc.ine.leb.roza.loading.TextFileLoader;
 import br.ufsc.ine.leb.roza.materialization.Junit4WithoutAssertionsTestCaseMaterializer;
 import br.ufsc.ine.leb.roza.materialization.TestCaseMaterializer;
-import br.ufsc.ine.leb.roza.measurement.LccssSimilarityMeasurer;
 import br.ufsc.ine.leb.roza.measurement.SimilarityMeasurer;
-import br.ufsc.ine.leb.roza.parsing.Junit4TestClassParser;
 import br.ufsc.ine.leb.roza.parsing.TestClassParser;
 import br.ufsc.ine.leb.roza.selection.JavaExtensionTextFileSelector;
 import br.ufsc.ine.leb.roza.selection.TextFileSelector;
@@ -32,11 +31,7 @@ public class Manager {
 	private List<TestCase> testCases;
 	private SimilarityReport similarityReport;
 
-	public Manager() {
-		parser = new Junit4TestClassParser();
-		extractor = new Junit4TestCaseExtractor();
-		measurer = new LccssSimilarityMeasurer();
-	}
+	public Manager() {}
 
 	public List<TestClass> loadClasses(List<File> files) {
 		new FolderUtils("main/exec/materializer").createEmptyFolder();
@@ -73,6 +68,10 @@ public class Manager {
 	public void setSimilarityMeasurer(SimilarityMeasurer measurer) {
 		this.measurer = measurer;
 	}
+
+	public void setLinkageFactory(LinkageFactory linkageFactory) {}
+
+	public void setReferee(Referee referee) {}
 
 	public void distributeTests() {}
 
