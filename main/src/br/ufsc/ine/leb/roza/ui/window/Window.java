@@ -4,6 +4,7 @@ import java.awt.Component;
 
 import javax.swing.JFrame;
 import javax.swing.JSplitPane;
+import javax.swing.UIManager;
 
 import br.ufsc.ine.leb.roza.ui.Hub;
 import br.ufsc.ine.leb.roza.ui.Manager;
@@ -27,6 +28,12 @@ public class Window implements UiComponent {
 
 	@Override
 	public void init() {
+		try {
+			UIManager.getInstalledLookAndFeels();
+			UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
+		} catch (Exception exception) {
+			exception.printStackTrace();
+		}
 		frame = new JFrame("Róża");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		pane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);

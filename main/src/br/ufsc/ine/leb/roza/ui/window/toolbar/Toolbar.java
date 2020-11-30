@@ -8,6 +8,10 @@ import br.ufsc.ine.leb.roza.ui.Hub;
 import br.ufsc.ine.leb.roza.ui.Manager;
 import br.ufsc.ine.leb.roza.ui.UiComponent;
 import br.ufsc.ine.leb.roza.ui.window.Window;
+import br.ufsc.ine.leb.roza.ui.window.toolbar.clustering.LinkageMethodComboBox;
+import br.ufsc.ine.leb.roza.ui.window.toolbar.clustering.RefereeComboBox;
+import br.ufsc.ine.leb.roza.ui.window.toolbar.clustering.StartTestsDistributionButton;
+import br.ufsc.ine.leb.roza.ui.window.toolbar.clustering.ThresholdCriteriaComboBox;
 import br.ufsc.ine.leb.roza.ui.window.toolbar.extraction.ExtractTestCasesButton;
 import br.ufsc.ine.leb.roza.ui.window.toolbar.extraction.ExtractorComboBox;
 import br.ufsc.ine.leb.roza.ui.window.toolbar.measuring.DeckardConfigurationInputs;
@@ -52,6 +56,11 @@ public class Toolbar implements UiComponent {
 		new JplagConfigurationInputs(hub, this);
 		new SimianConfigurationInputs(hub, this);
 		new MeasureTestCasesButton(hub, manager, this);
+		addComponent(new JToolBar.Separator());
+		new LinkageMethodComboBox(hub, this);
+		new RefereeComboBox(hub, this);
+		new ThresholdCriteriaComboBox(hub, this);
+		new StartTestsDistributionButton(hub, manager, this);
 	}
 
 	public void addComponent(Component component) {

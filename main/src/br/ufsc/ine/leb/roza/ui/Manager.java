@@ -74,4 +74,6 @@ public class Manager {
 		this.measurer = measurer;
 	}
 
+	public void distributeTests() {}
+
 }

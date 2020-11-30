@@ -9,6 +9,7 @@ import br.ufsc.ine.leb.roza.ui.Manager;
 import br.ufsc.ine.leb.roza.ui.UiComponent;
 import br.ufsc.ine.leb.roza.ui.window.content.Content;
 import br.ufsc.ine.leb.roza.ui.window.content.sidebar.classes.TestClassesTab;
+import br.ufsc.ine.leb.roza.ui.window.content.sidebar.clustering.ClusteringTab;
 import br.ufsc.ine.leb.roza.ui.window.content.sidebar.measurements.MeasurementsTab;
 import br.ufsc.ine.leb.roza.ui.window.content.sidebar.tests.TestCasesTab;
 
@@ -37,15 +38,18 @@ public class Sidebar implements UiComponent {
 			panel.setEnabledAt(0, true);
 			panel.setEnabledAt(1, false);
 			panel.setEnabledAt(2, false);
+			panel.setEnabledAt(3, false);
 		});
 		hub.extractTestCasesSubscribe(tests -> {
 			panel.setSelectedIndex(1);
 			panel.setEnabledAt(1, true);
 			panel.setEnabledAt(2, false);
+			panel.setEnabledAt(3, false);
 		});
 		hub.measureTestsSubscribe(similarityReort -> {
 			panel.setSelectedIndex(2);
 			panel.setEnabledAt(2, true);
+			panel.setEnabledAt(3, false);
 		});
 
 	}
@@ -55,6 +59,7 @@ public class Sidebar implements UiComponent {
 		new TestClassesTab(hub, manager, this);
 		new TestCasesTab(hub, manager, this);
 		new MeasurementsTab(hub, this);
+		new ClusteringTab(this);
 		panel.setEnabledAt(0, false);
 		panel.setEnabledAt(1, false);
 		panel.setEnabledAt(2, false);

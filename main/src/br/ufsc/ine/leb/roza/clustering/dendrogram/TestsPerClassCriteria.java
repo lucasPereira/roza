@@ -2,7 +2,6 @@ package br.ufsc.ine.leb.roza.clustering.dendrogram;
 
 import java.util.List;
 
-import br.ufsc.ine.leb.roza.Cluster;
 import br.ufsc.ine.leb.roza.exceptions.InvalidThresholdException;
 
 public class TestsPerClassCriteria implements ThresholdCriteria {
