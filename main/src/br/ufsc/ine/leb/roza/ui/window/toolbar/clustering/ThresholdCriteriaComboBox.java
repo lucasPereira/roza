@@ -23,8 +23,6 @@ public class ThresholdCriteriaComboBox implements UiComponent {
 		JComboBox<String> combo = new JComboBox<>();
 		combo.setToolTipText("Threshold Criteria");
 		combo.addItem("Similarity Based Criteria");
-		combo.addItem("Always Stop Criteria");
-		combo.addItem("Never Stop Criteria");
 		combo.addItem("Level Based Criteria");
 		combo.addItem("Test Per Class Criteria");
 		combo.setMaximumSize(combo.getPreferredSize());
