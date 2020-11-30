@@ -10,13 +10,13 @@ import br.ufsc.ine.leb.roza.ui.Manager;
 import br.ufsc.ine.leb.roza.ui.UiComponent;
 import br.ufsc.ine.leb.roza.ui.shared.ComboBoxBuilder;
 
-public class LinkageMethodComboBox implements UiComponent {
+public class LinkageComboBox implements UiComponent {
 
 	private Hub hub;
 	private Manager manager;
 	private ClusteringTab toolbar;
 
-	public LinkageMethodComboBox(Hub hub, Manager manager, ClusteringTab toolbar) {
+	public LinkageComboBox(Hub hub, Manager manager, ClusteringTab toolbar) {
 		this.hub = hub;
 		this.manager = manager;
 		this.toolbar = toolbar;

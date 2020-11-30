@@ -4,11 +4,11 @@ import javax.swing.JTextField;
 
 import br.ufsc.ine.leb.roza.ui.UiComponent;
 
-public class ThresholdCriteriaInput implements UiComponent {
+public class ThresholdCriteriaInputs implements UiComponent {
 
 	private ClusteringTab toolbar;
 
-	public ThresholdCriteriaInput(ClusteringTab toolbar) {
+	public ThresholdCriteriaInputs(ClusteringTab toolbar) {
 		this.toolbar = toolbar;
 		init();
 		createChilds();
