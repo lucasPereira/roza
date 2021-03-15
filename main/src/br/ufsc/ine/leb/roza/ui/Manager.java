@@ -2,12 +2,18 @@ package br.ufsc.ine.leb.roza.ui;
 
 import java.io.File;
 import java.util.List;
+import java.util.Set;
 
+import br.ufsc.ine.leb.roza.Cluster;
 import br.ufsc.ine.leb.roza.MaterializationReport;
 import br.ufsc.ine.leb.roza.SimilarityReport;
 import br.ufsc.ine.leb.roza.TestCase;
 import br.ufsc.ine.leb.roza.TestClass;
 import br.ufsc.ine.leb.roza.TextFile;
+import br.ufsc.ine.leb.roza.clustering.TestCaseClusterer;
+import br.ufsc.ine.leb.roza.clustering.dendrogram.ComposedCriteria;
+import br.ufsc.ine.leb.roza.clustering.dendrogram.DendogramTestCaseClusterer;
+import br.ufsc.ine.leb.roza.clustering.dendrogram.LevelBasedCriteria;
 import br.ufsc.ine.leb.roza.clustering.dendrogram.LinkageFactory;
 import br.ufsc.ine.leb.roza.clustering.dendrogram.Referee;
 import br.ufsc.ine.leb.roza.clustering.dendrogram.ThresholdCriteria;
@@ -31,6 +37,9 @@ public class Manager {
 	private List<TestClass> testClasses;
 	private List<TestCase> testCases;
 	private SimilarityReport similarityReport;
+	private LinkageFactory linkageFactory;
+	private Referee referee;
+	private ThresholdCriteria threshold;
 
 	public Manager() {}
 
@@ -70,12 +79,23 @@ public class Manager {
 		this.measurer = measurer;
 	}
 
-	public void setLinkageFactory(LinkageFactory linkageFactory) {}
+	public void setLinkageFactory(LinkageFactory linkageFactory) {
+		this.linkageFactory = linkageFactory;
+	}
 
-	public void setReferee(Referee referee) {}
+	public void setReferee(Referee referee) {
+		this.referee = referee;
+	}
 
-	public void setThresholdCriteria(ThresholdCriteria criteria) {}
+	public void setThresholdCriteria(ThresholdCriteria theshold) {
+		this.threshold = theshold;
+	}
 
-	public void distributeTests() {}
+	public Set<Cluster> distributeTests() {
+		ThresholdCriteria composedCriteria = new ComposedCriteria(new LevelBasedCriteria(1), threshold);
+		TestCaseClusterer clustering = new DendogramTestCaseClusterer(linkageFactory.create(similarityReport), referee, composedCriteria);
+		Set<Cluster> clusters = clustering.cluster(similarityReport);
+		return clusters;
+	}
 
 }

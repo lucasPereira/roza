@@ -2,9 +2,11 @@ package br.ufsc.ine.leb.roza.ui;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
+import br.ufsc.ine.leb.roza.Cluster;
 import br.ufsc.ine.leb.roza.SimilarityReport;
 import br.ufsc.ine.leb.roza.TestCase;
 import br.ufsc.ine.leb.roza.TestClass;
@@ -35,6 +37,7 @@ public class Hub {
 	private List<Runnable> selectSimilarityBasedCriteriaListeners;
 
 	private List<Runnable> startTestsDistributionListeners;
+	private List<Consumer<Set<Cluster>>> updateClustersListeners;
 
 	public Hub() {
 		loadTestClassesListeners = new LinkedList<>();
@@ -60,6 +63,7 @@ public class Hub {
 		selectSimilarityBasedCriteriaListeners = new LinkedList<>();
 
 		startTestsDistributionListeners = new LinkedList<>();
+		updateClustersListeners = new LinkedList<>();
 	}
 
 	public void loadTestClassesPublish(List<TestClass> classes) {
@@ -212,6 +216,14 @@ public class Hub {
 
 	public void startTestsDistributionPublishSubscribe(Runnable listener) {
 		startTestsDistributionListeners.add(listener);
+	}
+
+	public void updateClustersPublish(Set<Cluster> clusters) {
+		updateClustersListeners.forEach(listener -> listener.accept(clusters));
+	}
+
+	public void updateClustersSubscribe(Consumer<Set<Cluster>> listener) {
+		updateClustersListeners.add(listener);
 	}
 
 }

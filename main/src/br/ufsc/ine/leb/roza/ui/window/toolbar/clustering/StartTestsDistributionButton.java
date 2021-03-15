@@ -1,9 +1,11 @@
 package br.ufsc.ine.leb.roza.ui.window.toolbar.clustering;
 
 import java.util.List;
+import java.util.Set;
 
 import javax.swing.JButton;
 
+import br.ufsc.ine.leb.roza.Cluster;
 import br.ufsc.ine.leb.roza.ui.Hub;
 import br.ufsc.ine.leb.roza.ui.Manager;
 import br.ufsc.ine.leb.roza.ui.UiComponent;
@@ -26,8 +28,9 @@ public class StartTestsDistributionButton implements UiComponent {
 		hub.measureTestsSubscribe(similarityReport -> button.setEnabled(true));
 		button.addActionListener(event -> {
 			button.setEnabled(false);
-			manager.distributeTests();
 			hub.startTestsDistributionPublish();
+			Set<Cluster> clusters = manager.distributeTests();
+			hub.updateClustersPublish(clusters);
 		});
 	}
 
