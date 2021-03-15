@@ -25,7 +25,9 @@ public class StartTestsDistributionButton implements UiComponent {
 		hub.extractTestCasesSubscribe(testCases -> button.setEnabled(false));
 		hub.measureTestsSubscribe(similarityReport -> button.setEnabled(true));
 		button.addActionListener(event -> {
+			button.setEnabled(false);
 			manager.distributeTests();
+			hub.startTestsDistributionPublish();
 		});
 	}
 

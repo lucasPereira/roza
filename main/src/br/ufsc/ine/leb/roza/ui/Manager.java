@@ -10,6 +10,7 @@ import br.ufsc.ine.leb.roza.TestClass;
 import br.ufsc.ine.leb.roza.TextFile;
 import br.ufsc.ine.leb.roza.clustering.dendrogram.LinkageFactory;
 import br.ufsc.ine.leb.roza.clustering.dendrogram.Referee;
+import br.ufsc.ine.leb.roza.clustering.dendrogram.ThresholdCriteria;
 import br.ufsc.ine.leb.roza.extraction.TestCaseExtractor;
 import br.ufsc.ine.leb.roza.loading.ProgramaticTextFileLoader;
 import br.ufsc.ine.leb.roza.loading.TextFileLoader;
@@ -72,6 +73,8 @@ public class Manager {
 	public void setLinkageFactory(LinkageFactory linkageFactory) {}
 
 	public void setReferee(Referee referee) {}
+
+	public void setThresholdCriteria(ThresholdCriteria criteria) {}
 
 	public void distributeTests() {}
 

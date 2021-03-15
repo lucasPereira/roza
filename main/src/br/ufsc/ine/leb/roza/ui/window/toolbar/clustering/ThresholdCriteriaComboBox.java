@@ -22,13 +22,14 @@ public class ThresholdCriteriaComboBox implements UiComponent {
 	public void init(Hub hub, Manager manager) {
 		ComboBoxBuilder builder = new ComboBoxBuilder("Theshold Criteria");
 		builder.add("Level Based Criteria", () -> hub.selectLevelBasedCriteriaPublish());
-		builder.add("Test Per Class Criteria", () -> hub.selectTestsPerClassCriteriaPublish());
+		builder.add("Test per Class Criteria", () -> hub.selectTestsPerClassCriteriaPublish());
 		builder.add("Similarity Based Criteria", () -> hub.selectSimilarityBasedCriteriaPublish());
 		combo = builder.build();
 		toolbar.addComponent(combo);
 		hub.loadTestClassesSubscribe(classes -> combo.setEnabled(false));
 		hub.extractTestCasesSubscribe(testCases -> combo.setEnabled(false));
 		hub.measureTestsSubscribe(similarityReport -> combo.setEnabled(true));
+		hub.startTestsDistributionPublishSubscribe(() -> combo.setEnabled(false));
 	}
 
 	@Override

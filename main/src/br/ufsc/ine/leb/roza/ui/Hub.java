@@ -34,6 +34,8 @@ public class Hub {
 	private List<Runnable> selectTestsPerClassCriteriaListeners;
 	private List<Runnable> selectSimilarityBasedCriteriaListeners;
 
+	private List<Runnable> startTestsDistributionListeners;
+
 	public Hub() {
 		loadTestClassesListeners = new LinkedList<>();
 		selectTestClassListeners = new LinkedList<>();
@@ -56,6 +58,8 @@ public class Hub {
 		selectLevelBasedCriteriaListeners = new LinkedList<>();
 		selectTestsPerClassCriteriaListeners = new LinkedList<>();
 		selectSimilarityBasedCriteriaListeners = new LinkedList<>();
+
+		startTestsDistributionListeners = new LinkedList<>();
 	}
 
 	public void loadTestClassesPublish(List<TestClass> classes) {
@@ -200,6 +204,14 @@ public class Hub {
 
 	public void selectSimilarityBasedCriteriaSubscribe(Runnable listener) {
 		selectSimilarityBasedCriteriaListeners.add(listener);
+	}
+
+	public void startTestsDistributionPublish() {
+		startTestsDistributionListeners.forEach(listener -> listener.run());
+	}
+
+	public void startTestsDistributionPublishSubscribe(Runnable listener) {
+		startTestsDistributionListeners.add(listener);
 	}
 
 }
