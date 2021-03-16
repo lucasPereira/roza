@@ -1,12 +1,16 @@
 package br.ufsc.ine.leb.roza.ui.window.content.graph;
 
-import java.awt.Component;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.util.List;
 import java.util.Set;
 
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
 import org.graphstream.graph.implementations.SingleGraph;
+import org.graphstream.ui.geom.Point3;
+import org.graphstream.ui.swing_viewer.DefaultView;
+import org.graphstream.ui.swing_viewer.SwingViewer;
 import org.graphstream.ui.view.Viewer;
 
 import br.ufsc.ine.leb.roza.Cluster;
@@ -32,10 +36,42 @@ public class GraphCanvas implements UiComponent {
 		hub.extractTestCasesSubscribe(testCases -> graph.clear());
 		hub.measureTestsSubscribe(similarityReport -> graph.clear());
 		hub.updateClustersSubscribe((Set<Cluster> clusters) -> update(graph, clusters));
-		Viewer viewer = new Viewer(graph, Viewer.ThreadingModel.GRAPH_IN_GUI_THREAD);
-		Component view = viewer.addDefaultView(false);
+		SwingViewer viewer = new SwingViewer(graph, Viewer.ThreadingModel.GRAPH_IN_GUI_THREAD);
+		DefaultView view = (DefaultView) viewer.addDefaultView(false);
 		viewer.enableAutoLayout();
+		addMouveListeners(view);
 		content.addLeftComponent(view);
+	}
+
+	private void addGraphStyle(Graph graph) {
+		graph.setAttribute("ui.stylesheet", "graph { fill-color: #00003C, #000010; fill-mode: gradient-vertical; }");
+		graph.setAttribute("ui.stylesheet", "node { fill-color: #FFF; }");
+		graph.setAttribute("ui.stylesheet", "node { size: 10px; }");
+		graph.setAttribute("ui.stylesheet", "node { text-color: #FFF; }");
+		graph.setAttribute("ui.stylesheet", "node { text-alignment: under; }");
+		graph.setAttribute("ui.stylesheet", "node { text-size: 15px; }");
+		graph.setAttribute("ui.quality");
+		graph.setAttribute("ui.antialias");
+	}
+
+	private void addMouveListeners(DefaultView view) {
+		view.addMouseWheelListener(new MouseWheelListener() {
+
+			@Override
+			public void mouseWheelMoved(MouseWheelEvent event) {
+				Integer x = event.getX();
+				Integer y = event.getY();
+				Point3 center = view.getCamera().transformPxToGu(x, y);
+				view.getCamera().setViewCenter(center.x, center.y, center.z);
+				Integer amount = event.getWheelRotation();
+				Double currentZoom = view.getCamera().getViewPercent();
+				Double newZoom = amount * 0.1 + currentZoom;
+				if (newZoom >= 0.1 && newZoom <= 2) {
+					view.getCamera().setViewPercent(newZoom);
+				}
+			}
+
+		});
 	}
 
 	private void update(Graph graph, Set<Cluster> clusters) {
@@ -53,8 +89,9 @@ public class GraphCanvas implements UiComponent {
 		Node node = graph.getNode(test.getName());
 		if (node == null) {
 			node = graph.addNode(test.getName());
-			node.addAttribute("ui.label", test.getName());
+			node.setAttribute("ui.label", test.getName());
 		}
+		addGraphStyle(graph);
 		return node;
 	}
 
