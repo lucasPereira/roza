@@ -15,6 +15,7 @@ import org.graphstream.ui.view.Viewer;
 
 import br.ufsc.ine.leb.roza.Cluster;
 import br.ufsc.ine.leb.roza.TestCase;
+import br.ufsc.ine.leb.roza.clustering.dendrogram.Level;
 import br.ufsc.ine.leb.roza.ui.Hub;
 import br.ufsc.ine.leb.roza.ui.Manager;
 import br.ufsc.ine.leb.roza.ui.UiComponent;
@@ -35,7 +36,8 @@ public class GraphCanvas implements UiComponent {
 		hub.loadTestClassesSubscribe(classes -> graph.clear());
 		hub.extractTestCasesSubscribe(testCases -> graph.clear());
 		hub.measureTestsSubscribe(similarityReport -> graph.clear());
-		hub.updateClustersSubscribe((Set<Cluster> clusters) -> update(graph, clusters));
+		hub.startTestsDistributionSubscribe(levels -> update(graph, levels));
+		hub.resetTestsDistributionSubscribe(() -> graph.clear());
 		SwingViewer viewer = new SwingViewer(graph, Viewer.ThreadingModel.GRAPH_IN_GUI_THREAD);
 		DefaultView view = (DefaultView) viewer.addDefaultView(false);
 		viewer.enableAutoLayout();
@@ -82,8 +84,9 @@ public class GraphCanvas implements UiComponent {
 		});
 	}
 
-	private void update(Graph graph, Set<Cluster> clusters) {
+	private void update(Graph graph, List<Level> levels) {
 		graph.clear();
+		Set<Cluster> clusters = levels.get(0).getClusters();
 		for (Cluster cluster : clusters) {
 			for (TestCase source : cluster.getTestCases()) {
 				for (TestCase target : cluster.getTestCases()) {

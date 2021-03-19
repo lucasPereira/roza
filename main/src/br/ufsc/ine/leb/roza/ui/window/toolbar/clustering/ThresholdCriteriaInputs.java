@@ -30,50 +30,58 @@ public class ThresholdCriteriaInputs implements UiComponent {
 		levelBaseInput.setVisible(false);
 		testsPerClassInput.setVisible(false);
 		similarityBaseInput.setVisible(false);
+		createToolbarEvents(hub, levelBaseInput, testsPerClassInput, similarityBaseInput);
+		createSelectionEvents(hub, manager, levelBaseInput, testsPerClassInput, similarityBaseInput);
+		createValueChangedEvents(manager, levelBaseInput, testsPerClassInput, similarityBaseInput);
 		toolbar.addComponent(levelBaseInput);
 		toolbar.addComponent(testsPerClassInput);
 		toolbar.addComponent(similarityBaseInput);
-		createToolbarEvents(hub, levelBaseInput, testsPerClassInput, similarityBaseInput);
-		createSelectionEvents(hub, levelBaseInput, testsPerClassInput, similarityBaseInput);
-		createValueChangedEvents(manager, levelBaseInput, testsPerClassInput, similarityBaseInput);
 	}
 
 	private void createValueChangedEvents(Manager manager, JSpinner levelBaseInput, JSpinner testsPerClassInput, JSpinner similarityBaseInput) {
 		levelBaseInput.addChangeListener((evento) -> {
-			Integer valor = (Integer) levelBaseInput.getValue();
+			Integer valor = getIntegerValue(levelBaseInput);
 			manager.setThresholdCriteria(new LevelBasedCriteria(valor));
 		});
 		testsPerClassInput.addChangeListener((evento) -> {
-			Integer valor = (Integer) testsPerClassInput.getValue();
+			Integer valor = getIntegerValue(testsPerClassInput);
 			manager.setThresholdCriteria(new TestsPerClassCriteria(valor));
 		});
 		similarityBaseInput.addChangeListener((evento) -> {
-			Double valor = (Double) similarityBaseInput.getValue();
-			BigDecimal convertido = new BigDecimal(valor);
+			BigDecimal convertido = getBigDecimalValue(similarityBaseInput);
 			manager.setThresholdCriteria(new SimilarityBasedCriteria(convertido));
 		});
 	}
 
-	private void createSelectionEvents(Hub hub, JSpinner levelBaseInput, JSpinner testsPerClassInput, JSpinner similarityBaseInput) {
+	private BigDecimal getBigDecimalValue(JSpinner spiner) {
+		Double valor = (Double) spiner.getValue();
+		BigDecimal convertido = new BigDecimal(valor);
+		return convertido;
+	}
+
+	private Integer getIntegerValue(JSpinner spiner) {
+		Integer valor = (Integer) spiner.getValue();
+		return valor;
+	}
+
+	private void createSelectionEvents(Hub hub, Manager manager, JSpinner levelBaseInput, JSpinner testsPerClassInput, JSpinner similarityBaseInput) {
 		hub.selectLevelBasedCriteriaSubscribe(() -> {
 			levelBaseInput.setVisible(true);
 			testsPerClassInput.setVisible(false);
 			similarityBaseInput.setVisible(false);
+			manager.setThresholdCriteria(new LevelBasedCriteria(getIntegerValue(levelBaseInput)));
 		});
 		hub.selectTestsPerClassCriteriaSubscribe(() -> {
 			levelBaseInput.setVisible(false);
 			testsPerClassInput.setVisible(true);
 			similarityBaseInput.setVisible(false);
+			manager.setThresholdCriteria(new TestsPerClassCriteria(getIntegerValue(testsPerClassInput)));
 		});
 		hub.selectSimilarityBasedCriteriaSubscribe(() -> {
 			levelBaseInput.setVisible(false);
 			testsPerClassInput.setVisible(false);
 			similarityBaseInput.setVisible(true);
-		});
-		hub.startTestsDistributionSubscribe(() -> {
-			levelBaseInput.setEnabled(false);
-			testsPerClassInput.setEnabled(false);
-			similarityBaseInput.setEnabled(false);
+			manager.setThresholdCriteria(new SimilarityBasedCriteria(getBigDecimalValue(similarityBaseInput)));
 		});
 	}
 
@@ -93,7 +101,7 @@ public class ThresholdCriteriaInputs implements UiComponent {
 			testsPerClassInput.setEnabled(true);
 			similarityBaseInput.setEnabled(true);
 		});
-		hub.startTestsDistributionSubscribe(() -> {
+		hub.startTestsDistributionSubscribe(levels -> {
 			levelBaseInput.setEnabled(false);
 			testsPerClassInput.setEnabled(false);
 			similarityBaseInput.setEnabled(false);

@@ -2,14 +2,13 @@ package br.ufsc.ine.leb.roza.ui;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-import br.ufsc.ine.leb.roza.Cluster;
 import br.ufsc.ine.leb.roza.SimilarityReport;
 import br.ufsc.ine.leb.roza.TestCase;
 import br.ufsc.ine.leb.roza.TestClass;
+import br.ufsc.ine.leb.roza.clustering.dendrogram.Level;
 import br.ufsc.ine.leb.roza.ui.model.DeckardSettingsConsumer;
 
 public class Hub {
@@ -36,9 +35,8 @@ public class Hub {
 	private List<Runnable> selectTestsPerClassCriteriaListeners;
 	private List<Runnable> selectSimilarityBasedCriteriaListeners;
 
-	private List<Runnable> startTestsDistributionListeners;
+	private List<Consumer<List<Level>>> startTestsDistributionListeners;
 	private List<Runnable> resetTestsDistributionListeners;
-	private List<Consumer<Set<Cluster>>> updateClustersListeners;
 
 	public Hub() {
 		loadTestClassesListeners = new LinkedList<>();
@@ -65,7 +63,6 @@ public class Hub {
 
 		startTestsDistributionListeners = new LinkedList<>();
 		resetTestsDistributionListeners = new LinkedList<>();
-		updateClustersListeners = new LinkedList<>();
 	}
 
 	public void loadTestClassesPublish(List<TestClass> classes) {
@@ -212,11 +209,11 @@ public class Hub {
 		selectSimilarityBasedCriteriaListeners.add(listener);
 	}
 
-	public void startTestsDistributionPublish() {
-		startTestsDistributionListeners.forEach(listener -> listener.run());
+	public void startTestsDistributionPublish(List<Level> levels) {
+		startTestsDistributionListeners.forEach(listener -> listener.accept(levels));
 	}
 
-	public void startTestsDistributionSubscribe(Runnable listener) {
+	public void startTestsDistributionSubscribe(Consumer<List<Level>> listener) {
 		startTestsDistributionListeners.add(listener);
 	}
 
@@ -226,14 +223,6 @@ public class Hub {
 
 	public void resetTestsDistributionSubscribe(Runnable listener) {
 		resetTestsDistributionListeners.add(listener);
-	}
-
-	public void updateClustersPublish(Set<Cluster> clusters) {
-		updateClustersListeners.forEach(listener -> listener.accept(clusters));
-	}
-
-	public void updateClustersSubscribe(Consumer<Set<Cluster>> listener) {
-		updateClustersListeners.add(listener);
 	}
 
 }

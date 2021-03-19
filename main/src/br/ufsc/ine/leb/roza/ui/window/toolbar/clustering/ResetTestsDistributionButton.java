@@ -1,11 +1,9 @@
 package br.ufsc.ine.leb.roza.ui.window.toolbar.clustering;
 
-import java.util.HashSet;
 import java.util.List;
 
 import javax.swing.JButton;
 
-import br.ufsc.ine.leb.roza.Cluster;
 import br.ufsc.ine.leb.roza.ui.Hub;
 import br.ufsc.ine.leb.roza.ui.Manager;
 import br.ufsc.ine.leb.roza.ui.UiComponent;
@@ -26,11 +24,10 @@ public class ResetTestsDistributionButton implements UiComponent {
 		hub.loadTestClassesSubscribe(classes -> button.setEnabled(false));
 		hub.extractTestCasesSubscribe(testCases -> button.setEnabled(false));
 		hub.measureTestsSubscribe(similarityReport -> button.setEnabled(false));
-		hub.startTestsDistributionSubscribe(() -> button.setEnabled(true));
+		hub.startTestsDistributionSubscribe(levels -> button.setEnabled(true));
 		button.addActionListener(event -> {
 			button.setEnabled(false);
 			hub.resetTestsDistributionPublish();
-			hub.updateClustersPublish(new HashSet<Cluster>());
 		});
 	}
 

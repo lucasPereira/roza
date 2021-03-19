@@ -2,17 +2,15 @@ package br.ufsc.ine.leb.roza.ui;
 
 import java.io.File;
 import java.util.List;
-import java.util.Set;
 
-import br.ufsc.ine.leb.roza.Cluster;
 import br.ufsc.ine.leb.roza.MaterializationReport;
 import br.ufsc.ine.leb.roza.SimilarityReport;
 import br.ufsc.ine.leb.roza.TestCase;
 import br.ufsc.ine.leb.roza.TestClass;
 import br.ufsc.ine.leb.roza.TextFile;
-import br.ufsc.ine.leb.roza.clustering.TestCaseClusterer;
 import br.ufsc.ine.leb.roza.clustering.dendrogram.ComposedCriteria;
 import br.ufsc.ine.leb.roza.clustering.dendrogram.DendogramTestCaseClusterer;
+import br.ufsc.ine.leb.roza.clustering.dendrogram.Level;
 import br.ufsc.ine.leb.roza.clustering.dendrogram.LevelBasedCriteria;
 import br.ufsc.ine.leb.roza.clustering.dendrogram.LinkageFactory;
 import br.ufsc.ine.leb.roza.clustering.dendrogram.Referee;
@@ -91,11 +89,10 @@ public class Manager {
 		this.threshold = theshold;
 	}
 
-	public Set<Cluster> distributeTests() {
-		ThresholdCriteria composedCriteria = new ComposedCriteria(new LevelBasedCriteria(1), threshold);
-		TestCaseClusterer clustering = new DendogramTestCaseClusterer(linkageFactory.create(similarityReport), referee, composedCriteria);
-		Set<Cluster> clusters = clustering.cluster(similarityReport);
-		return clusters;
+	public List<Level> distributeTests() {
+		ThresholdCriteria composed = new ComposedCriteria(new LevelBasedCriteria(1), threshold);
+		DendogramTestCaseClusterer clustering = new DendogramTestCaseClusterer(linkageFactory.create(similarityReport), referee, composed);
+		return clustering.generateLevels(similarityReport);
 	}
 
 }

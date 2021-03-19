@@ -31,7 +31,7 @@ public class SimilarityBasedCriteria implements ThresholdCriteria {
 
 	@Override
 	public String toString() {
-		return String.format("%s(%d)", getClass().getSimpleName(), threshold);
+		return String.format("%s(%s)", getClass().getSimpleName(), threshold);
 	}
 
 }

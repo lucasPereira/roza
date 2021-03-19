@@ -8,7 +8,7 @@ import java.util.Set;
 import br.ufsc.ine.leb.roza.Cluster;
 import br.ufsc.ine.leb.roza.exceptions.NoNextLevelException;
 
-class Level {
+public class Level {
 
 	private Linkage linkage;
 	private Referee referee;

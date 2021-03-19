@@ -22,6 +22,11 @@ public class DendogramTestCaseClusterer implements TestCaseClusterer {
 
 	@Override
 	public Set<Cluster> cluster(SimilarityReport report) {
+		List<Level> levels = generateLevels(report);
+		return levels.get(levels.size() - 1).getClusters();
+	}
+
+	public List<Level> generateLevels(SimilarityReport report) {
 		Set<Cluster> clusters = new ClusterFactory().create(report);
 		List<Level> levels = new ArrayList<>();
 		Level level = new Level(linkage, referee, clusters);
@@ -30,7 +35,7 @@ public class DendogramTestCaseClusterer implements TestCaseClusterer {
 			level = level.generateNextLevel();
 			levels.add(level);
 		}
-		return level.getClusters();
+		return levels;
 	}
 
 }
