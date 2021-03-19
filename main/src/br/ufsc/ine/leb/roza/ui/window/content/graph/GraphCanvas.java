@@ -59,16 +59,24 @@ public class GraphCanvas implements UiComponent {
 
 			@Override
 			public void mouseWheelMoved(MouseWheelEvent event) {
-				Integer x = event.getX();
-				Integer y = event.getY();
-				Point3 center = view.getCamera().transformPxToGu(x, y);
-				view.getCamera().setViewCenter(center.x, center.y, center.z);
+				zoom(view, event);
+			}
+
+			private void zoom(DefaultView view, MouseWheelEvent event) {
 				Integer amount = event.getWheelRotation();
 				Double currentZoom = view.getCamera().getViewPercent();
 				Double newZoom = amount * 0.1 + currentZoom;
 				if (newZoom >= 0.1 && newZoom <= 2) {
 					view.getCamera().setViewPercent(newZoom);
 				}
+			}
+
+			@SuppressWarnings("unused")
+			public void centralize(DefaultView view, MouseWheelEvent event) {
+				Integer x = event.getX();
+				Integer y = event.getY();
+				Point3 center = view.getCamera().transformPxToGu(x, y);
+				view.getCamera().setViewCenter(center.x, center.y, center.z);
 			}
 
 		});
