@@ -37,6 +37,7 @@ public class Hub {
 	private List<Runnable> selectSimilarityBasedCriteriaListeners;
 
 	private List<Runnable> startTestsDistributionListeners;
+	private List<Runnable> resetTestsDistributionListeners;
 	private List<Consumer<Set<Cluster>>> updateClustersListeners;
 
 	public Hub() {
@@ -63,6 +64,7 @@ public class Hub {
 		selectSimilarityBasedCriteriaListeners = new LinkedList<>();
 
 		startTestsDistributionListeners = new LinkedList<>();
+		resetTestsDistributionListeners = new LinkedList<>();
 		updateClustersListeners = new LinkedList<>();
 	}
 
@@ -214,8 +216,16 @@ public class Hub {
 		startTestsDistributionListeners.forEach(listener -> listener.run());
 	}
 
-	public void startTestsDistributionPublishSubscribe(Runnable listener) {
+	public void startTestsDistributionSubscribe(Runnable listener) {
 		startTestsDistributionListeners.add(listener);
+	}
+
+	public void resetTestsDistributionPublish() {
+		resetTestsDistributionListeners.forEach(listener -> listener.run());
+	}
+
+	public void resetTestsDistributionSubscribe(Runnable listener) {
+		resetTestsDistributionListeners.add(listener);
 	}
 
 	public void updateClustersPublish(Set<Cluster> clusters) {

@@ -32,6 +32,7 @@ public class ClusteringTab implements UiComponent {
 		childs.add(new ThresholdCriteriaComboBox(this));
 		childs.add(new ThresholdCriteriaInputs(this));
 		childs.add(new StartTestsDistributionButton(this));
+		childs.add(new ResetTestsDistributionButton(this));
 	}
 
 	@Override

@@ -32,7 +32,8 @@ public class LinkageComboBox implements UiComponent {
 		hub.loadTestClassesSubscribe(classes -> combo.setEnabled(false));
 		hub.extractTestCasesSubscribe(testCases -> combo.setEnabled(false));
 		hub.measureTestsSubscribe(similarityReport -> combo.setEnabled(true));
-		hub.startTestsDistributionPublishSubscribe(() -> combo.setEnabled(false));
+		hub.startTestsDistributionSubscribe(() -> combo.setEnabled(false));
+		hub.resetTestsDistributionSubscribe(()-> combo.setEnabled(true));
 	}
 
 	@Override

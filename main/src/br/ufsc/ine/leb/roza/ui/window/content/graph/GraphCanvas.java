@@ -83,6 +83,7 @@ public class GraphCanvas implements UiComponent {
 	}
 
 	private void update(Graph graph, Set<Cluster> clusters) {
+		graph.clear();
 		for (Cluster cluster : clusters) {
 			for (TestCase source : cluster.getTestCases()) {
 				for (TestCase target : cluster.getTestCases()) {
