@@ -7,6 +7,7 @@ import javax.swing.JComboBox;
 import br.ufsc.ine.leb.roza.clustering.dendrogram.AverageLinkageFactory;
 import br.ufsc.ine.leb.roza.clustering.dendrogram.CompleteLinkageFactory;
 import br.ufsc.ine.leb.roza.clustering.dendrogram.SingleLinkageFactory;
+import br.ufsc.ine.leb.roza.clustering.dendrogram.SumOfIdsLinkageFactory;
 import br.ufsc.ine.leb.roza.ui.Hub;
 import br.ufsc.ine.leb.roza.ui.Manager;
 import br.ufsc.ine.leb.roza.ui.UiComponent;
@@ -24,6 +25,7 @@ public class LinkageComboBox implements UiComponent {
 	@Override
 	public void init(Hub hub, Manager manager) {
 		ComboBoxBuilder builder = new ComboBoxBuilder("Linkage Method");
+		builder.add("Sum of Identifiers Linkage", () -> manager.setLinkageFactory(new SumOfIdsLinkageFactory()));
 		builder.add("Single Linkage", () -> manager.setLinkageFactory(new SingleLinkageFactory()));
 		builder.add("Complete Linkage", () -> manager.setLinkageFactory(new CompleteLinkageFactory()));
 		builder.add("Average Linkage", () -> manager.setLinkageFactory(new AverageLinkageFactory()));
@@ -41,7 +43,7 @@ public class LinkageComboBox implements UiComponent {
 
 	@Override
 	public void start() {
-		combo.setSelectedIndex(1);
+		combo.setSelectedIndex(0);
 	}
 
 }
