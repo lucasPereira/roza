@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.swing.JSplitPane;
 
+import br.ufsc.ine.leb.roza.TestCase;
 import br.ufsc.ine.leb.roza.ui.Hub;
 import br.ufsc.ine.leb.roza.ui.Manager;
 import br.ufsc.ine.leb.roza.ui.UiComponent;
@@ -35,7 +36,9 @@ public class CompareTestCasesMeasurementPanel implements UiComponent {
 			sourcePanel.clearTestCase();
 			targetPanel.clearTestCase();
 		});
-		hub.compareTestCaseSubscribe((source, target) -> {
+		hub.compareTestCaseSubscribe(assessment -> {
+			TestCase source = assessment.getSource();
+			TestCase target = assessment.getTarget();
 			sourcePanel.setTestCase(source);
 			targetPanel.setTestCase(target);
 		});

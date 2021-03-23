@@ -2,9 +2,9 @@ package br.ufsc.ine.leb.roza.ui;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
+import br.ufsc.ine.leb.roza.SimilarityAssessment;
 import br.ufsc.ine.leb.roza.SimilarityReport;
 import br.ufsc.ine.leb.roza.TestCase;
 import br.ufsc.ine.leb.roza.TestClass;
@@ -29,7 +29,7 @@ public class Hub {
 	private List<Runnable> unselectSimianMetricListeners;
 	private List<Consumer<Integer>> changeSimianSettingsListeners;
 	private List<Consumer<SimilarityReport>> measureTestCaseListeners;
-	private List<BiConsumer<TestCase, TestCase>> compareTestCaseListeners;
+	private List<Consumer<SimilarityAssessment>> compareTestCaseListeners;
 
 	private List<Runnable> selectLevelBasedCriteriaListeners;
 	private List<Runnable> selectTestsPerClassCriteriaListeners;
@@ -177,11 +177,11 @@ public class Hub {
 		measureTestCaseListeners.add(listener);
 	}
 
-	public void compareTestCasePublish(TestCase source, TestCase target) {
-		compareTestCaseListeners.forEach(listener -> listener.accept(source, target));
+	public void compareTestCasePublish(SimilarityAssessment assessment) {
+		compareTestCaseListeners.forEach(listener -> listener.accept(assessment));
 	}
 
-	public void compareTestCaseSubscribe(BiConsumer<TestCase, TestCase> listener) {
+	public void compareTestCaseSubscribe(Consumer<SimilarityAssessment> listener) {
 		compareTestCaseListeners.add(listener);
 	}
 

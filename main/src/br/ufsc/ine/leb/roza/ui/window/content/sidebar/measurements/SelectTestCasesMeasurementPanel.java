@@ -4,6 +4,7 @@ import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.math.BigDecimal;
 import java.util.List;
 
 import javax.swing.DefaultComboBoxModel;
@@ -71,14 +72,42 @@ public class SelectTestCasesMeasurementPanel implements UiComponent {
 			sourceCombo.setMaximumSize(sourceCombo.getPreferredSize());
 			targetCombo.setMaximumSize(targetCombo.getPreferredSize());
 		});
-		sourceCombo.addActionListener(createListenerToTestSelection(hub, scoreLabel, sourceCombo, targetCombo));
-		targetCombo.addActionListener(createListenerToTestSelection(hub, scoreLabel, sourceCombo, targetCombo));
+		hub.compareTestCaseSubscribe((assessment) -> {
+			BigDecimal measure = assessment.getScore();
+			String score = new FormatterUtils().bigDecimal(measure);
+			scoreLabel.setText(score);
+			TestCase newSource = assessment.getSource();
+			TestCase newTarget = assessment.getTarget();
+			Object currentSource = sourceCombo.getSelectedItem();
+			Object currentTarget = targetCombo.getSelectedItem();
+			if (!newSource.equals(currentSource) || !newTarget.equals(currentTarget)) {
+				sourceCombo.setSelectedItem(newSource);
+				targetCombo.setSelectedItem(newTarget);
+			}
+		});
+		sourceCombo.addActionListener(createComboListener(hub, sourceCombo, targetCombo));
+		targetCombo.addActionListener(createComboListener(hub, sourceCombo, targetCombo));
 		panel.add(new JScrollPane(sourceCombo));
 		panel.add(new JScrollPane(targetCombo));
 		panel.add(scoreLabel);
 		parent.add(panel);
-		updateScore(hub, scoreLabel, sourceCombo, targetCombo);
 		measurementsTab.addTopComponent(parent);
+	}
+
+	private ActionListener createComboListener(Hub hub, JComboBox<TestCase> sourceCombo, JComboBox<TestCase> targetCombo) {
+		return new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent event) {
+				TestCase source = (TestCase) sourceCombo.getSelectedItem();
+				TestCase target = (TestCase) targetCombo.getSelectedItem();
+				if (source != null && target != null) {
+					SimilarityAssessment assessment = similarityReport.getPair(source, target);
+					hub.compareTestCasePublish(assessment);
+				}
+			}
+
+		};
 	}
 
 	@Override
@@ -86,29 +115,5 @@ public class SelectTestCasesMeasurementPanel implements UiComponent {
 
 	@Override
 	public void start() {}
-
-	private ActionListener createListenerToTestSelection(Hub hub, JLabel scoreLabel, JComboBox<TestCase> sourceCombo, JComboBox<TestCase> targetCombo) {
-		return new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent event) {
-				updateScore(hub, scoreLabel, sourceCombo, targetCombo);
-			}
-
-		};
-	}
-
-	private void updateScore(Hub hub, JLabel scoreLabel, JComboBox<TestCase> sourceCombo, JComboBox<TestCase> targetCombo) {
-		TestCase source = (TestCase) sourceCombo.getSelectedItem();
-		TestCase target = (TestCase) targetCombo.getSelectedItem();
-		if (source != null && target != null) {
-			SimilarityAssessment measure = similarityReport.getPair(source, target);
-			String score = new FormatterUtils().bigDecimal(measure.getScore());
-			scoreLabel.setText(score);
-			hub.compareTestCasePublish(source, target);
-		} else {
-			scoreLabel.setText(DEFAULT_SCORE);
-		}
-	}
 
 }
