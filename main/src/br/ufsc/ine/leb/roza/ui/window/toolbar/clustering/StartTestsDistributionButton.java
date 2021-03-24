@@ -30,6 +30,7 @@ public class StartTestsDistributionButton implements UiComponent {
 			button.setEnabled(false);
 			List<Level> levels= manager.distributeTests();
 			hub.startTestsDistributionPublish(levels);
+			hub.infoMessagePublish(String.format("Clustering started"));
 		});
 	}
 

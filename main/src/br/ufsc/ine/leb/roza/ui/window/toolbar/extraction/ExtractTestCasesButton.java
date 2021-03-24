@@ -26,6 +26,7 @@ public class ExtractTestCasesButton implements UiComponent {
 		button.addActionListener(listner -> {
 			List<TestCase> testCases = manager.extractTestCases();
 			hub.extractTestCasesPublish(testCases);
+			hub.infoMessagePublish(String.format("Extracted tests: %d", testCases.size()));
 		});
 		hub.loadTestClassesSubscribe(classes -> button.setEnabled(true));
 	}

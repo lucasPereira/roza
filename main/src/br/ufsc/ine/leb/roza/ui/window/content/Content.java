@@ -25,8 +25,7 @@ public class Content implements UiComponent {
 	@Override
 	public void init(Hub hub, Manager manager) {
 		panel = new JPanel(new GridLayout(1, 2));
-		window.addComponent(panel);
-
+		window.addBottomComponent(panel);
 	}
 
 	@Override

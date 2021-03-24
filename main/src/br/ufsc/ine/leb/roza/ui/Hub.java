@@ -38,6 +38,9 @@ public class Hub {
 	private List<Consumer<List<Level>>> startTestsDistributionListeners;
 	private List<Runnable> resetTestsDistributionListeners;
 
+	private List<Consumer<String>> infoMessageListeners;
+	private List<Consumer<String>> errorMessageListeners;
+
 	public Hub() {
 		loadTestClassesListeners = new LinkedList<>();
 		selectTestClassListeners = new LinkedList<>();
@@ -63,6 +66,9 @@ public class Hub {
 
 		startTestsDistributionListeners = new LinkedList<>();
 		resetTestsDistributionListeners = new LinkedList<>();
+
+		infoMessageListeners = new LinkedList<>();
+		errorMessageListeners = new LinkedList<>();
 	}
 
 	public void loadTestClassesPublish(List<TestClass> classes) {
@@ -223,6 +229,22 @@ public class Hub {
 
 	public void resetTestsDistributionSubscribe(Runnable listener) {
 		resetTestsDistributionListeners.add(listener);
+	}
+
+	public void infoMessagePublish(String message) {
+		infoMessageListeners.forEach(listener -> listener.accept(message));
+	}
+
+	public void infoMessageSubscribe(Consumer<String> listener) {
+		infoMessageListeners.add(listener);
+	}
+
+	public void errorMessagePublish(String message) {
+		errorMessageListeners.forEach(listener -> listener.accept(message));
+	}
+
+	public void errorMessageSubscribe(Consumer<String> listener) {
+		errorMessageListeners.add(listener);
 	}
 
 }

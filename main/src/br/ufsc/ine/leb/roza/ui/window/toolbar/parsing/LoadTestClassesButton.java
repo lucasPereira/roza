@@ -36,6 +36,7 @@ public class LoadTestClassesButton implements UiComponent {
 				File[] files = chooser.getSelectedFiles();
 				List<TestClass> classes = manager.loadClasses(Arrays.asList(files));
 				hub.loadTestClassesPublish(classes);
+				hub.infoMessagePublish(String.format("Loaded classes: %d", classes.size()));
 			}
 		});
 

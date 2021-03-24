@@ -26,7 +26,7 @@ public class Toolbar implements UiComponent {
 	@Override
 	public void init(Hub hub, Manager manager) {
 		panel = new JTabbedPane();
-		window.addComponent(panel);
+		window.addMiddleComponent(panel);
 		hub.loadTestClassesSubscribe(classes -> panel.setSelectedIndex(1));
 		hub.extractTestCasesSubscribe(tests -> panel.setSelectedIndex(2));
 		hub.measureTestsSubscribe(similarityReport -> panel.setSelectedIndex(3));

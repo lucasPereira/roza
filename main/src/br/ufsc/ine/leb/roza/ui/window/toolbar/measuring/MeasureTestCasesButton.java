@@ -27,6 +27,7 @@ public class MeasureTestCasesButton implements UiComponent {
 		button.addActionListener(listner -> {
 			SimilarityReport similarityReort = manager.measureTestCases();
 			hub.measureTestsPublish(similarityReort);
+			hub.infoMessagePublish(String.format("Similarity matrix created"));
 		});
 	}
 
