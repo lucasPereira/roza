@@ -20,8 +20,8 @@ import br.ufsc.ine.leb.roza.materialization.Junit4WithAssertionsTestCaseMaterial
 import br.ufsc.ine.leb.roza.materialization.TestCaseMaterializer;
 import br.ufsc.ine.leb.roza.measurement.LccssSimilarityMeasurer;
 import br.ufsc.ine.leb.roza.measurement.SimilarityMeasurer;
-import br.ufsc.ine.leb.roza.measurement.report.AssessmentScoreAndTestCaseNameComparator;
 import br.ufsc.ine.leb.roza.utils.FolderUtils;
+import br.ufsc.ine.leb.roza.utils.comparator.SimilarityAssessmentComparatorByScoreSourceNameAndTargetName;
 
 class LccssSimilarityMetricTest {
 
@@ -57,7 +57,7 @@ class LccssSimilarityMetricTest {
 		TestCase testCaseA = new TestCase("testA", Arrays.asList(), Arrays.asList(assertion));
 		TestCase testCaseB = new TestCase("testB", Arrays.asList(), Arrays.asList(assertion));
 		MaterializationReport materializationReport = materializer.materialize(Arrays.asList(testCaseA, testCaseB));
-		SimilarityReport report = measurer.measure(materializationReport).sort(new AssessmentScoreAndTestCaseNameComparator());
+		SimilarityReport report = measurer.measure(materializationReport).sort(new SimilarityAssessmentComparatorByScoreSourceNameAndTargetName());
 
 		Iterator<SimilarityAssessment> iterator = report.getAssessments().iterator();
 		SimilarityAssessment assessmentAA = iterator.next();
@@ -89,7 +89,7 @@ class LccssSimilarityMetricTest {
 		TestCase testCaseA = new TestCase("testA", Arrays.asList(fixture1, fixture2), Arrays.asList(assertion));
 		TestCase testCaseB = new TestCase("testB", Arrays.asList(fixture1, fixture3), Arrays.asList(assertion));
 		MaterializationReport materializationReport = materializer.materialize(Arrays.asList(testCaseA, testCaseB));
-		SimilarityReport report = measurer.measure(materializationReport).sort(new AssessmentScoreAndTestCaseNameComparator());
+		SimilarityReport report = measurer.measure(materializationReport).sort(new SimilarityAssessmentComparatorByScoreSourceNameAndTargetName());
 
 		Iterator<SimilarityAssessment> iterator = report.getAssessments().iterator();
 		SimilarityAssessment assessmentAA = iterator.next();
@@ -122,7 +122,7 @@ class LccssSimilarityMetricTest {
 		TestCase testCaseA = new TestCase("testA", Arrays.asList(fixture1, fixture2), Arrays.asList(assertion1));
 		TestCase testCaseB = new TestCase("testB", Arrays.asList(fixture1, fixture3), Arrays.asList(assertion2));
 		MaterializationReport materializationReport = materializer.materialize(Arrays.asList(testCaseA, testCaseB));
-		SimilarityReport report = measurer.measure(materializationReport).sort(new AssessmentScoreAndTestCaseNameComparator());
+		SimilarityReport report = measurer.measure(materializationReport).sort(new SimilarityAssessmentComparatorByScoreSourceNameAndTargetName());
 
 		Iterator<SimilarityAssessment> iterator = report.getAssessments().iterator();
 		SimilarityAssessment assessmentAA = iterator.next();
@@ -153,7 +153,7 @@ class LccssSimilarityMetricTest {
 		TestCase testCaseA = new TestCase("testA", Arrays.asList(fixture1, fixture2), Arrays.asList());
 		TestCase testCaseB = new TestCase("testB", Arrays.asList(fixture1, fixture3), Arrays.asList());
 		MaterializationReport materializationReport = materializer.materialize(Arrays.asList(testCaseA, testCaseB));
-		SimilarityReport report = measurer.measure(materializationReport).sort(new AssessmentScoreAndTestCaseNameComparator());
+		SimilarityReport report = measurer.measure(materializationReport).sort(new SimilarityAssessmentComparatorByScoreSourceNameAndTargetName());
 
 		Iterator<SimilarityAssessment> iterator = report.getAssessments().iterator();
 		SimilarityAssessment assessmentAA = iterator.next();
@@ -187,7 +187,7 @@ class LccssSimilarityMetricTest {
 		TestCase testCaseA = new TestCase("testA", Arrays.asList(fixture1, fixture2, fixture3, fixture5), Arrays.asList());
 		TestCase testCaseB = new TestCase("testB", Arrays.asList(fixture1, fixture2, fixture4, fixture6), Arrays.asList());
 		MaterializationReport materializationReport = materializer.materialize(Arrays.asList(testCaseA, testCaseB));
-		SimilarityReport report = measurer.measure(materializationReport).sort(new AssessmentScoreAndTestCaseNameComparator());
+		SimilarityReport report = measurer.measure(materializationReport).sort(new SimilarityAssessmentComparatorByScoreSourceNameAndTargetName());
 
 		Iterator<SimilarityAssessment> iterator = report.getAssessments().iterator();
 		SimilarityAssessment assessmentAA = iterator.next();
@@ -219,7 +219,7 @@ class LccssSimilarityMetricTest {
 		TestCase testCaseA = new TestCase("testA", Arrays.asList(fixture1, fixture2, fixture4), Arrays.asList());
 		TestCase testCaseB = new TestCase("testB", Arrays.asList(fixture1, fixture3, fixture4), Arrays.asList());
 		MaterializationReport materializationReport = materializer.materialize(Arrays.asList(testCaseA, testCaseB));
-		SimilarityReport report = measurer.measure(materializationReport).sort(new AssessmentScoreAndTestCaseNameComparator());
+		SimilarityReport report = measurer.measure(materializationReport).sort(new SimilarityAssessmentComparatorByScoreSourceNameAndTargetName());
 
 		Iterator<SimilarityAssessment> iterator = report.getAssessments().iterator();
 		SimilarityAssessment assessmentAA = iterator.next();
@@ -253,7 +253,7 @@ class LccssSimilarityMetricTest {
 		TestCase testCaseA = new TestCase("testA", Arrays.asList(fixture5, fixture1, fixture2, fixture4), Arrays.asList());
 		TestCase testCaseB = new TestCase("testB", Arrays.asList(fixture6, fixture1, fixture3, fixture4), Arrays.asList());
 		MaterializationReport materializationReport = materializer.materialize(Arrays.asList(testCaseA, testCaseB));
-		SimilarityReport report = measurer.measure(materializationReport).sort(new AssessmentScoreAndTestCaseNameComparator());
+		SimilarityReport report = measurer.measure(materializationReport).sort(new SimilarityAssessmentComparatorByScoreSourceNameAndTargetName());
 
 		Iterator<SimilarityAssessment> iterator = report.getAssessments().iterator();
 		SimilarityAssessment assessmentAA = iterator.next();
@@ -283,7 +283,7 @@ class LccssSimilarityMetricTest {
 		TestCase testCaseA = new TestCase("testA", Arrays.asList(fixture1), Arrays.asList());
 		TestCase testCaseB = new TestCase("testB", Arrays.asList(fixture1, fixture2), Arrays.asList());
 		MaterializationReport materializationReport = materializer.materialize(Arrays.asList(testCaseA, testCaseB));
-		SimilarityReport report = measurer.measure(materializationReport).sort(new AssessmentScoreAndTestCaseNameComparator());
+		SimilarityReport report = measurer.measure(materializationReport).sort(new SimilarityAssessmentComparatorByScoreSourceNameAndTargetName());
 
 		Iterator<SimilarityAssessment> iterator = report.getAssessments().iterator();
 		SimilarityAssessment assessmentAA = iterator.next();
@@ -314,7 +314,7 @@ class LccssSimilarityMetricTest {
 		TestCase testCaseA = new TestCase("testA", Arrays.asList(fixture1), Arrays.asList());
 		TestCase testCaseB = new TestCase("testB", Arrays.asList(fixture1, fixture2, fixture3), Arrays.asList());
 		MaterializationReport materializationReport = materializer.materialize(Arrays.asList(testCaseA, testCaseB));
-		SimilarityReport report = measurer.measure(materializationReport).sort(new AssessmentScoreAndTestCaseNameComparator());
+		SimilarityReport report = measurer.measure(materializationReport).sort(new SimilarityAssessmentComparatorByScoreSourceNameAndTargetName());
 
 		Iterator<SimilarityAssessment> iterator = report.getAssessments().iterator();
 		SimilarityAssessment assessmentAA = iterator.next();
@@ -346,7 +346,7 @@ class LccssSimilarityMetricTest {
 		TestCase testCaseB = new TestCase("testB", Arrays.asList(fixture1, fixture2), Arrays.asList());
 		TestCase testCaseC = new TestCase("testC", Arrays.asList(fixture1, fixture2, fixture3), Arrays.asList());
 		MaterializationReport materializationReport = materializer.materialize(Arrays.asList(testCaseA, testCaseB, testCaseC));
-		SimilarityReport report = measurer.measure(materializationReport).sort(new AssessmentScoreAndTestCaseNameComparator());
+		SimilarityReport report = measurer.measure(materializationReport).sort(new SimilarityAssessmentComparatorByScoreSourceNameAndTargetName());
 
 		Iterator<SimilarityAssessment> iterator = report.getAssessments().iterator();
 		SimilarityAssessment assessmentAA = iterator.next();
@@ -399,7 +399,7 @@ class LccssSimilarityMetricTest {
 		TestCase testCaseB = new TestCase("testB", Arrays.asList(fixture1, fixture2, fixture4), Arrays.asList());
 		TestCase testCaseC = new TestCase("testC", Arrays.asList(fixture1, fixture2, fixture3, fixture4), Arrays.asList());
 		MaterializationReport materializationReport = materializer.materialize(Arrays.asList(testCaseA, testCaseB, testCaseC));
-		SimilarityReport report = measurer.measure(materializationReport).sort(new AssessmentScoreAndTestCaseNameComparator());
+		SimilarityReport report = measurer.measure(materializationReport).sort(new SimilarityAssessmentComparatorByScoreSourceNameAndTargetName());
 
 		Iterator<SimilarityAssessment> iterator = report.getAssessments().iterator();
 		SimilarityAssessment assessmentAA = iterator.next();
@@ -454,7 +454,7 @@ class LccssSimilarityMetricTest {
 		TestCase testCaseB = new TestCase("testB", Arrays.asList(fixture1, fixture2, fixture4, fixture5), Arrays.asList());
 		TestCase testCaseC = new TestCase("testC", Arrays.asList(fixture1, fixture2, fixture3, fixture4, fixture5, fixture6), Arrays.asList());
 		MaterializationReport materializationReport = materializer.materialize(Arrays.asList(testCaseA, testCaseB, testCaseC));
-		SimilarityReport report = measurer.measure(materializationReport).sort(new AssessmentScoreAndTestCaseNameComparator());
+		SimilarityReport report = measurer.measure(materializationReport).sort(new SimilarityAssessmentComparatorByScoreSourceNameAndTargetName());
 
 		Iterator<SimilarityAssessment> iterator = report.getAssessments().iterator();
 		SimilarityAssessment assessmentAA = iterator.next();
@@ -509,7 +509,7 @@ class LccssSimilarityMetricTest {
 		TestCase testCaseB = new TestCase("testB", Arrays.asList(fixture1, fixture2, fixture4, fixture5), Arrays.asList());
 		TestCase testCaseC = new TestCase("testC", Arrays.asList(fixture1, fixture2, fixture3, fixture4), Arrays.asList());
 		MaterializationReport materializationReport = materializer.materialize(Arrays.asList(testCaseA, testCaseB, testCaseC));
-		SimilarityReport report = measurer.measure(materializationReport).sort(new AssessmentScoreAndTestCaseNameComparator());
+		SimilarityReport report = measurer.measure(materializationReport).sort(new SimilarityAssessmentComparatorByScoreSourceNameAndTargetName());
 
 		Iterator<SimilarityAssessment> iterator = report.getAssessments().iterator();
 		SimilarityAssessment assessmentAA = iterator.next();

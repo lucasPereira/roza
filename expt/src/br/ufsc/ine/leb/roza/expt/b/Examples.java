@@ -24,7 +24,6 @@ import br.ufsc.ine.leb.roza.measurement.SimilarityMeasurer;
 import br.ufsc.ine.leb.roza.measurement.configuration.deckard.DeckardConfigurations;
 import br.ufsc.ine.leb.roza.measurement.configuration.jplag.JplagConfigurations;
 import br.ufsc.ine.leb.roza.measurement.configuration.simian.SimianConfigurations;
-import br.ufsc.ine.leb.roza.measurement.report.AssessmentTestCaseNameComparator;
 import br.ufsc.ine.leb.roza.parsing.Junit4TestClassParser;
 import br.ufsc.ine.leb.roza.parsing.TestClassParser;
 import br.ufsc.ine.leb.roza.selection.JavaExtensionTextFileSelector;
@@ -32,6 +31,7 @@ import br.ufsc.ine.leb.roza.selection.TextFileSelector;
 import br.ufsc.ine.leb.roza.utils.CommaSeparatedValues;
 import br.ufsc.ine.leb.roza.utils.FolderUtils;
 import br.ufsc.ine.leb.roza.utils.FormatterUtils;
+import br.ufsc.ine.leb.roza.utils.comparator.SimilarityAssessmentComparatorBySourceAndTargetNames;
 
 public class Examples {
 
@@ -67,7 +67,7 @@ public class Examples {
 	private static void includeMetric(CommaSeparatedValues csv, MaterializationReport materializations, String metric, SimilarityMeasurer measurer) {
 		new FolderUtils("main/exec/measurer").createEmptyFolder();
 		FormatterUtils formatterUtils = new FormatterUtils();
-		Comparator<SimilarityAssessment> comparator = new AssessmentTestCaseNameComparator();
+		Comparator<SimilarityAssessment> comparator = new SimilarityAssessmentComparatorBySourceAndTargetNames();
 		SimilarityReport report = measurer.measure(materializations).sort(comparator).removeReflexives();
 		for (SimilarityAssessment assessment : report.getAssessments()) {
 			String source = assessment.getSource().getName();

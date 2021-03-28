@@ -15,8 +15,8 @@ import br.ufsc.ine.leb.roza.TestCase;
 import br.ufsc.ine.leb.roza.materialization.Junit4WithAssertionsTestCaseMaterializer;
 import br.ufsc.ine.leb.roza.materialization.TestCaseMaterializer;
 import br.ufsc.ine.leb.roza.measurement.configuration.simian.SimianConfigurations;
-import br.ufsc.ine.leb.roza.measurement.report.AssessmentScoreAndTestCaseNameComparator;
 import br.ufsc.ine.leb.roza.utils.FolderUtils;
+import br.ufsc.ine.leb.roza.utils.comparator.SimilarityAssessmentComparatorByScoreSourceNameAndTargetName;
 
 class SimianSimilarityMeasurerTest {
 
@@ -58,7 +58,7 @@ class SimianSimilarityMeasurerTest {
 		TestCase testCaseA = new TestCase("test", Arrays.asList(fixture), Arrays.asList(assertion));
 		TestCase testCaseB = new TestCase("test", Arrays.asList(fixture), Arrays.asList(assertion));
 		MaterializationReport materializationReport = materializer.materialize(Arrays.asList(testCaseA, testCaseB));
-		SimilarityReport report = measurer.measure(materializationReport).sort(new AssessmentScoreAndTestCaseNameComparator());
+		SimilarityReport report = measurer.measure(materializationReport).sort(new SimilarityAssessmentComparatorByScoreSourceNameAndTargetName());
 
 		assertEquals(4, report.getAssessments().size());
 		assertEquals(BigDecimal.ONE, report.getAssessments().get(0).getScore());
@@ -82,7 +82,7 @@ class SimianSimilarityMeasurerTest {
 		TestCase testCaseA = new TestCase("testA", Arrays.asList(fixture), Arrays.asList(assertion));
 		TestCase testCaseB = new TestCase("testB", Arrays.asList(fixture), Arrays.asList(assertion));
 		MaterializationReport materializationReport = materializer.materialize(Arrays.asList(testCaseA, testCaseB));
-		SimilarityReport report = measurer.measure(materializationReport).sort(new AssessmentScoreAndTestCaseNameComparator());
+		SimilarityReport report = measurer.measure(materializationReport).sort(new SimilarityAssessmentComparatorByScoreSourceNameAndTargetName());
 
 		assertEquals(4, report.getAssessments().size());
 		assertEquals(BigDecimal.ONE, report.getAssessments().get(0).getScore());
@@ -106,7 +106,7 @@ class SimianSimilarityMeasurerTest {
 		TestCase testCaseA = new TestCase("testA", Arrays.asList(fixture), Arrays.asList());
 		TestCase testCaseB = new TestCase("testB", Arrays.asList(), Arrays.asList(assertion));
 		MaterializationReport materializationReport = materializer.materialize(Arrays.asList(testCaseA, testCaseB));
-		SimilarityReport report = measurer.measure(materializationReport).sort(new AssessmentScoreAndTestCaseNameComparator());
+		SimilarityReport report = measurer.measure(materializationReport).sort(new SimilarityAssessmentComparatorByScoreSourceNameAndTargetName());
 
 		assertEquals(4, report.getAssessments().size());
 		assertEquals(BigDecimal.ONE, report.getAssessments().get(0).getScore());

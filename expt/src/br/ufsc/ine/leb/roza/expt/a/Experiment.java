@@ -27,8 +27,6 @@ import br.ufsc.ine.leb.roza.measurement.SimilarityMeasurer;
 import br.ufsc.ine.leb.roza.measurement.configuration.deckard.DeckardConfigurations;
 import br.ufsc.ine.leb.roza.measurement.configuration.jplag.JplagConfigurations;
 import br.ufsc.ine.leb.roza.measurement.configuration.simian.SimianConfigurations;
-import br.ufsc.ine.leb.roza.measurement.report.AssessmentScoreAndTestCaseNameComparator;
-import br.ufsc.ine.leb.roza.measurement.report.AssessmentTestCaseNameComparator;
 import br.ufsc.ine.leb.roza.parsing.Junit5TestClassParser;
 import br.ufsc.ine.leb.roza.parsing.TestClassParser;
 import br.ufsc.ine.leb.roza.retrieval.PrecisionRecall;
@@ -38,6 +36,8 @@ import br.ufsc.ine.leb.roza.utils.CommaSeparatedValues;
 import br.ufsc.ine.leb.roza.utils.FolderUtils;
 import br.ufsc.ine.leb.roza.utils.FormatterUtils;
 import br.ufsc.ine.leb.roza.utils.ReportUtils;
+import br.ufsc.ine.leb.roza.utils.comparator.SimilarityAssessmentComparatorByScoreSourceNameAndTargetName;
+import br.ufsc.ine.leb.roza.utils.comparator.SimilarityAssessmentComparatorBySourceAndTargetNames;
 
 public class Experiment {
 
@@ -137,7 +137,7 @@ public class Experiment {
 		FormatterUtils formatterUtils = new FormatterUtils();
 		CommaSeparatedValues csv = new CommaSeparatedValues();
 		FolderUtils folderUtils = new FolderUtils("expt/results/a/average-precision-recall-curve");
-		Comparator<SimilarityAssessment> scoreComparator = new AssessmentScoreAndTestCaseNameComparator();
+		Comparator<SimilarityAssessment> scoreComparator = new SimilarityAssessmentComparatorByScoreSourceNameAndTargetName();
 		StandardRecallLevels standardRecallLevels = new StandardRecallLevels();
 		csv.addLine("Precisão/Revocação", fileName);
 		for (RecallLevel recallLevel : standardRecallLevels) {
@@ -162,7 +162,7 @@ public class Experiment {
 		FormatterUtils formatterUtils = new FormatterUtils();
 		CommaSeparatedValues csv = new CommaSeparatedValues();
 		FolderUtils folderUtils = new FolderUtils("expt/results/a/precision-recall-curve");
-		Comparator<SimilarityAssessment> scoreComparator = new AssessmentScoreAndTestCaseNameComparator();
+		Comparator<SimilarityAssessment> scoreComparator = new SimilarityAssessmentComparatorByScoreSourceNameAndTargetName();
 		StandardRecallLevels standardRecallLevels = new StandardRecallLevels();
 		for (TestCase source : testCases) {
 			List<TestCase> ranking = reportUtils.getTargets(report.selectSource(source).removeReflexives().sort(scoreComparator));
@@ -183,7 +183,7 @@ public class Experiment {
 		FormatterUtils formatterUtils = new FormatterUtils();
 		CommaSeparatedValues csv = new CommaSeparatedValues();
 		FolderUtils folderUtils = new FolderUtils("expt/results/a/matrix");
-		Comparator<SimilarityAssessment> nameComparator = new AssessmentTestCaseNameComparator();
+		Comparator<SimilarityAssessment> nameComparator = new SimilarityAssessmentComparatorBySourceAndTargetNames();
 		report.sort(nameComparator);
 		List<SimilarityAssessment> assessments = report.getAssessments();
 		for (SimilarityAssessment assessment : assessments) {

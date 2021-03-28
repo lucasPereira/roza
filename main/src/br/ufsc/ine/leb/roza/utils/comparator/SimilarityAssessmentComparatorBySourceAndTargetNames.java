@@ -1,10 +1,10 @@
-package br.ufsc.ine.leb.roza.measurement.report;
+package br.ufsc.ine.leb.roza.utils.comparator;
 
 import java.util.Comparator;
 
 import br.ufsc.ine.leb.roza.SimilarityAssessment;
 
-public class AssessmentTestCaseNameComparator implements Comparator<SimilarityAssessment> {
+public class SimilarityAssessmentComparatorBySourceAndTargetNames implements Comparator<SimilarityAssessment> {
 
 	@Override
 	public int compare(SimilarityAssessment assessment1, SimilarityAssessment assessment2) {

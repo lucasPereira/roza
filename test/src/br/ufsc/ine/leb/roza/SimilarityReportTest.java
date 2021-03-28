@@ -10,7 +10,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import br.ufsc.ine.leb.roza.exceptions.MissingPairException;
-import br.ufsc.ine.leb.roza.measurement.report.AssessmentScoreAndTestCaseNameComparator;
+import br.ufsc.ine.leb.roza.utils.comparator.SimilarityAssessmentComparatorByScoreSourceNameAndTargetName;
 
 class SimilarityReportTest {
 
@@ -46,7 +46,7 @@ class SimilarityReportTest {
 	@Test
 	void create() throws Exception {
 		SimilarityReport report = new SimilarityReport(Arrays.asList(assessmentAA, assessmentAB));
-		report.sort(new AssessmentScoreAndTestCaseNameComparator());
+		report.sort(new SimilarityAssessmentComparatorByScoreSourceNameAndTargetName());
 		assertEquals(2, report.getAssessments().size());
 		assertEquals(assessmentAA, report.getAssessments().get(0));
 		assertEquals(assessmentAB, report.getAssessments().get(1));
@@ -99,7 +99,7 @@ class SimilarityReportTest {
 	@Test
 	void sorted() throws Exception {
 		SimilarityReport unsorted = new SimilarityReport(Arrays.asList(assessmentBB, assessmentAA, assessmentAB, assessmentAC, assessmentBA, assessmentBC, assessmentCA, assessmentCB, assessmentCC));
-		SimilarityReport sorted = unsorted.sort(new AssessmentScoreAndTestCaseNameComparator());
+		SimilarityReport sorted = unsorted.sort(new SimilarityAssessmentComparatorByScoreSourceNameAndTargetName());
 		assertEquals(9, sorted.getAssessments().size());
 		assertEquals(assessmentAA, sorted.getAssessments().get(0));
 		assertEquals(assessmentBB, sorted.getAssessments().get(1));

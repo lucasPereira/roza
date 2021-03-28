@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 
 import br.ufsc.ine.leb.roza.exceptions.MissingAssessmentException;
 import br.ufsc.ine.leb.roza.exceptions.PotentialErrorProneOperationException;
-import br.ufsc.ine.leb.roza.measurement.report.AssessmentTestCaseNameComparator;
+import br.ufsc.ine.leb.roza.utils.comparator.SimilarityAssessmentComparatorBySourceAndTargetNames;
 
 class SimilarityReportBuilderTest {
 
@@ -64,7 +64,7 @@ class SimilarityReportBuilderTest {
 
 	@Test
 	void addTwoTestsSymmetric() throws Exception {
-		SimilarityReport report = symmetric.add(testA).add(testB).complete().build().sort(new AssessmentTestCaseNameComparator());
+		SimilarityReport report = symmetric.add(testA).add(testB).complete().build().sort(new SimilarityAssessmentComparatorBySourceAndTargetNames());
 		assertEquals(4, report.getAssessments().size());
 		assertEquals(testA, report.getAssessments().get(0).getSource());
 		assertEquals(testA, report.getAssessments().get(0).getTarget());
@@ -82,7 +82,7 @@ class SimilarityReportBuilderTest {
 
 	@Test
 	void addTwoTestsAsymmetric() throws Exception {
-		SimilarityReport report = asymmetric.add(testA).add(testB).complete().build().sort(new AssessmentTestCaseNameComparator());
+		SimilarityReport report = asymmetric.add(testA).add(testB).complete().build().sort(new SimilarityAssessmentComparatorBySourceAndTargetNames());
 		assertEquals(4, report.getAssessments().size());
 		assertEquals(testA, report.getAssessments().get(0).getSource());
 		assertEquals(testA, report.getAssessments().get(0).getTarget());
@@ -100,7 +100,7 @@ class SimilarityReportBuilderTest {
 
 	@Test
 	void addPairOfTwoTestsSymmetric() throws Exception {
-		SimilarityReport report = symmetric.add(testA, testB, dotFive).build().sort(new AssessmentTestCaseNameComparator());
+		SimilarityReport report = symmetric.add(testA, testB, dotFive).build().sort(new SimilarityAssessmentComparatorBySourceAndTargetNames());
 		assertEquals(4, report.getAssessments().size());
 		assertEquals(testA, report.getAssessments().get(0).getSource());
 		assertEquals(testA, report.getAssessments().get(0).getTarget());
@@ -118,7 +118,7 @@ class SimilarityReportBuilderTest {
 
 	@Test
 	void addPairOfTwoTestsAsymmetric() throws Exception {
-		SimilarityReport report = asymmetric.add(testA, testB, dotFive).add(testB, testA, dotSix).build().sort(new AssessmentTestCaseNameComparator());
+		SimilarityReport report = asymmetric.add(testA, testB, dotFive).add(testB, testA, dotSix).build().sort(new SimilarityAssessmentComparatorBySourceAndTargetNames());
 		assertEquals(4, report.getAssessments().size());
 		assertEquals(testA, report.getAssessments().get(0).getSource());
 		assertEquals(testA, report.getAssessments().get(0).getTarget());
