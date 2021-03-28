@@ -27,6 +27,7 @@ public class DistributionTab implements UiComponent {
 
 	@Override
 	public void addChilds(List<UiComponent> childs) {
+		childs.add(new ClustersPanel(this));
 		childs.add(new GraphCanvas(this));
 	}
 

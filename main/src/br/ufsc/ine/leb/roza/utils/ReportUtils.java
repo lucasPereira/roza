@@ -6,7 +6,7 @@ import java.util.List;
 import br.ufsc.ine.leb.roza.SimilarityAssessment;
 import br.ufsc.ine.leb.roza.SimilarityReport;
 import br.ufsc.ine.leb.roza.TestCase;
-import br.ufsc.ine.leb.roza.measurement.report.TestCaseNameComparator;
+import br.ufsc.ine.leb.roza.utils.comparator.TestCaseComparatorByName;
 
 public class ReportUtils {
 
@@ -30,7 +30,7 @@ public class ReportUtils {
 				testCases.add(target);
 			}
 		}
-		testCases.sort(new TestCaseNameComparator());
+		testCases.sort(new TestCaseComparatorByName());
 		return testCases;
 	}
 
