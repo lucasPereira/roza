@@ -1,4 +1,4 @@
-package br.ufsc.ine.leb.roza.ui.window.content.graph;
+package br.ufsc.ine.leb.roza.ui.window.content.distribution;
 
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
@@ -19,18 +19,17 @@ import br.ufsc.ine.leb.roza.clustering.dendrogram.Level;
 import br.ufsc.ine.leb.roza.ui.Hub;
 import br.ufsc.ine.leb.roza.ui.Manager;
 import br.ufsc.ine.leb.roza.ui.UiComponent;
-import br.ufsc.ine.leb.roza.ui.window.content.Content;
 
 public class GraphCanvas implements UiComponent {
 
 	private static Integer EDGE_ID = 0;
 
-	private Content content;
+	private DistributionTab distributionTab;
 	private List<TestCase> testCases;
 	private SingleGraph graph;
 
-	public GraphCanvas(Content content) {
-		this.content = content;
+	public GraphCanvas(DistributionTab distributionTab) {
+		this.distributionTab = distributionTab;
 	}
 
 	@Override
@@ -39,9 +38,8 @@ public class GraphCanvas implements UiComponent {
 		graph = new SingleGraph("roza");
 		SwingViewer viewer = new SwingViewer(graph, Viewer.ThreadingModel.GRAPH_IN_GUI_THREAD);
 		DefaultView view = (DefaultView) viewer.addDefaultView(false);
-		viewer.enableAutoLayout();
 		addMouveListeners(view);
-		content.addLeftComponent(view);
+		distributionTab.addComponent("Graph", view);
 		hub.loadTestClassesSubscribe(classes -> {
 			graph.clear();
 		});
@@ -54,6 +52,7 @@ public class GraphCanvas implements UiComponent {
 		});
 		hub.distributeTestsSubscribe(levels -> {
 			graph.clear();
+			viewer.enableAutoLayout();
 			addGraphStyle(graph);
 			showNodes();
 		});
