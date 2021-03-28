@@ -48,6 +48,13 @@ public class Messages implements UiComponent {
 			displayCurrent();
 			updateButtonsState();
 		});
+		hub.errorMessageSubscribe(message -> {
+			index++;
+			Color color = new Color(220, 53, 69);
+			messages.add(new MessageModel(message, color));
+			displayCurrent();
+			updateButtonsState();
+		});
 		previous.addActionListener(new ActionListener() {
 
 			@Override
@@ -82,7 +89,7 @@ public class Messages implements UiComponent {
 	private void displayCurrent() {
 		MessageModel current = messages.get(index);
 		panel.setBackground(current.getColor());
-		label.setText(current.getMessage());
+		label.setText("<html>" + current.getMessage() + "</html>");
 	}
 
 	@Override

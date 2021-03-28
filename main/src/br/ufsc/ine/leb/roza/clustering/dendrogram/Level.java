@@ -7,6 +7,7 @@ import java.util.Set;
 
 import br.ufsc.ine.leb.roza.Cluster;
 import br.ufsc.ine.leb.roza.exceptions.NoNextLevelException;
+import br.ufsc.ine.leb.roza.exceptions.TiebreakException;
 
 public class Level {
 
@@ -53,8 +54,12 @@ public class Level {
 		if (!hasNextLevel()) {
 			return null;
 		}
-		Combination combination = getCombinationToNextLevel();
-		return linkage.evaluate(combination.getFirst(), combination.getSecond());
+		try {
+			Combination combination = getCombinationToNextLevel();
+			return linkage.evaluate(combination.getFirst(), combination.getSecond());
+		} catch (TiebreakException exception) {
+			return null;
+		}
 	}
 
 }

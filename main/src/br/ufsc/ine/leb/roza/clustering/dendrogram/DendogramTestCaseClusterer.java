@@ -36,10 +36,10 @@ public class DendogramTestCaseClusterer implements TestCaseClusterer {
 		while (level.hasNextLevel() && !criteria.shoudlStop(levels)) {
 			try {
 				level = level.generateNextLevel();
+				levels.add(level);
 			} catch (TiebreakException exception) {
 				throw new ClusteringLevelGenerationException(levels, exception);
 			}
-			levels.add(level);
 		}
 		return levels;
 	}
