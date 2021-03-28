@@ -24,13 +24,12 @@ public class ThresholdCriteriaComboBox implements UiComponent {
 		builder.add("Level Based Criteria", () -> hub.selectLevelBasedCriteriaPublish());
 		builder.add("Test per Class Criteria", () -> hub.selectTestsPerClassCriteriaPublish());
 		builder.add("Similarity Based Criteria", () -> hub.selectSimilarityBasedCriteriaPublish());
+		builder.add("Never stop", () -> hub.selectNeverStopCriteriaPublish());
 		combo = builder.build();
 		toolbar.addComponent(combo);
 		hub.loadTestClassesSubscribe(classes -> combo.setEnabled(false));
 		hub.extractTestCasesSubscribe(testCases -> combo.setEnabled(false));
 		hub.measureTestsSubscribe(similarityReport -> combo.setEnabled(true));
-		hub.startTestsDistributionSubscribe(levels -> combo.setEnabled(false));
-		hub.resetTestsDistributionSubscribe(()-> combo.setEnabled(true));
 	}
 
 	@Override
@@ -38,7 +37,7 @@ public class ThresholdCriteriaComboBox implements UiComponent {
 
 	@Override
 	public void start() {
-		combo.setSelectedIndex(2);
+		combo.setSelectedIndex(3);
 	}
 
 }

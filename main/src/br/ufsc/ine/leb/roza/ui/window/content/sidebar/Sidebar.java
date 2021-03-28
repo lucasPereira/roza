@@ -46,6 +46,10 @@ public class Sidebar implements UiComponent {
 			panel.setEnabledAt(2, true);
 			panel.setEnabledAt(3, false);
 		});
+		hub.distributeTestsSubscribe(levels -> {
+			panel.setSelectedIndex(3);
+			panel.setEnabledAt(3, true);
+		});
 	}
 
 	@Override

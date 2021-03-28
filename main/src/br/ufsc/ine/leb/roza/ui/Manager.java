@@ -8,10 +8,8 @@ import br.ufsc.ine.leb.roza.SimilarityReport;
 import br.ufsc.ine.leb.roza.TestCase;
 import br.ufsc.ine.leb.roza.TestClass;
 import br.ufsc.ine.leb.roza.TextFile;
-import br.ufsc.ine.leb.roza.clustering.dendrogram.ComposedCriteria;
 import br.ufsc.ine.leb.roza.clustering.dendrogram.DendogramTestCaseClusterer;
 import br.ufsc.ine.leb.roza.clustering.dendrogram.Level;
-import br.ufsc.ine.leb.roza.clustering.dendrogram.LevelBasedCriteria;
 import br.ufsc.ine.leb.roza.clustering.dendrogram.LinkageFactory;
 import br.ufsc.ine.leb.roza.clustering.dendrogram.Referee;
 import br.ufsc.ine.leb.roza.clustering.dendrogram.ThresholdCriteria;
@@ -90,8 +88,7 @@ public class Manager {
 	}
 
 	public List<Level> distributeTests() {
-		ThresholdCriteria composed = new ComposedCriteria(new LevelBasedCriteria(1), threshold);
-		DendogramTestCaseClusterer clustering = new DendogramTestCaseClusterer(linkageFactory.create(similarityReport), referee, composed);
+		DendogramTestCaseClusterer clustering = new DendogramTestCaseClusterer(linkageFactory.create(similarityReport), referee, threshold);
 		return clustering.generateLevels(similarityReport);
 	}
 

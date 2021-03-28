@@ -7,6 +7,7 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 
 import br.ufsc.ine.leb.roza.clustering.dendrogram.LevelBasedCriteria;
+import br.ufsc.ine.leb.roza.clustering.dendrogram.NeverStopCriteria;
 import br.ufsc.ine.leb.roza.clustering.dendrogram.SimilarityBasedCriteria;
 import br.ufsc.ine.leb.roza.clustering.dendrogram.TestsPerClassCriteria;
 import br.ufsc.ine.leb.roza.ui.Hub;
@@ -83,6 +84,12 @@ public class ThresholdCriteriaInputs implements UiComponent {
 			similarityBaseInput.setVisible(true);
 			manager.setThresholdCriteria(new SimilarityBasedCriteria(getBigDecimalValue(similarityBaseInput)));
 		});
+		hub.selectNeverStopCriteriaSubscribe(() -> {
+			levelBaseInput.setVisible(false);
+			testsPerClassInput.setVisible(false);
+			similarityBaseInput.setVisible(true);
+			manager.setThresholdCriteria(new NeverStopCriteria());
+		});
 	}
 
 	private void createToolbarEvents(Hub hub, JSpinner levelBaseInput, JSpinner testsPerClassInput, JSpinner similarityBaseInput) {
@@ -97,16 +104,6 @@ public class ThresholdCriteriaInputs implements UiComponent {
 			similarityBaseInput.setEnabled(false);
 		});
 		hub.measureTestsSubscribe(similarityReport -> {
-			levelBaseInput.setEnabled(true);
-			testsPerClassInput.setEnabled(true);
-			similarityBaseInput.setEnabled(true);
-		});
-		hub.startTestsDistributionSubscribe(levels -> {
-			levelBaseInput.setEnabled(false);
-			testsPerClassInput.setEnabled(false);
-			similarityBaseInput.setEnabled(false);
-		});
-		hub.resetTestsDistributionSubscribe(() -> {
 			levelBaseInput.setEnabled(true);
 			testsPerClassInput.setEnabled(true);
 			similarityBaseInput.setEnabled(true);

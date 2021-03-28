@@ -34,9 +34,10 @@ public class Hub {
 	private List<Runnable> selectLevelBasedCriteriaListeners;
 	private List<Runnable> selectTestsPerClassCriteriaListeners;
 	private List<Runnable> selectSimilarityBasedCriteriaListeners;
+	private List<Runnable> selectNeverStopCriteriaListeners;
 
-	private List<Consumer<List<Level>>> startTestsDistributionListeners;
-	private List<Runnable> resetTestsDistributionListeners;
+	private List<Consumer<List<Level>>> distributeTestsListeners;
+	private List<Consumer<Level>> selectLevelListeners;
 
 	private List<Consumer<String>> infoMessageListeners;
 	private List<Consumer<String>> errorMessageListeners;
@@ -63,9 +64,10 @@ public class Hub {
 		selectLevelBasedCriteriaListeners = new LinkedList<>();
 		selectTestsPerClassCriteriaListeners = new LinkedList<>();
 		selectSimilarityBasedCriteriaListeners = new LinkedList<>();
+		selectNeverStopCriteriaListeners = new LinkedList<>();
 
-		startTestsDistributionListeners = new LinkedList<>();
-		resetTestsDistributionListeners = new LinkedList<>();
+		distributeTestsListeners = new LinkedList<>();
+		selectLevelListeners = new LinkedList<>();
 
 		infoMessageListeners = new LinkedList<>();
 		errorMessageListeners = new LinkedList<>();
@@ -215,20 +217,28 @@ public class Hub {
 		selectSimilarityBasedCriteriaListeners.add(listener);
 	}
 
-	public void startTestsDistributionPublish(List<Level> levels) {
-		startTestsDistributionListeners.forEach(listener -> listener.accept(levels));
+	public void selectNeverStopCriteriaPublish() {
+		selectNeverStopCriteriaListeners.forEach(listener -> listener.run());
 	}
 
-	public void startTestsDistributionSubscribe(Consumer<List<Level>> listener) {
-		startTestsDistributionListeners.add(listener);
+	public void selectNeverStopCriteriaSubscribe(Runnable listener) {
+		selectNeverStopCriteriaListeners.add(listener);
 	}
 
-	public void resetTestsDistributionPublish() {
-		resetTestsDistributionListeners.forEach(listener -> listener.run());
+	public void distributeTestsPublish(List<Level> levels) {
+		distributeTestsListeners.forEach(listener -> listener.accept(levels));
 	}
 
-	public void resetTestsDistributionSubscribe(Runnable listener) {
-		resetTestsDistributionListeners.add(listener);
+	public void distributeTestsSubscribe(Consumer<List<Level>> listener) {
+		distributeTestsListeners.add(listener);
+	}
+
+	public void selectLevelPublish(Level level) {
+		selectLevelListeners.forEach(listener -> listener.accept(level));
+	}
+
+	public void selectLevelSubscribe(Consumer<Level> listener) {
+		selectLevelListeners.add(listener);
 	}
 
 	public void infoMessagePublish(String message) {

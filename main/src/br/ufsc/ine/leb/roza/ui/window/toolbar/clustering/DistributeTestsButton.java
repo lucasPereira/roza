@@ -9,27 +9,25 @@ import br.ufsc.ine.leb.roza.ui.Hub;
 import br.ufsc.ine.leb.roza.ui.Manager;
 import br.ufsc.ine.leb.roza.ui.UiComponent;
 
-public class StartTestsDistributionButton implements UiComponent {
+public class DistributeTestsButton implements UiComponent {
 
 	private ClusteringTab toolbar;
 
-	public StartTestsDistributionButton(ClusteringTab toolbar) {
+	public DistributeTestsButton(ClusteringTab toolbar) {
 		this.toolbar = toolbar;
 	}
 
 	@Override
 	public void init(Hub hub, Manager manager) {
-		JButton button = new JButton("Start Tests Distribution");
+		JButton button = new JButton("Distribute Tests");
 		button.setEnabled(false);
 		toolbar.addComponent(button);
 		hub.loadTestClassesSubscribe(classes -> button.setEnabled(false));
 		hub.extractTestCasesSubscribe(testCases -> button.setEnabled(false));
 		hub.measureTestsSubscribe(similarityReport -> button.setEnabled(true));
-		hub.resetTestsDistributionSubscribe(()-> button.setEnabled(true));
 		button.addActionListener(event -> {
-			button.setEnabled(false);
 			List<Level> levels= manager.distributeTests();
-			hub.startTestsDistributionPublish(levels);
+			hub.distributeTestsPublish(levels);
 			hub.infoMessagePublish(String.format("Clustering started"));
 		});
 	}

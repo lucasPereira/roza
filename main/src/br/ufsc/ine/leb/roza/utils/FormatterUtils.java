@@ -9,7 +9,7 @@ public class FormatterUtils {
 
 	public String bigDecimal(BigDecimal value) {
 		DecimalFormat formatter = new DecimalFormat();
-		formatter.setMaximumFractionDigits(Integer.MAX_VALUE);
+		formatter.setMaximumFractionDigits(2);
 		return formatter.format(value);
 	}
 
