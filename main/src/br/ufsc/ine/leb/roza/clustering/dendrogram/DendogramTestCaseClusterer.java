@@ -7,6 +7,8 @@ import java.util.Set;
 import br.ufsc.ine.leb.roza.Cluster;
 import br.ufsc.ine.leb.roza.SimilarityReport;
 import br.ufsc.ine.leb.roza.clustering.TestCaseClusterer;
+import br.ufsc.ine.leb.roza.exceptions.ClusteringLevelGenerationException;
+import br.ufsc.ine.leb.roza.exceptions.TiebreakException;
 
 public class DendogramTestCaseClusterer implements TestCaseClusterer {
 
@@ -32,7 +34,11 @@ public class DendogramTestCaseClusterer implements TestCaseClusterer {
 		Level level = new Level(linkage, referee, clusters);
 		levels.add(level);
 		while (level.hasNextLevel() && !criteria.shoudlStop(levels)) {
-			level = level.generateNextLevel();
+			try {
+				level = level.generateNextLevel();
+			} catch (TiebreakException exception) {
+				throw new ClusteringLevelGenerationException(levels, exception);
+			}
 			levels.add(level);
 		}
 		return levels;

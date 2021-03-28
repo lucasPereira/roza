@@ -38,7 +38,7 @@ class ClusterJoiner {
 
 	private Combination choose(Set<Combination> choosed) {
 		if (choosed.size() == 0) {
-			throw new TiebreakException();
+			throw new TiebreakException(choosed);
 		} else if (choosed.size() == 1) {
 			return choosed.iterator().next();
 		} else {
@@ -49,11 +49,11 @@ class ClusterJoiner {
 	private Combination untie(Set<Combination> choosed) {
 		Set<Combination> tiebreak = referee.untie(choosed);
 		if (tiebreak.size() == 0) {
-			throw new TiebreakException();
+			throw new TiebreakException(tiebreak);
 		} else if (tiebreak.size() == 1) {
 			return tiebreak.iterator().next();
 		} else {
-			throw new TiebreakException();
+			throw new TiebreakException(tiebreak);
 		}
 	}
 

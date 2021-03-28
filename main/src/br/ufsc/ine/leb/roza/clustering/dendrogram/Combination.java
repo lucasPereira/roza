@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 import br.ufsc.ine.leb.roza.Cluster;
 
-class Combination {
+public class Combination {
 
 	private Cluster first;
 	private Cluster second;

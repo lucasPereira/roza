@@ -2,6 +2,7 @@ package br.ufsc.ine.leb.roza.clustering.dendrogram;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -117,9 +118,12 @@ class ClusterJoinerWithSingleLinkageAndInsecureRefereeTest {
 		builder.add(gamma, alpha, dotNine).add(gamma, beta, dotFive);
 		SimilarityReport report = builder.build();
 		ClustersToMerge clusters = new ClustersToMerge(collectionUtils.set(alphaCluster, betaCluster, gammaCluster));
-		assertThrows(TiebreakException.class, () -> {
+		TiebreakException exception = assertThrows(TiebreakException.class, () -> {
 			new ClusterJoiner(new SingleLinkage(report), new InsecureReferee()).join(clusters);
 		});
+		assertEquals(2, exception.getTies().size());
+		assertTrue(exception.getTies().contains(new Combination(alphaCluster, gammaCluster)));
+		assertTrue(exception.getTies().contains(new Combination(betaCluster, gammaCluster)));
 	}
 
 }
