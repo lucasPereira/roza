@@ -50,7 +50,7 @@ public class Messages implements UiComponent {
 		});
 		hub.errorMessageSubscribe(message -> {
 			index++;
-			Color color = new Color(220, 53, 69);
+			Color color = new Color(220, 53, 69, 64);
 			messages.add(new MessageModel(message, color));
 			displayCurrent();
 			updateButtonsState();
