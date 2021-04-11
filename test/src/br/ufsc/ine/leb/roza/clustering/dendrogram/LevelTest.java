@@ -39,6 +39,7 @@ class LevelTest {
 	@Test
 	void empty() throws Exception {
 		Level one = new Level(linkage, referee, collectionUtils.set());
+		assertEquals(0, one.getStep());
 		assertFalse(one.hasNextLevel());
 		assertEquals(0, one.getClusters().size());
 		assertNull(one.getCombinationToNextLevel());
@@ -50,6 +51,7 @@ class LevelTest {
 		Cluster alphaCluster = new Cluster(alpha);
 
 		Level one = new Level(linkage, referee, collectionUtils.set(alphaCluster));
+		assertEquals(0, one.getStep());
 		assertFalse(one.hasNextLevel());
 		assertEquals(1, one.getClusters().size());
 		assertTrue(one.getClusters().contains(alphaCluster));
@@ -64,6 +66,7 @@ class LevelTest {
 		Cluster alphaBetaCluster = alphaCluster.merge(betaCluster);
 
 		Level one = new Level(linkage, referee, collectionUtils.set(alphaCluster, betaCluster));
+		assertEquals(0, one.getStep());
 		assertTrue(one.hasNextLevel());
 		assertEquals(2, one.getClusters().size());
 		assertTrue(one.getClusters().contains(alphaCluster));
@@ -72,6 +75,7 @@ class LevelTest {
 		assertEquals(new MathUtils().oneOver(alpha.getId(), beta.getId()), one.getEvaluationToNextLevel());
 
 		Level two = one.generateNextLevel();
+		assertEquals(1, two.getStep());
 		assertFalse(two.hasNextLevel());
 		assertEquals(1, two.getClusters().size());
 		assertTrue(two.getClusters().contains(alphaBetaCluster));
@@ -88,6 +92,7 @@ class LevelTest {
 		Cluster alphaBetaGammaCluster = alphaBetaCluster.merge(gammaCluster);
 
 		Level one = new Level(linkage, referee, collectionUtils.set(alphaCluster, betaCluster, gammaCluster));
+		assertEquals(0, one.getStep());
 		assertTrue(one.hasNextLevel());
 		assertTrue(one.getClusters().contains(alphaCluster));
 		assertTrue(one.getClusters().contains(betaCluster));
@@ -96,6 +101,7 @@ class LevelTest {
 		assertEquals(new MathUtils().oneOver(alpha.getId(), beta.getId()), one.getEvaluationToNextLevel());
 
 		Level two = one.generateNextLevel();
+		assertEquals(1, two.getStep());
 		assertTrue(two.hasNextLevel());
 		assertEquals(2, two.getClusters().size());
 		assertTrue(two.getClusters().contains(alphaBetaCluster));
@@ -104,6 +110,7 @@ class LevelTest {
 		assertEquals(new MathUtils().oneOver(alpha.getId(), beta.getId(), gamma.getId()), two.getEvaluationToNextLevel());
 
 		Level three = two.generateNextLevel();
+		assertEquals(2, three.getStep());
 		assertFalse(three.hasNextLevel());
 		assertEquals(1, three.getClusters().size());
 		assertTrue(three.getClusters().contains(alphaBetaGammaCluster));

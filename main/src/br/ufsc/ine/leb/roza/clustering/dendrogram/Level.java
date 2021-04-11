@@ -14,11 +14,18 @@ public class Level {
 	private Linkage linkage;
 	private Referee referee;
 	private Set<Cluster> clusters;
+	private Integer step;
 
 	public Level(Linkage linkage, Referee referee, Set<Cluster> clusters) {
 		this.linkage = linkage;
 		this.referee = referee;
 		this.clusters = clusters;
+		this.step = 0;
+	}
+
+	private Level(Integer step, Linkage linkage, Referee referee, Set<Cluster> next) {
+		this(linkage, referee, next);
+		this.step = step;
 	}
 
 	public Boolean hasNextLevel() {
@@ -36,7 +43,7 @@ public class Level {
 		Cluster merged = first.merge(second);
 		next.add(merged);
 		clusters.stream().filter((cluster) -> !cluster.equals(first) && !cluster.equals(second)).forEach((cluster) -> next.add(cluster));
-		return new Level(linkage, referee, next);
+		return new Level(step + 1, linkage, referee, next);
 	}
 
 	public Set<Cluster> getClusters() {
@@ -60,6 +67,10 @@ public class Level {
 		} catch (TiebreakException exception) {
 			return null;
 		}
+	}
+
+	public Integer getStep() {
+		return step;
 	}
 
 }
