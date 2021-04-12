@@ -2,7 +2,7 @@ package br.ufsc.ine.leb.roza.exceptions;
 
 import java.util.List;
 
-import br.ufsc.ine.leb.roza.clustering.dendrogram.Level;
+import br.ufsc.ine.leb.roza.clustering.Level;
 
 public class ClusteringLevelGenerationException extends RuntimeException {
 

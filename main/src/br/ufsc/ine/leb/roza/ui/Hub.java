@@ -8,7 +8,7 @@ import br.ufsc.ine.leb.roza.SimilarityAssessment;
 import br.ufsc.ine.leb.roza.SimilarityReport;
 import br.ufsc.ine.leb.roza.TestCase;
 import br.ufsc.ine.leb.roza.TestClass;
-import br.ufsc.ine.leb.roza.clustering.dendrogram.Level;
+import br.ufsc.ine.leb.roza.clustering.Level;
 import br.ufsc.ine.leb.roza.ui.model.DeckardSettingsConsumer;
 
 public class Hub {

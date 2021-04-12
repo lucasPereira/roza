@@ -2,7 +2,7 @@ package br.ufsc.ine.leb.roza.exceptions;
 
 import java.util.Set;
 
-import br.ufsc.ine.leb.roza.clustering.dendrogram.Combination;
+import br.ufsc.ine.leb.roza.clustering.Combination;
 
 public class TiebreakException extends RuntimeException {
 

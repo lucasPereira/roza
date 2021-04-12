@@ -6,10 +6,10 @@ import java.util.List;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 
-import br.ufsc.ine.leb.roza.clustering.dendrogram.LevelBasedCriteria;
-import br.ufsc.ine.leb.roza.clustering.dendrogram.NeverStopCriteria;
-import br.ufsc.ine.leb.roza.clustering.dendrogram.SimilarityBasedCriteria;
-import br.ufsc.ine.leb.roza.clustering.dendrogram.TestsPerClassCriteria;
+import br.ufsc.ine.leb.roza.clustering.LevelBasedCriteria;
+import br.ufsc.ine.leb.roza.clustering.NeverStopCriteria;
+import br.ufsc.ine.leb.roza.clustering.SimilarityBasedCriteria;
+import br.ufsc.ine.leb.roza.clustering.TestsPerClassCriteria;
 import br.ufsc.ine.leb.roza.ui.Hub;
 import br.ufsc.ine.leb.roza.ui.Manager;
 import br.ufsc.ine.leb.roza.ui.UiComponent;

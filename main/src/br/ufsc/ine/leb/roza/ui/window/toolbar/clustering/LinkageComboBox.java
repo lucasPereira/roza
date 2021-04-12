@@ -4,10 +4,10 @@ import java.util.List;
 
 import javax.swing.JComboBox;
 
-import br.ufsc.ine.leb.roza.clustering.dendrogram.AverageLinkageFactory;
-import br.ufsc.ine.leb.roza.clustering.dendrogram.CompleteLinkageFactory;
-import br.ufsc.ine.leb.roza.clustering.dendrogram.SingleLinkageFactory;
-import br.ufsc.ine.leb.roza.clustering.dendrogram.SumOfIdsLinkageFactory;
+import br.ufsc.ine.leb.roza.clustering.AverageLinkageFactory;
+import br.ufsc.ine.leb.roza.clustering.CompleteLinkageFactory;
+import br.ufsc.ine.leb.roza.clustering.SingleLinkageFactory;
+import br.ufsc.ine.leb.roza.clustering.SumOfIdsLinkageFactory;
 import br.ufsc.ine.leb.roza.ui.Hub;
 import br.ufsc.ine.leb.roza.ui.Manager;
 import br.ufsc.ine.leb.roza.ui.UiComponent;
