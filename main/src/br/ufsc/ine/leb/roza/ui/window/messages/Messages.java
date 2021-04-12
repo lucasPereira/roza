@@ -10,6 +10,7 @@ import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
 
 import br.ufsc.ine.leb.roza.ui.Hub;
 import br.ufsc.ine.leb.roza.ui.Manager;
@@ -23,9 +24,10 @@ public class Messages implements UiComponent {
 	private List<MessageModel> messages;
 	private Integer index;
 	private JPanel panel;
-	private JLabel label;
+	private JLabel messageLabel;
 	private JButton previous;
 	private JButton next;
+	private JLabel counterLabel;
 
 	public Messages(Window window) {
 		this.window = window;
@@ -36,7 +38,8 @@ public class Messages implements UiComponent {
 	@Override
 	public void init(Hub hub, Manager manager) {
 		panel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-		label = new JLabel("Sem mensagens");
+		messageLabel = new JLabel("Sem mensagens");
+		counterLabel = new JLabel("-");
 		previous = new JButton("<");
 		next = new JButton(">");
 		previous.setEnabled(false);
@@ -75,9 +78,14 @@ public class Messages implements UiComponent {
 			}
 
 		});
-		panel.add(label);
+		counterLabel.setBackground(Color.DARK_GRAY);
+		counterLabel.setOpaque(true);
+		counterLabel.setBorder(new EmptyBorder(5, 10, 5, 10));
+		counterLabel.setForeground(Color.WHITE);
+		panel.add(messageLabel);
 		panel.add(previous);
 		panel.add(next);
+		panel.add(counterLabel);
 		window.addTopComponent(panel);
 	}
 
@@ -88,8 +96,9 @@ public class Messages implements UiComponent {
 
 	private void displayCurrent() {
 		MessageModel current = messages.get(index);
+		counterLabel.setText(String.format("%d of %d", index + 1 , messages.size()));
 		panel.setBackground(current.getColor());
-		label.setText("<html>" + current.getMessage() + "</html>");
+		messageLabel.setText("<html>" + current.getMessage() + "</html>");
 	}
 
 	@Override
