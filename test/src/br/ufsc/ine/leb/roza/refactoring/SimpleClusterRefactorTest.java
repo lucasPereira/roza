@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import br.ufsc.ine.leb.roza.Cluster;
@@ -15,9 +16,17 @@ import br.ufsc.ine.leb.roza.TestClass;
 
 public class SimpleClusterRefactorTest {
 
+	private TestClassNamingStrategy namingStrategy;
+	private ClusterRefactor refactor;
+
+	@BeforeEach
+	void setup() {
+		namingStrategy = new IncrementalTestClassNamingStrategy();
+		refactor = new SimpleClusterRefactor(namingStrategy);
+	}
+
 	@Test
 	void withoutClusters() throws Exception {
-		SimpleClusterRefactor refactor = new SimpleClusterRefactor();
 		List<TestClass> classes = refactor.refactor(new HashSet<>());
 		assertEquals(0, classes.size());
 	}
@@ -28,7 +37,6 @@ public class SimpleClusterRefactorTest {
 		Cluster alphaCluster = new Cluster(alpha);
 		Set<Cluster> clusters = new HashSet<>();
 		clusters.add(alphaCluster);
-		SimpleClusterRefactor refactor = new SimpleClusterRefactor();
 		List<TestClass> classes = refactor.refactor(clusters);
 
 		assertEquals(1, classes.size());
@@ -49,7 +57,6 @@ public class SimpleClusterRefactorTest {
 		Cluster alphaBetaCluster = alphaCluster.merge(betaCluster);
 		Set<Cluster> clusters = new HashSet<>();
 		clusters.add(alphaBetaCluster);
-		SimpleClusterRefactor refactor = new SimpleClusterRefactor();
 		List<TestClass> classes = refactor.refactor(clusters);
 
 		assertEquals(1, classes.size());
@@ -72,7 +79,6 @@ public class SimpleClusterRefactorTest {
 		Set<Cluster> clusters = new HashSet<>();
 		clusters.add(alphaCluster);
 		clusters.add(betaCluster);
-		SimpleClusterRefactor refactor = new SimpleClusterRefactor();
 		List<TestClass> classes = refactor.refactor(clusters);
 
 		assertEquals(2, classes.size());
