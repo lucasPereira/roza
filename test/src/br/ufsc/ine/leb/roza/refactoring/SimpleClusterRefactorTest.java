@@ -162,7 +162,7 @@ public class SimpleClusterRefactorTest {
 	}
 
 	@Test
-	void oneClustersWithTwoNonEmptyTestsAndReusableFixture() throws Exception {
+	void oneClustersWithTwoNonEmptyTestsAndReusableStatement() throws Exception {
 		Statement fixtureAlpha = new Statement("System.out.println(0);");
 		Statement assertionAlpha = new Statement("assertTrue(true);");
 		TestCase alpha = new TestCase("alpha", Arrays.asList(fixtureAlpha), Arrays.asList(assertionAlpha));
@@ -187,6 +187,46 @@ public class SimpleClusterRefactorTest {
 		assertEquals(1, classes.get(0).getSetupMethods().get(0).getStatements().size());
 		assertEquals(fixtureAlpha, classes.get(0).getSetupMethods().get(0).getStatements().get(0));
 		assertEquals(fixtureBeta, classes.get(0).getSetupMethods().get(0).getStatements().get(0));
+		assertEquals(2, classes.get(0).getTestMethods().size());
+
+		assertEquals("alpha", classes.get(0).getTestMethods().get(0).getName());
+		assertEquals(1, classes.get(0).getTestMethods().get(0).getStatements().size());
+		assertEquals(assertionAlpha, classes.get(0).getTestMethods().get(0).getStatements().get(0));
+
+		assertEquals("beta", classes.get(0).getTestMethods().get(1).getName());
+		assertEquals(1, classes.get(0).getTestMethods().get(1).getStatements().size());
+		assertEquals(assertionBeta, classes.get(0).getTestMethods().get(1).getStatements().get(0));
+	}
+
+	@Test
+	void oneClustersWithTwoNonEmptyTestsAndReusableStatementAndFixture() throws Exception {
+		Statement fixtureAlpha = new Statement("Integer value = 10;");
+		Statement assertionAlpha = new Statement("assertEquals(value, 10);");
+		TestCase alpha = new TestCase("alpha", Arrays.asList(fixtureAlpha), Arrays.asList(assertionAlpha));
+		Cluster alphaCluster = new Cluster(alpha);
+
+		Statement fixtureBeta = new Statement("Integer value = 10;");
+		Statement assertionBeta = new Statement("assertEquals(\"10\", value.toString());");
+		TestCase beta = new TestCase("beta", Arrays.asList(fixtureBeta), Arrays.asList(assertionBeta));
+		Cluster betaCluster = new Cluster(beta);
+
+		Statement fixture = new Statement("value = 10;");
+
+		Cluster alphaBetaCluster = alphaCluster.merge(betaCluster);
+		Set<Cluster> clusters = new HashSet<>();
+		clusters.add(alphaBetaCluster);
+		List<TestClass> classes = refactor.refactor(clusters);
+
+		assertEquals(1, classes.size());
+
+		assertEquals("RefactoredTestClass1", classes.get(0).getName());
+		assertEquals(1, classes.get(0).getFields().size());
+		assertEquals("Integer", classes.get(0).getFields().get(0).getType());
+		assertEquals("value", classes.get(0).getFields().get(0).getName());
+		assertEquals(1, classes.get(0).getSetupMethods().size());
+		assertEquals("setup", classes.get(0).getSetupMethods().get(0).getName());
+		assertEquals(1, classes.get(0).getSetupMethods().get(0).getStatements().size());
+		assertEquals(fixture, classes.get(0).getSetupMethods().get(0).getStatements().get(0));
 		assertEquals(2, classes.get(0).getTestMethods().size());
 
 		assertEquals("alpha", classes.get(0).getTestMethods().get(0).getName());

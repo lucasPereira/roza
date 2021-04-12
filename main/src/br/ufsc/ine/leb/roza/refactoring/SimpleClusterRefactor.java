@@ -1,12 +1,15 @@
 package br.ufsc.ine.leb.roza.refactoring;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import com.github.javaparser.JavaParser;
+import com.github.javaparser.ast.expr.VariableDeclarationExpr;
 
 import br.ufsc.ine.leb.roza.Cluster;
 import br.ufsc.ine.leb.roza.Field;
@@ -48,12 +51,21 @@ public class SimpleClusterRefactor implements ClusterRefactor {
 				TestMethod testMethod = new TestMethod(testCase.getName(), testMethodStatements);
 				testMethods.add(testMethod);
 			}
+			List<Field> fields = new LinkedList<>();
 			List<SetupMethod> setupMethods = new LinkedList<>();
 			if (!sharedFixtures.isEmpty()) {
+				for (Integer index = 0; index < sharedFixtures.size(); index++) {
+					Statement statement = sharedFixtures.get(index);
+					Optional<VariableDeclarationExpr> declaration = JavaParser.parseStatement(statement.getText()).toExpressionStmt().get().getExpression().toVariableDeclarationExpr();
+					if (declaration.isPresent()) {
+						VariableDeclarationExpr declarationExpression = declaration.get();
+						sharedFixtures.set(index, new Statement(declarationExpression.getVariable(0).toString() + ";"));
+						fields.add(new Field(declarationExpression.getElementType().asString(), declarationExpression.getVariable(0).getNameAsString()));
+					}
+				}
 				SetupMethod setup = new SetupMethod("setup", sharedFixtures);
 				setupMethods.add(setup);
 			}
-			List<Field> fields = Arrays.asList();
 			String className = namingStrategy.nominate(fields, setupMethods, testMethods);
 			TestClass testClass = new TestClass(className, fields, setupMethods, testMethods);
 			classes.add(testClass);
