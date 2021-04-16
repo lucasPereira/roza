@@ -10,6 +10,7 @@ import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.printer.PrettyPrinterConfiguration;
 
 import br.ufsc.ine.leb.roza.Field;
@@ -58,7 +59,12 @@ public class JunitTestClassParser implements TestClassParser {
 			String type = parsedField.getElementType().asString();
 			parsedField.getVariables().forEach((parsedVariable) -> {
 				String filedName = parsedVariable.getName().asString();
-				fields.add(new Field(type, filedName));
+				if (parsedVariable.getInitializer().isPresent()) {
+					Expression initialization = parsedVariable.getInitializer().get();
+					fields.add(new Field(type, filedName, new Statement(initialization.toString() + ";")));
+				} else {
+					fields.add(new Field(type, filedName));
+				}
 			});
 		});
 		return fields;
@@ -83,11 +89,11 @@ public class JunitTestClassParser implements TestClassParser {
 	}
 
 	private List<Statement> extractStatements(MethodDeclaration parsedMethod) {
+		PrettyPrinterConfiguration configuration = new PrettyPrinterConfiguration();
+		configuration.setEndOfLineCharacter(" ");
+		configuration.setIndentSize(0);
 		List<Statement> statements = new LinkedList<>();
 		parsedMethod.getBody().get().getChildNodes().forEach((node) -> {
-			PrettyPrinterConfiguration configuration = new PrettyPrinterConfiguration();
-			configuration.setEndOfLineCharacter(" ");
-			configuration.setIndentSize(0);
 			statements.add(new Statement(node.toString(configuration)));
 		});
 		return statements;
