@@ -176,12 +176,13 @@ class Junit5TestClassParserTest {
 		assertEquals(0, testClasses.get(0).getSetupMethods().size());
 		assertEquals(1, testClasses.get(0).getTestMethods().size());
 		assertEquals("example", testClasses.get(0).getTestMethods().get(0).getName());
-		assertEquals(5, testClasses.get(0).getTestMethods().get(0).getStatements().size());
+		assertEquals(6, testClasses.get(0).getTestMethods().get(0).getStatements().size());
 		assertEquals("Integer firstFixture = 10;", testClasses.get(0).getTestMethods().get(0).getStatements().get(0).getText());
 		assertEquals("List<Integer> secondFixture = new ArrayList<>();", testClasses.get(0).getTestMethods().get(0).getStatements().get(1).getText());
-		assertEquals("Integer thirdFixture = 30, fourthFixture = 40;", testClasses.get(0).getTestMethods().get(0).getStatements().get(2).getText());
-		assertEquals("Integer fifthFixture;", testClasses.get(0).getTestMethods().get(0).getStatements().get(3).getText());
-		assertEquals("fourthField = 40;", testClasses.get(0).getTestMethods().get(0).getStatements().get(4).getText());
+		assertEquals("Integer thirdFixture = 30;", testClasses.get(0).getTestMethods().get(0).getStatements().get(2).getText());
+		assertEquals("Integer fourthFixture = 40;", testClasses.get(0).getTestMethods().get(0).getStatements().get(3).getText());
+		assertEquals("Integer fifthFixture;", testClasses.get(0).getTestMethods().get(0).getStatements().get(4).getText());
+		assertEquals("fourthField = 40;", testClasses.get(0).getTestMethods().get(0).getStatements().get(5).getText());
 	}
 
 }

@@ -10,7 +10,12 @@ import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.expr.Expression;
+import com.github.javaparser.ast.expr.SimpleName;
+import com.github.javaparser.ast.expr.VariableDeclarationExpr;
+import com.github.javaparser.ast.stmt.ExpressionStmt;
+import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.printer.PrettyPrinterConfiguration;
 
 import br.ufsc.ine.leb.roza.Field;
@@ -93,8 +98,31 @@ public class JunitTestClassParser implements TestClassParser {
 		configuration.setEndOfLineCharacter(" ");
 		configuration.setIndentSize(0);
 		List<Statement> statements = new LinkedList<>();
-		parsedMethod.getBody().get().getChildNodes().forEach((node) -> {
-			statements.add(new Statement(node.toString(configuration)));
+		parsedMethod.getBody().get().getStatements().forEach(statement -> {
+			if (statement.isExpressionStmt()) {
+				ExpressionStmt expression = statement.asExpressionStmt();
+				List<VariableDeclarationExpr> variableDeclarations = expression.findAll(VariableDeclarationExpr.class);
+				if (variableDeclarations.isEmpty()) {
+					statements.add(new Statement(statement.toString(configuration)));
+				} else {
+					variableDeclarations.forEach(variableDeclaration -> {
+						Type type = variableDeclaration.getElementType();
+						variableDeclaration.getVariables().forEach(variable -> {
+							SimpleName name = variable.getName();
+							Optional<Expression> initializer = variable.getInitializer();
+							if (initializer.isPresent()) {
+								VariableDeclarationExpr newStatement = new VariableDeclarationExpr(new VariableDeclarator(type, name, initializer.get()));
+								statements.add(new Statement(newStatement.toString(configuration) + ";"));
+							} else {
+								VariableDeclarationExpr newStatement = new VariableDeclarationExpr(new VariableDeclarator(type, name));
+								statements.add(new Statement(newStatement.toString(configuration) + ";"));
+							}
+						});
+					});
+				}
+			} else {
+				statements.add(new Statement(statement.toString(configuration)));
+			}
 		});
 		return statements;
 	}
