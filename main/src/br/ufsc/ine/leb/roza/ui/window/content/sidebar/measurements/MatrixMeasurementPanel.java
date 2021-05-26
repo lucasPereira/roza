@@ -5,6 +5,7 @@ import java.awt.event.MouseEvent;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableModel;
@@ -27,8 +28,10 @@ public class MatrixMeasurementPanel implements UiComponent {
 	@Override
 	public void init(Hub hub, Manager manager) {
 		JTable table = new JTable();
+		JScrollPane scroll = new JScrollPane(table);
 		table.setDefaultRenderer(SimilarityAssessment.class, new SimilarityAssessmentRenderer());
-		measurementsTab.addMiddleComponent(table);
+		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+		measurementsTab.addMiddleComponent(scroll);
 		hub.loadTestClassesSubscribe(testClasses -> {
 			reset(table);
 		});
@@ -52,6 +55,7 @@ public class MatrixMeasurementPanel implements UiComponent {
 		});
 		table.setCellSelectionEnabled(true);
 		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
 	}
 
 	private void reset(JTable table) {
