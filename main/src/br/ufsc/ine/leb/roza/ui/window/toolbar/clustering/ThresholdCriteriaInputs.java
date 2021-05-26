@@ -16,7 +16,14 @@ import br.ufsc.ine.leb.roza.ui.UiComponent;
 
 public class ThresholdCriteriaInputs implements UiComponent {
 
+	private Hub hub;
+	private Manager manager;
+
 	private ClusteringTab toolbar;
+
+	private JSpinner levelInput;
+	private JSpinner testsPerClassInput;
+	private JSpinner similarityInput;
 
 	public ThresholdCriteriaInputs(ClusteringTab toolbar) {
 		this.toolbar = toolbar;
@@ -24,34 +31,21 @@ public class ThresholdCriteriaInputs implements UiComponent {
 
 	@Override
 	public void init(Hub hub, Manager manager) {
-		JSpinner levelBaseInput = new JSpinner(new SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 1));
-		JSpinner testsPerClassInput = new JSpinner(new SpinnerNumberModel(1, 1, Integer.MAX_VALUE, 1));
-		JSpinner similarityBaseInput = new JSpinner(new SpinnerNumberModel(0.5, 0.0, 1.0, 0.1));
-		similarityBaseInput.setPreferredSize(levelBaseInput.getPreferredSize());
-		levelBaseInput.setVisible(false);
+		this.hub = hub;
+		this.manager = manager;
+		levelInput = new JSpinner(new SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 1));
+		testsPerClassInput = new JSpinner(new SpinnerNumberModel(1, 1, Integer.MAX_VALUE, 1));
+		similarityInput = new JSpinner(new SpinnerNumberModel(0.5, 0.0, 1.0, 0.1));
+		similarityInput.setPreferredSize(levelInput.getPreferredSize());
+		levelInput.setVisible(false);
 		testsPerClassInput.setVisible(false);
-		similarityBaseInput.setVisible(false);
-		createToolbarEvents(hub, levelBaseInput, testsPerClassInput, similarityBaseInput);
-		createSelectionEvents(hub, manager, levelBaseInput, testsPerClassInput, similarityBaseInput);
-		createValueChangedEvents(manager, levelBaseInput, testsPerClassInput, similarityBaseInput);
-		toolbar.addComponent(levelBaseInput);
+		similarityInput.setVisible(false);
+		createValueChangedEvents();
+		createSelectionEvents();
+		createToolbarEvents();
+		toolbar.addComponent(levelInput);
 		toolbar.addComponent(testsPerClassInput);
-		toolbar.addComponent(similarityBaseInput);
-	}
-
-	private void createValueChangedEvents(Manager manager, JSpinner levelBaseInput, JSpinner testsPerClassInput, JSpinner similarityBaseInput) {
-		levelBaseInput.addChangeListener((evento) -> {
-			Integer valor = getIntegerValue(levelBaseInput);
-			manager.setThresholdCriteria(new LevelBasedCriteria(valor));
-		});
-		testsPerClassInput.addChangeListener((evento) -> {
-			Integer valor = getIntegerValue(testsPerClassInput);
-			manager.setThresholdCriteria(new TestsPerClassCriteria(valor));
-		});
-		similarityBaseInput.addChangeListener((evento) -> {
-			BigDecimal convertido = getBigDecimalValue(similarityBaseInput);
-			manager.setThresholdCriteria(new SimilarityBasedCriteria(convertido));
-		});
+		toolbar.addComponent(similarityInput);
 	}
 
 	private BigDecimal getBigDecimalValue(JSpinner spiner) {
@@ -65,48 +59,63 @@ public class ThresholdCriteriaInputs implements UiComponent {
 		return valor;
 	}
 
-	private void createSelectionEvents(Hub hub, Manager manager, JSpinner levelBaseInput, JSpinner testsPerClassInput, JSpinner similarityBaseInput) {
+	private void createValueChangedEvents() {
+		levelInput.addChangeListener((evento) -> {
+			Integer valor = getIntegerValue(levelInput);
+			manager.setThresholdCriteria(new LevelBasedCriteria(valor));
+		});
+		testsPerClassInput.addChangeListener((evento) -> {
+			Integer valor = getIntegerValue(testsPerClassInput);
+			manager.setThresholdCriteria(new TestsPerClassCriteria(valor));
+		});
+		similarityInput.addChangeListener((evento) -> {
+			BigDecimal convertido = getBigDecimalValue(similarityInput);
+			manager.setThresholdCriteria(new SimilarityBasedCriteria(convertido));
+		});
+	}
+
+	private void createSelectionEvents() {
 		hub.selectLevelBasedCriteriaSubscribe(() -> {
-			levelBaseInput.setVisible(true);
+			levelInput.setVisible(true);
 			testsPerClassInput.setVisible(false);
-			similarityBaseInput.setVisible(false);
-			manager.setThresholdCriteria(new LevelBasedCriteria(getIntegerValue(levelBaseInput)));
+			similarityInput.setVisible(false);
+			manager.setThresholdCriteria(new LevelBasedCriteria(getIntegerValue(levelInput)));
 		});
 		hub.selectTestsPerClassCriteriaSubscribe(() -> {
-			levelBaseInput.setVisible(false);
+			levelInput.setVisible(false);
 			testsPerClassInput.setVisible(true);
-			similarityBaseInput.setVisible(false);
+			similarityInput.setVisible(false);
 			manager.setThresholdCriteria(new TestsPerClassCriteria(getIntegerValue(testsPerClassInput)));
 		});
 		hub.selectSimilarityBasedCriteriaSubscribe(() -> {
-			levelBaseInput.setVisible(false);
+			levelInput.setVisible(false);
 			testsPerClassInput.setVisible(false);
-			similarityBaseInput.setVisible(true);
-			manager.setThresholdCriteria(new SimilarityBasedCriteria(getBigDecimalValue(similarityBaseInput)));
+			similarityInput.setVisible(true);
+			manager.setThresholdCriteria(new SimilarityBasedCriteria(getBigDecimalValue(similarityInput)));
 		});
 		hub.selectNeverStopCriteriaSubscribe(() -> {
-			levelBaseInput.setVisible(false);
+			levelInput.setVisible(false);
 			testsPerClassInput.setVisible(false);
-			similarityBaseInput.setVisible(true);
+			similarityInput.setVisible(false);
 			manager.setThresholdCriteria(new NeverStopCriteria());
 		});
 	}
 
-	private void createToolbarEvents(Hub hub, JSpinner levelBaseInput, JSpinner testsPerClassInput, JSpinner similarityBaseInput) {
+	private void createToolbarEvents() {
 		hub.loadTestClassesSubscribe(classes -> {
-			levelBaseInput.setEnabled(false);
+			levelInput.setEnabled(false);
 			testsPerClassInput.setEnabled(false);
-			similarityBaseInput.setEnabled(false);
+			similarityInput.setEnabled(false);
 		});
 		hub.extractTestCasesSubscribe(testCases -> {
-			levelBaseInput.setEnabled(false);
+			levelInput.setEnabled(false);
 			testsPerClassInput.setEnabled(false);
-			similarityBaseInput.setEnabled(false);
+			similarityInput.setEnabled(false);
 		});
 		hub.measureTestsSubscribe(similarityReport -> {
-			levelBaseInput.setEnabled(true);
+			levelInput.setEnabled(true);
 			testsPerClassInput.setEnabled(true);
-			similarityBaseInput.setEnabled(true);
+			similarityInput.setEnabled(true);
 		});
 	}
 
