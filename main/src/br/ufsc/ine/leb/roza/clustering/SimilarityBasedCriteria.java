@@ -1,7 +1,6 @@
 package br.ufsc.ine.leb.roza.clustering;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 import br.ufsc.ine.leb.roza.exceptions.InvalidThresholdException;
 
@@ -17,16 +16,8 @@ public class SimilarityBasedCriteria implements ThresholdCriteria {
 	}
 
 	@Override
-	public Boolean shoudlStop(List<Level> levels) {
-		for (Level level : levels) {
-			if (level.hasNextLevel()) {
-				BigDecimal evaluationToNextLevel = level.getEvaluationToNextLevel();
-				if (threshold.compareTo(evaluationToNextLevel) >= 0) {
-					return true;
-				}
-			}
-		}
-		return false;
+	public Boolean shoudlStop(Integer nextLevel, Combination combinationToNext, BigDecimal evaluationToNext) {
+		return threshold.compareTo(evaluationToNext) >= 0;
 	}
 
 	@Override

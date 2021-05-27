@@ -1,5 +1,6 @@
 package br.ufsc.ine.leb.roza.clustering;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 
@@ -17,9 +18,9 @@ public class ComposedCriteria implements ThresholdCriteria {
 	}
 
 	@Override
-	public Boolean shoudlStop(List<Level> levels) {
+	public Boolean shoudlStop(Integer nextLevel, Combination combinationToNext, BigDecimal evaluationToNext) {
 		for (ThresholdCriteria threshold : thresholds) {
-			if (threshold.shoudlStop(levels)) {
+			if (threshold.shoudlStop(nextLevel, combinationToNext, evaluationToNext)) {
 				return true;
 			}
 		}

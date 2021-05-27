@@ -1,6 +1,6 @@
 package br.ufsc.ine.leb.roza.clustering;
 
-import java.util.List;
+import java.math.BigDecimal;
 
 import br.ufsc.ine.leb.roza.exceptions.InvalidThresholdException;
 
@@ -16,17 +16,9 @@ public class TestsPerClassCriteria implements ThresholdCriteria {
 	}
 
 	@Override
-	public Boolean shoudlStop(List<Level> levels) {
-		for (Level level : levels) {
-			if (level.hasNextLevel()) {
-				Combination next = level.getCombinationToNextLevel();
-				Integer nextSize = next.getFirst().getTestCases().size() + next.getSecond().getTestCases().size();
-				if (nextSize > threshold) {
-					return true;
-				}
-			}
-		}
-		return false;
+	public Boolean shoudlStop(Integer nextLevel, Combination combinationToNext, BigDecimal evaluationToNext) {
+		Integer nextSize = combinationToNext.getFirst().getTestCases().size() + combinationToNext.getSecond().getTestCases().size();
+		return nextSize > threshold;
 	}
 
 	@Override

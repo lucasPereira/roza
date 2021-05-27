@@ -1,9 +1,9 @@
 package br.ufsc.ine.leb.roza.clustering;
 
-import java.util.List;
+import java.math.BigDecimal;
 
 public interface ThresholdCriteria {
 
-	Boolean shoudlStop(List<Level> levels);
+	Boolean shoudlStop(Integer nextLevel, Combination combinationToNext, BigDecimal evaluationToNext);
 
 }
