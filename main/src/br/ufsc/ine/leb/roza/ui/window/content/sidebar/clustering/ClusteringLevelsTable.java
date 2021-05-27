@@ -39,7 +39,7 @@ public class ClusteringLevelsTable implements UiComponent {
 		Integer number = 0;
 		for (Level level : levels) {
 			String name = number + "";
-			BigDecimal evaluation = level.getEvaluationToNextLevel();
+			BigDecimal evaluation = level.getEvaluationToThisLevel();
 			String formattedEvaluation = evaluation == null ? "-" : new FormatterUtils().bigDecimal(evaluation);
 			table.getModel().setValueAt(name, number, 0);
 			table.getModel().setValueAt(formattedEvaluation, number, 1);

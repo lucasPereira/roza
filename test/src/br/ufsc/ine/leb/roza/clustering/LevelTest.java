@@ -1,129 +1,77 @@
 package br.ufsc.ine.leb.roza.clustering;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import br.ufsc.ine.leb.roza.Cluster;
 import br.ufsc.ine.leb.roza.TestCase;
-import br.ufsc.ine.leb.roza.exceptions.NoNextLevelException;
-import br.ufsc.ine.leb.roza.utils.CollectionUtils;
-import br.ufsc.ine.leb.roza.utils.MathUtils;
 
 class LevelTest {
 
-	private TestCase alpha;
-	private TestCase beta;
-	private TestCase gamma;
-	private Linkage linkage;
-	private InsecureReferee referee;
-	private CollectionUtils collectionUtils;
+	private Cluster alphaCluster;
+	private Cluster betaCluster;
+	private Cluster gammaCluster;
+	private Cluster alphaBetaCluster;
 
 	@BeforeEach
 	void setup() {
-		linkage = new SumOfIdsLinkage();
-		referee = new InsecureReferee();
-		collectionUtils = new CollectionUtils();
-		alpha = new TestCase("alpha", Arrays.asList(), Arrays.asList());
-		beta = new TestCase("beta", Arrays.asList(), Arrays.asList());
-		gamma = new TestCase("gamma", Arrays.asList(), Arrays.asList());
+		TestCase alpha = new TestCase("alpha", Arrays.asList(), Arrays.asList());
+		TestCase beta = new TestCase("beta", Arrays.asList(), Arrays.asList());
+		TestCase gamma = new TestCase("gamma", Arrays.asList(), Arrays.asList());
+		alphaCluster = new Cluster(alpha);
+		betaCluster = new Cluster(beta);
+		gammaCluster = new Cluster(gamma);
+		alphaBetaCluster = alphaCluster.merge(betaCluster);
 	}
 
 	@Test
-	void empty() throws Exception {
-		Level one = new Level(linkage, referee, collectionUtils.set());
-		assertEquals(0, one.getStep());
-		assertFalse(one.hasNextLevel());
-		assertEquals(0, one.getClusters().size());
-		assertNull(one.getCombinationToNextLevel());
-		assertNull(one.getEvaluationToNextLevel());
+	void levelZeroWithoutElements() throws Exception {
+		Set<Cluster> clusters = new HashSet<>();
+		Level zero = new Level(clusters);
+
+		assertEquals(0, zero.getStep());
+		assertEquals(0, zero.getClusters().size());
+		assertNull(zero.getEvaluationToThisLevel());
 	}
 
 	@Test
-	void oneElement() throws Exception {
-		Cluster alphaCluster = new Cluster(alpha);
+	void levelZeroWithOneElement() throws Exception {
+		Set<Cluster> clusters = new HashSet<>();
+		clusters.add(alphaCluster);
+		Level zero = new Level(clusters);
 
-		Level one = new Level(linkage, referee, collectionUtils.set(alphaCluster));
-		assertEquals(0, one.getStep());
-		assertFalse(one.hasNextLevel());
-		assertEquals(1, one.getClusters().size());
-		assertTrue(one.getClusters().contains(alphaCluster));
-		assertNull(one.getCombinationToNextLevel());
-		assertNull(one.getEvaluationToNextLevel());
+		assertEquals(0, zero.getStep());
+		assertEquals(1, zero.getClusters().size());
+		assertTrue(zero.getClusters().contains(alphaCluster));
+		assertNull(zero.getEvaluationToThisLevel());
 	}
 
 	@Test
-	void twoElements() throws Exception {
-		Cluster alphaCluster = new Cluster(alpha);
-		Cluster betaCluster = new Cluster(beta);
-		Cluster alphaBetaCluster = alphaCluster.merge(betaCluster);
+	void levelOne() throws Exception {
+		Set<Cluster> clustersZero = new HashSet<>();
+		clustersZero.add(alphaCluster);
+		clustersZero.add(betaCluster);
+		clustersZero.add(gammaCluster);
+		Set<Cluster> clustersOne = new HashSet<>();
+		clustersOne.add(alphaBetaCluster);
+		clustersOne.add(gammaCluster);
+		Level zero = new Level(clustersZero);
+		Level one = new Level(zero, clustersOne, BigDecimal.ONE);
 
-		Level one = new Level(linkage, referee, collectionUtils.set(alphaCluster, betaCluster));
-		assertEquals(0, one.getStep());
-		assertTrue(one.hasNextLevel());
+		assertEquals(1, one.getStep());
 		assertEquals(2, one.getClusters().size());
-		assertTrue(one.getClusters().contains(alphaCluster));
-		assertTrue(one.getClusters().contains(betaCluster));
-		assertEquals(new Combination(alphaCluster, betaCluster), one.getCombinationToNextLevel());
-		assertEquals(new MathUtils().oneOver(alpha.getId(), beta.getId()), one.getEvaluationToNextLevel());
-
-		Level two = one.generateNextLevel();
-		assertEquals(1, two.getStep());
-		assertFalse(two.hasNextLevel());
-		assertEquals(1, two.getClusters().size());
-		assertTrue(two.getClusters().contains(alphaBetaCluster));
-		assertNull(two.getCombinationToNextLevel());
-		assertNull(two.getEvaluationToNextLevel());
-	}
-
-	@Test
-	void threeElements() throws Exception {
-		Cluster alphaCluster = new Cluster(alpha);
-		Cluster betaCluster = new Cluster(beta);
-		Cluster gammaCluster = new Cluster(gamma);
-		Cluster alphaBetaCluster = alphaCluster.merge(betaCluster);
-		Cluster alphaBetaGammaCluster = alphaBetaCluster.merge(gammaCluster);
-
-		Level one = new Level(linkage, referee, collectionUtils.set(alphaCluster, betaCluster, gammaCluster));
-		assertEquals(0, one.getStep());
-		assertTrue(one.hasNextLevel());
-		assertTrue(one.getClusters().contains(alphaCluster));
-		assertTrue(one.getClusters().contains(betaCluster));
+		assertTrue(one.getClusters().contains(alphaBetaCluster));
 		assertTrue(one.getClusters().contains(gammaCluster));
-		assertEquals(new Combination(alphaCluster, betaCluster), one.getCombinationToNextLevel());
-		assertEquals(new MathUtils().oneOver(alpha.getId(), beta.getId()), one.getEvaluationToNextLevel());
-
-		Level two = one.generateNextLevel();
-		assertEquals(1, two.getStep());
-		assertTrue(two.hasNextLevel());
-		assertEquals(2, two.getClusters().size());
-		assertTrue(two.getClusters().contains(alphaBetaCluster));
-		assertTrue(two.getClusters().contains(gammaCluster));
-		assertEquals(new Combination(alphaCluster.merge(betaCluster), gammaCluster), two.getCombinationToNextLevel());
-		assertEquals(new MathUtils().oneOver(alpha.getId(), beta.getId(), gamma.getId()), two.getEvaluationToNextLevel());
-
-		Level three = two.generateNextLevel();
-		assertEquals(2, three.getStep());
-		assertFalse(three.hasNextLevel());
-		assertEquals(1, three.getClusters().size());
-		assertTrue(three.getClusters().contains(alphaBetaGammaCluster));
-		assertNull(three.getCombinationToNextLevel());
-		assertNull(three.getEvaluationToNextLevel());
-	}
-
-	@Test
-	void levelUpWithoutNextLevel() throws Exception {
-		Cluster alphaCluster = new Cluster(alpha);
-		assertThrows(NoNextLevelException.class, () -> {
-			new Level(linkage, referee, collectionUtils.set(alphaCluster)).generateNextLevel();
-		});
+		assertEquals(BigDecimal.ONE, one.getEvaluationToThisLevel());
 	}
 
 }

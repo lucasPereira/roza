@@ -1,8 +1,10 @@
 package br.ufsc.ine.leb.roza.clustering;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import br.ufsc.ine.leb.roza.Cluster;
 import br.ufsc.ine.leb.roza.SimilarityReport;
@@ -28,14 +30,34 @@ public class DendogramTestCaseClusterer implements TestCaseClusterer {
 	}
 
 	public List<Level> generateLevels(SimilarityReport report) {
-		Set<Cluster> clusters = new ClusterFactory().create(report);
+		ClusterJoiner joiner = new ClusterJoiner(linkage, referee);
+		Set<Cluster> currentClusters = new ClusterFactory().create(report);
 		List<Level> levels = new ArrayList<>();
-		Level level = new Level(linkage, referee, clusters);
-		levels.add(level);
-		while (level.hasNextLevel() && !criteria.shoudlStop(levels)) {
+		Level currentLevel = new Level(currentClusters);
+		levels.add(currentLevel);
+		Boolean shouldContinue = currentClusters.size() > 1;
+		while (shouldContinue) {
+			ClustersToMerge clustersToMerge = new ClustersToMerge(currentClusters);
 			try {
-				level = level.generateNextLevel();
-				levels.add(level);
+				WinnerCombination winner = joiner.join(clustersToMerge);
+				Combination combination = winner.getCombination();
+				BigDecimal evaluation = winner.getEvaluation();
+				Cluster first = combination.getFirst();
+				Cluster second = combination.getSecond();
+				Cluster merged = first.merge(second);
+				Set<Cluster> nextClusters = currentClusters.stream().filter(cluster -> !cluster.equals(first) && !cluster.equals(second)).collect(Collectors.toSet());
+				nextClusters.add(merged);
+				Level nextLevel = new Level(currentLevel, nextClusters, evaluation);
+				Boolean thresholdReached = criteria.shoudlStop(nextLevel.getStep(), combination, evaluation);
+				Boolean hasClustersToMerge = nextClusters.size() > 1;
+				shouldContinue = !thresholdReached && hasClustersToMerge;
+				if (!thresholdReached) {
+					levels.add(nextLevel);
+				}
+				if (shouldContinue) {
+					currentLevel = nextLevel;
+					currentClusters = nextClusters;
+				}
 			} catch (TiebreakException exception) {
 				throw new ClusteringLevelGenerationException(levels, exception);
 			}

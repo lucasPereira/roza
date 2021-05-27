@@ -12,9 +12,7 @@ import br.ufsc.ine.leb.roza.ui.UiComponent;
 public class NextLevelButton implements UiComponent {
 
 	private ClusteringTab clusteringTab;
-
 	private Level selected;
-
 	private List<Level> levels;
 
 	public NextLevelButton(ClusteringTab clusteringTab) {
@@ -34,7 +32,7 @@ public class NextLevelButton implements UiComponent {
 		});
 		hub.selectLevelSubscribe(level -> {
 			selected = level;
-			button.setEnabled(level.hasNextLevel());
+			button.setEnabled(selected.getStep() + 1 < levels.size());
 		});
 		button.addActionListener(event -> {
 			Level next = levels.get(selected.getStep() + 1);
