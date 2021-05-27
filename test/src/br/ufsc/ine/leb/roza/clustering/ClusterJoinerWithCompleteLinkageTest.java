@@ -17,7 +17,7 @@ import br.ufsc.ine.leb.roza.TestCase;
 import br.ufsc.ine.leb.roza.exceptions.TiebreakException;
 import br.ufsc.ine.leb.roza.utils.CollectionUtils;
 
-class ClusterJoinerWithCompleteLinkageAndInsecureRefereeTest {
+class ClusterJoinerWithCompleteLinkageTest {
 
 	private BigDecimal dotOne;
 	private BigDecimal dotTwo;
@@ -37,6 +37,7 @@ class ClusterJoinerWithCompleteLinkageAndInsecureRefereeTest {
 	private Cluster deltaCluster;
 	private Cluster alphaGammaCluster;
 	private CollectionUtils collectionUtils;
+	private InsecureReferee referee;
 
 	@BeforeEach
 	void setup() {
@@ -58,6 +59,7 @@ class ClusterJoinerWithCompleteLinkageAndInsecureRefereeTest {
 		deltaCluster = new Cluster(delta);
 		alphaGammaCluster = alphaCluster.merge(gammaCluster);
 		collectionUtils = new CollectionUtils();
+		referee = new InsecureReferee();
 	}
 
 	@Test
@@ -68,9 +70,11 @@ class ClusterJoinerWithCompleteLinkageAndInsecureRefereeTest {
 		builder.add(gamma, delta, dotThree);
 		SimilarityReport report = builder.build();
 		ClustersToMerge clusters = new ClustersToMerge(collectionUtils.set(alphaGammaCluster, betaCluster, deltaCluster));
-		Combination combination = new ClusterJoiner(new CompleteLinkage(report), new InsecureReferee()).join(clusters);
+		WinnerCombination winner = new ClusterJoiner(new CompleteLinkage(report), referee).join(clusters);
+		Combination combination = winner.getCombination();
 		assertEquals(new Combination(betaCluster, deltaCluster), combination);
 		assertEquals(new Combination(deltaCluster, betaCluster), combination);
+		assertEquals(dotFive, winner.getEvaluation());
 	}
 
 	@Test
@@ -81,9 +85,11 @@ class ClusterJoinerWithCompleteLinkageAndInsecureRefereeTest {
 		builder.add(gamma, delta, dotThree);
 		SimilarityReport report = builder.build();
 		ClustersToMerge clusters = new ClustersToMerge(collectionUtils.set(alphaGammaCluster, betaCluster, deltaCluster));
-		Combination combination = new ClusterJoiner(new CompleteLinkage(report), new InsecureReferee()).join(clusters);
+		WinnerCombination winner = new ClusterJoiner(new CompleteLinkage(report), referee).join(clusters);
+		Combination combination = winner.getCombination();
 		assertEquals(new Combination(alphaGammaCluster, deltaCluster), combination);
 		assertEquals(new Combination(deltaCluster, alphaGammaCluster), combination);
+		assertEquals(dotThree, winner.getEvaluation());
 	}
 
 	@Test
@@ -94,9 +100,11 @@ class ClusterJoinerWithCompleteLinkageAndInsecureRefereeTest {
 		builder.add(gamma, alpha, dotSix).add(gamma, beta, dotSix);
 		SimilarityReport report = builder.build();
 		ClustersToMerge clusters = new ClustersToMerge(collectionUtils.set(alphaCluster, betaCluster, gammaCluster));
-		Combination combination = new ClusterJoiner(new CompleteLinkage(report), new InsecureReferee()).join(clusters);
+		WinnerCombination winner = new ClusterJoiner(new CompleteLinkage(report), referee).join(clusters);
+		Combination combination = winner.getCombination();
 		assertEquals(new Combination(betaCluster, alphaCluster), combination);
 		assertEquals(new Combination(alphaCluster, betaCluster), combination);
+		assertEquals(dotSeven, winner.getEvaluation());
 	}
 
 	@Test
@@ -107,9 +115,11 @@ class ClusterJoinerWithCompleteLinkageAndInsecureRefereeTest {
 		builder.add(gamma, alpha, dotSix).add(gamma, beta, dotSix);
 		SimilarityReport report = builder.build();
 		ClustersToMerge clusters = new ClustersToMerge(collectionUtils.set(alphaCluster, betaCluster, gammaCluster));
-		Combination combination = new ClusterJoiner(new CompleteLinkage(report), new InsecureReferee()).join(clusters);
+		WinnerCombination winner = new ClusterJoiner(new CompleteLinkage(report), referee).join(clusters);
+		Combination combination = winner.getCombination();
 		assertEquals(new Combination(betaCluster, alphaCluster), combination);
 		assertEquals(new Combination(alphaCluster, betaCluster), combination);
+		assertEquals(dotSeven, winner.getEvaluation());
 	}
 
 	@Test
@@ -121,7 +131,7 @@ class ClusterJoinerWithCompleteLinkageAndInsecureRefereeTest {
 		SimilarityReport report = builder.build();
 		ClustersToMerge clusters = new ClustersToMerge(collectionUtils.set(alphaCluster, betaCluster, gammaCluster));
 		TiebreakException exception = assertThrows(TiebreakException.class, () -> {
-			new ClusterJoiner(new CompleteLinkage(report), new InsecureReferee()).join(clusters);
+			new ClusterJoiner(new CompleteLinkage(report), referee).join(clusters);
 		});
 		assertEquals(3, exception.getTies().size());
 		assertTrue(exception.getTies().contains(new Combination(alphaCluster, betaCluster)));

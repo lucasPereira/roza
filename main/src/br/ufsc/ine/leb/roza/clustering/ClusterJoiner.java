@@ -17,7 +17,7 @@ class ClusterJoiner {
 		this.referee = referee;
 	}
 
-	public Combination join(ClustersToMerge clusters) {
+	public WinnerCombination join(ClustersToMerge clusters) {
 		Set<Combination> choosed = new HashSet<>();
 		BigDecimal nearestDistance = BigDecimal.ZERO;
 		Set<Combination> combinations = clusters.getCombinations();
@@ -33,7 +33,7 @@ class ClusterJoiner {
 				nearestDistance = distance;
 			}
 		}
-		return choose(choosed);
+		return new WinnerCombination(choose(choosed), nearestDistance);
 	}
 
 	private Combination choose(Set<Combination> choosed) {
