@@ -44,8 +44,8 @@ public class GraphCanvas implements UiComponent {
 			graph.clear();
 		});
 		hub.extractTestCasesSubscribe(testCases -> {
-			this.testCases = testCases;
 			graph.clear();
+			this.testCases = testCases;
 		});
 		hub.measureTestsSubscribe(similarityReport -> {
 			graph.clear();
@@ -53,8 +53,8 @@ public class GraphCanvas implements UiComponent {
 		hub.distributeTestsSubscribe(levels -> {
 			graph.clear();
 			viewer.enableAutoLayout();
-			addGraphStyle(graph);
 			showNodes();
+			addGraphStyle(graph);
 		});
 		hub.selectLevelSubscribe(level -> {
 			viewer.disableAutoLayout();

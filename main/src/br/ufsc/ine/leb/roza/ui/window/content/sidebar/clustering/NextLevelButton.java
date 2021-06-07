@@ -45,7 +45,6 @@ public class NextLevelButton implements UiComponent {
 	public void addChilds(List<UiComponent> childs) {}
 
 	@Override
-	public void start() {
-	}
+	public void start() {}
 
 }

@@ -22,11 +22,7 @@ public class DistributeTestsButton implements UiComponent {
 	@Override
 	public void init(Hub hub, Manager manager) {
 		JButton button = new JButton("Distribute Tests");
-		button.setEnabled(false);
 		toolbar.addComponent(button);
-		hub.loadTestClassesSubscribe(classes -> button.setEnabled(false));
-		hub.extractTestCasesSubscribe(testCases -> button.setEnabled(false));
-		hub.measureTestsSubscribe(similarityReport -> button.setEnabled(true));
 		button.addActionListener(event -> {
 			List<Level> levels;
 			try {

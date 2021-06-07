@@ -43,7 +43,6 @@ public class DeckardConfigurationInputs implements UiComponent {
 			strideInput.setVisible(false);
 			similarityInput.setVisible(false);
 		});
-
 	}
 
 	@Override

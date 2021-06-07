@@ -55,7 +55,6 @@ public class MatrixMeasurementPanel implements UiComponent {
 		});
 		table.setCellSelectionEnabled(true);
 		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-
 	}
 
 	private void reset(JTable table) {

@@ -31,9 +31,6 @@ public class LinkageComboBox implements UiComponent {
 		builder.add("Average Linkage", () -> manager.setLinkageFactory(new AverageLinkageFactory()));
 		combo = builder.build();
 		toolbar.addComponent(combo);
-		hub.loadTestClassesSubscribe(classes -> combo.setEnabled(false));
-		hub.extractTestCasesSubscribe(testCases -> combo.setEnabled(false));
-		hub.measureTestsSubscribe(similarityReport -> combo.setEnabled(true));
 	}
 
 	@Override

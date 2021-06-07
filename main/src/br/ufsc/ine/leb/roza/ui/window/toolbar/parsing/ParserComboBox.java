@@ -27,7 +27,6 @@ public class ParserComboBox implements UiComponent {
 		}).add("JUnit 5", () -> {
 			manager.setTestClassParser(new Junit5TestClassParser());
 		}).build();
-		combo.setEnabled(true);
 		toolbar.addComponent(combo);
 	}
 

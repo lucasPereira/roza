@@ -27,9 +27,6 @@ public class ThresholdCriteriaComboBox implements UiComponent {
 		builder.add("Never stop", () -> hub.selectNeverStopCriteriaPublish());
 		combo = builder.build();
 		toolbar.addComponent(combo);
-		hub.loadTestClassesSubscribe(classes -> combo.setEnabled(false));
-		hub.extractTestCasesSubscribe(testCases -> combo.setEnabled(false));
-		hub.measureTestsSubscribe(similarityReport -> combo.setEnabled(true));
 	}
 
 	@Override

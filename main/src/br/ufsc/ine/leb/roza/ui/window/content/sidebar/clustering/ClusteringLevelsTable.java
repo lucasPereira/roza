@@ -18,23 +18,40 @@ public class ClusteringLevelsTable implements UiComponent {
 
 	private ClusteringTab clusteringTab;
 
+	private List<Level> levels;
+
+	private JTable table;
+
 	public ClusteringLevelsTable(ClusteringTab clusteringTab) {
 		this.clusteringTab = clusteringTab;
 	}
 
 	@Override
 	public void init(Hub hub, Manager manager) {
-		JTable table = new JTable();
-		hub.distributeTestsSubscribe(levels -> showTable(hub, table, levels));
+		table = new JTable();
+		hub.distributeTestsSubscribe(levels -> {
+			this.levels = levels;
+			showTable(hub);
+		});
 		hub.selectLevelSubscribe(level -> selectLevel(table, level));
 		clusteringTab.setTable(table);
+		table.addMouseListener(new MouseAdapter() {
+
+			@Override
+			public void mouseClicked(MouseEvent event) {
+				Integer index = table.rowAtPoint(event.getPoint());
+				Level level = levels.get(index);
+				hub.selectLevelPublish(level);
+			}
+
+		});
 	}
 
 	private void selectLevel(JTable table, Level level) {
 		table.setRowSelectionInterval(level.getStep(), level.getStep());
 	}
 
-	private void showTable(Hub hub, JTable table, List<Level> levels) {
+	private void showTable(Hub hub) {
 		table.setModel(new DefaultTableModel(levels.size(), 2));
 		Integer number = 0;
 		for (Level level : levels) {
@@ -45,20 +62,6 @@ public class ClusteringLevelsTable implements UiComponent {
 			table.getModel().setValueAt(formattedEvaluation, number, 1);
 			number++;
 		}
-		table.addMouseListener(createTableListener(hub, table, levels));
-	}
-
-	private MouseAdapter createTableListener(Hub hub, JTable table, List<Level> levels) {
-		return new MouseAdapter() {
-
-			@Override
-			public void mouseClicked(MouseEvent event) {
-				Integer index = table.rowAtPoint(event.getPoint());
-				Level level = levels.get(index);
-				hub.selectLevelPublish(level);
-			}
-
-		};
 	}
 
 	@Override

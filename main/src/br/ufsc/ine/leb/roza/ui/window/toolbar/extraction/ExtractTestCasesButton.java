@@ -21,14 +21,12 @@ public class ExtractTestCasesButton implements UiComponent {
 	@Override
 	public void init(Hub hub, Manager manager) {
 		button = new JButton("Extract Test Cases");
-		button.setEnabled(false);
 		toolbar.addComponent(button);
 		button.addActionListener(listner -> {
 			List<TestCase> testCases = manager.extractTestCases();
 			hub.extractTestCasesPublish(testCases);
 			hub.infoMessagePublish(String.format("Extracted tests: %d", testCases.size()));
 		});
-		hub.loadTestClassesSubscribe(classes -> button.setEnabled(true));
 	}
 
 	@Override

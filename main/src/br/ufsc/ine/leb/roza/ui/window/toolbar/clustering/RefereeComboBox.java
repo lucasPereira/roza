@@ -29,9 +29,6 @@ public class RefereeComboBox implements UiComponent {
 		builder.add("Insecure Referee", () -> manager.setReferee(new InsecureReferee()));
 		combo = builder.build();
 		toolbar.addComponent(combo);
-		hub.loadTestClassesSubscribe(classes -> combo.setEnabled(false));
-		hub.extractTestCasesSubscribe(testCases -> combo.setEnabled(false));
-		hub.measureTestsSubscribe(similarityReport -> combo.setEnabled(true));
 	}
 
 	@Override

@@ -42,7 +42,6 @@ public class ThresholdCriteriaInputs implements UiComponent {
 		similarityInput.setVisible(false);
 		createValueChangedEvents();
 		createSelectionEvents();
-		createToolbarEvents();
 		toolbar.addComponent(levelInput);
 		toolbar.addComponent(testsPerClassInput);
 		toolbar.addComponent(similarityInput);
@@ -98,24 +97,6 @@ public class ThresholdCriteriaInputs implements UiComponent {
 			testsPerClassInput.setVisible(false);
 			similarityInput.setVisible(false);
 			manager.setThresholdCriteria(new NeverStopCriteria());
-		});
-	}
-
-	private void createToolbarEvents() {
-		hub.loadTestClassesSubscribe(classes -> {
-			levelInput.setEnabled(false);
-			testsPerClassInput.setEnabled(false);
-			similarityInput.setEnabled(false);
-		});
-		hub.extractTestCasesSubscribe(testCases -> {
-			levelInput.setEnabled(false);
-			testsPerClassInput.setEnabled(false);
-			similarityInput.setEnabled(false);
-		});
-		hub.measureTestsSubscribe(similarityReport -> {
-			levelInput.setEnabled(true);
-			testsPerClassInput.setEnabled(true);
-			similarityInput.setEnabled(true);
 		});
 	}
 

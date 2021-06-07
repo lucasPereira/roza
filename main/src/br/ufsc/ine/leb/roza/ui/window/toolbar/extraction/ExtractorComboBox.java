@@ -33,7 +33,6 @@ public class ExtractorComboBox implements UiComponent {
 			manager.setTestCaseExtractor(new JunitTestCaseExtractor(assertions));
 		}).build();
 		toolbar.addComponent(combo);
-		hub.loadTestClassesSubscribe(classes -> combo.setEnabled(true));
 	}
 
 	@Override

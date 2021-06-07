@@ -65,8 +65,6 @@ public class MeasurerComboBox implements UiComponent {
 				settings.threshold(threshold);
 			});
 		}).build();
-		hub.loadTestClassesSubscribe(classes -> combo.setEnabled(false));
-		hub.extractTestCasesSubscribe(tests -> combo.setEnabled(true));
 		toolbar.addComponent(combo);
 	}
 

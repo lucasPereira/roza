@@ -32,7 +32,6 @@ public class SimianConfigurationInputs implements UiComponent {
 		hub.unselectSimianMetricSubscribe(() -> {
 			thresholdInput.setVisible(false);
 		});
-
 	}
 
 	@Override

@@ -22,6 +22,7 @@ public class PreviousLevelButton implements UiComponent {
 	@Override
 	public void init(Hub hub, Manager manager) {
 		JButton button = new JButton("<");
+		button.setEnabled(false);
 		hub.distributeTestsSubscribe(levels -> {
 			button.setEnabled(false);
 			this.levels = levels;

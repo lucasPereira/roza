@@ -13,7 +13,7 @@ import br.ufsc.ine.leb.roza.ui.window.content.Content;
 public class DistributionTab implements UiComponent {
 
 	private Content content;
-	private JTabbedPane tab;
+	private JTabbedPane panel;
 
 	public DistributionTab(Content content) {
 		this.content = content;
@@ -21,8 +21,25 @@ public class DistributionTab implements UiComponent {
 
 	@Override
 	public void init(Hub hub, Manager manager) {
-		tab = new JTabbedPane();
-		content.addLeftComponent(tab);
+		panel = new JTabbedPane();
+		content.addLeftComponent(panel);
+		hub.loadTestClassesSubscribe(classes -> {
+			panel.setEnabledAt(0, false);
+			panel.setEnabledAt(1, false);
+		});
+		hub.extractTestCasesSubscribe(tests -> {
+			panel.setEnabledAt(0, false);
+			panel.setEnabledAt(1, false);
+		});
+		hub.measureTestsSubscribe(similarityReport -> {
+			panel.setEnabledAt(0, false);
+			panel.setEnabledAt(1, false);
+		});
+		hub.distributeTestsSubscribe(levels -> {
+			panel.setEnabledAt(0, true);
+			panel.setEnabledAt(1, true);
+			panel.setSelectedIndex(0);
+		});
 	}
 
 	@Override
@@ -35,7 +52,8 @@ public class DistributionTab implements UiComponent {
 	public void start() {}
 
 	public void addComponent(String title, Component component) {
-		tab.add(title, component);
+		panel.add(title, component);
+		panel.setEnabledAt(panel.getTabCount() - 1, false);
 	}
 
 }

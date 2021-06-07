@@ -57,4 +57,5 @@ public class TestClassInformation implements UiComponent {
 		table.setModel(model);
 		panel.addTab(title, scroller);
 	}
+
 }

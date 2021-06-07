@@ -35,7 +35,6 @@ public class ComboBoxBuilder {
 
 		});
 		combo.setMaximumSize(combo.getPreferredSize());
-		combo.setEnabled(false);
 		return combo;
 	}
 

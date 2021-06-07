@@ -20,6 +20,7 @@ import br.ufsc.ine.leb.roza.materialization.Junit4WithoutAssertionsTestCaseMater
 import br.ufsc.ine.leb.roza.materialization.TestCaseMaterializer;
 import br.ufsc.ine.leb.roza.measurement.SimilarityMeasurer;
 import br.ufsc.ine.leb.roza.parsing.TestClassParser;
+import br.ufsc.ine.leb.roza.refactoring.ClusterRefactor;
 import br.ufsc.ine.leb.roza.selection.JavaExtensionTextFileSelector;
 import br.ufsc.ine.leb.roza.selection.TextFileSelector;
 import br.ufsc.ine.leb.roza.utils.FolderUtils;
@@ -86,6 +87,8 @@ public class Manager {
 	public void setThresholdCriteria(ThresholdCriteria theshold) {
 		this.threshold = theshold;
 	}
+
+	public void setRefactorStrategy(ClusterRefactor refactorStrategy) {}
 
 	public List<Level> distributeTests() {
 		DendogramTestCaseClusterer clustering = new DendogramTestCaseClusterer(linkageFactory.create(similarityReport), referee, threshold);

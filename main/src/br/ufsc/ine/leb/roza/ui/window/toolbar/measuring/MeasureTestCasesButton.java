@@ -20,10 +20,7 @@ public class MeasureTestCasesButton implements UiComponent {
 	@Override
 	public void init(Hub hub, Manager manager) {
 		JButton button = new JButton("Measure Tests");
-		button.setEnabled(false);
 		toolbar.addComponent(button);
-		hub.loadTestClassesSubscribe(classes -> button.setEnabled(false));
-		hub.extractTestCasesSubscribe(testCases -> button.setEnabled(true));
 		button.addActionListener(listner -> {
 			SimilarityReport similarityReort = manager.measureTestCases();
 			hub.measureTestsPublish(similarityReort);
