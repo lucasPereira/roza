@@ -1,7 +1,7 @@
 package br.ufsc.ine.leb.roza.clustering;
 
+import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.Arrays;
 
@@ -10,16 +10,15 @@ import org.junit.jupiter.api.Test;
 
 import br.ufsc.ine.leb.roza.Cluster;
 import br.ufsc.ine.leb.roza.TestCase;
+import br.ufsc.ine.leb.roza.exceptions.InsufficientRefereeException;
 import br.ufsc.ine.leb.roza.exceptions.NoCombinationToChooseException;
 import br.ufsc.ine.leb.roza.exceptions.TiebreakException;
 import br.ufsc.ine.leb.roza.utils.CollectionUtils;
 
-class BiggestClusterRefereeTest {
+public class ComposedRefereeTest {
 
-	private Referee referee;
-	private Combination alphaBetaCombinedDelta;
 	private Combination gammaCombinedDelta;
-	private Combination deltaCombinedAlphaBeta;
+	private Combination alphaBetaCombinedDelta;
 	private Combination alphaBetaCombinedGamma;
 	private CollectionUtils collectionUtils;
 
@@ -35,46 +34,45 @@ class BiggestClusterRefereeTest {
 		Cluster deltaCluster = new Cluster(delta);
 		Cluster alphaBetaCluster = alphaCluster.merge(betaCluster);
 		alphaBetaCombinedDelta = new Combination(alphaBetaCluster, deltaCluster);
-		deltaCombinedAlphaBeta = new Combination(deltaCluster, alphaBetaCluster);
 		alphaBetaCombinedGamma = new Combination(alphaBetaCluster, gammaCluster);
 		gammaCombinedDelta = new Combination(gammaCluster, deltaCluster);
 		collectionUtils = new CollectionUtils();
-		referee = new BiggestClusterReferee();
+	}
+
+	@Test
+	void withoutReferees() throws Exception {
+		assertThrows(InsufficientRefereeException.class, () -> new ComposedReferee());
+	}
+
+	@Test
+	void onlyOneReferee() throws Exception {
+		assertThrows(InsufficientRefereeException.class, () -> new ComposedReferee(new AnyClusterReferee()));
 	}
 
 	@Test
 	void withoutElements() throws Exception {
+		Referee referee = new ComposedReferee(new SmallestClusterReferee(), new BiggestClusterReferee());
 		assertThrows(NoCombinationToChooseException.class, () -> referee.untie(collectionUtils.set()));
 	}
 
 	@Test
-	void chooseUnique() throws Exception {
-		Combination chosen = referee.untie(collectionUtils.set(gammaCombinedDelta));
+	void stopAtFirst() throws Exception {
+		Referee referee = new ComposedReferee(new SmallestClusterReferee(), new InsecureReferee());
+		Combination chosen = referee.untie(collectionUtils.set(alphaBetaCombinedDelta, gammaCombinedDelta));
 		assertEquals(chosen, gammaCombinedDelta);
 	}
 
 	@Test
-	void chooseFirst() throws Exception {
-		Combination chosen = referee.untie(collectionUtils.set(gammaCombinedDelta, alphaBetaCombinedDelta));
-		assertEquals(chosen, alphaBetaCombinedDelta);
-	}
-
-	@Test
-	void chooseLast() throws Exception {
+	void stopAtLast() throws Exception {
+		Referee referee = new ComposedReferee(new InsecureReferee(), new BiggestClusterReferee());
 		Combination chosen = referee.untie(collectionUtils.set(alphaBetaCombinedDelta, gammaCombinedDelta));
 		assertEquals(chosen, alphaBetaCombinedDelta);
 	}
 
 	@Test
-	void tiebreak() throws Exception {
-		assertThrows(TiebreakException.class, () -> referee.untie(collectionUtils.set(alphaBetaCombinedDelta, gammaCombinedDelta, alphaBetaCombinedGamma)));
-	}
-
-	@Test
-	void chooseFirstAndLastEquals() throws Exception {
-		Combination chosen = referee.untie(collectionUtils.set(alphaBetaCombinedDelta, gammaCombinedDelta, deltaCombinedAlphaBeta));
-		assertEquals(chosen, alphaBetaCombinedDelta);
-		assertEquals(chosen, deltaCombinedAlphaBeta);
+	void doesNotStopAtAll() throws Exception {
+		Referee referee = new ComposedReferee(new SmallestClusterReferee(), new BiggestClusterReferee());
+		assertThrows(TiebreakException.class, () -> referee.untie(collectionUtils.set(alphaBetaCombinedDelta, alphaBetaCombinedGamma)));
 	}
 
 }

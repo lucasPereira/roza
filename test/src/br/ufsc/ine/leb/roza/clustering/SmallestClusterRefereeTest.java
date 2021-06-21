@@ -1,16 +1,17 @@
 package br.ufsc.ine.leb.roza.clustering;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.Arrays;
-import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import br.ufsc.ine.leb.roza.Cluster;
 import br.ufsc.ine.leb.roza.TestCase;
+import br.ufsc.ine.leb.roza.exceptions.NoCombinationToChooseException;
+import br.ufsc.ine.leb.roza.exceptions.TiebreakException;
 import br.ufsc.ine.leb.roza.utils.CollectionUtils;
 
 class SmallestClusterRefereeTest {
@@ -43,45 +44,37 @@ class SmallestClusterRefereeTest {
 
 	@Test
 	void withoutElements() throws Exception {
-		Set<Combination> tiebreak = referee.untie(collectionUtils.set());
-		assertEquals(0, tiebreak.size());
+		assertThrows(NoCombinationToChooseException.class, () -> referee.untie(collectionUtils.set()));
 	}
 
 	@Test
 	void chooseUnique() throws Exception {
-		Set<Combination> tiebreak = referee.untie(collectionUtils.set(alphaBetaCombinedDelta));
-		assertEquals(1, tiebreak.size());
-		assertTrue(tiebreak.contains(alphaBetaCombinedDelta));
+		Combination chosen = referee.untie(collectionUtils.set(alphaBetaCombinedDelta));
+		assertEquals(chosen, alphaBetaCombinedDelta);
 	}
 
 	@Test
 	void chooseFirst() throws Exception {
-		Set<Combination> tiebreak = referee.untie(collectionUtils.set(gammaCombinedDelta, alphaBetaCombinedDelta));
-		assertEquals(1, tiebreak.size());
-		assertTrue(tiebreak.contains(gammaCombinedDelta));
+		Combination chosen = referee.untie(collectionUtils.set(gammaCombinedDelta, alphaBetaCombinedDelta));
+		assertEquals(chosen, gammaCombinedDelta);
 	}
 
 	@Test
 	void chooseLast() throws Exception {
-		Set<Combination> tiebreak = referee.untie(collectionUtils.set(alphaBetaCombinedDelta, gammaCombinedDelta));
-		assertEquals(1, tiebreak.size());
-		assertTrue(tiebreak.contains(gammaCombinedDelta));
+		Combination chosen = referee.untie(collectionUtils.set(alphaBetaCombinedDelta, gammaCombinedDelta));
+		assertEquals(chosen, gammaCombinedDelta);
 	}
 
 	@Test
-	void chooseFirstAndLast() throws Exception {
-		Set<Combination> tiebreak = referee.untie(collectionUtils.set(gammaCombinedDelta, alphaBetaCombinedDelta, alphaCombinedBeta));
-		assertEquals(2, tiebreak.size());
-		assertTrue(tiebreak.contains(gammaCombinedDelta));
-		assertTrue(tiebreak.contains(alphaCombinedBeta));
+	void tiebreak() throws Exception {
+		assertThrows(TiebreakException.class, () -> referee.untie(collectionUtils.set(gammaCombinedDelta, alphaBetaCombinedDelta, alphaCombinedBeta)));
 	}
 
 	@Test
 	void chooseFirstAndLastEquals() throws Exception {
-		Set<Combination> tiebreak = referee.untie(collectionUtils.set(gammaCombinedDelta, alphaBetaCombinedDelta, deltaCombinedGamma));
-		assertEquals(1, tiebreak.size());
-		assertTrue(tiebreak.contains(gammaCombinedDelta));
-		assertTrue(tiebreak.contains(deltaCombinedGamma));
+		Combination chosen = referee.untie(collectionUtils.set(gammaCombinedDelta, alphaBetaCombinedDelta, deltaCombinedGamma));
+		assertEquals(chosen, gammaCombinedDelta);
+		assertEquals(chosen, deltaCombinedGamma);
 	}
 
 }

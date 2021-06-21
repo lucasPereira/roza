@@ -1,34 +1,14 @@
 package br.ufsc.ine.leb.roza.clustering;
 
-import java.util.HashSet;
-import java.util.Set;
+public class BiggestClusterReferee extends SizeClusterReferee implements Referee {
 
-import br.ufsc.ine.leb.roza.Cluster;
-
-public class BiggestClusterReferee implements Referee {
-
-	@Override
-	public Set<Combination> untie(Set<Combination> elements) {
-		Set<Combination> choosed = new HashSet<>();
-		Integer bigger = Integer.MIN_VALUE;
-		for (Combination combination : elements) {
-			Cluster first = combination.getFirst();
-			Cluster second = combination.getSecond();
-			Integer size = first.merge(second).getTestCases().size();
-			if (size.compareTo(bigger) == 0) {
-				choosed.add(combination);
-			} else if (size.compareTo(bigger) > 0) {
-				choosed.clear();
-				choosed.add(combination);
-				bigger = size;
-			}
-		}
-		return choosed;
+	public BiggestClusterReferee() {
+		super(Integer.MIN_VALUE);
 	}
 
 	@Override
-	public String toString() {
-		return getClass().getSimpleName();
+	public Integer compare(Integer chosenValue, Integer current) {
+		return current.compareTo(chosenValue);
 	}
 
 }

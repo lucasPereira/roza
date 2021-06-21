@@ -1,5 +1,8 @@
 package br.ufsc.ine.leb.roza.clustering;
 
+import static org.hamcrest.CoreMatchers.anyOf;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -11,14 +14,14 @@ import org.junit.jupiter.api.Test;
 import br.ufsc.ine.leb.roza.Cluster;
 import br.ufsc.ine.leb.roza.TestCase;
 import br.ufsc.ine.leb.roza.exceptions.NoCombinationToChooseException;
-import br.ufsc.ine.leb.roza.exceptions.TiebreakException;
 import br.ufsc.ine.leb.roza.utils.CollectionUtils;
 
-class InsecureRefereeTest {
+class AnyClusterRefereeTest {
 
 	private Referee referee;
 	private Combination alphaBetaCombinedDelta;
 	private Combination gammaCombinedDelta;
+	private Combination alphaCombinedBeta;
 	private CollectionUtils collectionUtils;
 
 	@BeforeEach
@@ -34,24 +37,32 @@ class InsecureRefereeTest {
 		Cluster alphaBetaCluster = alphaCluster.merge(betaCluster);
 		alphaBetaCombinedDelta = new Combination(alphaBetaCluster, deltaCluster);
 		gammaCombinedDelta = new Combination(gammaCluster, deltaCluster);
+		alphaCombinedBeta = new Combination(alphaCluster, betaCluster);
 		collectionUtils = new CollectionUtils();
-		referee = new InsecureReferee();
+		referee = new AnyClusterReferee();
 	}
 
 	@Test
-	void zero() throws Exception {
+	void withoutElements() throws Exception {
 		assertThrows(NoCombinationToChooseException.class, () -> referee.untie(collectionUtils.set()));
 	}
 
 	@Test
-	void one() throws Exception {
-		Combination chosen = referee.untie(collectionUtils.set(alphaBetaCombinedDelta));
-		assertEquals(chosen, alphaBetaCombinedDelta);
+	void chooseUnique() throws Exception {
+		Combination chosen = referee.untie(collectionUtils.set(alphaCombinedBeta));
+		assertEquals(chosen, alphaCombinedBeta);
 	}
 
 	@Test
-	void two() throws Exception {
-		assertThrows(TiebreakException.class, () -> referee.untie(collectionUtils.set(gammaCombinedDelta, alphaBetaCombinedDelta)));
+	void chooseAnyWithClustersOfSameSize() throws Exception {
+		Combination chosen =  referee.untie(collectionUtils.set(alphaCombinedBeta, gammaCombinedDelta));
+		assertThat(chosen, anyOf(equalTo(alphaCombinedBeta), equalTo(gammaCombinedDelta)));
+	}
+
+	@Test
+	void chooseAnyWithClustersOfDiffrentSize() throws Exception {
+		Combination chosen =  referee.untie(collectionUtils.set(alphaBetaCombinedDelta, gammaCombinedDelta));
+		assertThat(chosen, anyOf(equalTo(alphaBetaCombinedDelta), equalTo(gammaCombinedDelta)));
 	}
 
 }
