@@ -1,4 +1,4 @@
-package br.ufsc.ine.leb.roza.util;
+package br.ufsc.ine.leb.roza.utils;
 
 import java.util.ArrayList;
 import java.util.Collections;

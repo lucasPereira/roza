@@ -1,4 +1,4 @@
-package br.ufsc.ine.leb.roza.util;
+package br.ufsc.ine.leb.roza.utils;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
@@ -15,7 +15,6 @@ public class RingTest {
 	@BeforeEach
 	void setup() {
 		ring = new Ring<>();
-
 	}
 
 	@Test
