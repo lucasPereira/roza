@@ -28,6 +28,7 @@ public class RefactoringTab implements UiComponent {
 	@Override
 	public void addChilds(List<UiComponent> childs) {
 		childs.add(new RefactorStrategyComboBox(this));
+		childs.add(new WriteRefactoredTestClassesButton(this));
 	}
 
 	@Override

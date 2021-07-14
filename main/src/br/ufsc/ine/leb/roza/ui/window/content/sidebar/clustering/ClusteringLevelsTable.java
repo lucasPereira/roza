@@ -32,6 +32,8 @@ public class ClusteringLevelsTable implements UiComponent {
 		hub.distributeTestsSubscribe(levels -> {
 			this.levels = levels;
 			showTable(hub);
+			selectLevel(table, levels.get(0));
+			manager.selectCluster(levels.get(0).getClusters());
 		});
 		hub.selectLevelSubscribe(level -> selectLevel(table, level));
 		clusteringTab.setTable(table);
@@ -42,6 +44,7 @@ public class ClusteringLevelsTable implements UiComponent {
 				Integer index = table.rowAtPoint(event.getPoint());
 				Level level = levels.get(index);
 				hub.selectLevelPublish(level);
+				manager.selectCluster(level.getClusters());
 			}
 
 		});

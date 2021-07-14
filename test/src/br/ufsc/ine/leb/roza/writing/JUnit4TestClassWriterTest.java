@@ -18,7 +18,7 @@ import br.ufsc.ine.leb.roza.utils.CodeStringBuilder;
 import br.ufsc.ine.leb.roza.utils.FileUtils;
 import br.ufsc.ine.leb.roza.utils.FolderUtils;
 
-public class JavaTestClassWriterTest {
+public class JUnit4TestClassWriterTest {
 
 	private FolderUtils folderUtils;
 	private TestClassWriter writer;
@@ -29,7 +29,7 @@ public class JavaTestClassWriterTest {
 		fileUtils = new FileUtils();
 		folderUtils = new FolderUtils("main/exec/writer");
 		folderUtils.createEmptyFolder();
-		writer = new JavaTestClassWriter("main/exec/writer");
+		writer = new Junit4TestClassWriter("main/exec/writer");
 	}
 
 	@Test

@@ -37,6 +37,7 @@ public class NextLevelButton implements UiComponent {
 		button.addActionListener(event -> {
 			Level next = levels.get(selected.getStep() + 1);
 			hub.selectLevelPublish(next);
+			manager.selectCluster(next.getClusters());
 		});
 		clusteringTab.setNextButton(button);
 	}

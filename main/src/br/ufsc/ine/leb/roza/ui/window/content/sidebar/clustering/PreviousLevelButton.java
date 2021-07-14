@@ -37,6 +37,7 @@ public class PreviousLevelButton implements UiComponent {
 		button.addActionListener(event -> {
 			Level previous = levels.get(selected.getStep() - 1);
 			hub.selectLevelPublish(previous);
+			manager.selectCluster(previous.getClusters());
 		});
 		clusteringTab.setPreviousButton(button);
 	}

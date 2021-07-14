@@ -1,4 +1,5 @@
 bin/
 main/exec/materializer/
 main/exec/measurer/
+main/exec/writer/
 main/tools/deckard/tool/

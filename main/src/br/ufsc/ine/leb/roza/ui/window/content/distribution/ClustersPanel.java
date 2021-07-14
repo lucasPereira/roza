@@ -18,7 +18,7 @@ import br.ufsc.ine.leb.roza.ui.Hub;
 import br.ufsc.ine.leb.roza.ui.Manager;
 import br.ufsc.ine.leb.roza.ui.UiComponent;
 import br.ufsc.ine.leb.roza.ui.shared.WrapLayout;
-import br.ufsc.ine.leb.roza.util.Ring;
+import br.ufsc.ine.leb.roza.utils.Ring;
 import br.ufsc.ine.leb.roza.utils.comparator.ClusterComparatorBySizeAndTestName;
 import br.ufsc.ine.leb.roza.utils.comparator.TestCaseComparatorByName;
 

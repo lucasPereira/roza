@@ -2,7 +2,9 @@ package br.ufsc.ine.leb.roza.ui;
 
 import java.io.File;
 import java.util.List;
+import java.util.Set;
 
+import br.ufsc.ine.leb.roza.Cluster;
 import br.ufsc.ine.leb.roza.MaterializationReport;
 import br.ufsc.ine.leb.roza.SimilarityReport;
 import br.ufsc.ine.leb.roza.TestCase;
@@ -21,22 +23,28 @@ import br.ufsc.ine.leb.roza.materialization.TestCaseMaterializer;
 import br.ufsc.ine.leb.roza.measurement.SimilarityMeasurer;
 import br.ufsc.ine.leb.roza.parsing.TestClassParser;
 import br.ufsc.ine.leb.roza.refactoring.ClusterRefactor;
+import br.ufsc.ine.leb.roza.refactoring.IncrementalTestClassNamingStrategy;
+import br.ufsc.ine.leb.roza.refactoring.SimpleClusterRefactor;
 import br.ufsc.ine.leb.roza.selection.JavaExtensionTextFileSelector;
 import br.ufsc.ine.leb.roza.selection.TextFileSelector;
 import br.ufsc.ine.leb.roza.utils.FolderUtils;
+import br.ufsc.ine.leb.roza.writing.Junit4TestClassWriter;
+import br.ufsc.ine.leb.roza.writing.TestClassWriter;
 
 public class Manager {
 
 	private TestClassParser parser;
 	private TestCaseExtractor extractor;
 	private SimilarityMeasurer measurer;
+	private LinkageFactory linkageFactory;
+	private Referee referee;
+	private ThresholdCriteria threshold;
 
 	private List<TestClass> testClasses;
 	private List<TestCase> testCases;
 	private SimilarityReport similarityReport;
-	private LinkageFactory linkageFactory;
-	private Referee referee;
-	private ThresholdCriteria threshold;
+	private Set<Cluster> clusters;
+	private List<TestClass> refactoredTestClasses;
 
 	public Manager() {}
 
@@ -64,6 +72,27 @@ public class Manager {
 		return similarityReport;
 	}
 
+	public List<Level> distributeTests() {
+		DendogramTestCaseClusterer clustering = new DendogramTestCaseClusterer(linkageFactory.create(similarityReport), referee, threshold);
+		List<Level> levels = clustering.generateLevels(similarityReport);
+		return levels;
+	}
+
+	public List<TestClass> refactorClusters() {
+		SimpleClusterRefactor refactor = new SimpleClusterRefactor(new IncrementalTestClassNamingStrategy());
+		refactoredTestClasses = refactor.refactor(clusters);
+		return refactoredTestClasses;
+	}
+
+	public void selectCluster(Set<Cluster> clusters) {
+		this.clusters = clusters;
+	}
+
+	public void writeTestClasses(String baseFolder) {
+		TestClassWriter writer = new Junit4TestClassWriter(baseFolder);
+		writer.write(refactoredTestClasses);
+	}
+
 	public void setTestClassParser(TestClassParser parser) {
 		this.parser = parser;
 	}
@@ -89,10 +118,5 @@ public class Manager {
 	}
 
 	public void setRefactorStrategy(ClusterRefactor refactorStrategy) {}
-
-	public List<Level> distributeTests() {
-		DendogramTestCaseClusterer clustering = new DendogramTestCaseClusterer(linkageFactory.create(similarityReport), referee, threshold);
-		return clustering.generateLevels(similarityReport);
-	}
 
 }

@@ -29,6 +29,8 @@ public class LoadTestClassesButton implements UiComponent {
 		toolbar.addComponent(button);
 		button.addActionListener(event -> {
 			JFileChooser chooser = new JFileChooser();
+			chooser.setCurrentDirectory(new File("expt/resources/c"));
+			chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 			chooser.setFileFilter(new FileNameExtensionFilter("Java", "java"));
 			chooser.setMultiSelectionEnabled(true);
 			Integer result = chooser.showOpenDialog(SwingUtilities.getRoot(button));

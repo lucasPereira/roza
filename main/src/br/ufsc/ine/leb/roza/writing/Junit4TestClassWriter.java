@@ -17,11 +17,11 @@ import com.github.javaparser.printer.PrettyPrinterConfiguration.IndentType;
 import br.ufsc.ine.leb.roza.TestClass;
 import br.ufsc.ine.leb.roza.utils.FolderUtils;
 
-public class JavaTestClassWriter implements TestClassWriter {
+public class Junit4TestClassWriter implements TestClassWriter {
 
 	private FolderUtils folderUtils;
 
-	public JavaTestClassWriter(String baseFolder) {
+	public Junit4TestClassWriter(String baseFolder) {
 		folderUtils = new FolderUtils(baseFolder);
 	}
 
