@@ -3,9 +3,12 @@ package br.ufsc.ine.leb.roza.utils;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
+
+import br.ufsc.ine.leb.roza.utils.comparator.FileComparatorByPath;
 
 public class FolderUtils {
 
@@ -57,6 +60,7 @@ public class FolderUtils {
 				}
 			}
 		}
+		Collections.sort(selectedFiles, new FileComparatorByPath());
 		return selectedFiles;
 	}
 
