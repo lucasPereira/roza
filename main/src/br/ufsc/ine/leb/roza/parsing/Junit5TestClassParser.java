@@ -1,12 +1,20 @@
 package br.ufsc.ine.leb.roza.parsing;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import java.util.List;
 
-public class Junit5TestClassParser extends JunitTestClassParser implements TestClassParser {
+import br.ufsc.ine.leb.roza.loading.TextFile;
+
+public class Junit5TestClassParser implements TestClassParser {
+
+	private JavaTestClassParser parser;
 
 	public Junit5TestClassParser() {
-		super(Test.class, BeforeEach.class);
+		parser = new JavaTestClassParser(org.junit.jupiter.api.BeforeEach.class, org.junit.jupiter.api.Test.class);
+	}
+
+	@Override
+	public List<TestClass> parse(List<TextFile> files) {
+		return parser.parse(files);
 	}
 
 }

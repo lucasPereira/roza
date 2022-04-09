@@ -11,15 +11,15 @@ import java.util.Iterator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import br.ufsc.ine.leb.roza.MaterializationReport;
-import br.ufsc.ine.leb.roza.SimilarityAssessment;
-import br.ufsc.ine.leb.roza.SimilarityReport;
-import br.ufsc.ine.leb.roza.Statement;
-import br.ufsc.ine.leb.roza.TestCase;
+import br.ufsc.ine.leb.roza.extraction.TestCase;
 import br.ufsc.ine.leb.roza.materialization.Junit4WithAssertionsTestCaseMaterializer;
+import br.ufsc.ine.leb.roza.materialization.MaterializationReport;
 import br.ufsc.ine.leb.roza.materialization.TestCaseMaterializer;
 import br.ufsc.ine.leb.roza.measurement.LcsSimilarityMeasurer;
+import br.ufsc.ine.leb.roza.measurement.SimilarityAssessment;
 import br.ufsc.ine.leb.roza.measurement.SimilarityMeasurer;
+import br.ufsc.ine.leb.roza.measurement.SimilarityReport;
+import br.ufsc.ine.leb.roza.parsing.RozaStatement;
 import br.ufsc.ine.leb.roza.utils.FolderUtils;
 import br.ufsc.ine.leb.roza.utils.comparator.SimilarityAssessmentComparatorByScoreSourceNameAndTargetName;
 
@@ -49,7 +49,7 @@ class LcsSimilarityMetricTest {
 
 	@Test
 	void zeroFixtures() throws Exception {
-		Statement assertion = new Statement("assertEquals(0, 0);");
+		RozaStatement assertion = new RozaStatement("assertEquals(0, 0);");
 		TestCase testCaseA = new TestCase("testA", Arrays.asList(), Arrays.asList(assertion));
 		TestCase testCaseB = new TestCase("testB", Arrays.asList(), Arrays.asList(assertion));
 		MaterializationReport materializationReport = materializer.materialize(Arrays.asList(testCaseA, testCaseB));
@@ -78,10 +78,10 @@ class LcsSimilarityMetricTest {
 
 	@Test
 	void commonStartSequenceSameAssertions() throws Exception {
-		Statement fixture1 = new Statement("sut(1);");
-		Statement fixture2 = new Statement("sut(2);");
-		Statement fixture3 = new Statement("sut(3);");
-		Statement assertion = new Statement("assertEquals(0, 0);");
+		RozaStatement fixture1 = new RozaStatement("sut(1);");
+		RozaStatement fixture2 = new RozaStatement("sut(2);");
+		RozaStatement fixture3 = new RozaStatement("sut(3);");
+		RozaStatement assertion = new RozaStatement("assertEquals(0, 0);");
 		TestCase testCaseA = new TestCase("testA", Arrays.asList(fixture1, fixture2), Arrays.asList(assertion));
 		TestCase testCaseB = new TestCase("testB", Arrays.asList(fixture1, fixture3), Arrays.asList(assertion));
 		MaterializationReport materializationReport = materializer.materialize(Arrays.asList(testCaseA, testCaseB));
@@ -110,11 +110,11 @@ class LcsSimilarityMetricTest {
 
 	@Test
 	void commonStartSequenceDifferentAssertions() throws Exception {
-		Statement fixture1 = new Statement("sut(1);");
-		Statement fixture2 = new Statement("sut(2);");
-		Statement fixture3 = new Statement("sut(3);");
-		Statement assertion1 = new Statement("assertEquals(1, 1);");
-		Statement assertion2 = new Statement("assertEquals(2, 2);");
+		RozaStatement fixture1 = new RozaStatement("sut(1);");
+		RozaStatement fixture2 = new RozaStatement("sut(2);");
+		RozaStatement fixture3 = new RozaStatement("sut(3);");
+		RozaStatement assertion1 = new RozaStatement("assertEquals(1, 1);");
+		RozaStatement assertion2 = new RozaStatement("assertEquals(2, 2);");
 		TestCase testCaseA = new TestCase("testA", Arrays.asList(fixture1, fixture2), Arrays.asList(assertion1));
 		TestCase testCaseB = new TestCase("testB", Arrays.asList(fixture1, fixture3), Arrays.asList(assertion2));
 		MaterializationReport materializationReport = materializer.materialize(Arrays.asList(testCaseA, testCaseB));
@@ -143,9 +143,9 @@ class LcsSimilarityMetricTest {
 
 	@Test
 	void commonShortContigousStartSequence() throws Exception {
-		Statement fixture1 = new Statement("sut(1);");
-		Statement fixture2 = new Statement("sut(2);");
-		Statement fixture3 = new Statement("sut(3);");
+		RozaStatement fixture1 = new RozaStatement("sut(1);");
+		RozaStatement fixture2 = new RozaStatement("sut(2);");
+		RozaStatement fixture3 = new RozaStatement("sut(3);");
 		TestCase testCaseA = new TestCase("testA", Arrays.asList(fixture1, fixture2), Arrays.asList());
 		TestCase testCaseB = new TestCase("testB", Arrays.asList(fixture1, fixture3), Arrays.asList());
 		MaterializationReport materializationReport = materializer.materialize(Arrays.asList(testCaseA, testCaseB));
@@ -174,12 +174,12 @@ class LcsSimilarityMetricTest {
 
 	@Test
 	void commonLongContigousStartSequence() throws Exception {
-		Statement fixture1 = new Statement("sut(1);");
-		Statement fixture2 = new Statement("sut(2);");
-		Statement fixture3 = new Statement("sut(3);");
-		Statement fixture4 = new Statement("sut(4);");
-		Statement fixture5 = new Statement("sut(5);");
-		Statement fixture6 = new Statement("sut(6);");
+		RozaStatement fixture1 = new RozaStatement("sut(1);");
+		RozaStatement fixture2 = new RozaStatement("sut(2);");
+		RozaStatement fixture3 = new RozaStatement("sut(3);");
+		RozaStatement fixture4 = new RozaStatement("sut(4);");
+		RozaStatement fixture5 = new RozaStatement("sut(5);");
+		RozaStatement fixture6 = new RozaStatement("sut(6);");
 		TestCase testCaseA = new TestCase("testA", Arrays.asList(fixture1, fixture2, fixture3, fixture5), Arrays.asList());
 		TestCase testCaseB = new TestCase("testB", Arrays.asList(fixture1, fixture2, fixture4, fixture6), Arrays.asList());
 		MaterializationReport materializationReport = materializer.materialize(Arrays.asList(testCaseA, testCaseB));
@@ -208,10 +208,10 @@ class LcsSimilarityMetricTest {
 
 	@Test
 	void commonNonContigousSequenceAfterStart() throws Exception {
-		Statement fixture1 = new Statement("sut(1);");
-		Statement fixture2 = new Statement("sut(2);");
-		Statement fixture3 = new Statement("sut(3);");
-		Statement fixture4 = new Statement("sut(4);");
+		RozaStatement fixture1 = new RozaStatement("sut(1);");
+		RozaStatement fixture2 = new RozaStatement("sut(2);");
+		RozaStatement fixture3 = new RozaStatement("sut(3);");
+		RozaStatement fixture4 = new RozaStatement("sut(4);");
 		TestCase testCaseA = new TestCase("testA", Arrays.asList(fixture1, fixture2, fixture4), Arrays.asList());
 		TestCase testCaseB = new TestCase("testB", Arrays.asList(fixture1, fixture3, fixture4), Arrays.asList());
 		MaterializationReport materializationReport = materializer.materialize(Arrays.asList(testCaseA, testCaseB));
@@ -240,12 +240,12 @@ class LcsSimilarityMetricTest {
 
 	@Test
 	void commonNonContigousSequenceSinceStart() throws Exception {
-		Statement fixture1 = new Statement("sut(1);");
-		Statement fixture2 = new Statement("sut(2);");
-		Statement fixture3 = new Statement("sut(3);");
-		Statement fixture4 = new Statement("sut(4);");
-		Statement fixture5 = new Statement("sut(5);");
-		Statement fixture6 = new Statement("sut(6);");
+		RozaStatement fixture1 = new RozaStatement("sut(1);");
+		RozaStatement fixture2 = new RozaStatement("sut(2);");
+		RozaStatement fixture3 = new RozaStatement("sut(3);");
+		RozaStatement fixture4 = new RozaStatement("sut(4);");
+		RozaStatement fixture5 = new RozaStatement("sut(5);");
+		RozaStatement fixture6 = new RozaStatement("sut(6);");
 		TestCase testCaseA = new TestCase("testA", Arrays.asList(fixture5, fixture1, fixture2, fixture4), Arrays.asList());
 		TestCase testCaseB = new TestCase("testB", Arrays.asList(fixture6, fixture1, fixture3, fixture4), Arrays.asList());
 		MaterializationReport materializationReport = materializer.materialize(Arrays.asList(testCaseA, testCaseB));
@@ -274,8 +274,8 @@ class LcsSimilarityMetricTest {
 
 	@Test
 	void commonShortAsymmetricStartSequence() throws Exception {
-		Statement fixture1 = new Statement("sut(1);");
-		Statement fixture2 = new Statement("sut(2);");
+		RozaStatement fixture1 = new RozaStatement("sut(1);");
+		RozaStatement fixture2 = new RozaStatement("sut(2);");
 		TestCase testCaseA = new TestCase("testA", Arrays.asList(fixture1), Arrays.asList());
 		TestCase testCaseB = new TestCase("testB", Arrays.asList(fixture1, fixture2), Arrays.asList());
 		MaterializationReport materializationReport = materializer.materialize(Arrays.asList(testCaseA, testCaseB));
@@ -304,9 +304,9 @@ class LcsSimilarityMetricTest {
 
 	@Test
 	void commonLongAsymmetricStartSequence() throws Exception {
-		Statement fixture1 = new Statement("sut(1);");
-		Statement fixture2 = new Statement("sut(2);");
-		Statement fixture3 = new Statement("sut(3);");
+		RozaStatement fixture1 = new RozaStatement("sut(1);");
+		RozaStatement fixture2 = new RozaStatement("sut(2);");
+		RozaStatement fixture3 = new RozaStatement("sut(3);");
 		TestCase testCaseA = new TestCase("testA", Arrays.asList(fixture1), Arrays.asList());
 		TestCase testCaseB = new TestCase("testB", Arrays.asList(fixture1, fixture2, fixture3), Arrays.asList());
 		MaterializationReport materializationReport = materializer.materialize(Arrays.asList(testCaseA, testCaseB));
@@ -335,9 +335,9 @@ class LcsSimilarityMetricTest {
 
 	@Test
 	void commonAsymmetricStartSequenceWithoutRemainings() throws Exception {
-		Statement fixtureA = new Statement("sut(1);");
-		Statement fixtureB = new Statement("sut(2);");
-		Statement fixtureC = new Statement("sut(3);");
+		RozaStatement fixtureA = new RozaStatement("sut(1);");
+		RozaStatement fixtureB = new RozaStatement("sut(2);");
+		RozaStatement fixtureC = new RozaStatement("sut(3);");
 		TestCase testCaseA = new TestCase("testA", Arrays.asList(fixtureA), Arrays.asList());
 		TestCase testCaseB = new TestCase("testB", Arrays.asList(fixtureA, fixtureB), Arrays.asList());
 		TestCase testCaseC = new TestCase("testC", Arrays.asList(fixtureA, fixtureB, fixtureC), Arrays.asList());
@@ -387,10 +387,10 @@ class LcsSimilarityMetricTest {
 
 	@Test
 	void commonAsymmetricStartSequenceWithFixedRemainings() throws Exception {
-		Statement fixture1 = new Statement("sut(1);");
-		Statement fixture2 = new Statement("sut(2);");
-		Statement fixture3 = new Statement("sut(3);");
-		Statement fixture4 = new Statement("sut(4);");
+		RozaStatement fixture1 = new RozaStatement("sut(1);");
+		RozaStatement fixture2 = new RozaStatement("sut(2);");
+		RozaStatement fixture3 = new RozaStatement("sut(3);");
+		RozaStatement fixture4 = new RozaStatement("sut(4);");
 		TestCase testCaseA = new TestCase("testA", Arrays.asList(fixture1, fixture4), Arrays.asList());
 		TestCase testCaseB = new TestCase("testB", Arrays.asList(fixture1, fixture2, fixture4), Arrays.asList());
 		TestCase testCaseC = new TestCase("testC", Arrays.asList(fixture1, fixture2, fixture3, fixture4), Arrays.asList());
@@ -440,12 +440,12 @@ class LcsSimilarityMetricTest {
 
 	@Test
 	void commonAsymmetricStartSequenceWithProportionalRemainings() throws Exception {
-		Statement fixture1 = new Statement("sut(1);");
-		Statement fixture2 = new Statement("sut(2);");
-		Statement fixture3 = new Statement("sut(3);");
-		Statement fixture4 = new Statement("sut(4);");
-		Statement fixture5 = new Statement("sut(5);");
-		Statement fixture6 = new Statement("sut(6);");
+		RozaStatement fixture1 = new RozaStatement("sut(1);");
+		RozaStatement fixture2 = new RozaStatement("sut(2);");
+		RozaStatement fixture3 = new RozaStatement("sut(3);");
+		RozaStatement fixture4 = new RozaStatement("sut(4);");
+		RozaStatement fixture5 = new RozaStatement("sut(5);");
+		RozaStatement fixture6 = new RozaStatement("sut(6);");
 		TestCase testCaseA = new TestCase("testA", Arrays.asList(fixture1, fixture4), Arrays.asList());
 		TestCase testCaseB = new TestCase("testB", Arrays.asList(fixture1, fixture2, fixture4, fixture5), Arrays.asList());
 		TestCase testCaseC = new TestCase("testC", Arrays.asList(fixture1, fixture2, fixture3, fixture4, fixture5, fixture6), Arrays.asList());
@@ -495,12 +495,12 @@ class LcsSimilarityMetricTest {
 
 	@Test
 	void commonAsymmetricStartSequenceWithInverselyProportionalRemainings() throws Exception {
-		Statement fixture1 = new Statement("sut(1);");
-		Statement fixture2 = new Statement("sut(2);");
-		Statement fixture3 = new Statement("sut(3);");
-		Statement fixture4 = new Statement("sut(4);");
-		Statement fixture5 = new Statement("sut(5);");
-		Statement fixture6 = new Statement("sut(6);");
+		RozaStatement fixture1 = new RozaStatement("sut(1);");
+		RozaStatement fixture2 = new RozaStatement("sut(2);");
+		RozaStatement fixture3 = new RozaStatement("sut(3);");
+		RozaStatement fixture4 = new RozaStatement("sut(4);");
+		RozaStatement fixture5 = new RozaStatement("sut(5);");
+		RozaStatement fixture6 = new RozaStatement("sut(6);");
 		TestCase testCaseA = new TestCase("testA", Arrays.asList(fixture1, fixture4, fixture5, fixture6), Arrays.asList());
 		TestCase testCaseB = new TestCase("testB", Arrays.asList(fixture1, fixture2, fixture4, fixture5), Arrays.asList());
 		TestCase testCaseC = new TestCase("testC", Arrays.asList(fixture1, fixture2, fixture3, fixture4), Arrays.asList());

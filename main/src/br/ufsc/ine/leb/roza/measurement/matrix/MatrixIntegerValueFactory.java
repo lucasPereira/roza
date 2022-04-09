@@ -1,6 +1,6 @@
 package br.ufsc.ine.leb.roza.measurement.matrix;
 
-import br.ufsc.ine.leb.roza.TestCase;
+import br.ufsc.ine.leb.roza.extraction.TestCase;
 
 public class MatrixIntegerValueFactory implements MatrixValueFactory<TestCase, Integer> {
 

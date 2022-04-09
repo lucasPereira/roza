@@ -7,8 +7,8 @@ import java.util.Arrays;
 
 import org.junit.jupiter.api.Test;
 
-import br.ufsc.ine.leb.roza.TestCase;
-import br.ufsc.ine.leb.roza.TestCaseMaterialization;
+import br.ufsc.ine.leb.roza.extraction.TestCase;
+import br.ufsc.ine.leb.roza.materialization.TestCaseMaterialization;
 import br.ufsc.ine.leb.roza.measurement.matrix.MatrixElementToKeyConverter;
 
 class DeckardElementToKeyConverterTest {

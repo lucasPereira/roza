@@ -2,8 +2,6 @@ package br.ufsc.ine.leb.roza.clustering;
 
 import java.util.Arrays;
 
-import br.ufsc.ine.leb.roza.Cluster;
-
 public class Combination {
 
 	private Cluster first;

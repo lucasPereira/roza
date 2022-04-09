@@ -10,7 +10,7 @@ import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableModel;
 
-import br.ufsc.ine.leb.roza.SimilarityAssessment;
+import br.ufsc.ine.leb.roza.measurement.SimilarityAssessment;
 import br.ufsc.ine.leb.roza.ui.Hub;
 import br.ufsc.ine.leb.roza.ui.Manager;
 import br.ufsc.ine.leb.roza.ui.UiComponent;

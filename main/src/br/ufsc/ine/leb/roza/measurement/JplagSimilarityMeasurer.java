@@ -11,11 +11,9 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import br.ufsc.ine.leb.roza.MaterializationReport;
-import br.ufsc.ine.leb.roza.SimilarityReport;
-import br.ufsc.ine.leb.roza.SimilarityReportBuilder;
-import br.ufsc.ine.leb.roza.TestCase;
-import br.ufsc.ine.leb.roza.TestCaseMaterialization;
+import br.ufsc.ine.leb.roza.extraction.TestCase;
+import br.ufsc.ine.leb.roza.materialization.MaterializationReport;
+import br.ufsc.ine.leb.roza.materialization.TestCaseMaterialization;
 import br.ufsc.ine.leb.roza.measurement.configuration.jplag.JplagConfigurations;
 import br.ufsc.ine.leb.roza.measurement.matrix.Matrix;
 import br.ufsc.ine.leb.roza.measurement.matrix.MatrixElementToKeyConverter;

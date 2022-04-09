@@ -8,12 +8,11 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import br.ufsc.ine.leb.roza.Field;
-import br.ufsc.ine.leb.roza.SetupMethod;
-import br.ufsc.ine.leb.roza.Statement;
-import br.ufsc.ine.leb.roza.TestCase;
-import br.ufsc.ine.leb.roza.TestClass;
-import br.ufsc.ine.leb.roza.TestMethod;
+import br.ufsc.ine.leb.roza.parsing.Field;
+import br.ufsc.ine.leb.roza.parsing.SetupMethod;
+import br.ufsc.ine.leb.roza.parsing.RozaStatement;
+import br.ufsc.ine.leb.roza.parsing.TestClass;
+import br.ufsc.ine.leb.roza.parsing.TestMethod;
 
 class Junit5TestCaseExtractorTest {
 
@@ -49,7 +48,7 @@ class Junit5TestCaseExtractorTest {
 
 	@Test
 	void oneTestMethodWithOneAssert() throws Exception {
-		Statement assertStatement = new Statement("assertEquals(0, 0);");
+		RozaStatement assertStatement = new RozaStatement("assertEquals(0, 0);");
 		TestMethod testMethod = new TestMethod("example", Arrays.asList(assertStatement));
 		TestClass testClass = new TestClass("ExampleTest", Arrays.asList(), Arrays.asList(), Arrays.asList(testMethod));
 		List<TestCase> testCases = extractor.extract(Arrays.asList(testClass));
@@ -62,8 +61,8 @@ class Junit5TestCaseExtractorTest {
 
 	@Test
 	void oneTestMethodWithOneAssertOneSetupMethodWithOneFixture() throws Exception {
-		Statement fixtureStatement = new Statement("sut(0);");
-		Statement assertStatement = new Statement("assertEquals(0, 0);");
+		RozaStatement fixtureStatement = new RozaStatement("sut(0);");
+		RozaStatement assertStatement = new RozaStatement("assertEquals(0, 0);");
 		SetupMethod setupMethod = new SetupMethod("setup", Arrays.asList(fixtureStatement));
 		TestMethod testMethod = new TestMethod("example", Arrays.asList(assertStatement));
 		TestClass testClass = new TestClass("ExampleTest", Arrays.asList(), Arrays.asList(setupMethod), Arrays.asList(testMethod));
@@ -78,8 +77,8 @@ class Junit5TestCaseExtractorTest {
 
 	@Test
 	void oneTestMethodWithOneAssertOneSetupMethodWithOneAssert() throws Exception {
-		Statement assertStatement1 = new Statement("assertEquals(1, 1);");
-		Statement assertStatement2 = new Statement("assertEquals(2, 2);");
+		RozaStatement assertStatement1 = new RozaStatement("assertEquals(1, 1);");
+		RozaStatement assertStatement2 = new RozaStatement("assertEquals(2, 2);");
 		SetupMethod setupMethod = new SetupMethod("setup", Arrays.asList(assertStatement1));
 		TestMethod testMethod = new TestMethod("example", Arrays.asList(assertStatement2));
 		TestClass testClass = new TestClass("ExampleTest", Arrays.asList(), Arrays.asList(setupMethod), Arrays.asList(testMethod));
@@ -94,7 +93,7 @@ class Junit5TestCaseExtractorTest {
 
 	@Test
 	void oneTestMethodWithOneFixture() throws Exception {
-		Statement fixtureStatement = new Statement("sut(0);");
+		RozaStatement fixtureStatement = new RozaStatement("sut(0);");
 		TestMethod testMethod = new TestMethod("example", Arrays.asList(fixtureStatement));
 		TestClass testClass = new TestClass("ExampleTest", Arrays.asList(), Arrays.asList(), Arrays.asList(testMethod));
 		List<TestCase> testCases = extractor.extract(Arrays.asList(testClass));
@@ -107,8 +106,8 @@ class Junit5TestCaseExtractorTest {
 
 	@Test
 	void oneTestMethodWithOneFixtureOneSetupMethodWithOneFixture() throws Exception {
-		Statement fixtureStatement1 = new Statement("sut(1);");
-		Statement fixtureStatement2 = new Statement("sut(2);");
+		RozaStatement fixtureStatement1 = new RozaStatement("sut(1);");
+		RozaStatement fixtureStatement2 = new RozaStatement("sut(2);");
 		SetupMethod setupMethod = new SetupMethod("setup", Arrays.asList(fixtureStatement1));
 		TestMethod testMethod = new TestMethod("example", Arrays.asList(fixtureStatement2));
 		TestClass testClass = new TestClass("ExampleTest", Arrays.asList(), Arrays.asList(setupMethod), Arrays.asList(testMethod));
@@ -123,8 +122,8 @@ class Junit5TestCaseExtractorTest {
 
 	@Test
 	void oneTestMethodWithOneFixtureOneSetupMethodWithOneAssert() throws Exception {
-		Statement assertStatement = new Statement("assertEquals(0, 0);");
-		Statement fixtureStatement = new Statement("sut(0);");
+		RozaStatement assertStatement = new RozaStatement("assertEquals(0, 0);");
+		RozaStatement fixtureStatement = new RozaStatement("sut(0);");
 		SetupMethod setupMethod = new SetupMethod("setup", Arrays.asList(assertStatement));
 		TestMethod testMethod = new TestMethod("example", Arrays.asList(fixtureStatement));
 		TestClass testClass = new TestClass("ExampleTest", Arrays.asList(), Arrays.asList(setupMethod), Arrays.asList(testMethod));
@@ -139,10 +138,10 @@ class Junit5TestCaseExtractorTest {
 
 	@Test
 	void setupMethodWithFieldInicialization() throws Exception {
-		Statement sutDeclaretionAndInicialization = new Statement("Sut sut = new Sut();");
-		Statement sutInicialization = new Statement("sut = new Sut();");
-		Statement saveStatement = new Statement("sut.save(0);");
-		Statement assertStatement = new Statement("assertEquals(0, sut.get(0));");
+		RozaStatement sutDeclaretionAndInicialization = new RozaStatement("Sut sut = new Sut();");
+		RozaStatement sutInicialization = new RozaStatement("sut = new Sut();");
+		RozaStatement saveStatement = new RozaStatement("sut.save(0);");
+		RozaStatement assertStatement = new RozaStatement("assertEquals(0, sut.get(0));");
 		SetupMethod setupMethod = new SetupMethod("setup", Arrays.asList(sutInicialization));
 		Field field = new Field("Sut", "sut");
 		TestMethod testMethod = new TestMethod("test", Arrays.asList(saveStatement, assertStatement));
@@ -160,18 +159,18 @@ class Junit5TestCaseExtractorTest {
 
 	@Test
 	void complex() throws Exception {
-		Statement classASetup1Fixture1 = new Statement("sut(1);");
-		Statement classASetup1Fixture2 = new Statement("sut(2);");
-		Statement classATest1Fixture3 = new Statement("sut(3);");
-		Statement classATest1Fixture4 = new Statement("sut(4);");
-		Statement classASetup2Fixture5 = new Statement("sut(5);");
-		Statement classBSetup3Fixture6 = new Statement("sut(6);");
-		Statement classASetup1Assert1 = new Statement("assertEquals(1, 1);");
-		Statement classASetup1Assert2 = new Statement("assertEquals(2, 2);");
-		Statement classATest1Assert3 = new Statement("assertEquals(3, 3);");
-		Statement classATest1Assert4 = new Statement("assertEquals(4, 4);");
-		Statement classATest2Assert5 = new Statement("assertEquals(5, 5);");
-		Statement classBTest3Assert6 = new Statement("assertEquals(6, 6);");
+		RozaStatement classASetup1Fixture1 = new RozaStatement("sut(1);");
+		RozaStatement classASetup1Fixture2 = new RozaStatement("sut(2);");
+		RozaStatement classATest1Fixture3 = new RozaStatement("sut(3);");
+		RozaStatement classATest1Fixture4 = new RozaStatement("sut(4);");
+		RozaStatement classASetup2Fixture5 = new RozaStatement("sut(5);");
+		RozaStatement classBSetup3Fixture6 = new RozaStatement("sut(6);");
+		RozaStatement classASetup1Assert1 = new RozaStatement("assertEquals(1, 1);");
+		RozaStatement classASetup1Assert2 = new RozaStatement("assertEquals(2, 2);");
+		RozaStatement classATest1Assert3 = new RozaStatement("assertEquals(3, 3);");
+		RozaStatement classATest1Assert4 = new RozaStatement("assertEquals(4, 4);");
+		RozaStatement classATest2Assert5 = new RozaStatement("assertEquals(5, 5);");
+		RozaStatement classBTest3Assert6 = new RozaStatement("assertEquals(6, 6);");
 		SetupMethod classASetup1 = new SetupMethod("setup1", Arrays.asList(classASetup1Fixture1, classASetup1Fixture2, classASetup1Assert1, classASetup1Assert2));
 		SetupMethod classASetup2 = new SetupMethod("setup2", Arrays.asList(classASetup2Fixture5));
 		SetupMethod classBSetup3 = new SetupMethod("setup3", Arrays.asList(classBSetup3Fixture6));
@@ -219,23 +218,23 @@ class Junit5TestCaseExtractorTest {
 
 	@Test
 	void oneTestMethodWithAllAssertsOfJunit() throws Exception {
-		Statement equalsStatement = new Statement("assertEquals(0, 0);");
-		Statement notEqualsStatement = new Statement("assertNotEquals(0, 0);");
-		Statement trueStatement = new Statement("assertTrue(false);");
-		Statement falseStatement = new Statement("assertFalse(false);");
-		Statement nullStatement = new Statement("assertNull(null);");
-		Statement notNullStatement = new Statement("assertNotNull(BigDecimal.ZERO);");
-		Statement sameStatement = new Statement("assertSame(BigDecimal.ONE, BigDecimal.ONE);");
-		Statement notSameStatement = new Statement("assertNotSame(new BigDecimal(1024), new BigDecimal(1024));");
-		Statement arrayEqualsStatement = new Statement("assertArrayEquals(new Object[0], new Object[0]);");
-		Statement iterableEqualsStatement = new Statement("assertIterableEquals(Arrays.asList(1), Arrays.asList(1));");
-		Statement linesMatchStatement = new Statement("assertLinesMatch(Arrays.asList(\"A\"), Arrays.asList(\"A\"));");
-		Statement allStatement = new Statement("assertAll(() -> assertNotEquals(1, 0), () -> assertNotEquals(0, 1));");
-		Statement timeoutStatement = new Statement("assertTimeout(Duration.ofSeconds(1), () -> System.out.println(1));");
-		Statement timeoutPreemptivelyStatement = new Statement("assertTimeoutPreemptively(Duration.ofSeconds(1), () ->System.out.println(1));");
-		Statement throwsStatement = new Statement("assertThrows(Exception.class, () -> System.out.println(1 / 0));");
-		Statement doNotThrowStatement = new Statement("assertDoesNotThrow(() -> System.out.println(1 / 1));");
-		List<Statement> statements = Arrays.asList(equalsStatement, notEqualsStatement, trueStatement, falseStatement, nullStatement, notNullStatement, sameStatement, notSameStatement, arrayEqualsStatement, iterableEqualsStatement, linesMatchStatement, allStatement, timeoutStatement, timeoutPreemptivelyStatement, throwsStatement, doNotThrowStatement);
+		RozaStatement equalsStatement = new RozaStatement("assertEquals(0, 0);");
+		RozaStatement notEqualsStatement = new RozaStatement("assertNotEquals(0, 0);");
+		RozaStatement trueStatement = new RozaStatement("assertTrue(false);");
+		RozaStatement falseStatement = new RozaStatement("assertFalse(false);");
+		RozaStatement nullStatement = new RozaStatement("assertNull(null);");
+		RozaStatement notNullStatement = new RozaStatement("assertNotNull(BigDecimal.ZERO);");
+		RozaStatement sameStatement = new RozaStatement("assertSame(BigDecimal.ONE, BigDecimal.ONE);");
+		RozaStatement notSameStatement = new RozaStatement("assertNotSame(new BigDecimal(1024), new BigDecimal(1024));");
+		RozaStatement arrayEqualsStatement = new RozaStatement("assertArrayEquals(new Object[0], new Object[0]);");
+		RozaStatement iterableEqualsStatement = new RozaStatement("assertIterableEquals(Arrays.asList(1), Arrays.asList(1));");
+		RozaStatement linesMatchStatement = new RozaStatement("assertLinesMatch(Arrays.asList(\"A\"), Arrays.asList(\"A\"));");
+		RozaStatement allStatement = new RozaStatement("assertAll(() -> assertNotEquals(1, 0), () -> assertNotEquals(0, 1));");
+		RozaStatement timeoutStatement = new RozaStatement("assertTimeout(Duration.ofSeconds(1), () -> System.out.println(1));");
+		RozaStatement timeoutPreemptivelyStatement = new RozaStatement("assertTimeoutPreemptively(Duration.ofSeconds(1), () ->System.out.println(1));");
+		RozaStatement throwsStatement = new RozaStatement("assertThrows(Exception.class, () -> System.out.println(1 / 0));");
+		RozaStatement doNotThrowStatement = new RozaStatement("assertDoesNotThrow(() -> System.out.println(1 / 1));");
+		List<RozaStatement> statements = Arrays.asList(equalsStatement, notEqualsStatement, trueStatement, falseStatement, nullStatement, notNullStatement, sameStatement, notSameStatement, arrayEqualsStatement, iterableEqualsStatement, linesMatchStatement, allStatement, timeoutStatement, timeoutPreemptivelyStatement, throwsStatement, doNotThrowStatement);
 		TestMethod testMethod = new TestMethod("example", statements);
 		TestClass testClass = new TestClass("ExampleTest", Arrays.asList(), Arrays.asList(), Arrays.asList(testMethod));
 		List<TestCase> testCases = extractor.extract(Arrays.asList(testClass));
@@ -263,23 +262,23 @@ class Junit5TestCaseExtractorTest {
 
 	@Test
 	void oneTestMethodWithAllNonStaticAssertsOfJunit() throws Exception {
-		Statement equalsStatement = new Statement("Assertions.assertEquals(0, 0);");
-		Statement notEqualsStatement = new Statement("Assertions.assertNotEquals(0, 0);");
-		Statement trueStatement = new Statement("Assertions.assertTrue(false);");
-		Statement falseStatement = new Statement("Assertions.assertFalse(false);");
-		Statement nullStatement = new Statement("Assertions.assertNull(null);");
-		Statement notNullStatement = new Statement("Assertions.assertNotNull(BigDecimal.ZERO);");
-		Statement sameStatement = new Statement("Assertions.assertSame(BigDecimal.ONE, BigDecimal.ONE);");
-		Statement notSameStatement = new Statement("Assertions.assertNotSame(new BigDecimal(1024), new BigDecimal(1024));");
-		Statement arrayEqualsStatement = new Statement("Assertions.assertArrayEquals(new Object[0], new Object[0]);");
-		Statement iterableEqualsStatement = new Statement("Assertions.assertIterableEquals(Arrays.asList(1), Arrays.asList(1));");
-		Statement linesMatchStatement = new Statement("Assertions.assertLinesMatch(Arrays.asList(\"A\"), Arrays.asList(\"A\"));");
-		Statement allStatement = new Statement("Assertions.assertAll(() -> assertNotEquals(1, 0), () -> assertNotEquals(0, 1));");
-		Statement timeoutStatement = new Statement("Assertions.assertTimeout(Duration.ofSeconds(1), () -> System.out.println(1));");
-		Statement timeoutPreemptivelyStatement = new Statement("Assertions.assertTimeoutPreemptively(Duration.ofSeconds(1), () ->System.out.println(1));");
-		Statement throwsStatement = new Statement("Assertions.assertThrows(Exception.class, () -> System.out.println(1 / 0));");
-		Statement doNotThrowStatement = new Statement("Assertions.assertDoesNotThrow(() -> System.out.println(1 / 1));");
-		List<Statement> statements = Arrays.asList(equalsStatement, notEqualsStatement, trueStatement, falseStatement, nullStatement, notNullStatement, sameStatement, notSameStatement, arrayEqualsStatement, iterableEqualsStatement, linesMatchStatement, allStatement, timeoutStatement, timeoutPreemptivelyStatement, throwsStatement, doNotThrowStatement);
+		RozaStatement equalsStatement = new RozaStatement("Assertions.assertEquals(0, 0);");
+		RozaStatement notEqualsStatement = new RozaStatement("Assertions.assertNotEquals(0, 0);");
+		RozaStatement trueStatement = new RozaStatement("Assertions.assertTrue(false);");
+		RozaStatement falseStatement = new RozaStatement("Assertions.assertFalse(false);");
+		RozaStatement nullStatement = new RozaStatement("Assertions.assertNull(null);");
+		RozaStatement notNullStatement = new RozaStatement("Assertions.assertNotNull(BigDecimal.ZERO);");
+		RozaStatement sameStatement = new RozaStatement("Assertions.assertSame(BigDecimal.ONE, BigDecimal.ONE);");
+		RozaStatement notSameStatement = new RozaStatement("Assertions.assertNotSame(new BigDecimal(1024), new BigDecimal(1024));");
+		RozaStatement arrayEqualsStatement = new RozaStatement("Assertions.assertArrayEquals(new Object[0], new Object[0]);");
+		RozaStatement iterableEqualsStatement = new RozaStatement("Assertions.assertIterableEquals(Arrays.asList(1), Arrays.asList(1));");
+		RozaStatement linesMatchStatement = new RozaStatement("Assertions.assertLinesMatch(Arrays.asList(\"A\"), Arrays.asList(\"A\"));");
+		RozaStatement allStatement = new RozaStatement("Assertions.assertAll(() -> assertNotEquals(1, 0), () -> assertNotEquals(0, 1));");
+		RozaStatement timeoutStatement = new RozaStatement("Assertions.assertTimeout(Duration.ofSeconds(1), () -> System.out.println(1));");
+		RozaStatement timeoutPreemptivelyStatement = new RozaStatement("Assertions.assertTimeoutPreemptively(Duration.ofSeconds(1), () ->System.out.println(1));");
+		RozaStatement throwsStatement = new RozaStatement("Assertions.assertThrows(Exception.class, () -> System.out.println(1 / 0));");
+		RozaStatement doNotThrowStatement = new RozaStatement("Assertions.assertDoesNotThrow(() -> System.out.println(1 / 1));");
+		List<RozaStatement> statements = Arrays.asList(equalsStatement, notEqualsStatement, trueStatement, falseStatement, nullStatement, notNullStatement, sameStatement, notSameStatement, arrayEqualsStatement, iterableEqualsStatement, linesMatchStatement, allStatement, timeoutStatement, timeoutPreemptivelyStatement, throwsStatement, doNotThrowStatement);
 		TestMethod testMethod = new TestMethod("example", statements);
 		TestClass testClass = new TestClass("ExampleTest", Arrays.asList(), Arrays.asList(), Arrays.asList(testMethod));
 		List<TestCase> testCases = extractor.extract(Arrays.asList(testClass));

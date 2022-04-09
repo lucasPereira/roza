@@ -6,8 +6,8 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
-import br.ufsc.ine.leb.roza.Cluster;
-import br.ufsc.ine.leb.roza.TestCase;
+import br.ufsc.ine.leb.roza.clustering.Cluster;
+import br.ufsc.ine.leb.roza.extraction.TestCase;
 
 public class ClusterComparatorBySizeAndTestName implements Comparator<Cluster> {
 

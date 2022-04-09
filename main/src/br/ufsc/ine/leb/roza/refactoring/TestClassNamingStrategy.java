@@ -2,9 +2,9 @@ package br.ufsc.ine.leb.roza.refactoring;
 
 import java.util.List;
 
-import br.ufsc.ine.leb.roza.Field;
-import br.ufsc.ine.leb.roza.SetupMethod;
-import br.ufsc.ine.leb.roza.TestMethod;
+import br.ufsc.ine.leb.roza.parsing.Field;
+import br.ufsc.ine.leb.roza.parsing.SetupMethod;
+import br.ufsc.ine.leb.roza.parsing.TestMethod;
 
 public interface TestClassNamingStrategy {
 

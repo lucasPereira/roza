@@ -4,12 +4,10 @@ import java.math.BigDecimal;
 import java.math.MathContext;
 import java.util.List;
 
-import br.ufsc.ine.leb.roza.MaterializationReport;
-import br.ufsc.ine.leb.roza.SimilarityReport;
-import br.ufsc.ine.leb.roza.SimilarityReportBuilder;
-import br.ufsc.ine.leb.roza.Statement;
-import br.ufsc.ine.leb.roza.TestCase;
-import br.ufsc.ine.leb.roza.TestCaseMaterialization;
+import br.ufsc.ine.leb.roza.extraction.TestCase;
+import br.ufsc.ine.leb.roza.materialization.MaterializationReport;
+import br.ufsc.ine.leb.roza.materialization.TestCaseMaterialization;
+import br.ufsc.ine.leb.roza.parsing.RozaStatement;
 
 public class LcsSimilarityMeasurer extends AbstractSimilarityMeasurer implements SimilarityMeasurer {
 
@@ -18,11 +16,11 @@ public class LcsSimilarityMeasurer extends AbstractSimilarityMeasurer implements
 		List<TestCaseMaterialization> materializations = materializationReport.getMaterializations();
 		for (TestCaseMaterialization sourceMaterialization : materializations) {
 			TestCase source = sourceMaterialization.getTestCase();
-			List<Statement> sourceFixtures = source.getFixtures();
+			List<RozaStatement> sourceFixtures = source.getFixtures();
 			for (TestCaseMaterialization targetMaterialization : materializations) {
 				TestCase target = targetMaterialization.getTestCase();
 				if (!source.equals(target)) {
-					List<Statement> targetFixtures = target.getFixtures();
+					List<RozaStatement> targetFixtures = target.getFixtures();
 					Integer commonFixtures = lcs(sourceFixtures, targetFixtures);
 					Integer reusedFixtures = commonFixtures * 2;
 					Integer sourceOnlyFixtures = sourceFixtures.size() - commonFixtures;
@@ -36,7 +34,7 @@ public class LcsSimilarityMeasurer extends AbstractSimilarityMeasurer implements
 		return builder.build();
 	}
 
-	private Integer lcs(List<Statement> sourceFixtures, List<Statement> targetFixtures) {
+	private Integer lcs(List<RozaStatement> sourceFixtures, List<RozaStatement> targetFixtures) {
 		Integer sizeSource = sourceFixtures.size();
 		Integer sizeTarget = targetFixtures.size();
 		Integer[][] matrix = new Integer[sizeSource + 1][sizeTarget + 1];

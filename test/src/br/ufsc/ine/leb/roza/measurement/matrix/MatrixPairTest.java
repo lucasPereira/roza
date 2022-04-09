@@ -6,7 +6,7 @@ import java.util.Arrays;
 
 import org.junit.jupiter.api.Test;
 
-import br.ufsc.ine.leb.roza.TestCase;
+import br.ufsc.ine.leb.roza.extraction.TestCase;
 
 class MatrixPairTest {
 

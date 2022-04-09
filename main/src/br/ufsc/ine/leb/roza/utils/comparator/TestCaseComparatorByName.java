@@ -2,7 +2,7 @@ package br.ufsc.ine.leb.roza.utils.comparator;
 
 import java.util.Comparator;
 
-import br.ufsc.ine.leb.roza.TestCase;
+import br.ufsc.ine.leb.roza.extraction.TestCase;
 
 public class TestCaseComparatorByName implements Comparator<TestCase> {
 

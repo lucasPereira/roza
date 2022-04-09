@@ -3,7 +3,6 @@ package br.ufsc.ine.leb.roza.clustering;
 import java.util.HashSet;
 import java.util.Set;
 
-import br.ufsc.ine.leb.roza.Cluster;
 import br.ufsc.ine.leb.roza.exceptions.NoCombinationToChooseException;
 import br.ufsc.ine.leb.roza.exceptions.TiebreakException;
 

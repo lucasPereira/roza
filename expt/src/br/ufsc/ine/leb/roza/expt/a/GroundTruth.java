@@ -5,13 +5,11 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-import br.ufsc.ine.leb.roza.Statement;
-import br.ufsc.ine.leb.roza.TestCase;
-import br.ufsc.ine.leb.roza.TestClass;
-import br.ufsc.ine.leb.roza.TextFile;
 import br.ufsc.ine.leb.roza.extraction.JunitTestCaseExtractor;
+import br.ufsc.ine.leb.roza.extraction.TestCase;
 import br.ufsc.ine.leb.roza.extraction.TestCaseExtractor;
 import br.ufsc.ine.leb.roza.loading.RecursiveTextFileLoader;
+import br.ufsc.ine.leb.roza.loading.TextFile;
 import br.ufsc.ine.leb.roza.loading.TextFileLoader;
 import br.ufsc.ine.leb.roza.measurement.matrix.Matrix;
 import br.ufsc.ine.leb.roza.measurement.matrix.MatrixElementToKeyConverter;
@@ -20,6 +18,8 @@ import br.ufsc.ine.leb.roza.measurement.matrix.MatrixPair;
 import br.ufsc.ine.leb.roza.measurement.matrix.MatrixTestCaseToStringConverter;
 import br.ufsc.ine.leb.roza.measurement.matrix.MatrixValueFactory;
 import br.ufsc.ine.leb.roza.parsing.Junit5TestClassParser;
+import br.ufsc.ine.leb.roza.parsing.RozaStatement;
+import br.ufsc.ine.leb.roza.parsing.TestClass;
 import br.ufsc.ine.leb.roza.parsing.TestClassParser;
 
 public class GroundTruth {
@@ -363,7 +363,7 @@ public class GroundTruth {
 		}
 		Integer errors = 0;
 		for (TestCase source : testCases) {
-			List<Statement> sourceFixtures = source.getFixtures();
+			List<RozaStatement> sourceFixtures = source.getFixtures();
 			for (TestCase target : testCases) {
 				Integer commonFixtures = countCommonFixtures(sourceFixtures, target);
 				Integer truth = matrix.get(source.getName(), target.getName());
@@ -379,13 +379,13 @@ public class GroundTruth {
 		logSummary(errors);
 	}
 
-	private Integer countCommonFixtures(List<Statement> sourceFixtures, TestCase target) {
+	private Integer countCommonFixtures(List<RozaStatement> sourceFixtures, TestCase target) {
 		Boolean contiguous = true;
-		List<Statement> targetFixtures = target.getFixtures();
+		List<RozaStatement> targetFixtures = target.getFixtures();
 		Integer commonFixtures = 0;
 		for (Integer index = 0; contiguous && index < sourceFixtures.size() && index < targetFixtures.size(); index++) {
-			Statement sourceFixture = sourceFixtures.get(index);
-			Statement targetFixture = targetFixtures.get(index);
+			RozaStatement sourceFixture = sourceFixtures.get(index);
+			RozaStatement targetFixture = targetFixtures.get(index);
 			contiguous = sourceFixture.equals(targetFixture);
 			if (contiguous) {
 				commonFixtures++;

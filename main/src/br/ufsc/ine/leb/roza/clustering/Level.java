@@ -4,8 +4,6 @@ import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.Set;
 
-import br.ufsc.ine.leb.roza.Cluster;
-
 public class Level {
 
 	private Set<Cluster> clusters;

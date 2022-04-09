@@ -3,7 +3,7 @@ package br.ufsc.ine.leb.roza.selection;
 import java.util.LinkedList;
 import java.util.List;
 
-import br.ufsc.ine.leb.roza.TextFile;
+import br.ufsc.ine.leb.roza.loading.TextFile;
 
 public class JavaExtensionTextFileSelector implements TextFileSelector {
 

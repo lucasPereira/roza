@@ -9,11 +9,11 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import br.ufsc.ine.leb.roza.Field;
-import br.ufsc.ine.leb.roza.SetupMethod;
-import br.ufsc.ine.leb.roza.Statement;
-import br.ufsc.ine.leb.roza.TestClass;
-import br.ufsc.ine.leb.roza.TestMethod;
+import br.ufsc.ine.leb.roza.parsing.Field;
+import br.ufsc.ine.leb.roza.parsing.SetupMethod;
+import br.ufsc.ine.leb.roza.parsing.RozaStatement;
+import br.ufsc.ine.leb.roza.parsing.TestClass;
+import br.ufsc.ine.leb.roza.parsing.TestMethod;
 import br.ufsc.ine.leb.roza.utils.CodeStringBuilder;
 import br.ufsc.ine.leb.roza.utils.FileUtils;
 import br.ufsc.ine.leb.roza.utils.FolderUtils;
@@ -62,8 +62,8 @@ public class JUnit4TestClassWriterTest {
 
 	@Test
 	void testMethodWithStatements() throws Exception {
-		Statement fixture = new Statement("int a = 10;");
-		Statement assertion = new Statement("assertEquals(10, a);");
+		RozaStatement fixture = new RozaStatement("int a = 10;");
+		RozaStatement assertion = new RozaStatement("assertEquals(10, a);");
 		TestMethod test = new TestMethod("alpha", Arrays.asList(fixture, assertion));
 		TestClass alpha = new TestClass("Alpha", Arrays.asList(), Arrays.asList(), Arrays.asList(test));
 		writer.write(Arrays.asList(alpha));
@@ -117,8 +117,8 @@ public class JUnit4TestClassWriterTest {
 	@Test
 	void setupMethodWithFixture() throws Exception {
 		Field field = new Field("int", "a");
-		Statement fixture = new Statement("a = 10;");
-		Statement assertion = new Statement("assertEquals(10, a);");
+		RozaStatement fixture = new RozaStatement("a = 10;");
+		RozaStatement assertion = new RozaStatement("assertEquals(10, a);");
 		SetupMethod setup = new SetupMethod("setup", Arrays.asList(fixture));
 		TestMethod test = new TestMethod("alpha", Arrays.asList(assertion));
 		TestClass alpha = new TestClass("Alpha", Arrays.asList(field), Arrays.asList(setup), Arrays.asList(test));
@@ -151,8 +151,8 @@ public class JUnit4TestClassWriterTest {
 
 	@Test
 	void fieldInitialization() throws Exception {
-		Field field = new Field("int", "a", new Statement("10"));
-		Statement assertion = new Statement("assertEquals(10, a);");
+		Field field = new Field("int", "a", new RozaStatement("10"));
+		RozaStatement assertion = new RozaStatement("assertEquals(10, a);");
 		TestMethod test = new TestMethod("alpha", Arrays.asList(assertion));
 		TestClass alpha = new TestClass("Alpha", Arrays.asList(field), Arrays.asList(), Arrays.asList(test));
 		writer.write(Arrays.asList(alpha));
@@ -180,10 +180,10 @@ public class JUnit4TestClassWriterTest {
 	void twoTestClassesOneWithTwoSetupMethodsAndTwoTestMethodsAndOtherWithOneEmptyTestMethod() throws Exception {
 		Field filedAlphaOne = new Field("int", "a");
 		Field filedAlphaTwo = new Field("int", "b");
-		Statement fixtureAlphaOne = new Statement("a = 10;");
-		Statement fixtureAlphaTwo = new Statement("b = 20;");
-		Statement assertionAlphaOne = new Statement("assertEquals(10, a);");
-		Statement assertionAlphaTwo = new Statement("assertEquals(20, b);");
+		RozaStatement fixtureAlphaOne = new RozaStatement("a = 10;");
+		RozaStatement fixtureAlphaTwo = new RozaStatement("b = 20;");
+		RozaStatement assertionAlphaOne = new RozaStatement("assertEquals(10, a);");
+		RozaStatement assertionAlphaTwo = new RozaStatement("assertEquals(20, b);");
 		SetupMethod setupAlphaOne = new SetupMethod("setupAlphaOne", Arrays.asList(fixtureAlphaOne));
 		SetupMethod setupAlphaTwo = new SetupMethod("setupAlphaTwo", Arrays.asList(fixtureAlphaTwo));
 		TestMethod testAlphaOne = new TestMethod("testAlphaOne", Arrays.asList(assertionAlphaOne));

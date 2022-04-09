@@ -7,7 +7,7 @@ import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.SwingUtilities;
 
-import br.ufsc.ine.leb.roza.TestClass;
+import br.ufsc.ine.leb.roza.parsing.TestClass;
 import br.ufsc.ine.leb.roza.ui.Hub;
 import br.ufsc.ine.leb.roza.ui.Manager;
 import br.ufsc.ine.leb.roza.ui.UiComponent;

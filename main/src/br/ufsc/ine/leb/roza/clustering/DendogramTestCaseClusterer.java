@@ -6,10 +6,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import br.ufsc.ine.leb.roza.Cluster;
-import br.ufsc.ine.leb.roza.SimilarityReport;
 import br.ufsc.ine.leb.roza.exceptions.ClusteringLevelGenerationException;
 import br.ufsc.ine.leb.roza.exceptions.TiebreakException;
+import br.ufsc.ine.leb.roza.measurement.SimilarityReport;
 
 public class DendogramTestCaseClusterer implements TestCaseClusterer {
 

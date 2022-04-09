@@ -8,8 +8,8 @@ import javax.swing.text.Document;
 import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.StyleSheet;
 
-import br.ufsc.ine.leb.roza.Statement;
-import br.ufsc.ine.leb.roza.TestCase;
+import br.ufsc.ine.leb.roza.extraction.TestCase;
+import br.ufsc.ine.leb.roza.parsing.RozaStatement;
 
 public class CodePanel extends JScrollPane {
 
@@ -52,10 +52,10 @@ public class CodePanel extends JScrollPane {
 		code.append("<html>");
 		code.append("<body>");
 		code.append("<ul>");
-		for (Statement fixture : testCase.getFixtures()) {
+		for (RozaStatement fixture : testCase.getFixtures()) {
 			appendCode(line++, code, fixture, "fixture");
 		}
-		for (Statement assertion : testCase.getAsserts()) {
+		for (RozaStatement assertion : testCase.getAsserts()) {
 			appendCode(line++, code, assertion, "assert");
 		}
 		code.append("</ul>");
@@ -70,9 +70,9 @@ public class CodePanel extends JScrollPane {
 		sheet.addRule(rule);
 	}
 
-	private void appendCode(Integer line, StringBuilder code, Statement statement, String type) {
+	private void appendCode(Integer line, StringBuilder code, RozaStatement statement, String type) {
 		String color = line % 2 == 0 ? "even" : "odd";
-		code.append(String.format("<li class=\"%s-%s\">%02d. %s</li>", color, type, line, statement.getText()));
+		code.append(String.format("<li class=\"%s-%s\">%02d. %s</li>", color, type, line, statement.getCode()));
 	}
 
 	private void updateScroll() {

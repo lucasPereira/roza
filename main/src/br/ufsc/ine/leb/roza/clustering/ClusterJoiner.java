@@ -4,8 +4,6 @@ import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Set;
 
-import br.ufsc.ine.leb.roza.Cluster;
-
 class ClusterJoiner {
 
 	private Referee referee;

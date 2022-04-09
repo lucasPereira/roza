@@ -9,8 +9,8 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
-import br.ufsc.ine.leb.roza.TestCase;
-import br.ufsc.ine.leb.roza.TestCaseMaterialization;
+import br.ufsc.ine.leb.roza.extraction.TestCase;
+import br.ufsc.ine.leb.roza.materialization.TestCaseMaterialization;
 import br.ufsc.ine.leb.roza.measurement.intersector.Intersector;
 import br.ufsc.ine.leb.roza.measurement.matrix.simian.SimianMatrixElementToKeyConverter;
 import br.ufsc.ine.leb.roza.measurement.matrix.simian.SimianMatrixValueFactory;

@@ -3,9 +3,9 @@ package br.ufsc.ine.leb.roza.utils;
 import java.util.ArrayList;
 import java.util.List;
 
-import br.ufsc.ine.leb.roza.SimilarityAssessment;
-import br.ufsc.ine.leb.roza.SimilarityReport;
-import br.ufsc.ine.leb.roza.TestCase;
+import br.ufsc.ine.leb.roza.extraction.TestCase;
+import br.ufsc.ine.leb.roza.measurement.SimilarityAssessment;
+import br.ufsc.ine.leb.roza.measurement.SimilarityReport;
 import br.ufsc.ine.leb.roza.utils.comparator.TestCaseComparatorByName;
 
 public class ReportUtils {

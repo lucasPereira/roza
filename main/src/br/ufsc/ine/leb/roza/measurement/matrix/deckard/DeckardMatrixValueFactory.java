@@ -1,6 +1,6 @@
 package br.ufsc.ine.leb.roza.measurement.matrix.deckard;
 
-import br.ufsc.ine.leb.roza.TestCaseMaterialization;
+import br.ufsc.ine.leb.roza.materialization.TestCaseMaterialization;
 import br.ufsc.ine.leb.roza.measurement.intersector.Intersector;
 import br.ufsc.ine.leb.roza.measurement.matrix.MatrixValueFactory;
 

@@ -2,7 +2,6 @@ package br.ufsc.ine.leb.roza.clustering;
 
 import java.math.BigDecimal;
 
-import br.ufsc.ine.leb.roza.Cluster;
 import br.ufsc.ine.leb.roza.utils.MathUtils;
 
 class SumOfIdsLinkage implements Linkage {

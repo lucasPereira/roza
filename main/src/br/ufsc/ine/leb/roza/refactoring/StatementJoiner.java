@@ -5,27 +5,27 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import br.ufsc.ine.leb.roza.Statement;
+import br.ufsc.ine.leb.roza.parsing.RozaStatement;
 
 public class StatementJoiner {
 
-	public List<Statement> join(List<List<Statement>> blocks) {
+	public List<RozaStatement> join(List<List<RozaStatement>> blocks) {
 		if (blocks.size() <= 1) {
 			return Arrays.asList();
 		}
-		List<Statement> shared = new LinkedList<Statement>();
-		Iterator<List<Statement>> blocksIterator = blocks.iterator();
+		List<RozaStatement> shared = new LinkedList<RozaStatement>();
+		Iterator<List<RozaStatement>> blocksIterator = blocks.iterator();
 		if (blocksIterator.hasNext()) {
 			shared.addAll(blocksIterator.next());
 		}
 		while (blocksIterator.hasNext()) {
-			List<Statement> join = new LinkedList<Statement>();
-			Iterator<Statement> sharedIterator = shared.iterator();
-			Iterator<Statement> blockIterator = blocksIterator.next().iterator();
+			List<RozaStatement> join = new LinkedList<RozaStatement>();
+			Iterator<RozaStatement> sharedIterator = shared.iterator();
+			Iterator<RozaStatement> blockIterator = blocksIterator.next().iterator();
 			Boolean stop = false;
 			while (!stop && sharedIterator.hasNext() && blockIterator.hasNext()) {
-				Statement nextOfShared = sharedIterator.next();
-				Statement nextOfBlock = blockIterator.next();
+				RozaStatement nextOfShared = sharedIterator.next();
+				RozaStatement nextOfBlock = blockIterator.next();
 				if (nextOfShared.equals(nextOfBlock)) {
 					join.add(nextOfShared);
 				} else {

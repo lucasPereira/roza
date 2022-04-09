@@ -2,8 +2,7 @@ package br.ufsc.ine.leb.roza.clustering;
 
 import java.util.Set;
 
-import br.ufsc.ine.leb.roza.Cluster;
-import br.ufsc.ine.leb.roza.SimilarityReport;
+import br.ufsc.ine.leb.roza.measurement.SimilarityReport;
 
 public interface TestCaseClusterer {
 

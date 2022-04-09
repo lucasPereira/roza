@@ -6,7 +6,7 @@ import java.util.function.Supplier;
 
 import javax.swing.table.AbstractTableModel;
 
-import br.ufsc.ine.leb.roza.TestClass;
+import br.ufsc.ine.leb.roza.parsing.TestClass;
 
 public abstract class TestClassAbstractModel<T> extends AbstractTableModel {
 

@@ -4,7 +4,7 @@ import java.util.List;
 
 import javax.swing.JButton;
 
-import br.ufsc.ine.leb.roza.SimilarityReport;
+import br.ufsc.ine.leb.roza.measurement.SimilarityReport;
 import br.ufsc.ine.leb.roza.ui.Hub;
 import br.ufsc.ine.leb.roza.ui.Manager;
 import br.ufsc.ine.leb.roza.ui.UiComponent;

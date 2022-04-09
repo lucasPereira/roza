@@ -7,11 +7,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import br.ufsc.ine.leb.roza.MaterializationReport;
-import br.ufsc.ine.leb.roza.SimilarityReport;
-import br.ufsc.ine.leb.roza.SimilarityReportBuilder;
-import br.ufsc.ine.leb.roza.TestCase;
-import br.ufsc.ine.leb.roza.TestCaseMaterialization;
+import br.ufsc.ine.leb.roza.extraction.TestCase;
+import br.ufsc.ine.leb.roza.materialization.MaterializationReport;
+import br.ufsc.ine.leb.roza.materialization.TestCaseMaterialization;
 import br.ufsc.ine.leb.roza.measurement.configuration.deckard.DeckardConfigurations;
 import br.ufsc.ine.leb.roza.measurement.intersector.Intersector;
 import br.ufsc.ine.leb.roza.measurement.matrix.Matrix;

@@ -11,13 +11,13 @@ import java.util.stream.Collectors;
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.expr.VariableDeclarationExpr;
 
-import br.ufsc.ine.leb.roza.Cluster;
-import br.ufsc.ine.leb.roza.Field;
-import br.ufsc.ine.leb.roza.SetupMethod;
-import br.ufsc.ine.leb.roza.Statement;
-import br.ufsc.ine.leb.roza.TestCase;
-import br.ufsc.ine.leb.roza.TestClass;
-import br.ufsc.ine.leb.roza.TestMethod;
+import br.ufsc.ine.leb.roza.clustering.Cluster;
+import br.ufsc.ine.leb.roza.extraction.TestCase;
+import br.ufsc.ine.leb.roza.parsing.Field;
+import br.ufsc.ine.leb.roza.parsing.SetupMethod;
+import br.ufsc.ine.leb.roza.parsing.RozaStatement;
+import br.ufsc.ine.leb.roza.parsing.TestClass;
+import br.ufsc.ine.leb.roza.parsing.TestMethod;
 import br.ufsc.ine.leb.roza.utils.comparator.ClusterComparatorBySizeAndTestName;
 import br.ufsc.ine.leb.roza.utils.comparator.TestCaseComparatorByName;
 
@@ -38,14 +38,14 @@ public class SimpleClusterRefactor implements ClusterRefactor {
 			List<TestMethod> testMethods = new ArrayList<>(cluster.getTestCases().size());
 			List<TestCase> testCases = new ArrayList<>(cluster.getTestCases());
 			Collections.sort(testCases, new TestCaseComparatorByName());
-			List<Statement> sharedFixtures = new StatementJoiner().join(testCases.stream().map(testCase -> testCase.getFixtures()).collect(Collectors.toList()));
+			List<RozaStatement> sharedFixtures = new StatementJoiner().join(testCases.stream().map(testCase -> testCase.getFixtures()).collect(Collectors.toList()));
 			for (TestCase testCase : testCases) {
-				List<Statement> fixtures = testCase.getFixtures();
+				List<RozaStatement> fixtures = testCase.getFixtures();
 				Integer firstFixtureIndex = sharedFixtures.size();
 				Integer lastFixtureIndex = fixtures.isEmpty() ? 0 : fixtures.size();
-				List<Statement> nonSharedFixtures = fixtures.subList(firstFixtureIndex, lastFixtureIndex);
-				List<Statement> asserts = testCase.getAsserts();
-				List<Statement> testMethodStatements = new ArrayList<Statement>(nonSharedFixtures.size() + asserts.size());
+				List<RozaStatement> nonSharedFixtures = fixtures.subList(firstFixtureIndex, lastFixtureIndex);
+				List<RozaStatement> asserts = testCase.getAsserts();
+				List<RozaStatement> testMethodStatements = new ArrayList<RozaStatement>(nonSharedFixtures.size() + asserts.size());
 				testMethodStatements.addAll(nonSharedFixtures);
 				testMethodStatements.addAll(asserts);
 				TestMethod testMethod = new TestMethod(testCase.getName(), testMethodStatements);
@@ -55,11 +55,11 @@ public class SimpleClusterRefactor implements ClusterRefactor {
 			List<SetupMethod> setupMethods = new LinkedList<>();
 			if (!sharedFixtures.isEmpty()) {
 				for (Integer index = 0; index < sharedFixtures.size(); index++) {
-					Statement statement = sharedFixtures.get(index);
-					Optional<VariableDeclarationExpr> declaration = JavaParser.parseStatement(statement.getText()).toExpressionStmt().get().getExpression().toVariableDeclarationExpr();
+					RozaStatement statement = sharedFixtures.get(index);
+					Optional<VariableDeclarationExpr> declaration = JavaParser.parseStatement(statement.getCode()).toExpressionStmt().get().getExpression().toVariableDeclarationExpr();
 					if (declaration.isPresent()) {
 						VariableDeclarationExpr declarationExpression = declaration.get();
-						sharedFixtures.set(index, new Statement(declarationExpression.getVariable(0).toString() + ";"));
+						sharedFixtures.set(index, new RozaStatement(declarationExpression.getVariable(0).toString() + ";"));
 						fields.add(new Field(declarationExpression.getElementType().asString(), declarationExpression.getVariable(0).getNameAsString()));
 					}
 				}

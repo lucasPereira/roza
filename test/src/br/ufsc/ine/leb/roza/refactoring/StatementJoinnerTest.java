@@ -8,7 +8,7 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import br.ufsc.ine.leb.roza.Statement;
+import br.ufsc.ine.leb.roza.parsing.RozaStatement;
 
 public class StatementJoinnerTest {
 
@@ -21,62 +21,62 @@ public class StatementJoinnerTest {
 
 	@Test
 	void empty() throws Exception {
-		List<List<Statement>> blocks = Arrays.asList();
-		List<Statement> join = joiner.join(blocks);
+		List<List<RozaStatement>> blocks = Arrays.asList();
+		List<RozaStatement> join = joiner.join(blocks);
 
 		assertEquals(0, join.size());
 	}
 
 	@Test
 	void oneEmptyBlock() throws Exception {
-		List<Statement> block = Arrays.asList();
-		List<List<Statement>> blocks = Arrays.asList(block);
-		List<Statement> join = joiner.join(blocks);
+		List<RozaStatement> block = Arrays.asList();
+		List<List<RozaStatement>> blocks = Arrays.asList(block);
+		List<RozaStatement> join = joiner.join(blocks);
 
 		assertEquals(0, join.size());
 	}
 
 	@Test
 	void oneBlockWithOneStatement() throws Exception {
-		Statement statement = new Statement("System.out.println(0);");
-		List<Statement> block = Arrays.asList(statement);
-		List<List<Statement>> blocks = Arrays.asList(block);
-		List<Statement> join = joiner.join(blocks);
+		RozaStatement statement = new RozaStatement("System.out.println(0);");
+		List<RozaStatement> block = Arrays.asList(statement);
+		List<List<RozaStatement>> blocks = Arrays.asList(block);
+		List<RozaStatement> join = joiner.join(blocks);
 
 		assertEquals(0, join.size());
 	}
 
 	@Test
 	void oneBlockWithTwoStatements() throws Exception {
-		Statement statement1 = new Statement("System.out.println(0);");
-		Statement statement2 = new Statement("System.out.println(1);");
-		List<Statement> block = Arrays.asList(statement1, statement2);
-		List<List<Statement>> blocks = Arrays.asList(block);
-		List<Statement> join = joiner.join(blocks);
+		RozaStatement statement1 = new RozaStatement("System.out.println(0);");
+		RozaStatement statement2 = new RozaStatement("System.out.println(1);");
+		List<RozaStatement> block = Arrays.asList(statement1, statement2);
+		List<List<RozaStatement>> blocks = Arrays.asList(block);
+		List<RozaStatement> join = joiner.join(blocks);
 
 		assertEquals(0, join.size());
 	}
 
 	@Test
 	void twoBlocksWithDistinctStatements() throws Exception {
-		Statement statement1 = new Statement("System.out.println(0);");
-		Statement statement2 = new Statement("System.out.println(1);");
-		List<Statement> block1 = Arrays.asList(statement1);
-		List<Statement> block2 = Arrays.asList(statement2);
-		List<List<Statement>> blocks = Arrays.asList(block1, block2);
-		List<Statement> join = joiner.join(blocks);
+		RozaStatement statement1 = new RozaStatement("System.out.println(0);");
+		RozaStatement statement2 = new RozaStatement("System.out.println(1);");
+		List<RozaStatement> block1 = Arrays.asList(statement1);
+		List<RozaStatement> block2 = Arrays.asList(statement2);
+		List<List<RozaStatement>> blocks = Arrays.asList(block1, block2);
+		List<RozaStatement> join = joiner.join(blocks);
 
 		assertEquals(0, join.size());
 	}
 
 	@Test
 	void twoBlocksWithEqualStatement() throws Exception {
-		Statement statement1 = new Statement("System.out.println(0);");
-		Statement statement2 = new Statement("System.out.println(0);");
-		List<Statement> block1 = Arrays.asList(statement1);
-		List<Statement> block2 = Arrays.asList(statement2);
-		List<List<Statement>> blocks = Arrays.asList(block1, block2);
-		List<Statement> join = joiner.join(blocks);
+		RozaStatement statement1 = new RozaStatement("System.out.println(0);");
+		RozaStatement statement2 = new RozaStatement("System.out.println(0);");
+		List<RozaStatement> block1 = Arrays.asList(statement1);
+		List<RozaStatement> block2 = Arrays.asList(statement2);
+		List<List<RozaStatement>> blocks = Arrays.asList(block1, block2);
+		List<RozaStatement> join = joiner.join(blocks);
 
 		assertEquals(1, join.size());
 		assertEquals(statement1, join.get(0));
@@ -85,14 +85,14 @@ public class StatementJoinnerTest {
 
 	@Test
 	void twoBlocksWithOneEqualAndOneDistinctStatement() throws Exception {
-		Statement statement1 = new Statement("System.out.println(0);");
-		Statement statement2 = new Statement("System.out.println(1);");
-		Statement statement3 = new Statement("System.out.println(0);");
-		Statement statement4 = new Statement("System.out.println(2);");
-		List<Statement> block1 = Arrays.asList(statement1, statement2);
-		List<Statement> block2 = Arrays.asList(statement3, statement4);
-		List<List<Statement>> blocks = Arrays.asList(block1, block2);
-		List<Statement> join = joiner.join(blocks);
+		RozaStatement statement1 = new RozaStatement("System.out.println(0);");
+		RozaStatement statement2 = new RozaStatement("System.out.println(1);");
+		RozaStatement statement3 = new RozaStatement("System.out.println(0);");
+		RozaStatement statement4 = new RozaStatement("System.out.println(2);");
+		List<RozaStatement> block1 = Arrays.asList(statement1, statement2);
+		List<RozaStatement> block2 = Arrays.asList(statement3, statement4);
+		List<List<RozaStatement>> blocks = Arrays.asList(block1, block2);
+		List<RozaStatement> join = joiner.join(blocks);
 
 		assertEquals(1, join.size());
 		assertEquals(statement1, join.get(0));

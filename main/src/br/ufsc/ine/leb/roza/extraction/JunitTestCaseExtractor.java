@@ -10,11 +10,10 @@ import com.github.javaparser.ast.expr.AssignExpr;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.SimpleName;
 
-import br.ufsc.ine.leb.roza.Field;
-import br.ufsc.ine.leb.roza.Statement;
-import br.ufsc.ine.leb.roza.TestCase;
-import br.ufsc.ine.leb.roza.TestClass;
-import br.ufsc.ine.leb.roza.TestMethod;
+import br.ufsc.ine.leb.roza.parsing.Field;
+import br.ufsc.ine.leb.roza.parsing.RozaStatement;
+import br.ufsc.ine.leb.roza.parsing.TestClass;
+import br.ufsc.ine.leb.roza.parsing.TestMethod;
 
 public class JunitTestCaseExtractor implements TestCaseExtractor {
 
@@ -37,28 +36,28 @@ public class JunitTestCaseExtractor implements TestCaseExtractor {
 
 	private void extractTestCase(List<TestCase> testCases, TestClass testClass, TestMethod testMethod) {
 		String name = testMethod.getName();
-		List<Statement> fixtures = new ArrayList<>();
-		List<Statement> assertions = new LinkedList<>();
-		List<Statement> statements = extractStatements(testClass, testMethod);
+		List<RozaStatement> fixtures = new ArrayList<>();
+		List<RozaStatement> assertions = new LinkedList<>();
+		List<RozaStatement> statements = extractStatements(testClass, testMethod);
 		statements.forEach((statement) -> {
-			List<Statement> bucket = statementIsAssertion(statement) ? assertions : fixtures;
+			List<RozaStatement> bucket = statementIsAssertion(statement) ? assertions : fixtures;
 			bucket.add(statement);
 		});
 		TestCase testCase = new TestCase(name, fixtures, assertions);
 		testCases.add(testCase);
 	}
 
-	private List<Statement> extractStatements(TestClass testClass, TestMethod testMethod) {
-		List<Statement> statements = new LinkedList<Statement>();
+	private List<RozaStatement> extractStatements(TestClass testClass, TestMethod testMethod) {
+		List<RozaStatement> statements = new LinkedList<RozaStatement>();
 		testClass.getSetupMethods().forEach((setupMethod) -> {
 			setupMethod.getStatements().forEach((statement) -> {
-				Statement addedStatement = statement;
+				RozaStatement addedStatement = statement;
 				Optional<AssignExpr> assign = JavaParser.parseStatement(statement.getText()).toExpressionStmt().get().getExpression().toAssignExpr();
 				if (assign.isPresent()) {
 					AssignExpr assignExpression = assign.get();
 					for (Field field : testClass.getFields()) {
 						if (assignExpression.getTarget().toString().equals(field.getName())) {
-							addedStatement = new Statement(String.format("%s %s", field.getType(), statement.getText()));
+							addedStatement = new SimpleStatement(String.format("%s %s", field.getType(), statement.getText()));
 						}
 					}
 				}
@@ -69,7 +68,7 @@ public class JunitTestCaseExtractor implements TestCaseExtractor {
 		return statements;
 	}
 
-	private Boolean statementIsAssertion(Statement statement) {
+	private Boolean statementIsAssertion(RozaStatement statement) {
 		Optional<MethodCallExpr> methodCall = JavaParser.parseStatement(statement.getText()).toExpressionStmt().get().getExpression().toMethodCallExpr();
 		if (methodCall.isPresent()) {
 			MethodCallExpr methodCallExpression = methodCall.get();

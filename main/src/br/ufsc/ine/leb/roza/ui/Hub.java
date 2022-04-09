@@ -4,11 +4,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Consumer;
 
-import br.ufsc.ine.leb.roza.SimilarityAssessment;
-import br.ufsc.ine.leb.roza.SimilarityReport;
-import br.ufsc.ine.leb.roza.TestCase;
-import br.ufsc.ine.leb.roza.TestClass;
 import br.ufsc.ine.leb.roza.clustering.Level;
+import br.ufsc.ine.leb.roza.extraction.TestCase;
+import br.ufsc.ine.leb.roza.measurement.SimilarityAssessment;
+import br.ufsc.ine.leb.roza.measurement.SimilarityReport;
+import br.ufsc.ine.leb.roza.parsing.TestClass;
 import br.ufsc.ine.leb.roza.ui.model.DeckardSettingsConsumer;
 
 public class Hub {

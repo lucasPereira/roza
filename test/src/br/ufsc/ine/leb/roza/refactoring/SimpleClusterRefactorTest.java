@@ -10,10 +10,10 @@ import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import br.ufsc.ine.leb.roza.Cluster;
-import br.ufsc.ine.leb.roza.Statement;
-import br.ufsc.ine.leb.roza.TestCase;
-import br.ufsc.ine.leb.roza.TestClass;
+import br.ufsc.ine.leb.roza.clustering.Cluster;
+import br.ufsc.ine.leb.roza.extraction.TestCase;
+import br.ufsc.ine.leb.roza.parsing.RozaStatement;
+import br.ufsc.ine.leb.roza.parsing.TestClass;
 
 public class SimpleClusterRefactorTest {
 
@@ -106,8 +106,8 @@ public class SimpleClusterRefactorTest {
 
 	@Test
 	void oneClusterWithOneNonEmptyTest() throws Exception {
-		Statement fixture = new Statement("Integer value = 10;");
-		Statement assertion = new Statement("assertEquals(10, value);");
+		RozaStatement fixture = new RozaStatement("Integer value = 10;");
+		RozaStatement assertion = new RozaStatement("assertEquals(10, value);");
 		TestCase alpha = new TestCase("alpha", Arrays.asList(fixture), Arrays.asList(assertion));
 		Cluster alphaCluster = new Cluster(alpha);
 
@@ -128,13 +128,13 @@ public class SimpleClusterRefactorTest {
 
 	@Test
 	void oneClustersWithTwoNonEmptyTests() throws Exception {
-		Statement fixtureAlpha = new Statement("Integer value = 10;");
-		Statement assertionAlpha = new Statement("assertEquals(10, value);");
+		RozaStatement fixtureAlpha = new RozaStatement("Integer value = 10;");
+		RozaStatement assertionAlpha = new RozaStatement("assertEquals(10, value);");
 		TestCase alpha = new TestCase("alpha", Arrays.asList(fixtureAlpha), Arrays.asList(assertionAlpha));
 		Cluster alphaCluster = new Cluster(alpha);
 
-		Statement fixtureBeta = new Statement("Integer value = 20;");
-		Statement assertionBeta = new Statement("assertEquals(20, value);");
+		RozaStatement fixtureBeta = new RozaStatement("Integer value = 20;");
+		RozaStatement assertionBeta = new RozaStatement("assertEquals(20, value);");
 		TestCase beta = new TestCase("beta", Arrays.asList(fixtureBeta), Arrays.asList(assertionBeta));
 		Cluster betaCluster = new Cluster(beta);
 
@@ -163,13 +163,13 @@ public class SimpleClusterRefactorTest {
 
 	@Test
 	void oneClustersWithTwoNonEmptyTestsAndReusableStatement() throws Exception {
-		Statement fixtureAlpha = new Statement("System.out.println(0);");
-		Statement assertionAlpha = new Statement("assertTrue(true);");
+		RozaStatement fixtureAlpha = new RozaStatement("System.out.println(0);");
+		RozaStatement assertionAlpha = new RozaStatement("assertTrue(true);");
 		TestCase alpha = new TestCase("alpha", Arrays.asList(fixtureAlpha), Arrays.asList(assertionAlpha));
 		Cluster alphaCluster = new Cluster(alpha);
 
-		Statement fixtureBeta = new Statement("System.out.println(0);");
-		Statement assertionBeta = new Statement("assertTrue(true);");
+		RozaStatement fixtureBeta = new RozaStatement("System.out.println(0);");
+		RozaStatement assertionBeta = new RozaStatement("assertTrue(true);");
 		TestCase beta = new TestCase("beta", Arrays.asList(fixtureBeta), Arrays.asList(assertionBeta));
 		Cluster betaCluster = new Cluster(beta);
 
@@ -200,17 +200,17 @@ public class SimpleClusterRefactorTest {
 
 	@Test
 	void oneClustersWithTwoNonEmptyTestsAndReusableStatementAndFixture() throws Exception {
-		Statement fixtureAlpha = new Statement("Integer value = 10;");
-		Statement assertionAlpha = new Statement("assertEquals(value, 10);");
+		RozaStatement fixtureAlpha = new RozaStatement("Integer value = 10;");
+		RozaStatement assertionAlpha = new RozaStatement("assertEquals(value, 10);");
 		TestCase alpha = new TestCase("alpha", Arrays.asList(fixtureAlpha), Arrays.asList(assertionAlpha));
 		Cluster alphaCluster = new Cluster(alpha);
 
-		Statement fixtureBeta = new Statement("Integer value = 10;");
-		Statement assertionBeta = new Statement("assertEquals(\"10\", value.toString());");
+		RozaStatement fixtureBeta = new RozaStatement("Integer value = 10;");
+		RozaStatement assertionBeta = new RozaStatement("assertEquals(\"10\", value.toString());");
 		TestCase beta = new TestCase("beta", Arrays.asList(fixtureBeta), Arrays.asList(assertionBeta));
 		Cluster betaCluster = new Cluster(beta);
 
-		Statement fixture = new Statement("value = 10;");
+		RozaStatement fixture = new RozaStatement("value = 10;");
 
 		Cluster alphaBetaCluster = alphaCluster.merge(betaCluster);
 		Set<Cluster> clusters = new HashSet<>();

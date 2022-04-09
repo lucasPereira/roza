@@ -2,7 +2,7 @@ package br.ufsc.ine.leb.roza.clustering;
 
 import java.util.Arrays;
 
-import br.ufsc.ine.leb.roza.TestCase;
+import br.ufsc.ine.leb.roza.extraction.TestCase;
 
 class Pair {
 

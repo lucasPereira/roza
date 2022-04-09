@@ -8,7 +8,7 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import br.ufsc.ine.leb.roza.TextFile;
+import br.ufsc.ine.leb.roza.loading.TextFile;
 
 class JavaExtensionTextFileSelectorTest {
 

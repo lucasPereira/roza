@@ -8,10 +8,8 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import br.ufsc.ine.leb.roza.MaterializationReport;
-import br.ufsc.ine.leb.roza.Statement;
-import br.ufsc.ine.leb.roza.TestCase;
-import br.ufsc.ine.leb.roza.TestCaseMaterialization;
+import br.ufsc.ine.leb.roza.extraction.TestCase;
+import br.ufsc.ine.leb.roza.parsing.RozaStatement;
 import br.ufsc.ine.leb.roza.utils.FileUtils;
 import br.ufsc.ine.leb.roza.utils.FolderUtils;
 
@@ -29,8 +27,8 @@ class Junit4WithoutAssertionsTestCaseMaterializerTest {
 
 	@Test
 	void oneTestCase() throws Exception {
-		Statement fixtureStatement = new Statement("sut(0);");
-		Statement assertStatement = new Statement("assertEquals(0, 0);");
+		RozaStatement fixtureStatement = new RozaStatement("sut(0);");
+		RozaStatement assertStatement = new RozaStatement("assertEquals(0, 0);");
 		TestCase testCase = new TestCase("example", Arrays.asList(fixtureStatement), Arrays.asList(assertStatement));
 		MaterializationReport report = materializer.materialize(Arrays.asList(testCase));
 		List<TestCaseMaterialization> materializations = report.getMaterializations();
@@ -54,11 +52,11 @@ class Junit4WithoutAssertionsTestCaseMaterializerTest {
 
 	@Test
 	void twoTetCases() throws Exception {
-		Statement fixtureStatement1 = new Statement("sut(1);");
-		Statement assertStatement1 = new Statement("assertEquals(1, 1);");
+		RozaStatement fixtureStatement1 = new RozaStatement("sut(1);");
+		RozaStatement assertStatement1 = new RozaStatement("assertEquals(1, 1);");
 		TestCase testCase1 = new TestCase("example1", Arrays.asList(fixtureStatement1), Arrays.asList(assertStatement1));
-		Statement fixtureStatement2 = new Statement("sut(2);");
-		Statement assertStatement2 = new Statement("assertEquals(2, 2);");
+		RozaStatement fixtureStatement2 = new RozaStatement("sut(2);");
+		RozaStatement assertStatement2 = new RozaStatement("assertEquals(2, 2);");
 		TestCase testCase2 = new TestCase("example2", Arrays.asList(fixtureStatement2), Arrays.asList(assertStatement2));
 		MaterializationReport report = materializer.materialize(Arrays.asList(testCase1, testCase2));
 		List<TestCaseMaterialization> materializations = report.getMaterializations();
@@ -95,11 +93,11 @@ class Junit4WithoutAssertionsTestCaseMaterializerTest {
 
 	@Test
 	void twoTetCasesWithTheSameName() throws Exception {
-		Statement fixtureStatement1 = new Statement("sut(1);");
-		Statement assertStatement1 = new Statement("assertEquals(1, 1);");
+		RozaStatement fixtureStatement1 = new RozaStatement("sut(1);");
+		RozaStatement assertStatement1 = new RozaStatement("assertEquals(1, 1);");
 		TestCase testCase1 = new TestCase("example", Arrays.asList(fixtureStatement1), Arrays.asList(assertStatement1));
-		Statement fixtureStatement2 = new Statement("sut(2);");
-		Statement assertStatement2 = new Statement("assertEquals(2, 2);");
+		RozaStatement fixtureStatement2 = new RozaStatement("sut(2);");
+		RozaStatement assertStatement2 = new RozaStatement("assertEquals(2, 2);");
 		TestCase testCase2 = new TestCase("example", Arrays.asList(fixtureStatement2), Arrays.asList(assertStatement2));
 		MaterializationReport report = materializer.materialize(Arrays.asList(testCase1, testCase2));
 		List<TestCaseMaterialization> materializations = report.getMaterializations();

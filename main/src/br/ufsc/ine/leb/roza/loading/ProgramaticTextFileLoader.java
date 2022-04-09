@@ -2,12 +2,11 @@ package br.ufsc.ine.leb.roza.loading;
 
 import java.io.File;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
-import br.ufsc.ine.leb.roza.TextFile;
 import br.ufsc.ine.leb.roza.utils.FileUtils;
+import br.ufsc.ine.leb.roza.utils.comparator.TextFileComparatorByFileName;
 
 public class ProgramaticTextFileLoader implements TextFileLoader {
 
@@ -28,17 +27,8 @@ public class ProgramaticTextFileLoader implements TextFileLoader {
 			TextFile textFile = new TextFile(name, content);
 			textFiles.add(textFile);
 		}
-		Collections.sort(textFiles, new TextFileComparator());
+		Collections.sort(textFiles, new TextFileComparatorByFileName());
 		return textFiles;
-	}
-
-	private class TextFileComparator implements Comparator<TextFile> {
-
-		@Override
-		public int compare(TextFile file1, TextFile file2) {
-			return file1.getName().compareTo(file2.getName());
-		}
-
 	}
 
 }

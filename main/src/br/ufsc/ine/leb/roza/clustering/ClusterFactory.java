@@ -3,9 +3,8 @@ package br.ufsc.ine.leb.roza.clustering;
 import java.util.HashSet;
 import java.util.Set;
 
-import br.ufsc.ine.leb.roza.Cluster;
-import br.ufsc.ine.leb.roza.SimilarityReport;
-import br.ufsc.ine.leb.roza.TestCase;
+import br.ufsc.ine.leb.roza.extraction.TestCase;
+import br.ufsc.ine.leb.roza.measurement.SimilarityReport;
 import br.ufsc.ine.leb.roza.utils.ReportUtils;
 
 class ClusterFactory {

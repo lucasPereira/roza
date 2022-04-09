@@ -2,7 +2,7 @@ package br.ufsc.ine.leb.roza.measurement.matrix.jplag;
 
 import java.math.BigDecimal;
 
-import br.ufsc.ine.leb.roza.TestCaseMaterialization;
+import br.ufsc.ine.leb.roza.materialization.TestCaseMaterialization;
 import br.ufsc.ine.leb.roza.measurement.matrix.MatrixValueFactory;
 
 public class JplagMatrixValueFactory implements MatrixValueFactory<TestCaseMaterialization, BigDecimal> {

@@ -9,12 +9,10 @@ import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.stmt.BlockStmt;
-import com.github.javaparser.printer.PrettyPrinterConfiguration;
-import com.github.javaparser.printer.PrettyPrinterConfiguration.IndentType;
+import com.github.javaparser.printer.configuration.Indentation.IndentType;
+import com.github.javaparser.printer.configuration.PrettyPrinterConfiguration;
 
-import br.ufsc.ine.leb.roza.MaterializationReport;
-import br.ufsc.ine.leb.roza.TestCase;
-import br.ufsc.ine.leb.roza.TestCaseMaterialization;
+import br.ufsc.ine.leb.roza.extraction.TestCase;
 import br.ufsc.ine.leb.roza.utils.FolderUtils;
 
 public abstract class Junit4TestCaseMaterializer implements TestCaseMaterializer {
@@ -38,7 +36,7 @@ public abstract class Junit4TestCaseMaterializer implements TestCaseMaterializer
 			MethodDeclaration javaMethod = javaClass.addMethod(testCase.getName()).setPublic(true).addAnnotation("Test");
 			BlockStmt javaMethodBody = new BlockStmt();
 			testCase.getFixtures().forEach((fixture) -> {
-				javaMethodBody.addStatement(JavaParser.parseStatement(fixture.getText()));
+				javaMethodBody.addStatement(JavaParser.parseStatement(fixture.getCode()));
 			});
 			addAssertions(testCase, javaMethodBody);
 			javaMethod.setBody(javaMethodBody);

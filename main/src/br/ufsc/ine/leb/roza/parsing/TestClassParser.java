@@ -2,8 +2,7 @@ package br.ufsc.ine.leb.roza.parsing;
 
 import java.util.List;
 
-import br.ufsc.ine.leb.roza.TestClass;
-import br.ufsc.ine.leb.roza.TextFile;
+import br.ufsc.ine.leb.roza.loading.TextFile;
 
 public interface TestClassParser {
 
