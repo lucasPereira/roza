@@ -10,15 +10,15 @@ import java.util.Arrays;
 
 import org.junit.jupiter.api.Test;
 
-import br.ufsc.ine.leb.roza.fixtures.ParsingFixtures;
+import br.ufsc.ine.leb.roza.fixture.ExtractionFixtures;
 import br.ufsc.ine.leb.roza.parsing.RozaStatement;
 
 class TestCaseTest {
 
 	@Test
 	void create() throws Exception {
-		RozaStatement fixtureStatement = ParsingFixtures.buildFixtureStatement();
-		RozaStatement assertStatement = ParsingFixtures.buildAssertStatement();
+		RozaStatement fixtureStatement = ExtractionFixtures.sutCallWithZeroParameter();
+		RozaStatement assertStatement = ExtractionFixtures.assertEqualsWithZeroAndZero();
 		TestCase test = new TestCase("example", Arrays.asList(fixtureStatement), Arrays.asList(assertStatement));
 		assertNotNull(test.getId());
 		assertEquals("example", test.getName());

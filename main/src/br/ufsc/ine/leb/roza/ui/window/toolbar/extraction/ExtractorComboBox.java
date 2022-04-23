@@ -5,9 +5,9 @@ import java.util.List;
 
 import javax.swing.JComboBox;
 
-import br.ufsc.ine.leb.roza.extraction.Junit4TestCaseExtractor;
-import br.ufsc.ine.leb.roza.extraction.Junit5TestCaseExtractor;
-import br.ufsc.ine.leb.roza.extraction.JunitTestCaseExtractor;
+import br.ufsc.ine.leb.roza.extraction.lixo.Junit4TestCaseExtractor;
+import br.ufsc.ine.leb.roza.extraction.lixo.Junit5TestCaseExtractor;
+import br.ufsc.ine.leb.roza.extraction.lixo.JunitTestCaseExtractor;
 import br.ufsc.ine.leb.roza.ui.Hub;
 import br.ufsc.ine.leb.roza.ui.Manager;
 import br.ufsc.ine.leb.roza.ui.UiComponent;

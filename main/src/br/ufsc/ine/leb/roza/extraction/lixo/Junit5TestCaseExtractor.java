@@ -1,6 +1,8 @@
-package br.ufsc.ine.leb.roza.extraction;
+package br.ufsc.ine.leb.roza.extraction.lixo;
 
 import java.util.Arrays;
+
+import br.ufsc.ine.leb.roza.extraction.TestCaseExtractor;
 
 public class Junit5TestCaseExtractor extends JunitTestCaseExtractor implements TestCaseExtractor {
 

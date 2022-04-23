@@ -11,7 +11,6 @@ import br.ufsc.ine.leb.roza.parsing.TestClass;
 import br.ufsc.ine.leb.roza.ui.Hub;
 import br.ufsc.ine.leb.roza.ui.Manager;
 import br.ufsc.ine.leb.roza.ui.UiComponent;
-import br.ufsc.ine.leb.roza.utils.FolderUtils;
 
 public class WriteRefactoredTestClassesButton implements UiComponent {
 
@@ -35,7 +34,6 @@ public class WriteRefactoredTestClassesButton implements UiComponent {
 			Integer result = chooser.showOpenDialog(SwingUtilities.getRoot(button));
 			if (result == JFileChooser.APPROVE_OPTION) {
 				String baseFolder = chooser.getSelectedFile().getAbsolutePath();
-				new FolderUtils(baseFolder).createEmptyFolder();
 				List<TestClass> refactoredClasses = manager.refactorClusters();
 				manager.writeTestClasses(baseFolder);
 				hub.infoMessagePublish(String.format("Refactored classes: %d", refactoredClasses.size()));

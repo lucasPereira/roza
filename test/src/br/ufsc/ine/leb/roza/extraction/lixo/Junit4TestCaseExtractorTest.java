@@ -1,6 +1,6 @@
-package br.ufsc.ine.leb.roza.extraction;
+package br.ufsc.ine.leb.roza.extraction.lixo;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.Assert.assertEquals;
 
 import java.util.Arrays;
 import java.util.List;
@@ -8,19 +8,21 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import br.ufsc.ine.leb.roza.extraction.TestCase;
+import br.ufsc.ine.leb.roza.extraction.TestCaseExtractor;
 import br.ufsc.ine.leb.roza.parsing.Field;
 import br.ufsc.ine.leb.roza.parsing.SetupMethod;
 import br.ufsc.ine.leb.roza.parsing.RozaStatement;
 import br.ufsc.ine.leb.roza.parsing.TestClass;
 import br.ufsc.ine.leb.roza.parsing.TestMethod;
 
-class Junit5TestCaseExtractorTest {
+class Junit4TestCaseExtractorTest {
 
 	private TestCaseExtractor extractor;
 
 	@BeforeEach
 	void setup() {
-		extractor = new Junit5TestCaseExtractor();
+		extractor = new Junit4TestCaseExtractor();
 	}
 
 	@Test
@@ -218,90 +220,62 @@ class Junit5TestCaseExtractorTest {
 
 	@Test
 	void oneTestMethodWithAllAssertsOfJunit() throws Exception {
-		RozaStatement equalsStatement = new RozaStatement("assertEquals(0, 0);");
-		RozaStatement notEqualsStatement = new RozaStatement("assertNotEquals(0, 0);");
-		RozaStatement trueStatement = new RozaStatement("assertTrue(false);");
-		RozaStatement falseStatement = new RozaStatement("assertFalse(false);");
-		RozaStatement nullStatement = new RozaStatement("assertNull(null);");
-		RozaStatement notNullStatement = new RozaStatement("assertNotNull(BigDecimal.ZERO);");
-		RozaStatement sameStatement = new RozaStatement("assertSame(BigDecimal.ONE, BigDecimal.ONE);");
-		RozaStatement notSameStatement = new RozaStatement("assertNotSame(new BigDecimal(1024), new BigDecimal(1024));");
-		RozaStatement arrayEqualsStatement = new RozaStatement("assertArrayEquals(new Object[0], new Object[0]);");
-		RozaStatement iterableEqualsStatement = new RozaStatement("assertIterableEquals(Arrays.asList(1), Arrays.asList(1));");
-		RozaStatement linesMatchStatement = new RozaStatement("assertLinesMatch(Arrays.asList(\"A\"), Arrays.asList(\"A\"));");
-		RozaStatement allStatement = new RozaStatement("assertAll(() -> assertNotEquals(1, 0), () -> assertNotEquals(0, 1));");
-		RozaStatement timeoutStatement = new RozaStatement("assertTimeout(Duration.ofSeconds(1), () -> System.out.println(1));");
-		RozaStatement timeoutPreemptivelyStatement = new RozaStatement("assertTimeoutPreemptively(Duration.ofSeconds(1), () ->System.out.println(1));");
-		RozaStatement throwsStatement = new RozaStatement("assertThrows(Exception.class, () -> System.out.println(1 / 0));");
-		RozaStatement doNotThrowStatement = new RozaStatement("assertDoesNotThrow(() -> System.out.println(1 / 1));");
-		List<RozaStatement> statements = Arrays.asList(equalsStatement, notEqualsStatement, trueStatement, falseStatement, nullStatement, notNullStatement, sameStatement, notSameStatement, arrayEqualsStatement, iterableEqualsStatement, linesMatchStatement, allStatement, timeoutStatement, timeoutPreemptivelyStatement, throwsStatement, doNotThrowStatement);
+		RozaStatement arrayEqualsAssertion = new RozaStatement("assertArrayEquals(new Object[0], new Object[0]);");
+		RozaStatement equalsAssertion = new RozaStatement("assertEquals(0, 0);");
+		RozaStatement falseAssertion = new RozaStatement("assertFalse(false);");
+		RozaStatement notNullAssertion = new RozaStatement("assertNotNull(null);");
+		RozaStatement notSameAssertion = new RozaStatement("assertNotSame(null, null);");
+		RozaStatement nullAssertion = new RozaStatement("assertNull(null);");
+		RozaStatement sameAssertion = new RozaStatement("assertSame(null, null);");
+		RozaStatement thatAssertion = new RozaStatement("assertThat(null, IsNull.nullValue());");
+		RozaStatement trueAssertion = new RozaStatement("assertTrue(true);");
+		List<RozaStatement> statements = Arrays.asList(arrayEqualsAssertion, equalsAssertion, falseAssertion, notNullAssertion, notSameAssertion, nullAssertion, sameAssertion, thatAssertion, trueAssertion);
 		TestMethod testMethod = new TestMethod("example", statements);
 		TestClass testClass = new TestClass("ExampleTest", Arrays.asList(), Arrays.asList(), Arrays.asList(testMethod));
 		List<TestCase> testCases = extractor.extract(Arrays.asList(testClass));
 		assertEquals(1, testCases.size());
 		assertEquals("example", testCases.get(0).getName());
 		assertEquals(0, testCases.get(0).getFixtures().size());
-		assertEquals(16, testCases.get(0).getAsserts().size());
-		assertEquals(equalsStatement, testCases.get(0).getAsserts().get(0));
-		assertEquals(notEqualsStatement, testCases.get(0).getAsserts().get(1));
-		assertEquals(trueStatement, testCases.get(0).getAsserts().get(2));
-		assertEquals(falseStatement, testCases.get(0).getAsserts().get(3));
-		assertEquals(nullStatement, testCases.get(0).getAsserts().get(4));
-		assertEquals(notNullStatement, testCases.get(0).getAsserts().get(5));
-		assertEquals(sameStatement, testCases.get(0).getAsserts().get(6));
-		assertEquals(notSameStatement, testCases.get(0).getAsserts().get(7));
-		assertEquals(arrayEqualsStatement, testCases.get(0).getAsserts().get(8));
-		assertEquals(iterableEqualsStatement, testCases.get(0).getAsserts().get(9));
-		assertEquals(linesMatchStatement, testCases.get(0).getAsserts().get(10));
-		assertEquals(allStatement, testCases.get(0).getAsserts().get(11));
-		assertEquals(timeoutStatement, testCases.get(0).getAsserts().get(12));
-		assertEquals(timeoutPreemptivelyStatement, testCases.get(0).getAsserts().get(13));
-		assertEquals(throwsStatement, testCases.get(0).getAsserts().get(14));
-		assertEquals(doNotThrowStatement, testCases.get(0).getAsserts().get(15));
+		assertEquals(9, testCases.get(0).getAsserts().size());
+		assertEquals(arrayEqualsAssertion, testCases.get(0).getAsserts().get(0));
+		assertEquals(equalsAssertion, testCases.get(0).getAsserts().get(1));
+		assertEquals(falseAssertion, testCases.get(0).getAsserts().get(2));
+		assertEquals(notNullAssertion, testCases.get(0).getAsserts().get(3));
+		assertEquals(notSameAssertion, testCases.get(0).getAsserts().get(4));
+		assertEquals(nullAssertion, testCases.get(0).getAsserts().get(5));
+		assertEquals(sameAssertion, testCases.get(0).getAsserts().get(6));
+		assertEquals(thatAssertion, testCases.get(0).getAsserts().get(7));
+		assertEquals(trueAssertion, testCases.get(0).getAsserts().get(8));
 	}
 
 	@Test
 	void oneTestMethodWithAllNonStaticAssertsOfJunit() throws Exception {
-		RozaStatement equalsStatement = new RozaStatement("Assertions.assertEquals(0, 0);");
-		RozaStatement notEqualsStatement = new RozaStatement("Assertions.assertNotEquals(0, 0);");
-		RozaStatement trueStatement = new RozaStatement("Assertions.assertTrue(false);");
-		RozaStatement falseStatement = new RozaStatement("Assertions.assertFalse(false);");
-		RozaStatement nullStatement = new RozaStatement("Assertions.assertNull(null);");
-		RozaStatement notNullStatement = new RozaStatement("Assertions.assertNotNull(BigDecimal.ZERO);");
-		RozaStatement sameStatement = new RozaStatement("Assertions.assertSame(BigDecimal.ONE, BigDecimal.ONE);");
-		RozaStatement notSameStatement = new RozaStatement("Assertions.assertNotSame(new BigDecimal(1024), new BigDecimal(1024));");
-		RozaStatement arrayEqualsStatement = new RozaStatement("Assertions.assertArrayEquals(new Object[0], new Object[0]);");
-		RozaStatement iterableEqualsStatement = new RozaStatement("Assertions.assertIterableEquals(Arrays.asList(1), Arrays.asList(1));");
-		RozaStatement linesMatchStatement = new RozaStatement("Assertions.assertLinesMatch(Arrays.asList(\"A\"), Arrays.asList(\"A\"));");
-		RozaStatement allStatement = new RozaStatement("Assertions.assertAll(() -> assertNotEquals(1, 0), () -> assertNotEquals(0, 1));");
-		RozaStatement timeoutStatement = new RozaStatement("Assertions.assertTimeout(Duration.ofSeconds(1), () -> System.out.println(1));");
-		RozaStatement timeoutPreemptivelyStatement = new RozaStatement("Assertions.assertTimeoutPreemptively(Duration.ofSeconds(1), () ->System.out.println(1));");
-		RozaStatement throwsStatement = new RozaStatement("Assertions.assertThrows(Exception.class, () -> System.out.println(1 / 0));");
-		RozaStatement doNotThrowStatement = new RozaStatement("Assertions.assertDoesNotThrow(() -> System.out.println(1 / 1));");
-		List<RozaStatement> statements = Arrays.asList(equalsStatement, notEqualsStatement, trueStatement, falseStatement, nullStatement, notNullStatement, sameStatement, notSameStatement, arrayEqualsStatement, iterableEqualsStatement, linesMatchStatement, allStatement, timeoutStatement, timeoutPreemptivelyStatement, throwsStatement, doNotThrowStatement);
+		RozaStatement arrayEqualsAssertion = new RozaStatement("Assert.assertArrayEquals(new Object[0], new Object[0]);");
+		RozaStatement equalsAssertion = new RozaStatement("Assert.assertEquals(0, 0);");
+		RozaStatement falseAssertion = new RozaStatement("Assert.assertFalse(false);");
+		RozaStatement notNullAssertion = new RozaStatement("Assert.assertNotNull(null);");
+		RozaStatement notSameAssertion = new RozaStatement("Assert.assertNotSame(null, null);");
+		RozaStatement nullAssertion = new RozaStatement("Assert.assertNull(null);");
+		RozaStatement sameAssertion = new RozaStatement("Assert.assertSame(null, null);");
+		RozaStatement thatAssertion = new RozaStatement("Assert.assertThat(null, IsNull.nullValue());");
+		RozaStatement trueAssertion = new RozaStatement("Assert.assertTrue(true);");
+		List<RozaStatement> statements = Arrays.asList(arrayEqualsAssertion, equalsAssertion, falseAssertion, notNullAssertion, notSameAssertion, nullAssertion, sameAssertion, thatAssertion, trueAssertion);
 		TestMethod testMethod = new TestMethod("example", statements);
 		TestClass testClass = new TestClass("ExampleTest", Arrays.asList(), Arrays.asList(), Arrays.asList(testMethod));
 		List<TestCase> testCases = extractor.extract(Arrays.asList(testClass));
 		assertEquals(1, testCases.size());
 		assertEquals("example", testCases.get(0).getName());
 		assertEquals(0, testCases.get(0).getFixtures().size());
-		assertEquals(16, testCases.get(0).getAsserts().size());
-		assertEquals(equalsStatement, testCases.get(0).getAsserts().get(0));
-		assertEquals(notEqualsStatement, testCases.get(0).getAsserts().get(1));
-		assertEquals(trueStatement, testCases.get(0).getAsserts().get(2));
-		assertEquals(falseStatement, testCases.get(0).getAsserts().get(3));
-		assertEquals(nullStatement, testCases.get(0).getAsserts().get(4));
-		assertEquals(notNullStatement, testCases.get(0).getAsserts().get(5));
-		assertEquals(sameStatement, testCases.get(0).getAsserts().get(6));
-		assertEquals(notSameStatement, testCases.get(0).getAsserts().get(7));
-		assertEquals(arrayEqualsStatement, testCases.get(0).getAsserts().get(8));
-		assertEquals(iterableEqualsStatement, testCases.get(0).getAsserts().get(9));
-		assertEquals(linesMatchStatement, testCases.get(0).getAsserts().get(10));
-		assertEquals(allStatement, testCases.get(0).getAsserts().get(11));
-		assertEquals(timeoutStatement, testCases.get(0).getAsserts().get(12));
-		assertEquals(timeoutPreemptivelyStatement, testCases.get(0).getAsserts().get(13));
-		assertEquals(throwsStatement, testCases.get(0).getAsserts().get(14));
-		assertEquals(doNotThrowStatement, testCases.get(0).getAsserts().get(15));
+		assertEquals(9, testCases.get(0).getAsserts().size());
+		assertEquals(arrayEqualsAssertion, testCases.get(0).getAsserts().get(0));
+		assertEquals(equalsAssertion, testCases.get(0).getAsserts().get(1));
+		assertEquals(falseAssertion, testCases.get(0).getAsserts().get(2));
+		assertEquals(notNullAssertion, testCases.get(0).getAsserts().get(3));
+		assertEquals(notSameAssertion, testCases.get(0).getAsserts().get(4));
+		assertEquals(nullAssertion, testCases.get(0).getAsserts().get(5));
+		assertEquals(sameAssertion, testCases.get(0).getAsserts().get(6));
+		assertEquals(thatAssertion, testCases.get(0).getAsserts().get(7));
+		assertEquals(trueAssertion, testCases.get(0).getAsserts().get(8));
 	}
 
 }

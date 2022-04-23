@@ -1,37 +1,23 @@
 package br.ufsc.ine.leb.roza.parsing;
 
+import com.github.javaparser.ast.body.FieldDeclaration;
+import com.github.javaparser.printer.lexicalpreservation.LexicalPreservingPrinter;
+
 public class Field {
 
-	private String type;
-	private String name;
+	private FieldDeclaration declaration;
 
-	public Field(String type, String name) {
-		this.type = type;
-		this.name = name;
+	public Field(FieldDeclaration declaration) {
+		this.declaration = declaration;
 	}
 
-	public String getType() {
-		return type;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	@Override
-	public boolean equals(Object object) {
-		if (object instanceof Field) {
-			Field other = (Field) object;
-			Boolean sameType = this.type.equals(other.type);
-			Boolean sameName = this.name.equals(other.name);
-			return sameType && sameName;
-		}
-		return false;
+	public String toCode() {
+		return LexicalPreservingPrinter.print(declaration);
 	}
 
 	@Override
 	public String toString() {
-		return String.format("private %s %s;", type, name);
+		return toCode();
 	}
 
 }

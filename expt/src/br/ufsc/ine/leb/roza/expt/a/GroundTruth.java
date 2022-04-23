@@ -5,9 +5,9 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-import br.ufsc.ine.leb.roza.extraction.JunitTestCaseExtractor;
 import br.ufsc.ine.leb.roza.extraction.TestCase;
 import br.ufsc.ine.leb.roza.extraction.TestCaseExtractor;
+import br.ufsc.ine.leb.roza.extraction.lixo.JunitTestCaseExtractor;
 import br.ufsc.ine.leb.roza.loading.RecursiveTextFileLoader;
 import br.ufsc.ine.leb.roza.loading.TextFile;
 import br.ufsc.ine.leb.roza.loading.TextFileLoader;

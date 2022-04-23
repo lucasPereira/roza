@@ -36,7 +36,7 @@ public abstract class Junit4TestCaseMaterializer implements TestCaseMaterializer
 			MethodDeclaration javaMethod = javaClass.addMethod(testCase.getName()).setPublic(true).addAnnotation("Test");
 			BlockStmt javaMethodBody = new BlockStmt();
 			testCase.getFixtures().forEach((fixture) -> {
-				javaMethodBody.addStatement(JavaParser.parseStatement(fixture.getCode()));
+				javaMethodBody.addStatement(JavaParser.parseStatement(fixture.toCode()));
 			});
 			addAssertions(testCase, javaMethodBody);
 			javaMethod.setBody(javaMethodBody);

@@ -2,27 +2,24 @@ package br.ufsc.ine.leb.roza.parsing;
 
 import java.util.List;
 
-import br.ufsc.ine.leb.roza.exceptions.NoTestMethodException;
+import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 
 public class TestClass {
 
-	private String name;
-	private List<SetupMethod> setupMethods;
-	private List<TestMethod> testMethods;
+	private ClassOrInterfaceDeclaration declaration;
+	private List<SetupMethod> setup;
+	private List<TestMethod> tests;
 	private List<Field> fields;
 
-	public TestClass(String name, List<Field> fields, List<SetupMethod> setupMethods, List<TestMethod> testMethods) {
-		this.name = name;
+	public TestClass(ClassOrInterfaceDeclaration declaration, List<Field> fields, List<SetupMethod> setups, List<TestMethod> tests) {
+		this.declaration = declaration;
 		this.fields = fields;
-		this.setupMethods = setupMethods;
-		this.testMethods = testMethods;
-		if (testMethods.size() == 0) {
-			throw new NoTestMethodException();
-		}
+		this.setup = setups;
+		this.tests = tests;
 	}
 
 	public String getName() {
-		return name;
+		return declaration.getName().asString();
 	}
 
 	public List<Field> getFields() {
@@ -30,16 +27,11 @@ public class TestClass {
 	}
 
 	public List<SetupMethod> getSetupMethods() {
-		return setupMethods;
+		return setup;
 	}
 
 	public List<TestMethod> getTestMethods() {
-		return testMethods;
-	}
-
-	@Override
-	public String toString() {
-		return name;
+		return tests;
 	}
 
 }

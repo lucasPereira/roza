@@ -1,11 +1,11 @@
 package br.ufsc.ine.leb.roza.parsing;
 
 import com.github.javaparser.ast.expr.MethodCallExpr;
-import com.github.javaparser.ast.stmt.ExpressionStmt;
+import com.github.javaparser.ast.stmt.Statement;
 
 public class MethodCallStatement extends GenericStatement {
 
-	public MethodCallStatement(ExpressionStmt statement, MethodCallExpr expression) {
+	public MethodCallStatement(MethodCallExpr expression, Statement statement) {
 		super(statement);
 	}
 

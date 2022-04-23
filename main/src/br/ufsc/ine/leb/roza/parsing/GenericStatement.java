@@ -1,7 +1,8 @@
 package br.ufsc.ine.leb.roza.parsing;
 
 import com.github.javaparser.ast.stmt.Statement;
-import com.github.javaparser.printer.lexicalpreservation.LexicalPreservingPrinter;
+import com.github.javaparser.printer.DefaultPrettyPrinter;
+import com.github.javaparser.printer.configuration.DefaultPrinterConfiguration;
 
 public class GenericStatement implements RozaStatement {
 
@@ -12,13 +13,15 @@ public class GenericStatement implements RozaStatement {
 	}
 
 	@Override
-	public String getCode() {
-		return LexicalPreservingPrinter.print(statement);
+	public String toCode() {
+		DefaultPrinterConfiguration configuration = new DefaultPrinterConfiguration();
+		DefaultPrettyPrinter printer = new DefaultPrettyPrinter(configuration);
+		return printer.print(statement);
 	}
 
 	@Override
 	public String toString() {
-		return getCode();
+		return toCode();
 	}
 
 	@Override

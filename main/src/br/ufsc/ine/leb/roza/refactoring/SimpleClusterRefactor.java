@@ -56,7 +56,7 @@ public class SimpleClusterRefactor implements ClusterRefactor {
 			if (!sharedFixtures.isEmpty()) {
 				for (Integer index = 0; index < sharedFixtures.size(); index++) {
 					RozaStatement statement = sharedFixtures.get(index);
-					Optional<VariableDeclarationExpr> declaration = JavaParser.parseStatement(statement.getCode()).toExpressionStmt().get().getExpression().toVariableDeclarationExpr();
+					Optional<VariableDeclarationExpr> declaration = JavaParser.parseStatement(statement.toCode()).toExpressionStmt().get().getExpression().toVariableDeclarationExpr();
 					if (declaration.isPresent()) {
 						VariableDeclarationExpr declarationExpression = declaration.get();
 						sharedFixtures.set(index, new RozaStatement(declarationExpression.getVariable(0).toString() + ";"));

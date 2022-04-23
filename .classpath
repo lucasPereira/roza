@@ -12,7 +12,7 @@
 	<classpathentry kind="lib" path="main/lib/jsoup-1.11.3.jar"/>
 	<classpathentry kind="lib" path="main/lib/gs-core-2.0.jar"/>
 	<classpathentry kind="lib" path="main/lib/gs-ui-swing-2.0.jar"/>
-	<classpathentry kind="lib" path="main/lib/javaparser-core-3.22.1.jar"/>
+	<classpathentry kind="lib" path="main/lib/javaparser-core-3.22.1.jar" sourcepath="main/lib/javaparser-core-3.22.1-sources.zip"/>
 	<classpathentry kind="lib" path="main/lib/javaparser-symbol-solver-core-3.22.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

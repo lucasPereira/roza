@@ -1,16 +1,12 @@
 package br.ufsc.ine.leb.roza.parsing;
 
+import com.github.javaparser.ast.expr.VariableDeclarationExpr;
+import com.github.javaparser.ast.stmt.Statement;
+
 public class VariableDeclarationStatement extends GenericStatement {
 
-	private String variable;
-
-	public VariableDeclarationStatement(String code, String variable) {
-		super(code);
-		this.variable = variable;
-	}
-
-	public String getVariableName() {
-		return variable;
+	public VariableDeclarationStatement(VariableDeclarationExpr expression, Statement statement) {
+		super(statement);
 	}
 
 	@Override

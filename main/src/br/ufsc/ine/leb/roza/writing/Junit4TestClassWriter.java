@@ -39,7 +39,7 @@ public class Junit4TestClassWriter implements TestClassWriter {
 				if (field.getInitialization() == null) {
 					unitTestClass.addField (field.getType(), field.getName()).setPrivate(true);
 				} else {
-					Expression initialization = JavaParser.parseExpression(field.getInitialization().getCode());
+					Expression initialization = JavaParser.parseExpression(field.getInitialization().toCode());
 					unitTestClass.addFieldWithInitializer(field.getType(), field.getName(), initialization).setPrivate(true);
 				}
 			});
@@ -47,7 +47,7 @@ public class Junit4TestClassWriter implements TestClassWriter {
 				MethodDeclaration unitSetupMethod = unitTestClass.addMethod(setupMethod.getName()).setPublic(true).addAnnotation(Before.class);
 				BlockStmt unitSetupMethodBody = new BlockStmt();
 				setupMethod.getStatements().forEach((statement) -> {
-					unitSetupMethodBody.addStatement(JavaParser.parseStatement(statement.getCode()));
+					unitSetupMethodBody.addStatement(JavaParser.parseStatement(statement.toCode()));
 				});
 				unitSetupMethod.setBody(unitSetupMethodBody);
 			});
@@ -55,7 +55,7 @@ public class Junit4TestClassWriter implements TestClassWriter {
 				MethodDeclaration unitTestMethod = unitTestClass.addMethod(testMethod.getName()).setPublic(true).addAnnotation(Test.class);
 				BlockStmt unitTestMethodBody = new BlockStmt();
 				testMethod.getStatements().forEach((statement) -> {
-					unitTestMethodBody.addStatement(JavaParser.parseStatement(statement.getCode()));
+					unitTestMethodBody.addStatement(JavaParser.parseStatement(statement.toCode()));
 				});
 				unitTestMethod.setBody(unitTestMethodBody);
 			});

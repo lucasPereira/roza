@@ -2,27 +2,25 @@ package br.ufsc.ine.leb.roza.parsing;
 
 import java.util.List;
 
+import com.github.javaparser.ast.body.MethodDeclaration;
+
 public class SetupMethod {
 
-	private String name;
+	private MethodDeclaration declaration;
 	private List<RozaStatement> statements;
 
-	public SetupMethod(String name, List<RozaStatement> statements) {
-		this.name = name;
+
+	public SetupMethod(MethodDeclaration declaration, List<RozaStatement> statements) {
+		this.declaration = declaration;
 		this.statements = statements;
 	}
 
 	public String getName() {
-		return name;
+		return declaration.getName().asString();
 	}
 
 	public List<RozaStatement> getStatements() {
 		return statements;
-	}
-
-	@Override
-	public String toString() {
-		return String.format("@Before %s()", name);
 	}
 
 }

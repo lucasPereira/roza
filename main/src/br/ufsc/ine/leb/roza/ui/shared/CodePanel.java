@@ -72,7 +72,7 @@ public class CodePanel extends JScrollPane {
 
 	private void appendCode(Integer line, StringBuilder code, RozaStatement statement, String type) {
 		String color = line % 2 == 0 ? "even" : "odd";
-		code.append(String.format("<li class=\"%s-%s\">%02d. %s</li>", color, type, line, statement.getCode()));
+		code.append(String.format("<li class=\"%s-%s\">%02d. %s</li>", color, type, line, statement.toCode()));
 	}
 
 	private void updateScroll() {

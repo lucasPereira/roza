@@ -1,4 +1,4 @@
-package br.ufsc.ine.leb.roza.extraction;
+package br.ufsc.ine.leb.roza.extraction.lixo;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -10,6 +10,8 @@ import com.github.javaparser.ast.expr.AssignExpr;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.SimpleName;
 
+import br.ufsc.ine.leb.roza.extraction.TestCase;
+import br.ufsc.ine.leb.roza.extraction.TestCaseExtractor;
 import br.ufsc.ine.leb.roza.parsing.Field;
 import br.ufsc.ine.leb.roza.parsing.RozaStatement;
 import br.ufsc.ine.leb.roza.parsing.TestClass;

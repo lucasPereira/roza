@@ -7,7 +7,13 @@ import java.util.List;
 import br.ufsc.ine.leb.roza.parsing.RozaStatement;
 import br.ufsc.ine.leb.roza.parsing.TestClass;
 
-public class JavaTestCaseExtractor implements TestCaseExtractor {
+public class JUnitTestCaseExtractor implements TestCaseExtractor {
+
+	private AssertionDetector assertionDetector;
+
+	public JUnitTestCaseExtractor(AssertionDetector assertionDetector) {
+		this.assertionDetector = assertionDetector;
+	}
 
 	@Override
 	public List<TestCase> extract(List<TestClass> testClasses) {
@@ -18,7 +24,8 @@ public class JavaTestCaseExtractor implements TestCaseExtractor {
 				List<RozaStatement> fixtures = new ArrayList<>();
 				List<RozaStatement> assertions = new LinkedList<>();
 				testMethod.getStatements().forEach(statement -> {
-					fixtures.add(statement);
+					List<RozaStatement> statementContainer = assertionDetector.isAssertion(statement) ? assertions : fixtures;
+					statementContainer.add(statement);
 				});
 				TestCase testCase = new TestCase(name, fixtures, assertions);
 				testCases.add(testCase);

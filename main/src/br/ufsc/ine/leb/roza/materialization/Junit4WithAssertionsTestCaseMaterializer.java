@@ -13,7 +13,7 @@ public class Junit4WithAssertionsTestCaseMaterializer extends Junit4TestCaseMate
 
 	public void addAssertions(TestCase testCase, BlockStmt javaMethodBody) {
 		testCase.getAsserts().forEach((assertion) -> {
-			javaMethodBody.addStatement(JavaParser.parseStatement(assertion.getCode()));
+			javaMethodBody.addStatement(JavaParser.parseStatement(assertion.toCode()));
 		});
 	}
 

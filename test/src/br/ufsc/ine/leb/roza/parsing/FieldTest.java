@@ -5,29 +5,21 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import org.junit.jupiter.api.Test;
 
+import br.ufsc.ine.leb.roza.fixture.ParsingFixtures;
+
 class FieldTest {
 
 	@Test
-	void create() throws Exception {
-		Field field = new Field("Sut", "sut");
-		assertEquals("Sut", field.getType());
-		assertEquals("sut", field.getName());
+	void notInitialized() throws Exception {
+		Field field = ParsingFixtures.fieldInteger("fixture");
+		assertEquals("private Integer fixture;", field.toCode());
 	}
 
 	@Test
-	void equals() throws Exception {
-		assertEquals(new Field("Sut", "sut"), new Field("Sut", "sut"));
-	}
-
-	@Test
-	void notEquals() throws Exception {
-		assertNotEquals(new Field("Sut", "sut"), new Field("Sut", "tus"), "Same type, different names");
-		assertNotEquals(new Field("Tus", "sut"), new Field("Sut", "sut"), "Same name, different types");
-	}
-
-	@Test
-	public void string() {
-		assertEquals("private Sut sut;", new Field("Sut", "sut").toString());
+	void initialized() throws Exception {
+		Field field = ParsingFixtures.fieldInteger("fixture", 0);
+		assertNotEquals(field, ParsingFixtures.fieldInteger("fixture"));
+		assertEquals("private Integer fixture = 0;", field.toCode());
 	}
 
 }
