@@ -18,7 +18,7 @@ class DeckardElementToKeyConverterTest {
 		TestCase testCase = new TestCase("test", Arrays.asList(), Arrays.asList());
 		TestCaseMaterialization materialization = new TestCaseMaterialization(new File("Materialization.java"), 10, testCase);
 		MatrixElementToKeyConverter<TestCaseMaterialization, String> converter = new DeckardMatrixElementToKeyConverter();
-		assertEquals(materialization.getAbsoluteFilePath(), converter.convert(materialization));
+		assertEquals(materialization.getFileName(), converter.convert(materialization));
 	}
 
 }

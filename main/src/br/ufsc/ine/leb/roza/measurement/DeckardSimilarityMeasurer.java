@@ -64,12 +64,12 @@ public class DeckardSimilarityMeasurer extends AbstractSimilarityMeasurer implem
 				List<String> matches = Arrays.asList(cluster.split(lineSeparator));
 				for (String sourceMatch : matches) {
 					List<String> sourceFields = Arrays.asList(sourceMatch.split("\\s"));
-					String sourceFile = sourceFields.get(3);
+					String sourceFile = new File(sourceFields.get(3)).getName();
 					Integer sourceLine = Integer.parseInt(sourceFields.get(4).replaceFirst("LINE:([0-9]+):([0-9]+)", "$1"));
 					Integer sourceLenght = Integer.parseInt(sourceFields.get(4).replaceFirst("LINE:([0-9]+):([0-9]+)", "$2"));
 					for (String targetMatch : matches) {
 						List<String> targetFields = Arrays.asList(targetMatch.split("\\s"));
-						String targetFile = targetFields.get(3);
+						String targetFile = new File(targetFields.get(3)).getName();
 						matrix.get(sourceFile, targetFile).addSegment(sourceLine, sourceLine + sourceLenght - 1);
 					}
 				}
@@ -83,7 +83,11 @@ public class DeckardSimilarityMeasurer extends AbstractSimilarityMeasurer implem
 		String argumentsScript = String.format("#!/bin/sh\n%s", argumentsText);
 		folderUtils.writeContetAsString("config", argumentsScript);
 		ProcessUtils processUtils = new ProcessUtils(true, true, true, false);
-		processUtils.execute(new File("main/tools/deckard"), "./tool/scripts/clonedetect/deckard.sh");
+		if (configurations.isDockerMode()) {
+			processUtils.execute(new File("main/tools/deckard"), "./execute-using-docker.sh");
+		} else {
+			processUtils.execute(new File("main/tools/deckard"), "./execute.sh");
+		}
 		folderUtils.removeFile("config");
 	}
 

@@ -5,22 +5,16 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.io.File;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import br.ufsc.ine.leb.roza.exceptions.InvalidConfigurationException;
 
 class DeckardConfigurationsTest {
 
-	private DeckardConfigurations configurations;
-
-	@BeforeEach
-	void setup() {
-		configurations = new DeckardConfigurations();
-	}
-
 	@Test
 	void configurations() throws Exception {
+		DeckardConfigurations configurations = new DeckardConfigurations(true);
+
 		assertEquals(16, configurations.getAll().size());
 
 		assertEquals("MIN_TOKENS", configurations.getAll().get(0).getName());
@@ -32,11 +26,11 @@ class DeckardConfigurationsTest {
 		assertEquals("SIMILARITY", configurations.getAll().get(2).getName());
 		assertEquals("Similarity thresold based on editing distance", configurations.getAll().get(2).getDescription());
 
-		assertEquals("SRC_DIR", configurations.getAll().get(3).getName());
-		assertEquals("The root directory containing the source files", configurations.getAll().get(3).getDescription());
+		assertEquals("FILE_PATTERN", configurations.getAll().get(3).getName());
+		assertEquals("Input file name pattern", configurations.getAll().get(3).getDescription());
 
-		assertEquals("FILE_PATTERN", configurations.getAll().get(4).getName());
-		assertEquals("Input file name pattern", configurations.getAll().get(4).getDescription());
+		assertEquals("SRC_DIR", configurations.getAll().get(4).getName());
+		assertEquals("The root directory containing the source files", configurations.getAll().get(4).getDescription());
 
 		assertEquals("VECTOR_DIR", configurations.getAll().get(5).getName());
 		assertEquals("Where to output detected clone clusters", configurations.getAll().get(5).getDescription());
@@ -68,18 +62,19 @@ class DeckardConfigurationsTest {
 		assertEquals("GROUPING_S", configurations.getAll().get(14).getName());
 		assertEquals("The maximal vector size for the first group", configurations.getAll().get(14).getDescription());
 
-		assertEquals("MAX_PROC", configurations.getAll().get(15).getName());
+		assertEquals("MAX_PROCS", configurations.getAll().get(15).getName());
 		assertEquals("The maximal number of processes to be used", configurations.getAll().get(15).getDescription());
 	}
 
 	@Test
 	void defaultValues() throws Exception {
+		DeckardConfigurations configurations = new DeckardConfigurations(false);
 		assertEquals(16, configurations.getAllAsArguments().size());
 		assertEquals("export MIN_TOKENS=1", configurations.getAllAsArguments().get(0));
 		assertEquals("export STRIDE=0", configurations.getAllAsArguments().get(1));
 		assertEquals("export SIMILARITY=1.0", configurations.getAllAsArguments().get(2));
-		assertEquals("export SRC_DIR=" + new File("main/exec/materializer").getAbsolutePath(), configurations.getAllAsArguments().get(3));
-		assertEquals("export FILE_PATTERN=*.java", configurations.getAllAsArguments().get(4));
+		assertEquals("export FILE_PATTERN=*.java", configurations.getAllAsArguments().get(3));
+		assertEquals("export SRC_DIR=" + new File("main/exec/materializer").getAbsolutePath(), configurations.getAllAsArguments().get(4));
 		assertEquals("export VECTOR_DIR=" + new File("main/exec/measurer/vectors").getAbsolutePath(), configurations.getAllAsArguments().get(5));
 		assertEquals("export CLUSTER_DIR=" + new File("main/exec/measurer/cluster").getAbsolutePath(), configurations.getAllAsArguments().get(6));
 		assertEquals("export TIME_DIR=" + new File("main/exec/measurer/times").getAbsolutePath(), configurations.getAllAsArguments().get(7));
@@ -90,33 +85,43 @@ class DeckardConfigurationsTest {
 		assertEquals("export QUERY_EXEC=tool/src/lsh/bin/queryBuckets", configurations.getAllAsArguments().get(12));
 		assertEquals("export POSTPRO_EXEC=tool/scripts/clonedetect/post_process_groupfile", configurations.getAllAsArguments().get(13));
 		assertEquals("export GROUPING_S=1", configurations.getAllAsArguments().get(14));
-		assertEquals("export MAX_PROC=1", configurations.getAllAsArguments().get(15));
+		assertEquals("export MAX_PROCS=1", configurations.getAllAsArguments().get(15));
+	}
+
+	@Test
+	void defaultValuesForDockerMode() throws Exception {
+		DeckardConfigurations configurations = new DeckardConfigurations(true);
+		assertEquals(16, configurations.getAllAsArguments().size());
+		assertEquals("export MIN_TOKENS=1", configurations.getAllAsArguments().get(0));
+		assertEquals("export STRIDE=0", configurations.getAllAsArguments().get(1));
+		assertEquals("export SIMILARITY=1.0", configurations.getAllAsArguments().get(2));
+		assertEquals("export FILE_PATTERN=*.java", configurations.getAllAsArguments().get(3));
+		assertEquals("export SRC_DIR=" + "../../exec/materializer", configurations.getAllAsArguments().get(4));
+		assertEquals("export VECTOR_DIR=" + "../../exec/measurer/vectors", configurations.getAllAsArguments().get(5));
+		assertEquals("export CLUSTER_DIR=" + "../../exec/measurer/cluster", configurations.getAllAsArguments().get(6));
+		assertEquals("export TIME_DIR=" + "../../exec/measurer/times", configurations.getAllAsArguments().get(7));
+		assertEquals("export DECKARD_DIR=tool", configurations.getAllAsArguments().get(8));
+		assertEquals("export VGEN_EXEC=tool/src/main/jvecgen", configurations.getAllAsArguments().get(9));
+		assertEquals("export GROUPING_EXEC=tool/src/vgen/vgrouping/runvectorsort", configurations.getAllAsArguments().get(10));
+		assertEquals("export CLUSTER_EXEC=tool/src/lsh/bin/enumBuckets", configurations.getAllAsArguments().get(11));
+		assertEquals("export QUERY_EXEC=tool/src/lsh/bin/queryBuckets", configurations.getAllAsArguments().get(12));
+		assertEquals("export POSTPRO_EXEC=tool/scripts/clonedetect/post_process_groupfile", configurations.getAllAsArguments().get(13));
+		assertEquals("export GROUPING_S=1", configurations.getAllAsArguments().get(14));
+		assertEquals("export MAX_PROCS=1", configurations.getAllAsArguments().get(15));
 	}
 
 	@Test
 	void changeValues() throws Exception {
+		DeckardConfigurations configurations = new DeckardConfigurations(true);
 		configurations.minTokens(2).stride(Integer.MAX_VALUE).similarity(0.9);
-		assertEquals(16, configurations.getAllAsArguments().size());
 		assertEquals("export MIN_TOKENS=2", configurations.getAllAsArguments().get(0));
 		assertEquals("export STRIDE=inf", configurations.getAllAsArguments().get(1));
 		assertEquals("export SIMILARITY=0.9", configurations.getAllAsArguments().get(2));
-		assertEquals("export SRC_DIR=" + new File("main/exec/materializer").getAbsolutePath(), configurations.getAllAsArguments().get(3));
-		assertEquals("export FILE_PATTERN=*.java", configurations.getAllAsArguments().get(4));
-		assertEquals("export VECTOR_DIR=" + new File("main/exec/measurer/vectors").getAbsolutePath(), configurations.getAllAsArguments().get(5));
-		assertEquals("export CLUSTER_DIR=" + new File("main/exec/measurer/cluster").getAbsolutePath(), configurations.getAllAsArguments().get(6));
-		assertEquals("export TIME_DIR=" + new File("main/exec/measurer/times").getAbsolutePath(), configurations.getAllAsArguments().get(7));
-		assertEquals("export DECKARD_DIR=tool", configurations.getAllAsArguments().get(8));
-		assertEquals("export VGEN_EXEC=tool/src/main/jvecgen", configurations.getAllAsArguments().get(9));
-		assertEquals("export GROUPING_EXEC=tool/src/vgen/vgrouping/runvectorsort", configurations.getAllAsArguments().get(10));
-		assertEquals("export CLUSTER_EXEC=tool/src/lsh/bin/enumBuckets", configurations.getAllAsArguments().get(11));
-		assertEquals("export QUERY_EXEC=tool/src/lsh/bin/queryBuckets", configurations.getAllAsArguments().get(12));
-		assertEquals("export POSTPRO_EXEC=tool/scripts/clonedetect/post_process_groupfile", configurations.getAllAsArguments().get(13));
-		assertEquals("export GROUPING_S=1", configurations.getAllAsArguments().get(14));
-		assertEquals("export MAX_PROC=1", configurations.getAllAsArguments().get(15));
 	}
 
 	@Test
 	void minTokensShouldBeLargerThanZero() throws Exception {
+		DeckardConfigurations configurations = new DeckardConfigurations(true);
 		assertThrows(InvalidConfigurationException.class, () -> {
 			configurations.minTokens(-1);
 		});
@@ -130,6 +135,7 @@ class DeckardConfigurationsTest {
 
 	@Test
 	void strideShouldBePositive() throws Exception {
+		DeckardConfigurations configurations = new DeckardConfigurations(true);
 		assertThrows(InvalidConfigurationException.class, () -> {
 			configurations.stride(-1);
 		});
@@ -140,6 +146,7 @@ class DeckardConfigurationsTest {
 
 	@Test
 	void similarityShouldBeBetweenZeroAndOne() throws Exception {
+		DeckardConfigurations configurations = new DeckardConfigurations(true);
 		assertThrows(InvalidConfigurationException.class, () -> {
 			configurations.similarity(-0.1);
 		});
@@ -153,6 +160,7 @@ class DeckardConfigurationsTest {
 
 	@Test
 	void getConfigurations() throws Exception {
+		DeckardConfigurations configurations = new DeckardConfigurations(true);
 		assertEquals(new File("main/exec/measurer/cluster").getAbsolutePath(), configurations.clusterDir());
 	}
 }

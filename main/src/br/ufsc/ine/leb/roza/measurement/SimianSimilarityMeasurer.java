@@ -80,7 +80,7 @@ public class SimianSimilarityMeasurer extends AbstractSimilarityMeasurer impleme
 	}
 
 	private void run(MaterializationReport materializationReport, File fileReport) {
-		ProcessUtils processUtils = new ProcessUtils(true, false, true, false);
+		ProcessUtils processUtils = new ProcessUtils(true, true, true, false);
 		List<String> arguments = new LinkedList<String>();
 		arguments.add("java");
 		arguments.add("-jar");

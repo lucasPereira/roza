@@ -13,21 +13,19 @@ public class DeckardConfigurations extends AbstractConfigurations implements Con
 	private DeckardIntegerConfiguration minTokens;
 	private DeckardIntegerConfiguration stride;
 	private DeckardDoubleConfiguration similarity;
-	private DeckardStringConfiguration srcDir;
-	private DeckardStringConfiguration vectorDir;
-	private DeckardStringConfiguration clusterDir;
-	private DeckardStringConfiguration timeDir;
+	private Boolean isDockerMode;
 
-	public DeckardConfigurations() {
+	private static String SRC_DIR_PATH = "exec/materializer";
+	private static String RESULTS_DIR_PATH = "exec/measurer";
+	private static String VECTOR_DIR_PATH =  RESULTS_DIR_PATH + "/vectors";
+	private static String CLUSTER_DIR_PATH = RESULTS_DIR_PATH + "/cluster";
+	private static String TIME_DIR_PATH= RESULTS_DIR_PATH + "/times";
+
+	public DeckardConfigurations(boolean isDockerMode) {
+		this.isDockerMode = isDockerMode;
 		minTokens = new DeckardIntegerConfiguration("MIN_TOKENS", 1, "Minimum token count to suppress vectors for small sub-trees");
 		stride = new DeckardIntegerConfiguration("STRIDE", 0, "Width of the sliding window and how far it moves in each step");
 		similarity = new DeckardDoubleConfiguration("SIMILARITY", 1.0, "Similarity thresold based on editing distance");
-		srcDir = new DeckardStringConfiguration("SRC_DIR", null, "The root directory containing the source files");
-		vectorDir = new DeckardStringConfiguration("VECTOR_DIR", null, "Where to output detected clone clusters");
-		clusterDir = new DeckardStringConfiguration("CLUSTER_DIR", null, "Where to output detected clone clusters");
-		timeDir = new DeckardStringConfiguration("TIME_DIR", null, "Where to output timing/debugging info");
-		srcDir("main/exec/materializer");
-		results("main/exec/measurer");
 	}
 
 	@Override
@@ -36,11 +34,11 @@ public class DeckardConfigurations extends AbstractConfigurations implements Con
 		configurations.add(minTokens);
 		configurations.add(stride);
 		configurations.add(similarity);
-		configurations.add(srcDir);
 		configurations.add(new DeckardStringConfiguration("FILE_PATTERN", "*.java", "Input file name pattern"));
-		configurations.add(vectorDir);
-		configurations.add(clusterDir);
-		configurations.add(timeDir);
+		configurations.add(new DeckardStringConfiguration("SRC_DIR", getPath(SRC_DIR_PATH, isDockerMode), "The root directory containing the source files"));
+		configurations.add(new DeckardStringConfiguration("VECTOR_DIR", getPath(VECTOR_DIR_PATH, isDockerMode), "Where to output detected clone clusters"));
+		configurations.add(new DeckardStringConfiguration("CLUSTER_DIR", getPath(CLUSTER_DIR_PATH, isDockerMode), "Where to output detected clone clusters"));
+		configurations.add(new DeckardStringConfiguration("TIME_DIR", getPath(TIME_DIR_PATH, isDockerMode), "Where to output timing/debugging info"));
 		configurations.add(new DeckardStringConfiguration("DECKARD_DIR", "tool", "Where is the home directory of Deckard"));
 		configurations.add(new DeckardStringConfiguration("VGEN_EXEC", "tool/src/main/jvecgen", "Where is the vector generator"));
 		configurations.add(new DeckardStringConfiguration("GROUPING_EXEC", "tool/src/vgen/vgrouping/runvectorsort", "How to divide the vectors into groups"));
@@ -48,13 +46,13 @@ public class DeckardConfigurations extends AbstractConfigurations implements Con
 		configurations.add(new DeckardStringConfiguration("QUERY_EXEC", "tool/src/lsh/bin/queryBuckets", "Where is the LSH for vector querying"));
 		configurations.add(new DeckardStringConfiguration("POSTPRO_EXEC", "tool/scripts/clonedetect/post_process_groupfile", "How to post process clone groups"));
 		configurations.add(new DeckardIntegerConfiguration("GROUPING_S", 1, "The maximal vector size for the first group"));
-		configurations.add(new DeckardIntegerConfiguration("MAX_PROC", 1, "The maximal number of processes to be used"));
+		configurations.add(new DeckardIntegerConfiguration("MAX_PROCS", 1, "The maximal number of processes to be used"));
 		return configurations;
 	}
 
 	@Override
 	protected Boolean hasAllConfigurations() {
-		return srcDir.getValue() != null && vectorDir.getValue() != null && clusterDir.getValue() != null && timeDir.getValue() != null;
+		return true;
 	}
 
 	public DeckardConfigurations minTokens(Integer value) {
@@ -79,22 +77,20 @@ public class DeckardConfigurations extends AbstractConfigurations implements Con
 		return this;
 	}
 
-	private DeckardConfigurations srcDir(String value) {
-		ensureThat(value != null);
-		srcDir.setValue(new File(value).getAbsolutePath());
-		return this;
-	}
-
-	private DeckardConfigurations results(String value) {
-		ensureThat(value != null);
-		vectorDir.setValue(new File(value, "vectors").getAbsolutePath());
-		clusterDir.setValue(new File(value, "cluster").getAbsolutePath());
-		timeDir.setValue(new File(value, "times").getAbsolutePath());
-		return this;
+	private String getPath(String path, Boolean useRelativePath) {
+		if (useRelativePath) {
+			return new File("../../" + path).getPath();
+		} else {
+			return new File("main/" + path).getAbsolutePath();
+		}
 	}
 
 	public String clusterDir() {
-		return clusterDir.getValue();
+		return getPath(CLUSTER_DIR_PATH, false);
+	}
+
+	public Boolean isDockerMode() {
+		return isDockerMode;
 	}
 
 }

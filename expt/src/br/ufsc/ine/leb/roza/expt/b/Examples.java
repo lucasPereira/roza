@@ -55,7 +55,7 @@ public class Examples {
 
 		JplagConfigurations jplagSettings = new JplagConfigurations().sensitivity(1);
 		SimianConfigurations simianSettings = new SimianConfigurations().threshold(2);
-		DeckardConfigurations deckardSettings = new DeckardConfigurations().minTokens(1).stride(Integer.MAX_VALUE).similarity(1.0);
+		DeckardConfigurations deckardSettings = new DeckardConfigurations(true).minTokens(1).stride(Integer.MAX_VALUE).similarity(1.0);
 		includeMetric(csv, materializations, "LCS", new LcsSimilarityMeasurer());
 		includeMetric(csv, materializations, "LCCSS", new LccssSimilarityMeasurer());
 		includeMetric(csv, materializations, "JPlag", new JplagSimilarityMeasurer(jplagSettings));

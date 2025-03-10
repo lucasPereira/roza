@@ -108,7 +108,7 @@ public class Experiment {
 
 	private static void deckard(Integer minTokens, Integer stride, Double similarity) {
 		String fileName = String.format("deckard-%d-%d-%.1f.csv", minTokens, stride, similarity);
-		DeckardConfigurations configurations = new DeckardConfigurations().minTokens(minTokens).stride(stride).similarity(similarity);
+		DeckardConfigurations configurations = new DeckardConfigurations(true).minTokens(minTokens).stride(stride).similarity(similarity);
 		SimilarityMeasurer measurer = new DeckardSimilarityMeasurer(configurations);
 		evaluateMeasure(fileName, measurer);
 	}

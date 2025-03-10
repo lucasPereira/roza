@@ -36,7 +36,7 @@ public class MeasurerComboBox implements UiComponent {
 		}).add("LCS", () -> {
 			manager.setSimilarityMeasurer(new LcsSimilarityMeasurer());
 		}).add("Deckard", () -> {
-			DeckardConfigurations settings = new DeckardConfigurations();
+			DeckardConfigurations settings = new DeckardConfigurations(true);
 			manager.setSimilarityMeasurer(new DeckardSimilarityMeasurer(settings));
 			hub.unselectJplagMetricPublish();
 			hub.unselectSimianMetricPublish();

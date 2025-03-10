@@ -88,8 +88,7 @@ public class FolderUtils {
 		try {
 			File file = new File(baseFolder, path);
 			file.createNewFile();
-			FileWriter writer;
-			writer = new FileWriter(file);
+			FileWriter writer = new FileWriter(file);
 			writer.write(content);
 			writer.close();
 			return file;
