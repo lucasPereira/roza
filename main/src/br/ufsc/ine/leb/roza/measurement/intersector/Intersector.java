@@ -21,6 +21,10 @@ public class Intersector {
 		for (Interval interval : intervals) {
 			sum = sum.add(interval.getLength());
 		}
+		/**
+		 * TODO: we need to reevaluate this because it considering as length the class and method declarations,
+		 * blank lines and annotations.
+		 **/
 		return sum.divide(length, MathContext.DECIMAL32);
 	}
 

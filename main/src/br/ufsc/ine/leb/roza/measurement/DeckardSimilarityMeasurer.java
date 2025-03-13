@@ -68,6 +68,25 @@ public class DeckardSimilarityMeasurer extends AbstractSimilarityMeasurer implem
 					Integer sourceLine = Integer.parseInt(sourceFields.get(4).replaceFirst("LINE:([0-9]+):([0-9]+)", "$1"));
 					Integer sourceLenght = Integer.parseInt(sourceFields.get(4).replaceFirst("LINE:([0-9]+):([0-9]+)", "$2"));
 					for (String targetMatch : matches) {
+						/**
+						 * TODO: the report might being interpreted incorrectly.
+						 * Possibly we must to make sure to only include targets that have the same TBID and TEID.
+						 * Otherwise we will consider the line a match even if it is not.
+						 * Consider the following example:
+						 *
+						 * TestClass18CadastrarFichaDeAvaliacaoVerFichaDeAvaliacaoTest.java LINE:9:1 NODE_KIND:121 nVARs:2 NUM_NODE:8 TBID:49 TEID:54
+						 * TestClass18CadastrarFichaDeAvaliacaoVerFichaDeAvaliacaoTest.java LINE:10:1 NODE_KIND:121 nVARs:2 NUM_NODE:8 TBID:55 TEID:60
+						 * TestClass18CadastrarFichaDeAvaliacaoVerFichaDeAvaliacaoTest.java LINE:11:1 NODE_KIND:121 nVARs:2 NUM_NODE:8 TBID:61 TEID:66
+						 * TestClass18CadastrarFichaDeAvaliacaoVerFichaDeAvaliacaoTest.java LINE:12:1 NODE_KIND:121 nVARs:2 NUM_NODE:8 TBID:67 TEID:72
+						 * TestClass18CadastrarFichaDeAvaliacaoVerFichaDeAvaliacaoTest.java LINE:30:1 NODE_KIND:121 nVARs:2 NUM_NODE:8 TBID:200 TEID:205
+						 * TestClass38ImportarProducoesDuasVezesComSucessoTest.java LINE:9:1 NODE_KIND:121 nVARs:2 NUM_NODE:8 TBID:49 TEID:54
+						 * TestClass38ImportarProducoesDuasVezesComSucessoTest.java LINE:10:1 NODE_KIND:121 nVARs:2 NUM_NODE:8 TBID:55 TEID:60
+						 * TestClass38ImportarProducoesDuasVezesComSucessoTest.java LINE:11:1 NODE_KIND:121 nVARs:2 NUM_NODE:8 TBID:61 TEID:66
+						 * TestClass38ImportarProducoesDuasVezesComSucessoTest.java LINE:12:1 NODE_KIND:121 nVARs:2 NUM_NODE:8 TBID:67 TEID:72
+						 *
+						 * In the above example we will consider the fifth line a match, but it is not because there is no equivalence for the target.
+						 * This will demand a deeper investigation about how Deckard's report works.
+						 * */
 						List<String> targetFields = Arrays.asList(targetMatch.split("\\s"));
 						String targetFile = new File(targetFields.get(3)).getName();
 						matrix.get(sourceFile, targetFile).addSegment(sourceLine, sourceLine + sourceLenght - 1);
