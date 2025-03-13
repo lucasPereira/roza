@@ -72,7 +72,7 @@ public class Examples {
 		for (SimilarityAssessment assessment : report.getAssessments()) {
 			String source = assessment.getSource().getName();
 			String target = assessment.getTarget().getName();
-			String score = formatterUtils.bigDecimal(assessment.getScore());
+			String score = formatterUtils.fractionNumberForCsv(assessment.getScore());
 			csv.addLine(metric, source, target, score);
 		}
 	}

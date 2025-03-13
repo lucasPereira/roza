@@ -33,7 +33,7 @@ public class DeckardSimilarityMeasurer extends AbstractSimilarityMeasurer implem
 	}
 
 	@Override
-	public SimilarityReport measureMoreTheOneTest(MaterializationReport materializationReport, SimilarityReportBuilder builder) {
+	public SimilarityReport measureMoreThanOne(MaterializationReport materializationReport, SimilarityReportBuilder builder) {
 		List<TestCaseMaterialization> materializations = materializationReport.getMaterializations();
 		MatrixElementToKeyConverter<TestCaseMaterialization, String> converter = new DeckardMatrixElementToKeyConverter();
 		MatrixValueFactory<TestCaseMaterialization, Intersector> factory = new DeckardMatrixValueFactory();

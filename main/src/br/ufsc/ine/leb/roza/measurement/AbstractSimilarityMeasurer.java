@@ -19,9 +19,9 @@ public abstract class AbstractSimilarityMeasurer implements SimilarityMeasurer {
 		if (materializations.size() == 1) {
 			return builder.add(materializations.iterator().next().getTestCase()).build();
 		}
-		return measureMoreTheOneTest(materializationReport, builder);
+		return measureMoreThanOne(materializationReport, builder);
 	}
 
-	abstract SimilarityReport measureMoreTheOneTest(MaterializationReport materializationReport, SimilarityReportBuilder builder);
+	abstract SimilarityReport measureMoreThanOne(MaterializationReport materializationReport, SimilarityReportBuilder builder);
 
 }

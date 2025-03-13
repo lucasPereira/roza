@@ -24,7 +24,7 @@ public class SimilarityAssessmentRenderer implements TableCellRenderer {
 		if (value instanceof SimilarityAssessment) {
 			SimilarityAssessment assessment = (SimilarityAssessment) value;
 			BigDecimal measure = assessment.getScore();
-			score = new FormatterUtils().bigDecimal(measure);
+			score = new FormatterUtils().fractionNumberForUi(measure);
 		}
 		return renderer.getTableCellRendererComponent(table, score, isSelected, hasFocus, row, column);
 	}

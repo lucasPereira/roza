@@ -14,7 +14,7 @@ import br.ufsc.ine.leb.roza.TestCaseMaterialization;
 public class LccssSimilarityMeasurer extends AbstractSimilarityMeasurer implements SimilarityMeasurer {
 
 	@Override
-	public SimilarityReport measureMoreTheOneTest(MaterializationReport materializationReport, SimilarityReportBuilder builder) {
+	public SimilarityReport measureMoreThanOne(MaterializationReport materializationReport, SimilarityReportBuilder builder) {
 		List<TestCaseMaterialization> materializations = materializationReport.getMaterializations();
 		for (TestCaseMaterialization sourceMaterialization : materializations) {
 			TestCase source = sourceMaterialization.getTestCase();

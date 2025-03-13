@@ -64,16 +64,16 @@ public class DeckardConfigurations extends AbstractConfigurations implements Con
 
 	public DeckardConfigurations stride(Integer value) {
 		ensureThat(value != null);
-		stride.setValue(value);
 		ensureThat(value >= 0);
+		stride.setValue(value);
 		return this;
 	}
 
 	public DeckardConfigurations similarity(Double value) {
 		ensureThat(value != null);
-		similarity.setValue(value);
 		ensureThat(value >= 0);
 		ensureThat(value <= 1);
+		similarity.setValue(value);
 		return this;
 	}
 

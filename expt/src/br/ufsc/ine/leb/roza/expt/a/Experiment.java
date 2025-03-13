@@ -107,7 +107,9 @@ public class Experiment {
 	}
 
 	private static void deckard(Integer minTokens, Integer stride, Double similarity) {
-		String fileName = String.format("deckard-%d-%d-%.1f.csv", minTokens, stride, similarity);
+		FormatterUtils formatterUtils = new FormatterUtils();
+		String similarityAsText = formatterUtils.fractionNumberForFileName(similarity);
+		String fileName = String.format("deckard-%d-%d-%s.csv", minTokens, stride, similarityAsText);
 		DeckardConfigurations configurations = new DeckardConfigurations(true).minTokens(minTokens).stride(stride).similarity(similarity);
 		SimilarityMeasurer measurer = new DeckardSimilarityMeasurer(configurations);
 		evaluateMeasure(fileName, measurer);
@@ -151,7 +153,7 @@ public class Experiment {
 			}
 			BigDecimal averagePrecision = totalPrecision.divide(new BigDecimal(testCases.size()), MathContext.DECIMAL32);
 			String recallLevelText = formatterUtils.recallLevel(recallLevel);
-			String averagePrecisionText = formatterUtils.bigDecimal(averagePrecision);
+			String averagePrecisionText = formatterUtils.fractionNumberForCsv(averagePrecision);
 			csv.addLine(recallLevelText, averagePrecisionText);
 		}
 		folderUtils.writeContetAsString(fileName, csv.getContent());
@@ -172,7 +174,7 @@ public class Experiment {
 				BigDecimal precisionAtRecallLevel = precisionRecall.precisionAtRecallLevel(recallLevel);
 				String sourceName = source.getName();
 				String recallLevelText = formatterUtils.recallLevel(recallLevel);
-				String precisionText = formatterUtils.bigDecimal(precisionAtRecallLevel);
+				String precisionText = formatterUtils.fractionNumberForCsv(precisionAtRecallLevel);
 				csv.addLine(sourceName, recallLevelText, precisionText);
 			}
 		}
@@ -184,12 +186,11 @@ public class Experiment {
 		CommaSeparatedValues csv = new CommaSeparatedValues();
 		FolderUtils folderUtils = new FolderUtils("expt/results/a/matrix");
 		Comparator<SimilarityAssessment> nameComparator = new SimilarityAssessmentComparatorBySourceAndTargetNames();
-		report.sort(nameComparator);
-		List<SimilarityAssessment> assessments = report.getAssessments();
+		List<SimilarityAssessment> assessments = report.sort(nameComparator).getAssessments();
 		for (SimilarityAssessment assessment : assessments) {
 			String sourceName = assessment.getSource().getName();
 			String targetName = assessment.getTarget().getName();
-			String score = formatterUtils.bigDecimal(assessment.getScore());
+			String score = formatterUtils.fractionNumberForCsv(assessment.getScore());
 			csv.addLine(sourceName, targetName, score);
 		}
 		folderUtils.writeContetAsString(fileName, csv.getContent());

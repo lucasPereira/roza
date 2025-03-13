@@ -35,7 +35,7 @@ public class JplagSimilarityMeasurer extends AbstractSimilarityMeasurer implemen
 	}
 
 	@Override
-	public SimilarityReport measureMoreTheOneTest(MaterializationReport materializationReport, SimilarityReportBuilder builder) {
+	public SimilarityReport measureMoreThanOne(MaterializationReport materializationReport, SimilarityReportBuilder builder) {
 		List<TestCaseMaterialization> materializations = materializationReport.getMaterializations();
 		MatrixElementToKeyConverter<TestCaseMaterialization, String> converter = new JplagMatrixElementToKeyConverter();
 		MatrixValueFactory<TestCaseMaterialization, BigDecimal> factory = new JplagMatrixValueFactory();
@@ -84,7 +84,7 @@ public class JplagSimilarityMeasurer extends AbstractSimilarityMeasurer implemen
 	}
 
 	private void run(MaterializationReport materializationReport) {
-		ProcessUtils processUtils = new ProcessUtils(true, true, true, false);
+		ProcessUtils processUtils = new ProcessUtils(true, true, true, true);
 		List<String> arguments = new LinkedList<String>();
 		arguments.add("java");
 		arguments.add("-jar");

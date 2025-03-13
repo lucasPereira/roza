@@ -74,7 +74,7 @@ public class SelectTestCasesMeasurementPanel implements UiComponent {
 		});
 		hub.compareTestCaseSubscribe((assessment) -> {
 			BigDecimal measure = assessment.getScore();
-			String score = new FormatterUtils().bigDecimal(measure);
+			String score = new FormatterUtils().fractionNumberForUi(measure);
 			scoreLabel.setText(score);
 			TestCase newSource = assessment.getSource();
 			TestCase newTarget = assessment.getTarget();

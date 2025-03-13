@@ -62,12 +62,14 @@ public class ProcessUtils {
 				builder.inheritIO();
 			}
 			Process process = builder.start();
+			if (!quiet) {
+				ler(process.getInputStream());
+				ler(process.getErrorStream());
+			}
 			process.waitFor();
 			exitValue = process.exitValue();
 			if (!quiet) {
 				System.out.println(exitValue);
-				ler(process.getInputStream());
-				ler(process.getErrorStream());
 			}
 		} catch (Exception exception) {
 			exceptionToThrow = exception;
