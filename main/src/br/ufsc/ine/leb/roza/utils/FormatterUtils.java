@@ -9,22 +9,25 @@ import br.ufsc.ine.leb.roza.retrieval.RecallLevel;
 
 public class FormatterUtils {
 
+	private Locale locale = Locale.forLanguageTag("pt-BR");
+	private DecimalFormatSymbols decimalFormatSymbol = DecimalFormatSymbols.getInstance(locale);
+
 	public String fractionNumberForCsv(BigDecimal value) {
 		DecimalFormat formatter = new DecimalFormat();
 		formatter.setMaximumFractionDigits(Integer.MAX_VALUE);
-		formatter.setDecimalFormatSymbols(DecimalFormatSymbols.getInstance(Locale.of("pt", "BR")));
+		formatter.setDecimalFormatSymbols(decimalFormatSymbol);
 		return formatter.format(value);
 	}
 
 	public String fractionNumberForUi(BigDecimal value) {
 		DecimalFormat formatter = new DecimalFormat();
 		formatter.setMaximumFractionDigits(6);
-		formatter.setDecimalFormatSymbols(DecimalFormatSymbols.getInstance(Locale.of("pt", "BR")));
+		formatter.setDecimalFormatSymbols(decimalFormatSymbol);
 		return formatter.format(value);
 	}
 
 	public String fractionNumberForFileName(Double value) {
-		return String.format(Locale.of("pt", "BR"), "%.1f", value);
+		return String.format(locale, "%.1f", value);
 	}
 
 	public String fractionNumberForDeckardConfiguration(Double value) {
