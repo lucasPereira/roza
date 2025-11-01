@@ -9,7 +9,7 @@ import br.ufsc.ine.leb.roza.TestCase;
 
 public class SingleLinkage implements Linkage {
 
-	private SimilarityReport report;
+	private final SimilarityReport report;
 
 	public SingleLinkage(SimilarityReport report) {
 		this.report = report;

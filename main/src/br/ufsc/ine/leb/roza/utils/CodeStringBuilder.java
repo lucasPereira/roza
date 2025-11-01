@@ -2,7 +2,7 @@ package br.ufsc.ine.leb.roza.utils;
 
 public class CodeStringBuilder {
 
-	private StringBuilder code;
+	private final StringBuilder code;
 	private Integer indentations;
 
 	public CodeStringBuilder() {
@@ -11,7 +11,7 @@ public class CodeStringBuilder {
 	}
 
 	public void add(String line) {
-		code.append(getIndentation() + line + System.lineSeparator());
+		code.append(getIndentation()).append(line).append(System.lineSeparator());
 		indentations = 0;
 	}
 
@@ -25,11 +25,7 @@ public class CodeStringBuilder {
 	}
 
 	private String getIndentation() {
-		StringBuilder indentation = new StringBuilder();
-		for (Integer index = 0; index < indentations; index++) {
-			indentation.append("\t");
-		}
-		return indentation.toString();
+		return "\t".repeat(Math.max(0, indentations));
 	}
 
 	@Override

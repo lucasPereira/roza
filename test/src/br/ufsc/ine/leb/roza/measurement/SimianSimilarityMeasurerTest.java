@@ -3,7 +3,7 @@ package br.ufsc.ine.leb.roza.measurement;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,17 +32,17 @@ class SimianSimilarityMeasurerTest {
 	}
 
 	@Test
-	void zeroTestCases() throws Exception {
-		SimilarityReport report = measurer.measure(materializer.materialize(Arrays.asList()));
+	void zeroTestCases() {
+		SimilarityReport report = measurer.measure(materializer.materialize(List.of()));
 		assertEquals(0, report.getAssessments().size());
 	}
 
 	@Test
-	void oneTestCase() throws Exception {
+	void oneTestCase() {
 		Statement fixture = new Statement("sut(0);");
 		Statement assertion = new Statement("assertEquals(0, 0);");
-		TestCase testCase = new TestCase("test", Arrays.asList(fixture), Arrays.asList(assertion));
-		MaterializationReport materializationReport = materializer.materialize(Arrays.asList(testCase));
+		TestCase testCase = new TestCase("test", List.of(fixture), List.of(assertion));
+		MaterializationReport materializationReport = materializer.materialize(List.of(testCase));
 		SimilarityReport report = measurer.measure(materializationReport);
 
 		assertEquals(1, report.getAssessments().size());
@@ -52,12 +52,12 @@ class SimianSimilarityMeasurerTest {
 	}
 
 	@Test
-	void twoIdenticalTestCasesWithTheSameName() throws Exception {
+	void twoIdenticalTestCasesWithTheSameName() {
 		Statement fixture = new Statement("sut(0);");
 		Statement assertion = new Statement("assertEquals(0, 0);");
-		TestCase testCaseA = new TestCase("test", Arrays.asList(fixture), Arrays.asList(assertion));
-		TestCase testCaseB = new TestCase("test", Arrays.asList(fixture), Arrays.asList(assertion));
-		MaterializationReport materializationReport = materializer.materialize(Arrays.asList(testCaseA, testCaseB));
+		TestCase testCaseA = new TestCase("test", List.of(fixture), List.of(assertion));
+		TestCase testCaseB = new TestCase("test", List.of(fixture), List.of(assertion));
+		MaterializationReport materializationReport = materializer.materialize(List.of(testCaseA, testCaseB));
 		SimilarityReport report = measurer.measure(materializationReport).sort(new SimilarityAssessmentComparatorByScoreSourceNameAndTargetName());
 
 		assertEquals(4, report.getAssessments().size());
@@ -76,12 +76,12 @@ class SimianSimilarityMeasurerTest {
 	}
 
 	@Test
-	void twoIdenticalTestCasesWithDifferentNames() throws Exception {
+	void twoIdenticalTestCasesWithDifferentNames() {
 		Statement fixture = new Statement("sut(0);");
 		Statement assertion = new Statement("assertEquals(0, 0);");
-		TestCase testCaseA = new TestCase("testA", Arrays.asList(fixture), Arrays.asList(assertion));
-		TestCase testCaseB = new TestCase("testB", Arrays.asList(fixture), Arrays.asList(assertion));
-		MaterializationReport materializationReport = materializer.materialize(Arrays.asList(testCaseA, testCaseB));
+		TestCase testCaseA = new TestCase("testA", List.of(fixture), List.of(assertion));
+		TestCase testCaseB = new TestCase("testB", List.of(fixture), List.of(assertion));
+		MaterializationReport materializationReport = materializer.materialize(List.of(testCaseA, testCaseB));
 		SimilarityReport report = measurer.measure(materializationReport).sort(new SimilarityAssessmentComparatorByScoreSourceNameAndTargetName());
 
 		assertEquals(4, report.getAssessments().size());
@@ -100,12 +100,12 @@ class SimianSimilarityMeasurerTest {
 	}
 
 	@Test
-	void twoDistinctTestCases() throws Exception {
+	void twoDistinctTestCases() {
 		Statement fixture = new Statement("new Sut(0).sut();");
 		Statement assertion = new Statement("assertEquals(0, 0);");
-		TestCase testCaseA = new TestCase("testA", Arrays.asList(fixture), Arrays.asList());
-		TestCase testCaseB = new TestCase("testB", Arrays.asList(), Arrays.asList(assertion));
-		MaterializationReport materializationReport = materializer.materialize(Arrays.asList(testCaseA, testCaseB));
+		TestCase testCaseA = new TestCase("testA", List.of(fixture), List.of());
+		TestCase testCaseB = new TestCase("testB", List.of(), List.of(assertion));
+		MaterializationReport materializationReport = materializer.materialize(List.of(testCaseA, testCaseB));
 		SimilarityReport report = measurer.measure(materializationReport).sort(new SimilarityAssessmentComparatorByScoreSourceNameAndTargetName());
 
 		assertEquals(4, report.getAssessments().size());

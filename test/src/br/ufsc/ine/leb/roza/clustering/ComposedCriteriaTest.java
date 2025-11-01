@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,60 +21,56 @@ public class ComposedCriteriaTest {
 
 	@BeforeEach
 	public void seutp() {
-		TestCase alpha = new TestCase("alpha", Arrays.asList(), Arrays.asList());
-		TestCase beta = new TestCase("beta", Arrays.asList(), Arrays.asList());
+		TestCase alpha = new TestCase("alpha", List.of(), List.of());
+		TestCase beta = new TestCase("beta", List.of(), List.of());
 		alphaCluster = new Cluster(alpha);
 		betaCluster = new Cluster(beta);
 	}
 
 	@Test
-	public void shouldNotBeEmpty() throws Exception {
-		assertThrows(InvalidThresholdException.class, () -> {
-			new ComposedCriteria();
-		});
+	public void shouldNotBeEmpty() {
+		assertThrows(InvalidThresholdException.class, ComposedCriteria::new);
 	}
 
 	@Test
-	public void shouldHaveMoreThanOneElement() throws Exception {
-		assertThrows(InvalidThresholdException.class, () -> {
-			new ComposedCriteria(new LevelBasedCriteria(1));
-		});
+	public void shouldHaveMoreThanOneElement() {
+		assertThrows(InvalidThresholdException.class, () -> new ComposedCriteria(new LevelBasedCriteria(1)));
 	}
 
 	@Test
-	void shouldNotStopInAny() throws Exception {
+	void shouldNotStopInAny() {
 		ThresholdCriteria threshold = new ComposedCriteria(new LevelBasedCriteria(1), new TestsPerClassCriteria(2));
-		assertFalse(threshold.shoudlStop(1, new Combination(alphaCluster, betaCluster), BigDecimal.ONE));
+		assertFalse(threshold.shouldStop(1, new Combination(alphaCluster, betaCluster), BigDecimal.ONE));
 	}
 
 	@Test
-	void shouldStopInFirstLevelBased() throws Exception {
+	void shouldStopInFirstLevelBased() {
 		ThresholdCriteria threshold = new ComposedCriteria(new LevelBasedCriteria(0), new TestsPerClassCriteria(2));
-		assertTrue(threshold.shoudlStop(1, new Combination(alphaCluster, betaCluster), BigDecimal.ONE));
+		assertTrue(threshold.shouldStop(1, new Combination(alphaCluster, betaCluster), BigDecimal.ONE));
 	}
 
 	@Test
-	void shouldStopInSecondTestsPerClass() throws Exception {
+	void shouldStopInSecondTestsPerClass() {
 		ThresholdCriteria threshold = new ComposedCriteria(new LevelBasedCriteria(1), new TestsPerClassCriteria(1));
-		assertTrue(threshold.shoudlStop(1, new Combination(alphaCluster, betaCluster), BigDecimal.ONE));
+		assertTrue(threshold.shouldStop(1, new Combination(alphaCluster, betaCluster), BigDecimal.ONE));
 	}
 
 	@Test
-	void shouldStopInFirstTestsPerClassBased() throws Exception {
+	void shouldStopInFirstTestsPerClassBased() {
 		ThresholdCriteria threshold = new ComposedCriteria(new TestsPerClassCriteria(1), new LevelBasedCriteria(1));
-		assertTrue(threshold.shoudlStop(1, new Combination(alphaCluster, betaCluster), BigDecimal.ONE));
+		assertTrue(threshold.shouldStop(1, new Combination(alphaCluster, betaCluster), BigDecimal.ONE));
 	}
 
 	@Test
-	void shouldStopInSecondLevelBased() throws Exception {
+	void shouldStopInSecondLevelBased() {
 		ThresholdCriteria threshold = new ComposedCriteria(new TestsPerClassCriteria(2), new LevelBasedCriteria(0));
-		assertTrue(threshold.shoudlStop(1, new Combination(alphaCluster, betaCluster), BigDecimal.ONE));
+		assertTrue(threshold.shouldStop(1, new Combination(alphaCluster, betaCluster), BigDecimal.ONE));
 	}
 
 	@Test
-	void shouldStopInBoth() throws Exception {
+	void shouldStopInBoth() {
 		ThresholdCriteria threshold = new ComposedCriteria(new TestsPerClassCriteria(1), new LevelBasedCriteria(0));
-		assertTrue(threshold.shoudlStop(1, new Combination(alphaCluster, betaCluster), BigDecimal.ONE));
+		assertTrue(threshold.shouldStop(1, new Combination(alphaCluster, betaCluster), BigDecimal.ONE));
 	}
 
 }

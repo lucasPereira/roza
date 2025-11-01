@@ -4,26 +4,26 @@ import java.util.List;
 
 public class MaterializationReport {
 
-	private String baseFolder;
-	private List<TestCaseMaterialization> materializations;
+	private final String baseFolder;
+	private final List<TestCaseMaterialization> materialization;
 
-	public MaterializationReport(String baseFolder, List<TestCaseMaterialization> materializations) {
+	public MaterializationReport(String baseFolder, List<TestCaseMaterialization> materialization) {
 		this.baseFolder = baseFolder;
-		this.materializations = materializations;
+		this.materialization = materialization;
 	}
 
 	public String getBaseFolder() {
 		return baseFolder;
 	}
 
-	public List<TestCaseMaterialization> getMaterializations() {
-		return materializations;
+	public List<TestCaseMaterialization> getMaterialization() {
+		return materialization;
 	}
 
 	@Override
 	public String toString() {
 		StringBuilder text = new StringBuilder();
-		materializations.forEach(materialization -> {
+		materialization.forEach(materialization -> {
 			text.append(materialization.toString());
 			text.append(System.lineSeparator());
 		});

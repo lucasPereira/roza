@@ -1,4 +1,4 @@
-package br.ufsc.ine.leb.roza.ui.window.toolbar.measuring;
+package br.ufsc.ine.leb.roza.ui.window.toolbar.measurement;
 
 import java.util.List;
 
@@ -11,9 +11,9 @@ import br.ufsc.ine.leb.roza.ui.UiComponent;
 
 public class MeasureTestCasesButton implements UiComponent {
 
-	private MeasuringTab toolbar;
+	private final MeasurementTab toolbar;
 
-	public MeasureTestCasesButton(MeasuringTab toolbar) {
+	public MeasureTestCasesButton(MeasurementTab toolbar) {
 		this.toolbar = toolbar;
 	}
 
@@ -24,12 +24,12 @@ public class MeasureTestCasesButton implements UiComponent {
 		button.addActionListener(listner -> {
 			SimilarityReport similarityReort = manager.measureTestCases();
 			hub.measureTestsPublish(similarityReort);
-			hub.infoMessagePublish(String.format("Similarity matrix created"));
+			hub.infoMessagePublish("Similarity matrix created");
 		});
 	}
 
 	@Override
-	public void addChilds(List<UiComponent> childs) {}
+	public void addChildren(List<UiComponent> children) {}
 
 	@Override
 	public void start() {}

@@ -5,7 +5,7 @@ import br.ufsc.ine.leb.roza.exceptions.RecallLevelOutOfBoundsException;
 
 public class RecallLevel {
 
-	private Integer level;
+	private final Integer level;
 
 	public RecallLevel(Integer level) {
 		if (level < 0 || level > 10) {

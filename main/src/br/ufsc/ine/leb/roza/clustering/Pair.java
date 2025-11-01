@@ -1,13 +1,14 @@
 package br.ufsc.ine.leb.roza.clustering;
 
-import java.util.Arrays;
 
 import br.ufsc.ine.leb.roza.TestCase;
 
+import java.util.List;
+
 class Pair {
 
-	private TestCase first;
-	private TestCase second;
+	private final TestCase first;
+	private final TestCase second;
 
 	public Pair(TestCase first, TestCase second) {
 		this.first = first;
@@ -38,7 +39,7 @@ class Pair {
 
 	@Override
 	public String toString() {
-		return Arrays.asList(first, second).toString();
+		return List.of(first, second).toString();
 	}
 
 }

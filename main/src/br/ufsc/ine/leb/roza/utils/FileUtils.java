@@ -10,8 +10,8 @@ public class FileUtils {
 		try {
 			byte[] bytes = Files.readAllBytes(file.toPath());
 			return new String(bytes);
-		} catch (IOException excecao) {
-			throw new RuntimeException(excecao);
+		} catch (IOException exception) {
+			throw new RuntimeException(exception);
 		}
 	}
 

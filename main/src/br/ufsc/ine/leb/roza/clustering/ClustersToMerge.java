@@ -8,7 +8,7 @@ import br.ufsc.ine.leb.roza.exceptions.NoClustersToMergeException;
 
 class ClustersToMerge {
 
-	private Set<Cluster> clusters;
+	private final Set<Cluster> clusters;
 
 	public ClustersToMerge(Set<Cluster> clusters) {
 		if (clusters.size() < 2) {

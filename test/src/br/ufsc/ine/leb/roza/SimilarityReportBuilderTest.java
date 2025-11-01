@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,8 +24,8 @@ class SimilarityReportBuilderTest {
 
 	@BeforeEach
 	void setup() {
-		testA = new TestCase("testA", Arrays.asList(), Arrays.asList());
-		testB = new TestCase("testB", Arrays.asList(), Arrays.asList());
+		testA = new TestCase("testA", List.of(), List.of());
+		testB = new TestCase("testB", List.of(), List.of());
 		dotFive = new BigDecimal("0.5");
 		dotSix = new BigDecimal("0.6");
 		symmetric = new SimilarityReportBuilder(true);
@@ -33,19 +33,19 @@ class SimilarityReportBuilderTest {
 	}
 
 	@Test
-	void emptySymmetric() throws Exception {
+	void emptySymmetric() {
 		SimilarityReport report = symmetric.build();
 		assertEquals(0, report.getAssessments().size());
 	}
 
 	@Test
-	void emptyAsymmetric() throws Exception {
+	void emptyAsymmetric() {
 		SimilarityReport report = asymmetric.build();
 		assertEquals(0, report.getAssessments().size());
 	}
 
 	@Test
-	void addOneTestSymmetric() throws Exception {
+	void addOneTestSymmetric() {
 		SimilarityReport report = symmetric.add(testA).build();
 		assertEquals(1, report.getAssessments().size());
 		assertEquals(testA, report.getAssessments().get(0).getSource());
@@ -54,7 +54,7 @@ class SimilarityReportBuilderTest {
 	}
 
 	@Test
-	void addOneTestAsymmetric() throws Exception {
+	void addOneTestAsymmetric() {
 		SimilarityReport report = asymmetric.add(testA).build();
 		assertEquals(1, report.getAssessments().size());
 		assertEquals(testA, report.getAssessments().get(0).getSource());
@@ -63,7 +63,7 @@ class SimilarityReportBuilderTest {
 	}
 
 	@Test
-	void addTwoTestsSymmetric() throws Exception {
+	void addTwoTestsSymmetric() {
 		SimilarityReport report = symmetric.add(testA).add(testB).complete().build().sort(new SimilarityAssessmentComparatorBySourceAndTargetNames());
 		assertEquals(4, report.getAssessments().size());
 		assertEquals(testA, report.getAssessments().get(0).getSource());
@@ -81,7 +81,7 @@ class SimilarityReportBuilderTest {
 	}
 
 	@Test
-	void addTwoTestsAsymmetric() throws Exception {
+	void addTwoTestsAsymmetric() {
 		SimilarityReport report = asymmetric.add(testA).add(testB).complete().build().sort(new SimilarityAssessmentComparatorBySourceAndTargetNames());
 		assertEquals(4, report.getAssessments().size());
 		assertEquals(testA, report.getAssessments().get(0).getSource());
@@ -99,7 +99,7 @@ class SimilarityReportBuilderTest {
 	}
 
 	@Test
-	void addPairOfTwoTestsSymmetric() throws Exception {
+	void addPairOfTwoTestsSymmetric() {
 		SimilarityReport report = symmetric.add(testA, testB, dotFive).build().sort(new SimilarityAssessmentComparatorBySourceAndTargetNames());
 		assertEquals(4, report.getAssessments().size());
 		assertEquals(testA, report.getAssessments().get(0).getSource());
@@ -117,7 +117,7 @@ class SimilarityReportBuilderTest {
 	}
 
 	@Test
-	void addPairOfTwoTestsAsymmetric() throws Exception {
+	void addPairOfTwoTestsAsymmetric() {
 		SimilarityReport report = asymmetric.add(testA, testB, dotFive).add(testB, testA, dotSix).build().sort(new SimilarityAssessmentComparatorBySourceAndTargetNames());
 		assertEquals(4, report.getAssessments().size());
 		assertEquals(testA, report.getAssessments().get(0).getSource());
@@ -135,66 +135,40 @@ class SimilarityReportBuilderTest {
 	}
 
 	@Test
-	void addTestTwice() throws Exception {
-		assertThrows(PotentialErrorProneOperationException.class, () -> {
-			symmetric.add(testA).add(testA);
-		});
-		assertThrows(PotentialErrorProneOperationException.class, () -> {
-			asymmetric.add(testA).add(testA);
-		});
+	void addTestTwice() {
+		assertThrows(PotentialErrorProneOperationException.class, () -> symmetric.add(testA).add(testA));
+		assertThrows(PotentialErrorProneOperationException.class, () -> asymmetric.add(testA).add(testA));
 	}
 
 	@Test
-	void addTestWithItself() throws Exception {
-		assertThrows(PotentialErrorProneOperationException.class, () -> {
-			symmetric.add(testA, testA, dotFive);
-		});
-		assertThrows(PotentialErrorProneOperationException.class, () -> {
-			asymmetric.add(testA, testA, dotFive);
-		});
+	void addTestWithItself() {
+		assertThrows(PotentialErrorProneOperationException.class, () -> symmetric.add(testA, testA, dotFive));
+		assertThrows(PotentialErrorProneOperationException.class, () -> asymmetric.add(testA, testA, dotFive));
 	}
 
 	@Test
-	void addTestAndPairWithItseflAndAnotherTest() throws Exception {
-		assertThrows(PotentialErrorProneOperationException.class, () -> {
-			symmetric.add(testA).add(testA, testB, dotFive);
-		});
-		assertThrows(PotentialErrorProneOperationException.class, () -> {
-			symmetric.add(testA, testB, dotFive).add(testB);
-		});
-		assertThrows(PotentialErrorProneOperationException.class, () -> {
-			asymmetric.add(testA).add(testA, testB, dotFive);
-		});
-		assertThrows(PotentialErrorProneOperationException.class, () -> {
-			asymmetric.add(testA, testB, dotFive).add(testB);
-		});
+	void addTestAndPairWithItseflAndAnotherTest() {
+		assertThrows(PotentialErrorProneOperationException.class, () -> symmetric.add(testA).add(testA, testB, dotFive));
+		assertThrows(PotentialErrorProneOperationException.class, () -> symmetric.add(testA, testB, dotFive).add(testB));
+		assertThrows(PotentialErrorProneOperationException.class, () -> asymmetric.add(testA).add(testA, testB, dotFive));
+		assertThrows(PotentialErrorProneOperationException.class, () -> asymmetric.add(testA, testB, dotFive).add(testB));
 	}
 
 	@Test
-	void addSamePairTwice() throws Exception {
-		assertThrows(PotentialErrorProneOperationException.class, () -> {
-			symmetric.add(testA, testB, dotFive).add(testA, testB, dotSix);
-		});
-		assertThrows(PotentialErrorProneOperationException.class, () -> {
-			symmetric.add(testA, testB, dotFive).add(testB, testA, dotSix);
-		});
-		assertThrows(PotentialErrorProneOperationException.class, () -> {
-			asymmetric.add(testA, testB, dotFive).add(testA, testB, dotSix);
-		});
+	void addSamePairTwice() {
+		assertThrows(PotentialErrorProneOperationException.class, () -> symmetric.add(testA, testB, dotFive).add(testA, testB, dotSix));
+		assertThrows(PotentialErrorProneOperationException.class, () -> symmetric.add(testA, testB, dotFive).add(testB, testA, dotSix));
+		assertThrows(PotentialErrorProneOperationException.class, () -> asymmetric.add(testA, testB, dotFive).add(testA, testB, dotSix));
 	}
 
 	@Test
-	void addTwoTestsSymmetricWithoutComplete() throws Exception {
-		assertThrows(MissingAssessmentException.class, () -> {
-			symmetric.add(testA).add(testB).build();
-		});
+	void addTwoTestsSymmetricWithoutComplete() {
+		assertThrows(MissingAssessmentException.class, () -> symmetric.add(testA).add(testB).build());
 	}
 
 	@Test
-	void addTwoTestsAsymmetricWithoutComplete() throws Exception {
-		assertThrows(MissingAssessmentException.class, () -> {
-			asymmetric.add(testA).add(testB).build();
-		});
+	void addTwoTestsAsymmetricWithoutComplete() {
+		assertThrows(MissingAssessmentException.class, () -> asymmetric.add(testA).add(testB).build());
 	}
 
 }

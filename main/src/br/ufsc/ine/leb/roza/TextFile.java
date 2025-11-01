@@ -2,8 +2,8 @@ package br.ufsc.ine.leb.roza;
 
 public class TextFile {
 
-	private String name;
-	private String content;
+	private final String name;
+	private final String content;
 
 	public TextFile(String name, String content) {
 		this.name = name;

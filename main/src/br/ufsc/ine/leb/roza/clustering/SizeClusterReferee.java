@@ -9,7 +9,7 @@ import br.ufsc.ine.leb.roza.exceptions.TiebreakException;
 
 public abstract class SizeClusterReferee implements Referee {
 
-	private Integer initialValue;
+	private final Integer initialValue;
 
 	public SizeClusterReferee(Integer initialValue) {
 		this.initialValue = initialValue;
@@ -23,10 +23,10 @@ public abstract class SizeClusterReferee implements Referee {
 			Cluster first = combination.getFirst();
 			Cluster second = combination.getSecond();
 			Integer current = first.merge(second).getTestCases().size();
-			Integer comparinson = compare(chosenValue, current);
-			if (comparinson == 0) {
+			Integer comparison = compare(chosenValue, current);
+			if (comparison == 0) {
 				chosen.add(combination);
-			} else if (comparinson > 0) {
+			} else if (comparison > 0) {
 				chosen.clear();
 				chosen.add(combination);
 				chosenValue = current;

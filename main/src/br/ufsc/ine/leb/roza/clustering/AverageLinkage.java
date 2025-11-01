@@ -10,7 +10,7 @@ import br.ufsc.ine.leb.roza.utils.MathUtils;
 
 public class AverageLinkage implements Linkage {
 
-	private SimilarityReport report;
+	private final SimilarityReport report;
 
 	public AverageLinkage(SimilarityReport report) {
 		this.report = report;

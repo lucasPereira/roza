@@ -27,8 +27,8 @@ import br.ufsc.ine.leb.roza.TextFile;
 
 public class JunitTestClassParser implements TestClassParser {
 
-	private Class<? extends Annotation> testAnnotation;
-	private Class<? extends Annotation> setupAnnotation;
+	private final Class<? extends Annotation> testAnnotation;
+	private final Class<? extends Annotation> setupAnnotation;
 
 	public JunitTestClassParser(Class<? extends Annotation> testAnnotation, Class<? extends Annotation> setupAnnotation) {
 		this.testAnnotation = testAnnotation;
@@ -41,8 +41,8 @@ public class JunitTestClassParser implements TestClassParser {
 		files.forEach((file) -> {
 			CompilationUnit compilationUnit = JavaParser.parse(file.getContent());
 			Optional<ClassOrInterfaceDeclaration> parsedTestClass = compilationUnit.findFirst(ClassOrInterfaceDeclaration.class);
-			String name = parsedTestClass.get().getNameAsString();
-			List<Field> fields = extractFields(parsedTestClass);
+			String name = parsedTestClass.orElseThrow().getNameAsString();
+			List<Field> fields = extractFields(parsedTestClass.orElseThrow());
 			List<SetupMethod> setupMethods = new LinkedList<>();
 			List<TestMethod> testMethods = new LinkedList<>();
 			List<MethodDeclaration> parsedMethods = parsedTestClass.get().findAll(MethodDeclaration.class);
@@ -50,7 +50,7 @@ public class JunitTestClassParser implements TestClassParser {
 				extractSetupMethod(setupMethods, parsedMethod);
 				extractTestMethod(testMethods, parsedMethod);
 			});
-			if (testMethods.size() > 0) {
+			if (!testMethods.isEmpty()) {
 				TestClass testClass = new TestClass(name, fields, setupMethods, testMethods);
 				testClasses.add(testClass);
 			}
@@ -58,15 +58,15 @@ public class JunitTestClassParser implements TestClassParser {
 		return testClasses;
 	}
 
-	private List<Field> extractFields(Optional<ClassOrInterfaceDeclaration> parsedTestClass) {
+	private List<Field> extractFields(ClassOrInterfaceDeclaration parsedTestClass) {
 		List<Field> fields = new LinkedList<>();
-		parsedTestClass.get().findAll(FieldDeclaration.class).forEach((parsedField) -> {
+		parsedTestClass.findAll(FieldDeclaration.class).forEach((parsedField) -> {
 			String type = parsedField.getElementType().asString();
 			parsedField.getVariables().forEach((parsedVariable) -> {
 				String filedName = parsedVariable.getName().asString();
 				if (parsedVariable.getInitializer().isPresent()) {
 					Expression initialization = parsedVariable.getInitializer().get();
-					fields.add(new Field(type, filedName, new Statement(initialization.toString() + ";")));
+					fields.add(new Field(type, filedName, new Statement(initialization + ";")));
 				} else {
 					fields.add(new Field(type, filedName));
 				}
@@ -76,7 +76,7 @@ public class JunitTestClassParser implements TestClassParser {
 	}
 
 	private void extractTestMethod(List<TestMethod> testMethods, MethodDeclaration parsedMethod) {
-		Boolean hasTestAnnotation = parsedMethod.getAnnotationByClass(testAnnotation).isPresent();
+		boolean hasTestAnnotation = parsedMethod.getAnnotationByClass(testAnnotation).isPresent();
 		if (hasTestAnnotation) {
 			List<Statement> statements = extractStatements(parsedMethod);
 			TestMethod testMethod = new TestMethod(parsedMethod.getNameAsString(), statements);
@@ -85,7 +85,7 @@ public class JunitTestClassParser implements TestClassParser {
 	}
 
 	private void extractSetupMethod(List<SetupMethod> setupMethods, MethodDeclaration parsedMethod) {
-		Boolean hasBeforeAnnotation = parsedMethod.getAnnotationByClass(setupAnnotation).isPresent();
+		boolean hasBeforeAnnotation = parsedMethod.getAnnotationByClass(setupAnnotation).isPresent();
 		if (hasBeforeAnnotation) {
 			List<Statement> statements = extractStatements(parsedMethod);
 			SetupMethod setupMethod = new SetupMethod(parsedMethod.getNameAsString(), statements);
@@ -98,7 +98,7 @@ public class JunitTestClassParser implements TestClassParser {
 		configuration.setEndOfLineCharacter(" ");
 		configuration.setIndentSize(0);
 		List<Statement> statements = new LinkedList<>();
-		parsedMethod.getBody().get().getStatements().forEach(statement -> {
+		parsedMethod.getBody().orElseThrow().getStatements().forEach(statement -> {
 			if (statement.isExpressionStmt()) {
 				ExpressionStmt expression = statement.asExpressionStmt();
 				List<VariableDeclarationExpr> variableDeclarations = expression.findAll(VariableDeclarationExpr.class);
@@ -110,13 +110,9 @@ public class JunitTestClassParser implements TestClassParser {
 						variableDeclaration.getVariables().forEach(variable -> {
 							SimpleName name = variable.getName();
 							Optional<Expression> initializer = variable.getInitializer();
-							if (initializer.isPresent()) {
-								VariableDeclarationExpr newStatement = new VariableDeclarationExpr(new VariableDeclarator(type, name, initializer.get()));
-								statements.add(new Statement(newStatement.toString(configuration) + ";"));
-							} else {
-								VariableDeclarationExpr newStatement = new VariableDeclarationExpr(new VariableDeclarator(type, name));
-								statements.add(new Statement(newStatement.toString(configuration) + ";"));
-							}
+							VariableDeclarationExpr newStatement;
+							newStatement = initializer.map(value -> new VariableDeclarationExpr(new VariableDeclarator(type, name, value))).orElseGet(() -> new VariableDeclarationExpr(new VariableDeclarator(type, name)));
+							statements.add(new Statement(newStatement.toString(configuration) + ";"));
 						});
 					});
 				}

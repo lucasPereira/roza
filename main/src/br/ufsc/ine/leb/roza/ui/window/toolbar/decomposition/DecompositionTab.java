@@ -1,4 +1,4 @@
-package br.ufsc.ine.leb.roza.ui.window.toolbar.measuring;
+package br.ufsc.ine.leb.roza.ui.window.toolbar.decomposition;
 
 import java.awt.Component;
 import java.util.List;
@@ -10,28 +10,25 @@ import br.ufsc.ine.leb.roza.ui.Manager;
 import br.ufsc.ine.leb.roza.ui.UiComponent;
 import br.ufsc.ine.leb.roza.ui.window.toolbar.Toolbar;
 
-public class MeasuringTab implements UiComponent {
+public class DecompositionTab implements UiComponent {
 
-	private Toolbar toolbar;
+	private final Toolbar toolbar;
 	private JPanel panel;
 
-	public MeasuringTab(Toolbar toolbar) {
+	public DecompositionTab(Toolbar toolbar) {
 		this.toolbar = toolbar;
 	}
 
 	@Override
 	public void init(Hub hub, Manager manager) {
 		panel = new JPanel();
-		toolbar.addComponent("Measuring", panel);
+		toolbar.addComponent("Decomposition", panel);
 	}
 
 	@Override
-	public void addChilds(List<UiComponent> childs) {
-		childs.add(new MeasurerComboBox(this));
-		childs.add(new DeckardConfigurationInputs(this));
-		childs.add(new JplagConfigurationInputs(this));
-		childs.add(new SimianConfigurationInputs(this));
-		childs.add(new MeasureTestCasesButton(this));
+	public void addChildren(List<UiComponent> children) {
+		children.add(new ExtractorComboBox(this));
+		children.add(new ExtractTestCasesButton(this));
 	}
 
 	@Override

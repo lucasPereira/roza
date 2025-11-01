@@ -12,8 +12,7 @@ import br.ufsc.ine.leb.roza.ui.shared.CodePanel;
 
 public class CompareTestCasesMeasurementPanel implements UiComponent {
 
-	private MeasurementsTab measurementsTab;
-	private JSplitPane panel;
+	private final MeasurementsTab measurementsTab;
 
 	public CompareTestCasesMeasurementPanel(MeasurementsTab measurementsTab) {
 		this.measurementsTab = measurementsTab;
@@ -21,7 +20,7 @@ public class CompareTestCasesMeasurementPanel implements UiComponent {
 
 	@Override
 	public void init(Hub hub, Manager manager) {
-		panel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+		JSplitPane panel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 		CodePanel sourcePanel = new CodePanel();
 		CodePanel targetPanel = new CodePanel();
 		panel.setResizeWeight(0.5);
@@ -45,7 +44,7 @@ public class CompareTestCasesMeasurementPanel implements UiComponent {
 	}
 
 	@Override
-	public void addChilds(List<UiComponent> childs) {}
+	public void addChildren(List<UiComponent> children) {}
 
 	@Override
 	public void start() {}

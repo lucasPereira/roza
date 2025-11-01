@@ -18,7 +18,7 @@ class SimianConfigurationsTest {
 	}
 
 	@Test
-	void configurations() throws Exception {
+	void configurations() {
 		assertEquals(20, configurations.getAll().size());
 
 		assertEquals("threshold", configurations.getAll().get(0).getName());
@@ -28,7 +28,7 @@ class SimianConfigurationsTest {
 		assertEquals("Curly braces are ignored", configurations.getAll().get(1).getDescription());
 
 		assertEquals("ignoreIdentifiers", configurations.getAll().get(2).getName());
-		assertEquals("Completely ignores all identfiers", configurations.getAll().get(2).getDescription());
+		assertEquals("Completely ignores all identifiers", configurations.getAll().get(2).getDescription());
 
 		assertEquals("ignoreStrings", configurations.getAll().get(3).getName());
 		assertEquals("\"abc\" and \"def\" would both match", configurations.getAll().get(3).getDescription());
@@ -67,7 +67,7 @@ class SimianConfigurationsTest {
 		assertEquals("\"Hello, World\" and \"HELLO, WORLD\" would both match", configurations.getAll().get(14).getDescription());
 
 		assertEquals("ignoreCharacterCase", configurations.getAll().get(15).getName());
-		assertEquals("'A' and 'a'would both match", configurations.getAll().get(15).getDescription());
+		assertEquals("'A' and 'a' would both match", configurations.getAll().get(15).getDescription());
 
 		assertEquals("ignoreSubtypeNames", configurations.getAll().get(16).getName());
 		assertEquals("BufferedReader, StringReader and Reader would all match", configurations.getAll().get(16).getDescription());
@@ -83,7 +83,7 @@ class SimianConfigurationsTest {
 	}
 
 	@Test
-	void defaultValues() throws Exception {
+	void defaultValues() {
 		assertEquals(20, configurations.getAllAsArguments().size());
 		assertEquals("-threshold=6", configurations.getAllAsArguments().get(0));
 		assertEquals("-ignoreCurlyBraces+", configurations.getAllAsArguments().get(1));
@@ -108,7 +108,7 @@ class SimianConfigurationsTest {
 	}
 
 	@Test
-	void changeValues() throws Exception {
+	void changeValues() {
 		configurations.threshold(2);
 		assertEquals(20, configurations.getAllAsArguments().size());
 		assertEquals("-threshold=2", configurations.getAllAsArguments().get(0));
@@ -134,19 +134,11 @@ class SimianConfigurationsTest {
 	}
 
 	@Test
-	void threasholdShoudBeLargerThanTwo() throws Exception {
-		assertThrows(InvalidConfigurationException.class, () -> {
-			configurations.threshold(-1);
-		});
-		assertThrows(InvalidConfigurationException.class, () -> {
-			configurations.threshold(0);
-		});
-		assertThrows(InvalidConfigurationException.class, () -> {
-			configurations.threshold(1);
-		});
-		assertThrows(InvalidConfigurationException.class, () -> {
-			configurations.threshold(null);
-		});
+	void threasholdShoudBeLargerThanTwo() {
+		assertThrows(InvalidConfigurationException.class, () -> configurations.threshold(-1));
+		assertThrows(InvalidConfigurationException.class, () -> configurations.threshold(0));
+		assertThrows(InvalidConfigurationException.class, () -> configurations.threshold(1));
+		assertThrows(InvalidConfigurationException.class, () -> configurations.threshold(null));
 	}
 
 }

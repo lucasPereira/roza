@@ -1,10 +1,5 @@
 package br.ufsc.ine.leb.roza.measurement.intersector;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.math.BigDecimal;
 
 import org.junit.jupiter.api.Test;
@@ -12,10 +7,12 @@ import org.junit.jupiter.api.Test;
 import br.ufsc.ine.leb.roza.exceptions.IntervalWithoutOverlapForConcatenationException;
 import br.ufsc.ine.leb.roza.exceptions.InvalidIntervalException;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 class IntervalTest {
 
 	@Test
-	void oneToTen() throws Exception {
+	void oneToTen() {
 		Interval interval = new Interval(1, 10);
 		assertEquals(1, interval.getStart().intValue());
 		assertEquals(10, interval.getEnd().intValue());
@@ -23,7 +20,7 @@ class IntervalTest {
 	}
 
 	@Test
-	void twoToTen() throws Exception {
+	void twoToTen() {
 		Interval interval = new Interval(2, 10);
 		assertEquals(2, interval.getStart().intValue());
 		assertEquals(10, interval.getEnd().intValue());
@@ -31,7 +28,7 @@ class IntervalTest {
 	}
 
 	@Test
-	void oneToOne() throws Exception {
+	void oneToOne() {
 		Interval interval = new Interval(1, 1);
 		assertEquals(1, interval.getStart().intValue());
 		assertEquals(1, interval.getEnd().intValue());
@@ -39,19 +36,19 @@ class IntervalTest {
 	}
 
 	@Test
-	void equals() throws Exception {
+	void equals() {
 		Interval oneToTen = new Interval(1, 10);
-		assertTrue(new Interval(1, 10).equals(oneToTen));
+		assertEquals(new Interval(1, 10), oneToTen);
 	}
 
 	@Test
-	void notEquals() throws Exception {
+	void notEquals() {
 		Interval twoToEleven = new Interval(2, 11);
-		assertFalse(new Interval(1, 10).equals(twoToEleven));
+		assertNotEquals(new Interval(1, 10), twoToEleven);
 	}
 
 	@Test
-	void overlaps() throws Exception {
+	void overlaps() {
 		Interval fourToFive = new Interval(4, 5);
 		Interval fiveToSix = new Interval(5, 6);
 		assertTrue(fourToFive.overlaps(fiveToSix));
@@ -59,7 +56,7 @@ class IntervalTest {
 	}
 
 	@Test
-	void notOverlaps() throws Exception {
+	void notOverlaps() {
 		Interval fourToFive = new Interval(4, 5);
 		Interval sixToSeven = new Interval(6, 7);
 		assertFalse(fourToFive.overlaps(sixToSeven));
@@ -67,7 +64,7 @@ class IntervalTest {
 	}
 
 	@Test
-	void concatenate() throws Exception {
+	void concatenate() {
 		Interval fourToFive = new Interval(4, 5);
 		Interval fiveToSix = new Interval(5, 6);
 		Interval fourToSix = new Interval(4, 6);
@@ -76,50 +73,36 @@ class IntervalTest {
 	}
 
 	@Test
-	void notConcatenate() throws Exception {
+	void notConcatenate() {
 		Interval fourToFive = new Interval(4, 5);
 		Interval sixToSeven = new Interval(6, 7);
-		assertThrows(IntervalWithoutOverlapForConcatenationException.class, () -> {
-			fourToFive.concatenate(sixToSeven);
-		});
-		assertThrows(IntervalWithoutOverlapForConcatenationException.class, () -> {
-			sixToSeven.concatenate(fourToFive);
-		});
+		assertThrows(IntervalWithoutOverlapForConcatenationException.class, () -> fourToFive.concatenate(sixToSeven));
+		assertThrows(IntervalWithoutOverlapForConcatenationException.class, () -> sixToSeven.concatenate(fourToFive));
 	}
 
 	@Test
-	void startGreaterThanEnd() throws Exception {
-		assertThrows(InvalidIntervalException.class, () -> {
-			new Interval(10, 1);
-		});
+	void startGreaterThanEnd() {
+		assertThrows(InvalidIntervalException.class, () -> new Interval(10, 1));
 	}
 
 	@Test
-	void zeroStart() throws Exception {
-		assertThrows(InvalidIntervalException.class, () -> {
-			new Interval(0, 10);
-		});
+	void zeroStart() {
+		assertThrows(InvalidIntervalException.class, () -> new Interval(0, 10));
 	}
 
 	@Test
-	void negativeStart() throws Exception {
-		assertThrows(InvalidIntervalException.class, () -> {
-			new Interval(-1, 10);
-		});
+	void negativeStart() {
+		assertThrows(InvalidIntervalException.class, () -> new Interval(-1, 10));
 	}
 
 	@Test
-	void zeroEnd() throws Exception {
-		assertThrows(InvalidIntervalException.class, () -> {
-			new Interval(1, 0);
-		});
+	void zeroEnd() {
+		assertThrows(InvalidIntervalException.class, () -> new Interval(1, 0));
 	}
 
 	@Test
-	void negativeEnd() throws Exception {
-		assertThrows(InvalidIntervalException.class, () -> {
-			new Interval(1, -1);
-		});
+	void negativeEnd() {
+		assertThrows(InvalidIntervalException.class, () -> new Interval(1, -1));
 	}
 
 }

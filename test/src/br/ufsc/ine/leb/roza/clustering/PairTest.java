@@ -1,14 +1,13 @@
 package br.ufsc.ine.leb.roza.clustering;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-
-import java.util.Arrays;
-
+import br.ufsc.ine.leb.roza.TestCase;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import br.ufsc.ine.leb.roza.TestCase;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 class PairTest {
 
@@ -19,14 +18,14 @@ class PairTest {
 
 	@BeforeEach
 	void setup() {
-		alpha = new TestCase("alpha", Arrays.asList(), Arrays.asList());
-		beta = new TestCase("beta", Arrays.asList(), Arrays.asList());
+		alpha = new TestCase("alpha", List.of(), List.of());
+		beta = new TestCase("beta", List.of(), List.of());
 		alphaBetaPair = new Pair(alpha, beta);
 		betaAlphaPair = new Pair(beta, alpha);
 	}
 
 	@Test
-	void alphaBeta() throws Exception {
+	void alphaBeta() {
 		assertEquals(alpha, alphaBetaPair.getFirst());
 		assertEquals(beta, alphaBetaPair.getSecond());
 		assertEquals(alphaBetaPair, new Pair(alpha, beta));
@@ -35,7 +34,7 @@ class PairTest {
 	}
 
 	@Test
-	void betaAlpha() throws Exception {
+	void betaAlpha() {
 		assertEquals(beta, betaAlphaPair.getFirst());
 		assertEquals(alpha, betaAlphaPair.getSecond());
 		assertEquals(betaAlphaPair, new Pair(beta, alpha));

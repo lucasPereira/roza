@@ -4,8 +4,8 @@ import java.math.BigDecimal;
 
 public class WinnerCombination {
 
-	private Combination combination;
-	private BigDecimal evaluation;
+	private final Combination combination;
+	private final BigDecimal evaluation;
 
 	public WinnerCombination(Combination combination, BigDecimal evaluation) {
 		this.combination = combination;

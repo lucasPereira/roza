@@ -1,4 +1,4 @@
-package br.ufsc.ine.leb.roza.ui.window.toolbar.measuring;
+package br.ufsc.ine.leb.roza.ui.window.toolbar.measurement;
 
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
@@ -15,42 +15,38 @@ import br.ufsc.ine.leb.roza.ui.model.OnlyNumbersFilter;
 
 public class JplagConfigurationInputs implements UiComponent {
 
-	private MeasuringTab toolbar;
+	private final MeasurementTab toolbar;
 	private JTextField sensitivityInput;
 
-	public JplagConfigurationInputs(MeasuringTab toolbar) {
+	public JplagConfigurationInputs(MeasurementTab toolbar) {
 		this.toolbar = toolbar;
 	}
 
 	@Override
 	public void init(Hub hub, Manager manager) {
-		sensitivityInput = createInput(hub, "1", "t: sensitivity of the comparison", "^[1-9][0-9]*$", new OnlyNumbersFilter());
+		sensitivityInput = createInput(hub, new OnlyNumbersFilter());
 		toolbar.addComponent(sensitivityInput);
-		hub.selectJplagMetricSubscribe(() -> {
-			sensitivityInput.setVisible(true);
-		});
-		hub.unselectJplagMetricSubscribe(() -> {
-			sensitivityInput.setVisible(false);
-		});
+		hub.selectJplagMetricSubscribe(() -> sensitivityInput.setVisible(true));
+		hub.unselectJplagMetricSubscribe(() -> sensitivityInput.setVisible(false));
 	}
 
 	@Override
-	public void addChilds(List<UiComponent> childs) {}
+	public void addChildren(List<UiComponent> children) {}
 
 	@Override
 	public void start() {}
 
-	private JTextField createInput(Hub hub, String value, String tip, String regex, DocumentFilter filter) {
+	private JTextField createInput(Hub hub, DocumentFilter filter) {
 		JTextField input = new JTextField();
-		input.setText(value);
-		input.setToolTipText(tip);
+		input.setText("1");
+		input.setToolTipText("t: sensitivity of the comparison");
 		input.setVisible(false);
 		final String original = input.getText();
 		input.addFocusListener(new FocusListener() {
 
 			@Override
 			public void focusLost(FocusEvent event) {
-				if (!input.getText().matches(regex)) {
+				if (!input.getText().matches("^[1-9][0-9]*$")) {
 					input.setText(original);
 				}
 				Integer sensitivity = Integer.parseInt(sensitivityInput.getText());

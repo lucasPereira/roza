@@ -24,7 +24,7 @@ public class GraphCanvas implements UiComponent {
 
 	private static Integer EDGE_ID = 0;
 
-	private DistributionTab distributionTab;
+	private final DistributionTab distributionTab;
 	private List<TestCase> testCases;
 	private SingleGraph graph;
 
@@ -40,16 +40,12 @@ public class GraphCanvas implements UiComponent {
 		DefaultView view = (DefaultView) viewer.addDefaultView(false);
 		addMouveListeners(view);
 		distributionTab.addComponent("Graph", view);
-		hub.loadTestClassesSubscribe(classes -> {
-			graph.clear();
-		});
+		hub.loadTestClassesSubscribe(classes -> graph.clear());
 		hub.extractTestCasesSubscribe(testCases -> {
 			graph.clear();
 			this.testCases = testCases;
 		});
-		hub.measureTestsSubscribe(similarityReport -> {
-			graph.clear();
-		});
+		hub.measureTestsSubscribe(similarityReport -> graph.clear());
 		hub.distributeTestsSubscribe(levels -> {
 			graph.clear();
 			viewer.enableAutoLayout();
@@ -118,9 +114,9 @@ public class GraphCanvas implements UiComponent {
 			}
 
 			private void zoom(DefaultView view, MouseWheelEvent event) {
-				Integer amount = event.getWheelRotation();
-				Double currentZoom = view.getCamera().getViewPercent();
-				Double newZoom = amount * 0.1 + currentZoom;
+				int amount = event.getWheelRotation();
+				double currentZoom = view.getCamera().getViewPercent();
+				double newZoom = amount * 0.1 + currentZoom;
 				if (newZoom >= 0.1 && newZoom <= 2) {
 					view.getCamera().setViewPercent(newZoom);
 				}
@@ -128,8 +124,8 @@ public class GraphCanvas implements UiComponent {
 
 			@SuppressWarnings("unused")
 			public void centralize(DefaultView view, MouseWheelEvent event) {
-				Integer x = event.getX();
-				Integer y = event.getY();
+				int x = event.getX();
+				int y = event.getY();
 				Point3 center = view.getCamera().transformPxToGu(x, y);
 				view.getCamera().setViewCenter(center.x, center.y, center.z);
 			}
@@ -138,7 +134,7 @@ public class GraphCanvas implements UiComponent {
 	}
 
 	@Override
-	public void addChilds(List<UiComponent> childs) {}
+	public void addChildren(List<UiComponent> children) {}
 
 	@Override
 	public void start() {}

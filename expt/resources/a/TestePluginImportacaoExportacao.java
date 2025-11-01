@@ -12,7 +12,7 @@ public class TestePluginImportacaoExportacao {
 	private Selenium selenium;
 
 	@BeforeEach
-	void configurar() throws Exception {
+	void configurar() {
 		correioEletronico = new CorreioEletronico();
 		bancoDeDados = new BancoDeDados();
 		servidor = new Servidor();
@@ -34,13 +34,13 @@ public class TestePluginImportacaoExportacao {
 	}
 
 	@Test
-	void pluginsPaginaGeral() throws Exception {
+	void pluginsPaginaGeral() {
 		selenium.assegurarTexto("Tools", ".pkp_page_title");
 		selenium.assegurarTexto("Produções de livros CAPES: Importação e exportação de produções de livros", ".pkp_page_content > ul:nth-child(2) > li:nth-child(1)");
 	}
 
 	@Test
-	void pluginsPaginaDoPlugin() throws Exception {
+	void pluginsPaginaDoPlugin() {
 		selenium.clicar("#ui-id-2 > div > ul > li:nth-child(1) > a");
 		selenium.assegurarTexto("Produções de livros CAPES", ".pkp_page_title");
 		selenium.assegurarQuantidadeDeElementos(5, "#capes-abas > ul > li");
@@ -52,7 +52,7 @@ public class TestePluginImportacaoExportacao {
 	}
 
 	@AfterEach
-	void finalizar() throws Exception {
+	void finalizar() {
 		selenium.fechar();
 		servidor.finalizar();
 		correioEletronico.finalizar();

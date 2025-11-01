@@ -1,4 +1,7 @@
+.gradle/
 bin/
+build/
+
 main/exec/materializer/
 main/exec/measurer/
 main/exec/writer/

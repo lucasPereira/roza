@@ -4,8 +4,8 @@ import java.awt.Color;
 
 public class MessageModel {
 
-	private String message;
-	private Color color;
+	private final String message;
+	private final Color color;
 
 	public MessageModel(String message, Color color) {
 		this.message = message;

@@ -3,6 +3,8 @@ package br.ufsc.ine.leb.roza.measurement;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.math.MathContext;
+import java.math.RoundingMode;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -28,7 +30,7 @@ import br.ufsc.ine.leb.roza.utils.ProcessUtils;
 
 public class JplagSimilarityMeasurer extends AbstractSimilarityMeasurer implements SimilarityMeasurer {
 
-	private JplagConfigurations configurations;
+	private final JplagConfigurations configurations;
 
 	public JplagSimilarityMeasurer(JplagConfigurations configurations) {
 		this.configurations = configurations;
@@ -36,11 +38,11 @@ public class JplagSimilarityMeasurer extends AbstractSimilarityMeasurer implemen
 
 	@Override
 	public SimilarityReport measureMoreThanOne(MaterializationReport materializationReport, SimilarityReportBuilder builder) {
-		List<TestCaseMaterialization> materializations = materializationReport.getMaterializations();
+		List<TestCaseMaterialization> materialization = materializationReport.getMaterialization();
 		MatrixElementToKeyConverter<TestCaseMaterialization, String> converter = new JplagMatrixElementToKeyConverter();
 		MatrixValueFactory<TestCaseMaterialization, BigDecimal> factory = new JplagMatrixValueFactory();
-		Matrix<TestCaseMaterialization, String, BigDecimal> matrix = new Matrix<>(materializations, converter, factory);
-		run(materializationReport);
+		Matrix<TestCaseMaterialization, String, BigDecimal> matrix = new Matrix<>(materialization, converter, factory);
+		run();
 		parse(matrix);
 		for (MatrixPair<TestCaseMaterialization, BigDecimal> pair : matrix.getNonReflexivePairs()) {
 			TestCase source = pair.getSource().getTestCase();
@@ -58,8 +60,8 @@ public class JplagSimilarityMeasurer extends AbstractSimilarityMeasurer implemen
 				Document document = Jsoup.parse(result, "utf-8");
 				Elements tables = document.body().getElementsByTag("table");
 				Element table = tables.get(0);
-				Elements tableBodys = table.getElementsByTag("tbody");
-				Element tableBody = tableBodys.get(0);
+				Elements allTableBody = table.getElementsByTag("tbody");
+				Element tableBody = allTableBody.get(0);
 				Elements rows = tableBody.getElementsByTag("tr");
 				Element row = rows.get(0);
 				Elements columns = row.getElementsByTag("th");
@@ -69,23 +71,21 @@ public class JplagSimilarityMeasurer extends AbstractSimilarityMeasurer implemen
 				String nameSecond = columnSecond.text().split(" ")[0];
 				String textScoreFirst = columnFirst.text().split(" ")[1].replaceAll("[%()]", "");
 				String textScoreSecond = columnSecond.text().split(" ")[1].replaceAll("[%()]", "");
-				BigDecimal scoreFirst = new BigDecimal(textScoreFirst).divide(new BigDecimal(100));
-				BigDecimal scoreSecond = new BigDecimal(textScoreSecond).divide(new BigDecimal(100));
-				BigDecimal oneScaled = BigDecimal.ONE.setScale(1);
-				BigDecimal oneNotScaled = BigDecimal.ONE;
-				scoreFirst = scoreFirst.equals(oneScaled) ? oneNotScaled : scoreFirst;
-				scoreSecond = scoreSecond.equals(oneScaled) ? oneNotScaled : scoreSecond;
+				BigDecimal scoreFirst = new BigDecimal(textScoreFirst).divide(new BigDecimal(100), MathContext.DECIMAL32);
+				BigDecimal scoreSecond = new BigDecimal(textScoreSecond).divide(new BigDecimal(100), MathContext.DECIMAL32);
+				scoreFirst = scoreFirst.compareTo(BigDecimal.ONE) == 0 ? BigDecimal.ONE : scoreFirst;
+				scoreSecond = scoreSecond.compareTo(BigDecimal.ONE) == 0 ? BigDecimal.ONE : scoreSecond;
 				matrix.set(nameFirst, nameSecond, scoreFirst);
 				matrix.set(nameSecond, nameFirst, scoreSecond);
 			}
-		} catch (IOException excecao) {
-			throw new RuntimeException(excecao);
+		} catch (IOException exception) {
+			throw new RuntimeException(exception);
 		}
 	}
 
-	private void run(MaterializationReport materializationReport) {
+	private void run() {
 		ProcessUtils processUtils = new ProcessUtils(true, true, true, true);
-		List<String> arguments = new LinkedList<String>();
+		List<String> arguments = new LinkedList<>();
 		arguments.add("java");
 		arguments.add("-jar");
 		arguments.add("main/tools/jplag/jplag-2.11.9.jar");

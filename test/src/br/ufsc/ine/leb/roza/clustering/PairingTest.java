@@ -3,7 +3,7 @@ package br.ufsc.ine.leb.roza.clustering;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -27,9 +27,9 @@ class PairingTest {
 
 	@BeforeEach
 	void setup() {
-		alpha = new TestCase("alpha", Arrays.asList(), Arrays.asList());
-		beta = new TestCase("beta", Arrays.asList(), Arrays.asList());
-		gamma = new TestCase("gamma", Arrays.asList(), Arrays.asList());
+		alpha = new TestCase("alpha", List.of(), List.of());
+		beta = new TestCase("beta", List.of(), List.of());
+		gamma = new TestCase("gamma", List.of(), List.of());
 		alphaAlphaPair = new Pair(alpha, alpha);
 		alphaBetaPair = new Pair(alpha, beta);
 		betaAlphaPair = new Pair(beta, alpha);
@@ -40,7 +40,7 @@ class PairingTest {
 	}
 
 	@Test
-	void pairClusterWithItself() throws Exception {
+	void pairClusterWithItself() {
 		Cluster alphaCluster = new Cluster(alpha);
 		Set<Pair> alphaPairedAlpha = new Pairing(alphaCluster, alphaCluster).getPairs();
 		assertEquals(1, alphaPairedAlpha.size());
@@ -48,7 +48,7 @@ class PairingTest {
 	}
 
 	@Test
-	void pairClustersWithTheSameElement() throws Exception {
+	void pairClustersWithTheSameElement() {
 		Cluster alphaCluster = new Cluster(alpha);
 		Set<Pair> alphaPairedAlpha = new Pairing(alphaCluster, new Cluster(alpha)).getPairs();
 		assertEquals(1, alphaPairedAlpha.size());
@@ -56,7 +56,7 @@ class PairingTest {
 	}
 
 	@Test
-	void pairClustersWithDistincElements() throws Exception {
+	void pairClustersWithDistincElements() {
 		Cluster alphaCluster = new Cluster(alpha);
 		Cluster betaCluster = new Cluster(beta);
 		Set<Pair> alphaPairedBeta = new Pairing(alphaCluster, betaCluster).getPairs();
@@ -72,7 +72,7 @@ class PairingTest {
 	}
 
 	@Test
-	void pairClustersWithDistincElementsAndDistinctSizes() throws Exception {
+	void pairClustersWithDistincElementsAndDistinctSizes() {
 		Cluster alphaCluster = new Cluster(alpha);
 		Cluster betaCluster = new Cluster(beta);
 		Cluster gammaCluster = new Cluster(gamma);
@@ -94,7 +94,7 @@ class PairingTest {
 	}
 
 	@Test
-	void pairClustersWithDistincElementsAndDistinctSizesWithoutRepetition() throws Exception {
+	void pairClustersWithDistincElementsAndDistinctSizesWithoutRepetition() {
 		Cluster alphaCluster = new Cluster(alpha);
 		Cluster betaCluster = new Cluster(beta);
 		Cluster gammaCluster = new Cluster(gamma);

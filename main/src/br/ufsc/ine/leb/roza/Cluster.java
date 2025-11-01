@@ -6,7 +6,7 @@ import java.util.Set;
 
 public class Cluster {
 
-	private Set<TestCase> elements;
+	private final Set<TestCase> elements;
 
 	public Cluster(TestCase test) {
 		elements = new HashSet<>();

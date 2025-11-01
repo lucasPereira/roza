@@ -15,7 +15,7 @@ public class CodePanel extends JScrollPane {
 
 	private static final long serialVersionUID = 1L;
 
-	private JEditorPane pane;
+	private final JEditorPane pane;
 
 	public CodePanel() {
 		super(new JEditorPane());
@@ -47,7 +47,7 @@ public class CodePanel extends JScrollPane {
 	}
 
 	public void setTestCase(TestCase testCase) {
-		Integer line = 1;
+		int line = 1;
 		StringBuilder code = new StringBuilder();
 		code.append("<html>");
 		code.append("<body>");
@@ -77,18 +77,13 @@ public class CodePanel extends JScrollPane {
 
 	private void updateScroll() {
 		CodePanel scroller = this;
-		SwingUtilities.invokeLater(new Runnable() {
-
-			@Override
-			public void run() {
-				JScrollBar vertical = scroller.getVerticalScrollBar();
-				JScrollBar horizontal = scroller.getHorizontalScrollBar();
-				vertical.setValue(vertical.getMinimum());
-				horizontal.setValue(horizontal.getMinimum());
-				scroller.revalidate();
-				scroller.repaint();
-			}
-
+		SwingUtilities.invokeLater(() -> {
+			JScrollBar vertical = scroller.getVerticalScrollBar();
+			JScrollBar horizontal = scroller.getHorizontalScrollBar();
+			vertical.setValue(vertical.getMinimum());
+			horizontal.setValue(horizontal.getMinimum());
+			scroller.revalidate();
+			scroller.repaint();
 		});
 	}
 

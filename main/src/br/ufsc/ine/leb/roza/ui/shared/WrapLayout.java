@@ -13,8 +13,8 @@ public class WrapLayout extends FlowLayout {
 
 	private static final long serialVersionUID = 1L;
 
-	public WrapLayout(int align) {
-		super(align);
+	public WrapLayout() {
+		super(WrapLayout.LEFT);
 	}
 
 	@Override
@@ -31,12 +31,11 @@ public class WrapLayout extends FlowLayout {
 
 	private Dimension layoutSize(Container target, boolean preferred) {
 		synchronized (target.getTreeLock()) {
-			int targetWidth = target.getSize().width;
 			Container container = target;
 			while (container.getSize().width == 0 && container.getParent() != null) {
 				container = container.getParent();
 			}
-			targetWidth = container.getSize().width;
+			int targetWidth = container.getSize().width;
 			if (targetWidth == 0) {
 				targetWidth = Integer.MAX_VALUE;
 			}

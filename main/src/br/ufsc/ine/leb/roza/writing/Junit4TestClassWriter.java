@@ -19,7 +19,7 @@ import br.ufsc.ine.leb.roza.utils.FolderUtils;
 
 public class Junit4TestClassWriter implements TestClassWriter {
 
-	private FolderUtils folderUtils;
+	private final FolderUtils folderUtils;
 
 	public Junit4TestClassWriter(String baseFolder) {
 		folderUtils = new FolderUtils(baseFolder);
@@ -46,17 +46,13 @@ public class Junit4TestClassWriter implements TestClassWriter {
 			testClass.getSetupMethods().forEach(setupMethod -> {
 				MethodDeclaration unitSetupMethod = unitTestClass.addMethod(setupMethod.getName()).setPublic(true).addAnnotation(Before.class);
 				BlockStmt unitSetupMethodBody = new BlockStmt();
-				setupMethod.getStatements().forEach((statement) -> {
-					unitSetupMethodBody.addStatement(JavaParser.parseStatement(statement.getText()));
-				});
+				setupMethod.getStatements().forEach((statement) -> unitSetupMethodBody.addStatement(JavaParser.parseStatement(statement.getText())));
 				unitSetupMethod.setBody(unitSetupMethodBody);
 			});
 			testClass.getTestMethods().forEach(testMethod -> {
 				MethodDeclaration unitTestMethod = unitTestClass.addMethod(testMethod.getName()).setPublic(true).addAnnotation(Test.class);
 				BlockStmt unitTestMethodBody = new BlockStmt();
-				testMethod.getStatements().forEach((statement) -> {
-					unitTestMethodBody.addStatement(JavaParser.parseStatement(statement.getText()));
-				});
+				testMethod.getStatements().forEach((statement) -> unitTestMethodBody.addStatement(JavaParser.parseStatement(statement.getText())));
 				unitTestMethod.setBody(unitTestMethodBody);
 			});
 			String code = unit.toString(configuration);

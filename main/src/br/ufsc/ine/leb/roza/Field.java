@@ -2,9 +2,9 @@ package br.ufsc.ine.leb.roza;
 
 public class Field {
 
-	private String type;
-	private String name;
-	private Statement initialization;
+	private final String type;
+	private final String name;
+	private final Statement initialization;
 
 	public Field(String type, String name) {
 		this(type, name, null);

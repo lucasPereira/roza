@@ -15,7 +15,7 @@ import br.ufsc.ine.leb.roza.ui.window.content.sidebar.Sidebar;
 
 public class Content implements UiComponent {
 
-	private Window window;
+	private final Window window;
 	private JPanel panel;
 
 	public Content(Window window) {
@@ -29,9 +29,9 @@ public class Content implements UiComponent {
 	}
 
 	@Override
-	public void addChilds(List<UiComponent> childs) {
-		childs.add(new DistributionTab(this));
-		childs.add(new Sidebar(this));
+	public void addChildren(List<UiComponent> children) {
+		children.add(new DistributionTab(this));
+		children.add(new Sidebar(this));
 	}
 
 	@Override

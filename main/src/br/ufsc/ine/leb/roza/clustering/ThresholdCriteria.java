@@ -4,6 +4,6 @@ import java.math.BigDecimal;
 
 public interface ThresholdCriteria {
 
-	Boolean shoudlStop(Integer nextLevel, Combination combinationToNext, BigDecimal evaluationToNext);
+	Boolean shouldStop(Integer nextLevel, Combination combinationToNext, BigDecimal evaluationToNext);
 
 }

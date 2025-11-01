@@ -3,19 +3,19 @@ package br.ufsc.ine.leb.roza;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.File;
-import java.util.Arrays;
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
 class MaterializationReportTest {
 
 	@Test
-	void create() throws Exception {
-		TestCase testCase = new TestCase("example", Arrays.asList(), Arrays.asList());
+	void create() {
+		TestCase testCase = new TestCase("example", List.of(), List.of());
 		TestCaseMaterialization materialization = new TestCaseMaterialization(new File("example/Example.java"), 10, testCase);
-		MaterializationReport materializtionReport = new MaterializationReport("example", Arrays.asList(materialization));
-		assertEquals(1, materializtionReport.getMaterializations().size());
-		assertEquals(materialization, materializtionReport.getMaterializations().get(0));
+		MaterializationReport materializtionReport = new MaterializationReport("example", List.of(materialization));
+		assertEquals(1, materializtionReport.getMaterialization().size());
+		assertEquals(materialization, materializtionReport.getMaterialization().get(0));
 		assertEquals("example", materializtionReport.getBaseFolder());
 	}
 

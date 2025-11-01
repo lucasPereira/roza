@@ -13,7 +13,7 @@ import br.ufsc.ine.leb.roza.ui.shared.ComboBoxBuilder;
 
 public class ParserComboBox implements UiComponent {
 
-	private ParsingTab toolbar;
+	private final ParsingTab toolbar;
 	private JComboBox<String> combo;
 
 	public ParserComboBox(ParsingTab toolbar) {
@@ -22,16 +22,12 @@ public class ParserComboBox implements UiComponent {
 
 	@Override
 	public void init(Hub hub, Manager manager) {
-		combo = new ComboBoxBuilder("Parser").add("JUnit 4", () -> {
-			manager.setTestClassParser(new Junit4TestClassParser());
-		}).add("JUnit 5", () -> {
-			manager.setTestClassParser(new Junit5TestClassParser());
-		}).build();
+		combo = new ComboBoxBuilder("Parser").add("JUnit 4", () -> manager.setTestClassParser(new Junit4TestClassParser())).add("JUnit 5", () -> manager.setTestClassParser(new Junit5TestClassParser())).build();
 		toolbar.addComponent(combo);
 	}
 
 	@Override
-	public void addChilds(List<UiComponent> childs) {}
+	public void addChildren(List<UiComponent> children) {}
 
 	@Override
 	public void start() {

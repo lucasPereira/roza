@@ -6,7 +6,7 @@ import br.ufsc.ine.leb.roza.exceptions.InvalidThresholdException;
 
 public class SimilarityBasedCriteria implements ThresholdCriteria {
 
-	private BigDecimal threshold;
+	private final BigDecimal threshold;
 
 	public SimilarityBasedCriteria(BigDecimal threshold) {
 		if (BigDecimal.ZERO.compareTo(threshold) > 0 || BigDecimal.ONE.compareTo(threshold) < 0) {
@@ -16,7 +16,7 @@ public class SimilarityBasedCriteria implements ThresholdCriteria {
 	}
 
 	@Override
-	public Boolean shoudlStop(Integer nextLevel, Combination combinationToNext, BigDecimal evaluationToNext) {
+	public Boolean shouldStop(Integer nextLevel, Combination combinationToNext, BigDecimal evaluationToNext) {
 		return threshold.compareTo(evaluationToNext) >= 0;
 	}
 

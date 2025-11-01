@@ -1,4 +1,4 @@
-package br.ufsc.ine.leb.roza.ui.window.toolbar.measuring;
+package br.ufsc.ine.leb.roza.ui.window.toolbar.measurement;
 
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
@@ -16,12 +16,12 @@ import br.ufsc.ine.leb.roza.ui.model.OnlyNumbersFilter;
 
 public class DeckardConfigurationInputs implements UiComponent {
 
-	private MeasuringTab toolbar;
+	private final MeasurementTab toolbar;
 	private JTextField minTokensInput;
 	private JTextField strideInput;
 	private JTextField similarityInput;
 
-	public DeckardConfigurationInputs(MeasuringTab toolbar) {
+	public DeckardConfigurationInputs(MeasurementTab toolbar) {
 		this.toolbar = toolbar;
 	}
 
@@ -46,7 +46,7 @@ public class DeckardConfigurationInputs implements UiComponent {
 	}
 
 	@Override
-	public void addChilds(List<UiComponent> childs) {}
+	public void addChildren(List<UiComponent> children) {}
 
 	@Override
 	public void start() {}

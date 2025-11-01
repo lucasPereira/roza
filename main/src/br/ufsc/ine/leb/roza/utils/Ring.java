@@ -12,7 +12,7 @@ import br.ufsc.ine.leb.roza.ui.window.content.sidebar.clustering.ClusteringTab;
 @SuiteClasses({ ClusteringTab.class })
 public class Ring<T> {
 
-	private List<T> elements;
+	private final List<T> elements;
 	private Integer index;
 
 	public Ring() {
@@ -20,7 +20,7 @@ public class Ring<T> {
 		index = 0;
 	}
 
-	public void shuffe() {
+	public void shuffle() {
 		Collections.shuffle(elements);
 	}
 
@@ -32,7 +32,7 @@ public class Ring<T> {
 		if (elements.isEmpty()) {
 			throw new NoSuchElementException();
 		}
-		Integer current = index % elements.size();
+		int current = index % elements.size();
 		index++;
 		return elements.get(current);
 	}

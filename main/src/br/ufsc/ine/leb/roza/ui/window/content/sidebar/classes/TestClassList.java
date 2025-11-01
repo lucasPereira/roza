@@ -6,8 +6,6 @@ import javax.swing.DefaultListModel;
 import javax.swing.JList;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 
 import br.ufsc.ine.leb.roza.TestClass;
 import br.ufsc.ine.leb.roza.ui.Hub;
@@ -17,7 +15,7 @@ import br.ufsc.ine.leb.roza.ui.model.TestClassRenderer;
 
 public class TestClassList implements UiComponent {
 
-	private TestClassesTab testClassesTab;
+	private final TestClassesTab testClassesTab;
 
 	public TestClassList(TestClassesTab testClassesTab) {
 		this.testClassesTab = testClassesTab;
@@ -31,25 +29,20 @@ public class TestClassList implements UiComponent {
 		testClassesTab.addTopComponent(scroller);
 		hub.loadTestClassesSubscribe((List<TestClass> classes) -> {
 			DefaultListModel<TestClass> model = new DefaultListModel<>();
-			classes.forEach(testClass -> model.addElement(testClass));
+			classes.forEach(model::addElement);
 			list.setModel(model);
 			list.setCellRenderer(new TestClassRenderer());
 		});
-		list.addListSelectionListener(new ListSelectionListener() {
-
-			@Override
-			public void valueChanged(ListSelectionEvent event) {
-				TestClass testClass = list.getSelectedValue();
-				if (testClass != null && !event.getValueIsAdjusting()) {
-					hub.selectTestClassPublish(testClass);
-				}
+		list.addListSelectionListener(event -> {
+			TestClass testClass = list.getSelectedValue();
+			if (testClass != null && !event.getValueIsAdjusting()) {
+				hub.selectTestClassPublish(testClass);
 			}
-
 		});
 	}
 
 	@Override
-	public void addChilds(List<UiComponent> childs) {}
+	public void addChildren(List<UiComponent> children) {}
 
 	@Override
 	public void start() {}

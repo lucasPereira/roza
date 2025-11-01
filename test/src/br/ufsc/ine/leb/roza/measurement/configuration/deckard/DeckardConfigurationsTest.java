@@ -12,7 +12,7 @@ import br.ufsc.ine.leb.roza.exceptions.InvalidConfigurationException;
 class DeckardConfigurationsTest {
 
 	@Test
-	void configurations() throws Exception {
+	void configurations() {
 		DeckardConfigurations configurations = new DeckardConfigurations(true);
 
 		assertEquals(16, configurations.getAll().size());
@@ -24,7 +24,7 @@ class DeckardConfigurationsTest {
 		assertEquals("Width of the sliding window and how far it moves in each step", configurations.getAll().get(1).getDescription());
 
 		assertEquals("SIMILARITY", configurations.getAll().get(2).getName());
-		assertEquals("Similarity thresold based on editing distance", configurations.getAll().get(2).getDescription());
+		assertEquals("Similarity threshold based on editing distance", configurations.getAll().get(2).getDescription());
 
 		assertEquals("FILE_PATTERN", configurations.getAll().get(3).getName());
 		assertEquals("Input file name pattern", configurations.getAll().get(3).getDescription());
@@ -67,7 +67,7 @@ class DeckardConfigurationsTest {
 	}
 
 	@Test
-	void defaultValues() throws Exception {
+	void defaultValues() {
 		DeckardConfigurations configurations = new DeckardConfigurations(false);
 		assertEquals(16, configurations.getAllAsArguments().size());
 		assertEquals("export MIN_TOKENS=1", configurations.getAllAsArguments().get(0));
@@ -89,7 +89,7 @@ class DeckardConfigurationsTest {
 	}
 
 	@Test
-	void defaultValuesForDockerMode() throws Exception {
+	void defaultValuesForDockerMode() {
 		DeckardConfigurations configurations = new DeckardConfigurations(true);
 		assertEquals(16, configurations.getAllAsArguments().size());
 		assertEquals("export MIN_TOKENS=1", configurations.getAllAsArguments().get(0));
@@ -111,7 +111,7 @@ class DeckardConfigurationsTest {
 	}
 
 	@Test
-	void changeValues() throws Exception {
+	void changeValues() {
 		DeckardConfigurations configurations = new DeckardConfigurations(true);
 		configurations.minTokens(2).stride(Integer.MAX_VALUE).similarity(0.9);
 		assertEquals("export MIN_TOKENS=2", configurations.getAllAsArguments().get(0));
@@ -120,46 +120,30 @@ class DeckardConfigurationsTest {
 	}
 
 	@Test
-	void minTokensShouldBeLargerThanZero() throws Exception {
+	void minTokensShouldBeLargerThanZero() {
 		DeckardConfigurations configurations = new DeckardConfigurations(true);
-		assertThrows(InvalidConfigurationException.class, () -> {
-			configurations.minTokens(-1);
-		});
-		assertThrows(InvalidConfigurationException.class, () -> {
-			configurations.minTokens(0);
-		});
-		assertThrows(InvalidConfigurationException.class, () -> {
-			configurations.minTokens(null);
-		});
+		assertThrows(InvalidConfigurationException.class, () -> configurations.minTokens(-1));
+		assertThrows(InvalidConfigurationException.class, () -> configurations.minTokens(0));
+		assertThrows(InvalidConfigurationException.class, () -> configurations.minTokens(null));
 	}
 
 	@Test
-	void strideShouldBePositive() throws Exception {
+	void strideShouldBePositive() {
 		DeckardConfigurations configurations = new DeckardConfigurations(true);
-		assertThrows(InvalidConfigurationException.class, () -> {
-			configurations.stride(-1);
-		});
-		assertThrows(InvalidConfigurationException.class, () -> {
-			configurations.stride(null);
-		});
+		assertThrows(InvalidConfigurationException.class, () -> configurations.stride(-1));
+		assertThrows(InvalidConfigurationException.class, () -> configurations.stride(null));
 	}
 
 	@Test
-	void similarityShouldBeBetweenZeroAndOne() throws Exception {
+	void similarityShouldBeBetweenZeroAndOne() {
 		DeckardConfigurations configurations = new DeckardConfigurations(true);
-		assertThrows(InvalidConfigurationException.class, () -> {
-			configurations.similarity(-0.1);
-		});
-		assertThrows(InvalidConfigurationException.class, () -> {
-			configurations.similarity(1.1);
-		});
-		assertThrows(InvalidConfigurationException.class, () -> {
-			configurations.minTokens(null);
-		});
+		assertThrows(InvalidConfigurationException.class, () -> configurations.similarity(-0.1));
+		assertThrows(InvalidConfigurationException.class, () -> configurations.similarity(1.1));
+		assertThrows(InvalidConfigurationException.class, () -> configurations.minTokens(null));
 	}
 
 	@Test
-	void getConfigurations() throws Exception {
+	void getConfigurations() {
 		DeckardConfigurations configurations = new DeckardConfigurations(true);
 		assertEquals(new File("main/exec/measurer/cluster").getAbsolutePath(), configurations.clusterDir());
 	}

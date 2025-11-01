@@ -8,7 +8,7 @@ public class TiebreakException extends RuntimeException {
 
 	private static final long serialVersionUID = 1L;
 
-	private Set<Combination> tiebreak;
+	private final Set<Combination> tiebreak;
 
 	public TiebreakException(Set<Combination> tiebreak) {
 		this.tiebreak = tiebreak;

@@ -6,17 +6,17 @@ import br.ufsc.ine.leb.roza.exceptions.NoTestMethodException;
 
 public class TestClass {
 
-	private String name;
-	private List<SetupMethod> setupMethods;
-	private List<TestMethod> testMethods;
-	private List<Field> fields;
+	private final String name;
+	private final List<SetupMethod> setupMethods;
+	private final List<TestMethod> testMethods;
+	private final List<Field> fields;
 
 	public TestClass(String name, List<Field> fields, List<SetupMethod> setupMethods, List<TestMethod> testMethods) {
 		this.name = name;
 		this.fields = fields;
 		this.setupMethods = setupMethods;
 		this.testMethods = testMethods;
-		if (testMethods.size() == 0) {
+		if (testMethods.isEmpty()) {
 			throw new NoTestMethodException();
 		}
 	}

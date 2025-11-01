@@ -1,12 +1,12 @@
 package br.ufsc.ine.leb.roza.measurement.metric;
 
-import static org.junit.Assert.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
-import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -52,11 +52,11 @@ class LccssSimilarityMetricTest {
 	}
 
 	@Test
-	void zeroFixtures() throws Exception {
+	void zeroFixtures() {
 		Statement assertion = new Statement("assertEquals(0, 0);");
-		TestCase testCaseA = new TestCase("testA", Arrays.asList(), Arrays.asList(assertion));
-		TestCase testCaseB = new TestCase("testB", Arrays.asList(), Arrays.asList(assertion));
-		MaterializationReport materializationReport = materializer.materialize(Arrays.asList(testCaseA, testCaseB));
+		TestCase testCaseA = new TestCase("testA", List.of(), List.of(assertion));
+		TestCase testCaseB = new TestCase("testB", List.of(), List.of(assertion));
+		MaterializationReport materializationReport = materializer.materialize(List.of(testCaseA, testCaseB));
 		SimilarityReport report = measurer.measure(materializationReport).sort(new SimilarityAssessmentComparatorByScoreSourceNameAndTargetName());
 
 		Iterator<SimilarityAssessment> iterator = report.getAssessments().iterator();
@@ -81,14 +81,14 @@ class LccssSimilarityMetricTest {
 	}
 
 	@Test
-	void commonStartSequenceSameAssertions() throws Exception {
+	void commonStartSequenceSameAssertions() {
 		Statement fixture1 = new Statement("sut(1);");
 		Statement fixture2 = new Statement("sut(2);");
 		Statement fixture3 = new Statement("sut(3);");
 		Statement assertion = new Statement("assertEquals(0, 0);");
-		TestCase testCaseA = new TestCase("testA", Arrays.asList(fixture1, fixture2), Arrays.asList(assertion));
-		TestCase testCaseB = new TestCase("testB", Arrays.asList(fixture1, fixture3), Arrays.asList(assertion));
-		MaterializationReport materializationReport = materializer.materialize(Arrays.asList(testCaseA, testCaseB));
+		TestCase testCaseA = new TestCase("testA", List.of(fixture1, fixture2), List.of(assertion));
+		TestCase testCaseB = new TestCase("testB", List.of(fixture1, fixture3), List.of(assertion));
+		MaterializationReport materializationReport = materializer.materialize(List.of(testCaseA, testCaseB));
 		SimilarityReport report = measurer.measure(materializationReport).sort(new SimilarityAssessmentComparatorByScoreSourceNameAndTargetName());
 
 		Iterator<SimilarityAssessment> iterator = report.getAssessments().iterator();
@@ -113,15 +113,15 @@ class LccssSimilarityMetricTest {
 	}
 
 	@Test
-	void commonStartSequenceDifferentAssertions() throws Exception {
+	void commonStartSequenceDifferentAssertions() {
 		Statement fixture1 = new Statement("sut(1);");
 		Statement fixture2 = new Statement("sut(2);");
 		Statement fixture3 = new Statement("sut(3);");
 		Statement assertion1 = new Statement("assertEquals(1, 1);");
 		Statement assertion2 = new Statement("assertEquals(2, 2);");
-		TestCase testCaseA = new TestCase("testA", Arrays.asList(fixture1, fixture2), Arrays.asList(assertion1));
-		TestCase testCaseB = new TestCase("testB", Arrays.asList(fixture1, fixture3), Arrays.asList(assertion2));
-		MaterializationReport materializationReport = materializer.materialize(Arrays.asList(testCaseA, testCaseB));
+		TestCase testCaseA = new TestCase("testA", List.of(fixture1, fixture2), List.of(assertion1));
+		TestCase testCaseB = new TestCase("testB", List.of(fixture1, fixture3), List.of(assertion2));
+		MaterializationReport materializationReport = materializer.materialize(List.of(testCaseA, testCaseB));
 		SimilarityReport report = measurer.measure(materializationReport).sort(new SimilarityAssessmentComparatorByScoreSourceNameAndTargetName());
 
 		Iterator<SimilarityAssessment> iterator = report.getAssessments().iterator();
@@ -146,13 +146,13 @@ class LccssSimilarityMetricTest {
 	}
 
 	@Test
-	void commonShortContigousStartSequence() throws Exception {
+	void commonShortContigousStartSequence() {
 		Statement fixture1 = new Statement("sut(1);");
 		Statement fixture2 = new Statement("sut(2);");
 		Statement fixture3 = new Statement("sut(3);");
-		TestCase testCaseA = new TestCase("testA", Arrays.asList(fixture1, fixture2), Arrays.asList());
-		TestCase testCaseB = new TestCase("testB", Arrays.asList(fixture1, fixture3), Arrays.asList());
-		MaterializationReport materializationReport = materializer.materialize(Arrays.asList(testCaseA, testCaseB));
+		TestCase testCaseA = new TestCase("testA", List.of(fixture1, fixture2), List.of());
+		TestCase testCaseB = new TestCase("testB", List.of(fixture1, fixture3), List.of());
+		MaterializationReport materializationReport = materializer.materialize(List.of(testCaseA, testCaseB));
 		SimilarityReport report = measurer.measure(materializationReport).sort(new SimilarityAssessmentComparatorByScoreSourceNameAndTargetName());
 
 		Iterator<SimilarityAssessment> iterator = report.getAssessments().iterator();
@@ -177,16 +177,16 @@ class LccssSimilarityMetricTest {
 	}
 
 	@Test
-	void commonLongContigousStartSequence() throws Exception {
+	void commonLongContigousStartSequence() {
 		Statement fixture1 = new Statement("sut(1);");
 		Statement fixture2 = new Statement("sut(2);");
 		Statement fixture3 = new Statement("sut(3);");
 		Statement fixture4 = new Statement("sut(4);");
 		Statement fixture5 = new Statement("sut(5);");
 		Statement fixture6 = new Statement("sut(6);");
-		TestCase testCaseA = new TestCase("testA", Arrays.asList(fixture1, fixture2, fixture3, fixture5), Arrays.asList());
-		TestCase testCaseB = new TestCase("testB", Arrays.asList(fixture1, fixture2, fixture4, fixture6), Arrays.asList());
-		MaterializationReport materializationReport = materializer.materialize(Arrays.asList(testCaseA, testCaseB));
+		TestCase testCaseA = new TestCase("testA", List.of(fixture1, fixture2, fixture3, fixture5), List.of());
+		TestCase testCaseB = new TestCase("testB", List.of(fixture1, fixture2, fixture4, fixture6), List.of());
+		MaterializationReport materializationReport = materializer.materialize(List.of(testCaseA, testCaseB));
 		SimilarityReport report = measurer.measure(materializationReport).sort(new SimilarityAssessmentComparatorByScoreSourceNameAndTargetName());
 
 		Iterator<SimilarityAssessment> iterator = report.getAssessments().iterator();
@@ -211,14 +211,14 @@ class LccssSimilarityMetricTest {
 	}
 
 	@Test
-	void commonNonContigousSequenceAfterStart() throws Exception {
+	void commonNonContigousSequenceAfterStart() {
 		Statement fixture1 = new Statement("sut(1);");
 		Statement fixture2 = new Statement("sut(2);");
 		Statement fixture3 = new Statement("sut(3);");
 		Statement fixture4 = new Statement("sut(4);");
-		TestCase testCaseA = new TestCase("testA", Arrays.asList(fixture1, fixture2, fixture4), Arrays.asList());
-		TestCase testCaseB = new TestCase("testB", Arrays.asList(fixture1, fixture3, fixture4), Arrays.asList());
-		MaterializationReport materializationReport = materializer.materialize(Arrays.asList(testCaseA, testCaseB));
+		TestCase testCaseA = new TestCase("testA", List.of(fixture1, fixture2, fixture4), List.of());
+		TestCase testCaseB = new TestCase("testB", List.of(fixture1, fixture3, fixture4), List.of());
+		MaterializationReport materializationReport = materializer.materialize(List.of(testCaseA, testCaseB));
 		SimilarityReport report = measurer.measure(materializationReport).sort(new SimilarityAssessmentComparatorByScoreSourceNameAndTargetName());
 
 		Iterator<SimilarityAssessment> iterator = report.getAssessments().iterator();
@@ -243,16 +243,16 @@ class LccssSimilarityMetricTest {
 	}
 
 	@Test
-	void commonNonContigousSequenceSinceStart() throws Exception {
+	void commonNonContigousSequenceSinceStart() {
 		Statement fixture1 = new Statement("sut(1);");
 		Statement fixture2 = new Statement("sut(2);");
 		Statement fixture3 = new Statement("sut(3);");
 		Statement fixture4 = new Statement("sut(4);");
 		Statement fixture5 = new Statement("sut(5);");
 		Statement fixture6 = new Statement("sut(6);");
-		TestCase testCaseA = new TestCase("testA", Arrays.asList(fixture5, fixture1, fixture2, fixture4), Arrays.asList());
-		TestCase testCaseB = new TestCase("testB", Arrays.asList(fixture6, fixture1, fixture3, fixture4), Arrays.asList());
-		MaterializationReport materializationReport = materializer.materialize(Arrays.asList(testCaseA, testCaseB));
+		TestCase testCaseA = new TestCase("testA", List.of(fixture5, fixture1, fixture2, fixture4), List.of());
+		TestCase testCaseB = new TestCase("testB", List.of(fixture6, fixture1, fixture3, fixture4), List.of());
+		MaterializationReport materializationReport = materializer.materialize(List.of(testCaseA, testCaseB));
 		SimilarityReport report = measurer.measure(materializationReport).sort(new SimilarityAssessmentComparatorByScoreSourceNameAndTargetName());
 
 		Iterator<SimilarityAssessment> iterator = report.getAssessments().iterator();
@@ -277,12 +277,12 @@ class LccssSimilarityMetricTest {
 	}
 
 	@Test
-	void commonShortAsymmetricStartSequence() throws Exception {
+	void commonShortAsymmetricStartSequence() {
 		Statement fixture1 = new Statement("sut(1);");
 		Statement fixture2 = new Statement("sut(2);");
-		TestCase testCaseA = new TestCase("testA", Arrays.asList(fixture1), Arrays.asList());
-		TestCase testCaseB = new TestCase("testB", Arrays.asList(fixture1, fixture2), Arrays.asList());
-		MaterializationReport materializationReport = materializer.materialize(Arrays.asList(testCaseA, testCaseB));
+		TestCase testCaseA = new TestCase("testA", List.of(fixture1), List.of());
+		TestCase testCaseB = new TestCase("testB", List.of(fixture1, fixture2), List.of());
+		MaterializationReport materializationReport = materializer.materialize(List.of(testCaseA, testCaseB));
 		SimilarityReport report = measurer.measure(materializationReport).sort(new SimilarityAssessmentComparatorByScoreSourceNameAndTargetName());
 
 		Iterator<SimilarityAssessment> iterator = report.getAssessments().iterator();
@@ -307,13 +307,13 @@ class LccssSimilarityMetricTest {
 	}
 
 	@Test
-	void commonLongAsymmetricStartSequence() throws Exception {
+	void commonLongAsymmetricStartSequence() {
 		Statement fixture1 = new Statement("sut(1);");
 		Statement fixture2 = new Statement("sut(2);");
 		Statement fixture3 = new Statement("sut(3);");
-		TestCase testCaseA = new TestCase("testA", Arrays.asList(fixture1), Arrays.asList());
-		TestCase testCaseB = new TestCase("testB", Arrays.asList(fixture1, fixture2, fixture3), Arrays.asList());
-		MaterializationReport materializationReport = materializer.materialize(Arrays.asList(testCaseA, testCaseB));
+		TestCase testCaseA = new TestCase("testA", List.of(fixture1), List.of());
+		TestCase testCaseB = new TestCase("testB", List.of(fixture1, fixture2, fixture3), List.of());
+		MaterializationReport materializationReport = materializer.materialize(List.of(testCaseA, testCaseB));
 		SimilarityReport report = measurer.measure(materializationReport).sort(new SimilarityAssessmentComparatorByScoreSourceNameAndTargetName());
 
 		Iterator<SimilarityAssessment> iterator = report.getAssessments().iterator();
@@ -338,14 +338,14 @@ class LccssSimilarityMetricTest {
 	}
 
 	@Test
-	void commonAsymmetricStartSequenceWithoutRemainings() throws Exception {
+	void commonAsymmetricStartSequenceWithoutRemainings() {
 		Statement fixture1 = new Statement("sut(1);");
 		Statement fixture2 = new Statement("sut(2);");
 		Statement fixture3 = new Statement("sut(3);");
-		TestCase testCaseA = new TestCase("testA", Arrays.asList(fixture1), Arrays.asList());
-		TestCase testCaseB = new TestCase("testB", Arrays.asList(fixture1, fixture2), Arrays.asList());
-		TestCase testCaseC = new TestCase("testC", Arrays.asList(fixture1, fixture2, fixture3), Arrays.asList());
-		MaterializationReport materializationReport = materializer.materialize(Arrays.asList(testCaseA, testCaseB, testCaseC));
+		TestCase testCaseA = new TestCase("testA", List.of(fixture1), List.of());
+		TestCase testCaseB = new TestCase("testB", List.of(fixture1, fixture2), List.of());
+		TestCase testCaseC = new TestCase("testC", List.of(fixture1, fixture2, fixture3), List.of());
+		MaterializationReport materializationReport = materializer.materialize(List.of(testCaseA, testCaseB, testCaseC));
 		SimilarityReport report = measurer.measure(materializationReport).sort(new SimilarityAssessmentComparatorByScoreSourceNameAndTargetName());
 
 		Iterator<SimilarityAssessment> iterator = report.getAssessments().iterator();
@@ -390,15 +390,15 @@ class LccssSimilarityMetricTest {
 	}
 
 	@Test
-	void commonAsymmetricStartSequenceWithFixedRemainings() throws Exception {
+	void commonAsymmetricStartSequenceWithFixedRemainings() {
 		Statement fixture1 = new Statement("sut(1);");
 		Statement fixture2 = new Statement("sut(2);");
 		Statement fixture3 = new Statement("sut(3);");
 		Statement fixture4 = new Statement("sut(4);");
-		TestCase testCaseA = new TestCase("testA", Arrays.asList(fixture1, fixture4), Arrays.asList());
-		TestCase testCaseB = new TestCase("testB", Arrays.asList(fixture1, fixture2, fixture4), Arrays.asList());
-		TestCase testCaseC = new TestCase("testC", Arrays.asList(fixture1, fixture2, fixture3, fixture4), Arrays.asList());
-		MaterializationReport materializationReport = materializer.materialize(Arrays.asList(testCaseA, testCaseB, testCaseC));
+		TestCase testCaseA = new TestCase("testA", List.of(fixture1, fixture4), List.of());
+		TestCase testCaseB = new TestCase("testB", List.of(fixture1, fixture2, fixture4), List.of());
+		TestCase testCaseC = new TestCase("testC", List.of(fixture1, fixture2, fixture3, fixture4), List.of());
+		MaterializationReport materializationReport = materializer.materialize(List.of(testCaseA, testCaseB, testCaseC));
 		SimilarityReport report = measurer.measure(materializationReport).sort(new SimilarityAssessmentComparatorByScoreSourceNameAndTargetName());
 
 		Iterator<SimilarityAssessment> iterator = report.getAssessments().iterator();
@@ -443,17 +443,17 @@ class LccssSimilarityMetricTest {
 	}
 
 	@Test
-	void commonAsymmetricStartSequenceWithProportionalRemainings() throws Exception {
+	void commonAsymmetricStartSequenceWithProportionalRemainings() {
 		Statement fixture1 = new Statement("sut(1);");
 		Statement fixture2 = new Statement("sut(2);");
 		Statement fixture3 = new Statement("sut(3);");
 		Statement fixture4 = new Statement("sut(4);");
 		Statement fixture5 = new Statement("sut(5);");
 		Statement fixture6 = new Statement("sut(6);");
-		TestCase testCaseA = new TestCase("testA", Arrays.asList(fixture1, fixture4), Arrays.asList());
-		TestCase testCaseB = new TestCase("testB", Arrays.asList(fixture1, fixture2, fixture4, fixture5), Arrays.asList());
-		TestCase testCaseC = new TestCase("testC", Arrays.asList(fixture1, fixture2, fixture3, fixture4, fixture5, fixture6), Arrays.asList());
-		MaterializationReport materializationReport = materializer.materialize(Arrays.asList(testCaseA, testCaseB, testCaseC));
+		TestCase testCaseA = new TestCase("testA", List.of(fixture1, fixture4), List.of());
+		TestCase testCaseB = new TestCase("testB", List.of(fixture1, fixture2, fixture4, fixture5), List.of());
+		TestCase testCaseC = new TestCase("testC", List.of(fixture1, fixture2, fixture3, fixture4, fixture5, fixture6), List.of());
+		MaterializationReport materializationReport = materializer.materialize(List.of(testCaseA, testCaseB, testCaseC));
 		SimilarityReport report = measurer.measure(materializationReport).sort(new SimilarityAssessmentComparatorByScoreSourceNameAndTargetName());
 
 		Iterator<SimilarityAssessment> iterator = report.getAssessments().iterator();
@@ -498,17 +498,17 @@ class LccssSimilarityMetricTest {
 	}
 
 	@Test
-	void commonAsymmetricStartSequenceWithInverselyProportionalRemainings() throws Exception {
+	void commonAsymmetricStartSequenceWithInverselyProportionalRemainings() {
 		Statement fixture1 = new Statement("sut(1);");
 		Statement fixture2 = new Statement("sut(2);");
 		Statement fixture3 = new Statement("sut(3);");
 		Statement fixture4 = new Statement("sut(4);");
 		Statement fixture5 = new Statement("sut(5);");
 		Statement fixture6 = new Statement("sut(6);");
-		TestCase testCaseA = new TestCase("testA", Arrays.asList(fixture1, fixture4, fixture5, fixture6), Arrays.asList());
-		TestCase testCaseB = new TestCase("testB", Arrays.asList(fixture1, fixture2, fixture4, fixture5), Arrays.asList());
-		TestCase testCaseC = new TestCase("testC", Arrays.asList(fixture1, fixture2, fixture3, fixture4), Arrays.asList());
-		MaterializationReport materializationReport = materializer.materialize(Arrays.asList(testCaseA, testCaseB, testCaseC));
+		TestCase testCaseA = new TestCase("testA", List.of(fixture1, fixture4, fixture5, fixture6), List.of());
+		TestCase testCaseB = new TestCase("testB", List.of(fixture1, fixture2, fixture4, fixture5), List.of());
+		TestCase testCaseC = new TestCase("testC", List.of(fixture1, fixture2, fixture3, fixture4), List.of());
+		MaterializationReport materializationReport = materializer.materialize(List.of(testCaseA, testCaseB, testCaseC));
 		SimilarityReport report = measurer.measure(materializationReport).sort(new SimilarityAssessmentComparatorByScoreSourceNameAndTargetName());
 
 		Iterator<SimilarityAssessment> iterator = report.getAssessments().iterator();

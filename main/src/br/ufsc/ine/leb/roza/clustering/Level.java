@@ -8,8 +8,8 @@ import br.ufsc.ine.leb.roza.Cluster;
 
 public class Level {
 
-	private Set<Cluster> clusters;
-	private Integer step;
+	private final Set<Cluster> clusters;
+	private final Integer step;
 	private BigDecimal evaluation;
 
 	public Level(Set<Cluster> clusters) {

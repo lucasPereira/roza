@@ -9,7 +9,7 @@ import br.ufsc.ine.leb.roza.ui.shared.CodePanel;
 
 public class TestCaseCode implements UiComponent {
 
-	private TestCasesTab testCasesTab;
+	private final TestCasesTab testCasesTab;
 
 	public TestCaseCode(TestCasesTab testCasesTab) {
 		this.testCasesTab = testCasesTab;
@@ -19,19 +19,13 @@ public class TestCaseCode implements UiComponent {
 	public void init(Hub hub, Manager manager) {
 		CodePanel testCodePanel = new CodePanel();
 		testCasesTab.addBottomComponent(testCodePanel);
-		hub.loadTestClassesSubscribe(testClasses -> {
-			testCodePanel.clearTestCase();
-		});
-		hub.extractTestCasesSubscribe(testCases -> {
-			testCodePanel.clearTestCase();
-		});
-		hub.selectTestCaseSubscribe(testCase -> {
-			testCodePanel.setTestCase(testCase);
-		});
+		hub.loadTestClassesSubscribe(testClasses -> testCodePanel.clearTestCase());
+		hub.extractTestCasesSubscribe(testCases -> testCodePanel.clearTestCase());
+		hub.selectTestCaseSubscribe(testCodePanel::setTestCase);
 	}
 
 	@Override
-	public void addChilds(List<UiComponent> childs) {}
+	public void addChildren(List<UiComponent> children) {}
 
 	@Override
 	public void start() {}

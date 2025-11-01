@@ -2,7 +2,6 @@ package br.ufsc.ine.leb.roza.expt.a;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
@@ -45,7 +44,7 @@ public class Experiment {
 
 	public static void main(String[] args) {
 		groundTruth = new GroundTruth();
-		groundTruth.findInconsistences();
+		groundTruth.findInconsistencies();
 		new FolderUtils("expt/results/a/average-precision-recall-curve").createEmptyFolder();
 		new FolderUtils("expt/results/a/precision-recall-curve").createEmptyFolder();
 		new FolderUtils("expt/results/a/matrix").createEmptyFolder();
@@ -57,20 +56,20 @@ public class Experiment {
 	}
 
 	protected static void simian() {
-		for (Integer threshold = 2; threshold <= 15; threshold++) {
+		for (int threshold = 2; threshold <= 15; threshold++) {
 			simian(threshold);
 		}
 	}
 
 	protected static void jplag() {
-		for (Integer sensitivity = 1; sensitivity <= 50; sensitivity++) {
+		for (int sensitivity = 1; sensitivity <= 50; sensitivity++) {
 			jplag(sensitivity);
 		}
 	}
 
 	protected static void deckard() {
-		List<Integer> strides = Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, Integer.MAX_VALUE);
-		List<Double> similarities = Arrays.asList(0.9, 1.0);
+		List<Integer> strides = List.of(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, Integer.MAX_VALUE);
+		List<Double> similarities = List.of(0.9, 1.0);
 		for (Integer minTokens = 1; minTokens < 15; minTokens++) {
 			for (Integer stride : strides) {
 				for (Double similarity : similarities) {
@@ -121,7 +120,7 @@ public class Experiment {
 
 		TextFileLoader loader = new RecursiveTextFileLoader("expt/resources/a");
 		TestClassParser parser = new Junit5TestClassParser();
-		TestCaseExtractor extractor = new JunitTestCaseExtractor(Arrays.asList("assegurarTexto", "assegurarValor", "assegurarQuantidadeDeElementos", "assegurarConteudoDeArquivoBaixado", "assegurarNaoMarcado", "assegurarMarcado", "assegurarMarcacao"));
+		TestCaseExtractor extractor = new JunitTestCaseExtractor(List.of("assegurarTexto", "assegurarValor", "assegurarQuantidadeDeElementos", "assegurarConteudoDeArquivoBaixado", "assegurarNaoMarcado", "assegurarMarcado", "assegurarMarcacao"));
 		TestCaseMaterializer materializer = new Junit4WithoutAssertionsTestCaseMaterializer("main/exec/materializer");
 		List<TextFile> files = loader.load();
 		List<TestClass> testClasses = parser.parse(files);
@@ -146,7 +145,7 @@ public class Experiment {
 			BigDecimal totalPrecision = BigDecimal.ZERO;
 			for (TestCase source : testCases) {
 				List<TestCase> ranking = reportUtils.getTargets(report.selectSource(source).removeReflexives().sort(scoreComparator));
-				List<TestCase> relevantSet = groundTruth.getRelevanteElements(testCases, source);
+				List<TestCase> relevantSet = groundTruth.getRelevantElements(testCases, source);
 				PrecisionRecall<TestCase> precisionRecall = new PrecisionRecall<>(ranking, relevantSet);
 				BigDecimal precisionAtRecallLevel = precisionRecall.precisionAtRecallLevel(recallLevel);
 				totalPrecision = totalPrecision.add(precisionAtRecallLevel);
@@ -168,7 +167,7 @@ public class Experiment {
 		StandardRecallLevels standardRecallLevels = new StandardRecallLevels();
 		for (TestCase source : testCases) {
 			List<TestCase> ranking = reportUtils.getTargets(report.selectSource(source).removeReflexives().sort(scoreComparator));
-			List<TestCase> relevantSet = groundTruth.getRelevanteElements(testCases, source);
+			List<TestCase> relevantSet = groundTruth.getRelevantElements(testCases, source);
 			PrecisionRecall<TestCase> precisionRecall = new PrecisionRecall<>(ranking, relevantSet);
 			for (RecallLevel recallLevel : standardRecallLevels) {
 				BigDecimal precisionAtRecallLevel = precisionRecall.precisionAtRecallLevel(recallLevel);

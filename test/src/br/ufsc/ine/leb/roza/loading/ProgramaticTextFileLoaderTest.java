@@ -22,7 +22,7 @@ class ProgramaticTextFileLoaderTest {
 	}
 
 	@Test
-	void names() throws Exception {
+	void names() {
 		List<TextFile> files = loader.load();
 		assertEquals(6, files.size());
 		assertEquals("Example.bin", files.get(0).getName());
@@ -34,7 +34,7 @@ class ProgramaticTextFileLoaderTest {
 	}
 
 	@Test
-	void content() throws Exception {
+	void content() {
 		List<TextFile> files = loader.load();
 		assertEquals(6, files.size());
 		assertEquals("Example.bin\n", files.get(0).getContent());

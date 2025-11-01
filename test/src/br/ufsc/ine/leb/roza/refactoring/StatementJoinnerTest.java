@@ -2,7 +2,6 @@ package br.ufsc.ine.leb.roza.refactoring;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -20,62 +19,62 @@ public class StatementJoinnerTest {
 	}
 
 	@Test
-	void empty() throws Exception {
-		List<List<Statement>> blocks = Arrays.asList();
+	void empty() {
+		List<List<Statement>> blocks = List.of();
 		List<Statement> join = joiner.join(blocks);
 
 		assertEquals(0, join.size());
 	}
 
 	@Test
-	void oneEmptyBlock() throws Exception {
-		List<Statement> block = Arrays.asList();
-		List<List<Statement>> blocks = Arrays.asList(block);
+	void oneEmptyBlock() {
+		List<Statement> block = List.of();
+		List<List<Statement>> blocks = List.of(block);
 		List<Statement> join = joiner.join(blocks);
 
 		assertEquals(0, join.size());
 	}
 
 	@Test
-	void oneBlockWithOneStatement() throws Exception {
+	void oneBlockWithOneStatement() {
 		Statement statement = new Statement("System.out.println(0);");
-		List<Statement> block = Arrays.asList(statement);
-		List<List<Statement>> blocks = Arrays.asList(block);
+		List<Statement> block = List.of(statement);
+		List<List<Statement>> blocks = List.of(block);
 		List<Statement> join = joiner.join(blocks);
 
 		assertEquals(0, join.size());
 	}
 
 	@Test
-	void oneBlockWithTwoStatements() throws Exception {
+	void oneBlockWithTwoStatements() {
 		Statement statement1 = new Statement("System.out.println(0);");
 		Statement statement2 = new Statement("System.out.println(1);");
-		List<Statement> block = Arrays.asList(statement1, statement2);
-		List<List<Statement>> blocks = Arrays.asList(block);
+		List<Statement> block = List.of(statement1, statement2);
+		List<List<Statement>> blocks = List.of(block);
 		List<Statement> join = joiner.join(blocks);
 
 		assertEquals(0, join.size());
 	}
 
 	@Test
-	void twoBlocksWithDistinctStatements() throws Exception {
+	void twoBlocksWithDistinctStatements() {
 		Statement statement1 = new Statement("System.out.println(0);");
 		Statement statement2 = new Statement("System.out.println(1);");
-		List<Statement> block1 = Arrays.asList(statement1);
-		List<Statement> block2 = Arrays.asList(statement2);
-		List<List<Statement>> blocks = Arrays.asList(block1, block2);
+		List<Statement> block1 = List.of(statement1);
+		List<Statement> block2 = List.of(statement2);
+		List<List<Statement>> blocks = List.of(block1, block2);
 		List<Statement> join = joiner.join(blocks);
 
 		assertEquals(0, join.size());
 	}
 
 	@Test
-	void twoBlocksWithEqualStatement() throws Exception {
+	void twoBlocksWithEqualStatement() {
 		Statement statement1 = new Statement("System.out.println(0);");
 		Statement statement2 = new Statement("System.out.println(0);");
-		List<Statement> block1 = Arrays.asList(statement1);
-		List<Statement> block2 = Arrays.asList(statement2);
-		List<List<Statement>> blocks = Arrays.asList(block1, block2);
+		List<Statement> block1 = List.of(statement1);
+		List<Statement> block2 = List.of(statement2);
+		List<List<Statement>> blocks = List.of(block1, block2);
 		List<Statement> join = joiner.join(blocks);
 
 		assertEquals(1, join.size());
@@ -84,14 +83,14 @@ public class StatementJoinnerTest {
 	}
 
 	@Test
-	void twoBlocksWithOneEqualAndOneDistinctStatement() throws Exception {
+	void twoBlocksWithOneEqualAndOneDistinctStatement() {
 		Statement statement1 = new Statement("System.out.println(0);");
 		Statement statement2 = new Statement("System.out.println(1);");
 		Statement statement3 = new Statement("System.out.println(0);");
 		Statement statement4 = new Statement("System.out.println(2);");
-		List<Statement> block1 = Arrays.asList(statement1, statement2);
-		List<Statement> block2 = Arrays.asList(statement3, statement4);
-		List<List<Statement>> blocks = Arrays.asList(block1, block2);
+		List<Statement> block1 = List.of(statement1, statement2);
+		List<Statement> block2 = List.of(statement3, statement4);
+		List<List<Statement>> blocks = List.of(block1, block2);
 		List<Statement> join = joiner.join(blocks);
 
 		assertEquals(1, join.size());

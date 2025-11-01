@@ -4,13 +4,13 @@ import java.io.File;
 
 public class TestCaseMaterialization {
 
-	private File file;
-	private TestCase testCase;
-	private Integer lenght;
+	private final File file;
+	private final TestCase testCase;
+	private final Integer length;
 
-	public TestCaseMaterialization(File file, Integer lenght, TestCase testCase) {
+	public TestCaseMaterialization(File file, Integer length, TestCase testCase) {
 		this.file = file;
-		this.lenght = lenght;
+		this.length = length;
 		this.testCase = testCase;
 	}
 
@@ -35,7 +35,7 @@ public class TestCaseMaterialization {
 	}
 
 	public Integer getLength() {
-		return lenght;
+		return length;
 	}
 
 	@Override

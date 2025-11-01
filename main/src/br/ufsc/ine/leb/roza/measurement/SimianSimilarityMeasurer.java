@@ -28,8 +28,8 @@ import br.ufsc.ine.leb.roza.utils.ProcessUtils;
 
 public class SimianSimilarityMeasurer extends AbstractSimilarityMeasurer implements SimilarityMeasurer {
 
-	private SimianConfigurations configurations;
-	private String resultsFolder;
+	private final SimianConfigurations configurations;
+	private final String resultsFolder;
 
 	public SimianSimilarityMeasurer(SimianConfigurations configurations) {
 		this.configurations = configurations;
@@ -38,10 +38,10 @@ public class SimianSimilarityMeasurer extends AbstractSimilarityMeasurer impleme
 
 	@Override
 	public SimilarityReport measureMoreThanOne(MaterializationReport materializationReport, SimilarityReportBuilder builder) {
-		List<TestCaseMaterialization> materializations = materializationReport.getMaterializations();
+		List<TestCaseMaterialization> materialization = materializationReport.getMaterialization();
 		MatrixElementToKeyConverter<TestCaseMaterialization, String> converter = new SimianMatrixElementToKeyConverter();
 		MatrixValueFactory<TestCaseMaterialization, Intersector> factory = new SimianMatrixValueFactory();
-		Matrix<TestCaseMaterialization, String, Intersector> matrix = new Matrix<>(materializations, converter, factory);
+		Matrix<TestCaseMaterialization, String, Intersector> matrix = new Matrix<>(materialization, converter, factory);
 		File fileReport = new File(resultsFolder, "report.xml");
 		run(materializationReport, fileReport);
 		parse(matrix, fileReport);
@@ -59,29 +59,27 @@ public class SimianSimilarityMeasurer extends AbstractSimilarityMeasurer impleme
 		try {
 			Document document = Jsoup.parse(fileReport, "utf-8");
 			Elements sets = document.getElementsByTag("set");
-			for (Integer setIndex = 0; setIndex < sets.size(); setIndex++) {
-				Element set = sets.get(setIndex);
+			for (Element set : sets) {
 				Elements blocks = set.getElementsByTag("block");
-				for (Integer sourceBlockIndex = 0; sourceBlockIndex < blocks.size(); sourceBlockIndex++) {
+				for (int sourceBlockIndex = 0; sourceBlockIndex < blocks.size(); sourceBlockIndex++) {
 					Element sourceBlock = blocks.get(sourceBlockIndex);
 					String sourceKey = sourceBlock.attr("sourceFile");
 					Integer start = Integer.parseInt(sourceBlock.attr("startLineNumber"));
 					Integer end = Integer.parseInt(sourceBlock.attr("endLineNumber"));
-					for (Integer targetBlockIndex = 0; targetBlockIndex < blocks.size(); targetBlockIndex++) {
-						Element targetBlock = blocks.get(targetBlockIndex);
+					for (Element targetBlock : blocks) {
 						String targetKey = targetBlock.attr("sourceFile");
 						matrix.get(sourceKey, targetKey).addSegment(start, end);
 					}
 				}
 			}
-		} catch (IOException excecao) {
-			throw new RuntimeException(excecao);
+		} catch (IOException exception) {
+			throw new RuntimeException(exception);
 		}
 	}
 
 	private void run(MaterializationReport materializationReport, File fileReport) {
 		ProcessUtils processUtils = new ProcessUtils(true, true, true, false);
-		List<String> arguments = new LinkedList<String>();
+		List<String> arguments = new LinkedList<>();
 		arguments.add("java");
 		arguments.add("-jar");
 		arguments.add("main/tools/simian/simian-2.5.10.jar");

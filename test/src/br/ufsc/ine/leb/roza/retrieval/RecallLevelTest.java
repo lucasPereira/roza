@@ -12,7 +12,7 @@ import br.ufsc.ine.leb.roza.exceptions.RecallLevelOutOfBoundsException;
 class RecallLevelTest {
 
 	@Test
-	void tenPercentLevel() throws Exception {
+	void tenPercentLevel() {
 		RecallLevel tenPercentLevel = new RecallLevel(1);
 		assertEquals(0, tenPercentLevel.getAmountOfElementsInRelevantSet(0));
 		assertEquals(0, tenPercentLevel.getAmountOfElementsInRelevantSet(9));
@@ -24,7 +24,7 @@ class RecallLevelTest {
 	}
 
 	@Test
-	void fiftyPercentLevel() throws Exception {
+	void fiftyPercentLevel() {
 		RecallLevel fiftyPercentLevel = new RecallLevel(5);
 		assertEquals(0, fiftyPercentLevel.getAmountOfElementsInRelevantSet(0));
 		assertEquals(4, fiftyPercentLevel.getAmountOfElementsInRelevantSet(9));
@@ -36,7 +36,7 @@ class RecallLevelTest {
 	}
 
 	@Test
-	void oneeHundredPercentLevel() throws Exception {
+	void oneeHundredPercentLevel() {
 		RecallLevel oneHundredPercentPercentLevel = new RecallLevel(10);
 		assertEquals(0, oneHundredPercentPercentLevel.getAmountOfElementsInRelevantSet(0));
 		assertEquals(9, oneHundredPercentPercentLevel.getAmountOfElementsInRelevantSet(9));
@@ -48,36 +48,30 @@ class RecallLevelTest {
 	}
 
 	@Test
-	void zeroPercentLevel() throws Exception {
+	void zeroPercentLevel() {
 		RecallLevel oneHundredPercentPercentLevel = new RecallLevel(0);
 		assertEquals(0, oneHundredPercentPercentLevel.getAmountOfElementsInRelevantSet(0));
 		assertEquals(0, oneHundredPercentPercentLevel.getAmountOfElementsInRelevantSet(1));
 	}
 
 	@Test
-	void outOfBounds() throws Exception {
-		assertThrows(RecallLevelOutOfBoundsException.class, () -> {
-			new RecallLevel(-1);
-		});
-		assertThrows(RecallLevelOutOfBoundsException.class, () -> {
-			new RecallLevel(11);
-		});
+	void outOfBounds() {
+		assertThrows(RecallLevelOutOfBoundsException.class, () -> new RecallLevel(-1));
+		assertThrows(RecallLevelOutOfBoundsException.class, () -> new RecallLevel(11));
 	}
 
 	@Test
-	void negativeRelevantSetSize() throws Exception {
-		assertThrows(NegativeRelevantSetSizeException.class, () -> {
-			new RecallLevel(1).getAmountOfElementsInRelevantSet(-1);
-		});
+	void negativeRelevantSetSize() {
+		assertThrows(NegativeRelevantSetSizeException.class, () -> new RecallLevel(1).getAmountOfElementsInRelevantSet(-1));
 	}
 
 	@Test
-	void equals() throws Exception {
+	void equals() {
 		assertEquals(new RecallLevel(1), new RecallLevel(1));
 	}
 
 	@Test
-	void notEquals() throws Exception {
+	void notEquals() {
 		assertNotEquals(new RecallLevel(1), new RecallLevel(2));
 	}
 

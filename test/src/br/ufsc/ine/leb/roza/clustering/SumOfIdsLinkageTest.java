@@ -3,7 +3,7 @@ package br.ufsc.ine.leb.roza.clustering;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,9 +29,9 @@ class SumOfIdsLinkageTest {
 	void setup() {
 		linkage = new SumOfIdsLinkage();
 		mathUtils = new MathUtils();
-		alpha = new TestCase("alpha", Arrays.asList(), Arrays.asList());
-		beta = new TestCase("beta", Arrays.asList(), Arrays.asList());
-		gamma = new TestCase("gamma", Arrays.asList(), Arrays.asList());
+		alpha = new TestCase("alpha", List.of(), List.of());
+		beta = new TestCase("beta", List.of(), List.of());
+		gamma = new TestCase("gamma", List.of(), List.of());
 		alphaCluster = new Cluster(alpha);
 		betaCluster = new Cluster(beta);
 		gammaCluster = new Cluster(gamma);
@@ -40,37 +40,37 @@ class SumOfIdsLinkageTest {
 	}
 
 	@Test
-	void alphaAndBeta() throws Exception {
+	void alphaAndBeta() {
 		BigDecimal evaluation = linkage.evaluate(alphaCluster, betaCluster);
 		assertEquals(mathUtils.oneOver(alpha.getId(), beta.getId()), evaluation);
 	}
 
 	@Test
-	void betaAndAlpha() throws Exception {
+	void betaAndAlpha() {
 		BigDecimal evaluation = linkage.evaluate(betaCluster, alphaCluster);
 		assertEquals(mathUtils.oneOver(alpha.getId(), beta.getId()), evaluation);
 	}
 
 	@Test
-	void alphaBetaAndGamma() throws Exception {
+	void alphaBetaAndGamma() {
 		BigDecimal evaluation = linkage.evaluate(alphaBetaCluster, gammaCluster);
 		assertEquals(mathUtils.oneOver(alpha.getId(), beta.getId(), gamma.getId()), evaluation);
 	}
 
 	@Test
-	void gammaAndAlphaBeta() throws Exception {
+	void gammaAndAlphaBeta() {
 		BigDecimal evaluation = linkage.evaluate(gammaCluster, alphaBetaCluster);
 		assertEquals(mathUtils.oneOver(alpha.getId(), beta.getId(), gamma.getId()), evaluation);
 	}
 
 	@Test
-	void alphaAndBetaGamma() throws Exception {
+	void alphaAndBetaGamma() {
 		BigDecimal evaluation = linkage.evaluate(alphaCluster, betaGammaCluster);
 		assertEquals(mathUtils.oneOver(alpha.getId(), beta.getId(), gamma.getId()), evaluation);
 	}
 
 	@Test
-	void betaGammaAndAlpha() throws Exception {
+	void betaGammaAndAlpha() {
 		BigDecimal evaluation = linkage.evaluate(betaGammaCluster, alphaCluster);
 		assertEquals(mathUtils.oneOver(alpha.getId(), beta.getId(), gamma.getId()), evaluation);
 	}

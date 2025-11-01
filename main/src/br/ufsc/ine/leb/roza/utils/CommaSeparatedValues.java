@@ -1,13 +1,13 @@
 package br.ufsc.ine.leb.roza.utils;
 
-import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 
 public class CommaSeparatedValues {
 
-	private String columnSeparator;
-	private String lineBreak;
-	private StringBuilder text;
+	private final String columnSeparator;
+	private final String lineBreak;
+	private final StringBuilder text;
 
 	public CommaSeparatedValues() {
 		columnSeparator = ";";
@@ -16,7 +16,7 @@ public class CommaSeparatedValues {
 	}
 
 	public void addLine(String... columns) {
-		Iterator<String> iterator = Arrays.asList(columns).iterator();
+		Iterator<String> iterator = List.of(columns).iterator();
 		while (iterator.hasNext()) {
 			String column = iterator.next();
 			String delimiter = iterator.hasNext() ? columnSeparator : lineBreak;

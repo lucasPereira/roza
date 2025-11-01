@@ -20,13 +20,13 @@ class DeckardIntegerConfigurationTest {
 	}
 
 	@Test
-	void nameAndDescription() throws Exception {
+	void nameAndDescription() {
 		assertEquals("MIN_TOKENS", configuration.getName());
 		assertEquals("Minimum token count to suppress vectors for small sub-trees", configuration.getDescription());
 	}
 
 	@Test
-	void create() throws Exception {
+	void create() {
 		configuration.addArgument(arguments);
 		assertEquals(1, configuration.getValue().intValue());
 		assertEquals(1, arguments.size());
@@ -34,7 +34,7 @@ class DeckardIntegerConfigurationTest {
 	}
 
 	@Test
-	void change() throws Exception {
+	void change() {
 		configuration.setValue(Integer.MAX_VALUE);
 		configuration.addArgument(arguments);
 		assertEquals(Integer.MAX_VALUE, configuration.getValue().intValue());

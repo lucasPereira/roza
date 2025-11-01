@@ -20,13 +20,13 @@ class JplagNumberConfigurationTest {
 	}
 
 	@Test
-	void nameAndDescription() throws Exception {
+	void nameAndDescription() {
 		assertEquals("t", configuration.getName());
 		assertEquals("Tune the sensitivity of the comparison", configuration.getDescription());
 	}
 
 	@Test
-	void create() throws Exception {
+	void create() {
 		configuration.addArgument(arguments);
 		assertEquals(1, configuration.getValue().intValue());
 		assertEquals(2, arguments.size());
@@ -35,7 +35,7 @@ class JplagNumberConfigurationTest {
 	}
 
 	@Test
-	void change() throws Exception {
+	void change() {
 		configuration.setValue(2);
 		configuration.addArgument(arguments);
 		assertEquals(2, configuration.getValue().intValue());

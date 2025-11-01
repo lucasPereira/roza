@@ -14,9 +14,9 @@ public class SimilarityReportModel extends AbstractTableModel implements TableMo
 
 	private static final long serialVersionUID = 1L;
 
-	private SimilarityReport report;
+	private final SimilarityReport report;
 
-	private List<TestCase> tests;
+	private final List<TestCase> tests;
 
 	public SimilarityReportModel(SimilarityReport report) {
 		this.report = report;

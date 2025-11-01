@@ -1,14 +1,12 @@
 package br.ufsc.ine.leb.roza.measurement.configuration.simian;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import java.util.LinkedList;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 class SimianBooleanConfigurationTest {
 
@@ -24,7 +22,7 @@ class SimianBooleanConfigurationTest {
 	}
 
 	@Test
-	void nameAndDescription() throws Exception {
+	void nameAndDescription() {
 		assertEquals("ignoreCurlyBraces", configurationTrue.getName());
 		assertEquals("Curly braces are ignored", configurationTrue.getDescription());
 		assertEquals("ignoreCurlyBraces", configurationFalse.getName());
@@ -32,7 +30,7 @@ class SimianBooleanConfigurationTest {
 	}
 
 	@Test
-	void createTrue() throws Exception {
+	void createTrue() {
 		configurationTrue.addArgument(arguments);
 		assertTrue(configurationTrue.getValue());
 		assertEquals(1, arguments.size());
@@ -40,7 +38,7 @@ class SimianBooleanConfigurationTest {
 	}
 
 	@Test
-	void createFalse() throws Exception {
+	void createFalse() {
 		configurationFalse.addArgument(arguments);
 		assertFalse(configurationFalse.getValue());
 		assertEquals(1, arguments.size());
@@ -48,7 +46,7 @@ class SimianBooleanConfigurationTest {
 	}
 
 	@Test
-	void changeTrueToFalse() throws Exception {
+	void changeTrueToFalse() {
 		configurationTrue.unset();
 		configurationTrue.addArgument(arguments);
 		assertFalse(configurationTrue.getValue());
@@ -57,7 +55,7 @@ class SimianBooleanConfigurationTest {
 	}
 
 	@Test
-	void changeFalseToTrue() throws Exception {
+	void changeFalseToTrue() {
 		configurationFalse.set();
 		configurationFalse.addArgument(arguments);
 		assertTrue(configurationFalse.getValue());

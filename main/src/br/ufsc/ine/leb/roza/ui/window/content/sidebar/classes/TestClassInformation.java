@@ -17,7 +17,7 @@ import br.ufsc.ine.leb.roza.ui.model.TestClassTestsModel;
 
 public class TestClassInformation implements UiComponent {
 
-	private TestClassesTab testClassesTab;
+	private final TestClassesTab testClassesTab;
 
 	public TestClassInformation(TestClassesTab testClassesTab) {
 		this.testClassesTab = testClassesTab;
@@ -32,7 +32,7 @@ public class TestClassInformation implements UiComponent {
 	}
 
 	@Override
-	public void addChilds(List<UiComponent> childs) {}
+	public void addChildren(List<UiComponent> children) {}
 
 	@Override
 	public void start() {}

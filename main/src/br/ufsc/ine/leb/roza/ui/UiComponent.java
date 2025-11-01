@@ -6,7 +6,7 @@ public interface UiComponent {
 
 	void init(Hub hub, Manager manager);
 
-	void addChilds(List<UiComponent> childs);
+	void addChildren(List<UiComponent> children);
 
 	void start();
 

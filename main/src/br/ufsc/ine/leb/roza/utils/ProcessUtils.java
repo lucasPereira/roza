@@ -9,29 +9,16 @@ import java.util.List;
 
 public class ProcessUtils {
 
-	private Boolean failOnException;
-	private Boolean failOnExitError;
-	private Boolean quiet;
-	private Boolean inheritIo;
+	private final Boolean failOnException;
+	private final Boolean failOnExitError;
+	private final Boolean quiet;
+	private final Boolean inheritIo;
 
 	public ProcessUtils(Boolean failOnError, Boolean failOnExitError, Boolean quiet, Boolean inheritIo) {
 		this.failOnException = failOnError;
 		this.failOnExitError = failOnExitError;
 		this.quiet = quiet;
 		this.inheritIo = inheritIo;
-	}
-
-	public void execute(String... arguments) {
-		ProcessBuilder builder = new ProcessBuilder();
-		builder.command(arguments);
-		execute(builder);
-	}
-
-	public void execute(File redirect, String... arguments) {
-		ProcessBuilder builder = new ProcessBuilder();
-		builder.command(arguments);
-		builder.redirectOutput(redirect);
-		execute(builder);
 	}
 
 	public void execute(File directory, String command) {
@@ -55,7 +42,7 @@ public class ProcessUtils {
 	}
 
 	public void execute(ProcessBuilder builder) {
-		Integer exitValue = 0;
+		int exitValue = 0;
 		Exception exceptionToThrow = null;
 		try {
 			if (inheritIo) {
@@ -63,13 +50,13 @@ public class ProcessUtils {
 			}
 			Process process = builder.start();
 			if (!quiet) {
-				ler(process.getInputStream());
-				ler(process.getErrorStream());
+				read(process.getInputStream());
+				read(process.getErrorStream());
 			}
 			process.waitFor();
 			exitValue = process.exitValue();
 			if (!quiet) {
-				System.out.println(exitValue);
+				RozaLogger.getInstance().debug(String.format("Exit value: %d", exitValue));
 			}
 		} catch (Exception exception) {
 			exceptionToThrow = exception;
@@ -79,28 +66,20 @@ public class ProcessUtils {
 		}
 	}
 
-	private void ler(InputStream stream) {
-		new Thread(new Runnable() {
-
-			@Override
-			public void run() {
-				BufferedReader leitor = new BufferedReader(new InputStreamReader(stream));
-				String linha;
+	private void read(InputStream stream) {
+		new Thread(() -> {
+			try (BufferedReader leitor = new BufferedReader(new InputStreamReader(stream))) {
 				try {
-					while ((linha = leitor.readLine()) != null) {
-						System.out.println(linha);
+					String line;
+					while ((line = leitor.readLine()) != null) {
+						RozaLogger.getInstance().debug(line);
 					}
-				} catch (IOException excecao) {
-					excecao.printStackTrace();
-				} finally {
-					try {
-						leitor.close();
-					} catch (IOException excecao) {
-						excecao.printStackTrace();
-					}
+				} catch (IOException exception) {
+					RozaLogger.getInstance().error("Failed to read process output", exception);
 				}
+			} catch (IOException exception) {
+				RozaLogger.getInstance().error("Failed to read process output", exception);
 			}
-
 		}).start();
 	}
 

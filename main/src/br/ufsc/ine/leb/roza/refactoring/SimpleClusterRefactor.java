@@ -1,7 +1,6 @@
 package br.ufsc.ine.leb.roza.refactoring;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -23,7 +22,7 @@ import br.ufsc.ine.leb.roza.utils.comparator.TestCaseComparatorByName;
 
 public class SimpleClusterRefactor implements ClusterRefactor {
 
-	private TestClassNamingStrategy namingStrategy;
+	private final TestClassNamingStrategy namingStrategy;
 
 	public SimpleClusterRefactor(TestClassNamingStrategy namingStrategy) {
 		this.namingStrategy = namingStrategy;
@@ -31,32 +30,24 @@ public class SimpleClusterRefactor implements ClusterRefactor {
 
 	@Override
 	public List<TestClass> refactor(Set<Cluster> clusters) {
-		List<TestClass> classes = new ArrayList<TestClass>(clusters.size());
+		List<TestClass> classes = new ArrayList<>(clusters.size());
 		List<Cluster> clustersOrderedBySizeAndTestName = new ArrayList<>(clusters);
-		Collections.sort(clustersOrderedBySizeAndTestName, new ClusterComparatorBySizeAndTestName());
+		clustersOrderedBySizeAndTestName.sort(new ClusterComparatorBySizeAndTestName());
 		for (Cluster cluster : clustersOrderedBySizeAndTestName) {
 			List<TestMethod> testMethods = new ArrayList<>(cluster.getTestCases().size());
 			List<TestCase> testCases = new ArrayList<>(cluster.getTestCases());
-			Collections.sort(testCases, new TestCaseComparatorByName());
-			List<Statement> sharedFixtures = new StatementJoiner().join(testCases.stream().map(testCase -> testCase.getFixtures()).collect(Collectors.toList()));
+			testCases.sort(new TestCaseComparatorByName());
+			List<Statement> sharedFixtures = new StatementJoiner().join(testCases.stream().map(TestCase::getFixtures).collect(Collectors.toList()));
 			for (TestCase testCase : testCases) {
-				List<Statement> fixtures = testCase.getFixtures();
-				Integer firstFixtureIndex = sharedFixtures.size();
-				Integer lastFixtureIndex = fixtures.isEmpty() ? 0 : fixtures.size();
-				List<Statement> nonSharedFixtures = fixtures.subList(firstFixtureIndex, lastFixtureIndex);
-				List<Statement> asserts = testCase.getAsserts();
-				List<Statement> testMethodStatements = new ArrayList<Statement>(nonSharedFixtures.size() + asserts.size());
-				testMethodStatements.addAll(nonSharedFixtures);
-				testMethodStatements.addAll(asserts);
-				TestMethod testMethod = new TestMethod(testCase.getName(), testMethodStatements);
+				TestMethod testMethod = getTestMethod(testCase, sharedFixtures);
 				testMethods.add(testMethod);
 			}
 			List<Field> fields = new LinkedList<>();
 			List<SetupMethod> setupMethods = new LinkedList<>();
 			if (!sharedFixtures.isEmpty()) {
-				for (Integer index = 0; index < sharedFixtures.size(); index++) {
+				for (int index = 0; index < sharedFixtures.size(); index++) {
 					Statement statement = sharedFixtures.get(index);
-					Optional<VariableDeclarationExpr> declaration = JavaParser.parseStatement(statement.getText()).toExpressionStmt().get().getExpression().toVariableDeclarationExpr();
+					Optional<VariableDeclarationExpr> declaration = JavaParser.parseStatement(statement.getText()).toExpressionStmt().orElseThrow().getExpression().toVariableDeclarationExpr();
 					if (declaration.isPresent()) {
 						VariableDeclarationExpr declarationExpression = declaration.get();
 						sharedFixtures.set(index, new Statement(declarationExpression.getVariable(0).toString() + ";"));
@@ -66,11 +57,23 @@ public class SimpleClusterRefactor implements ClusterRefactor {
 				SetupMethod setup = new SetupMethod("setup", sharedFixtures);
 				setupMethods.add(setup);
 			}
-			String className = namingStrategy.nominate(fields, setupMethods, testMethods);
+			String className = namingStrategy.nominate();
 			TestClass testClass = new TestClass(className, fields, setupMethods, testMethods);
 			classes.add(testClass);
 		}
 		return classes;
+	}
+
+	private static TestMethod getTestMethod(TestCase testCase, List<Statement> sharedFixtures) {
+		List<Statement> fixtures = testCase.getFixtures();
+		int firstFixtureIndex = sharedFixtures.size();
+		int lastFixtureIndex = fixtures.isEmpty() ? 0 : fixtures.size();
+		List<Statement> nonSharedFixtures = fixtures.subList(firstFixtureIndex, lastFixtureIndex);
+		List<Statement> asserts = testCase.getAsserts();
+		List<Statement> testMethodStatements = new ArrayList<>(nonSharedFixtures.size() + asserts.size());
+		testMethodStatements.addAll(nonSharedFixtures);
+		testMethodStatements.addAll(asserts);
+		return new TestMethod(testCase.getName(), testMethodStatements);
 	}
 
 }

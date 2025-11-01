@@ -20,13 +20,13 @@ class SimianStringConfigurationTest {
 	}
 
 	@Test
-	void nameAndDescription() throws Exception {
+	void nameAndDescription() {
 		assertEquals("language", configuration.getName());
 		assertEquals("Assumes all files are in the specified language", configuration.getDescription());
 	}
 
 	@Test
-	void create() throws Exception {
+	void create() {
 		configuration.addArgument(arguments);
 		assertEquals("java", configuration.getValue());
 		assertEquals(1, arguments.size());
@@ -34,7 +34,7 @@ class SimianStringConfigurationTest {
 	}
 
 	@Test
-	void change() throws Exception {
+	void change() {
 		configuration.setValue("ruby");
 		configuration.addArgument(arguments);
 		assertEquals("ruby", configuration.getValue());

@@ -16,7 +16,7 @@ import br.ufsc.ine.leb.roza.ui.window.content.sidebar.tests.TestCasesTab;
 
 public class Sidebar implements UiComponent {
 
-	private Content content;
+	private final Content content;
 	private JTabbedPane panel;
 
 	public Sidebar(Content content) {
@@ -53,11 +53,11 @@ public class Sidebar implements UiComponent {
 	}
 
 	@Override
-	public void addChilds(List<UiComponent> childs) {
-		childs.add(new TestClassesTab(this));
-		childs.add(new TestCasesTab(this));
-		childs.add(new MeasurementsTab(this));
-		childs.add(new ClusteringTab(this));
+	public void addChildren(List<UiComponent> children) {
+		children.add(new TestClassesTab(this));
+		children.add(new TestCasesTab(this));
+		children.add(new MeasurementsTab(this));
+		children.add(new ClusteringTab(this));
 	}
 
 	@Override

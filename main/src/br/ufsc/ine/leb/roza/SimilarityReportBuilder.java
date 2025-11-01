@@ -13,9 +13,9 @@ import br.ufsc.ine.leb.roza.exceptions.PotentialErrorProneOperationException;
 
 public class SimilarityReportBuilder {
 
-	private Set<TestCase> tests;
-	private Map<TestCase, Map<TestCase, BigDecimal>> map;
-	private Boolean symmetric;
+	private final Set<TestCase> tests;
+	private final Map<TestCase, Map<TestCase, BigDecimal>> map;
+	private final Boolean symmetric;
 
 	public SimilarityReportBuilder(Boolean symmetric) {
 		this.symmetric = symmetric;
@@ -78,7 +78,7 @@ public class SimilarityReportBuilder {
 				}
 			}
 		}
-		Integer size = all.size() * all.size();
+		int size = all.size() * all.size();
 		if (size != assessments.size()) {
 			throw new MissingAssessmentException();
 		}

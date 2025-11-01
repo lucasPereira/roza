@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,9 +29,9 @@ class SimilarityReportTest {
 
 	@BeforeEach
 	void setup() {
-		testCaseA = new TestCase("testA", Arrays.asList(), Arrays.asList());
-		testCaseB = new TestCase("testB", Arrays.asList(), Arrays.asList());
-		testCaseC = new TestCase("testC", Arrays.asList(), Arrays.asList());
+		testCaseA = new TestCase("testA", List.of(), List.of());
+		testCaseB = new TestCase("testB", List.of(), List.of());
+		testCaseC = new TestCase("testC", List.of(), List.of());
 		assessmentAA = new SimilarityAssessment(testCaseA, testCaseA, BigDecimal.ONE);
 		assessmentAB = new SimilarityAssessment(testCaseA, testCaseB, new BigDecimal("0.2"));
 		assessmentAC = new SimilarityAssessment(testCaseA, testCaseC, new BigDecimal("0.9"));
@@ -44,8 +44,8 @@ class SimilarityReportTest {
 	}
 
 	@Test
-	void create() throws Exception {
-		SimilarityReport report = new SimilarityReport(Arrays.asList(assessmentAA, assessmentAB));
+	void create() {
+		SimilarityReport report = new SimilarityReport(List.of(assessmentAA, assessmentAB));
 		report.sort(new SimilarityAssessmentComparatorByScoreSourceNameAndTargetName());
 		assertEquals(2, report.getAssessments().size());
 		assertEquals(assessmentAA, report.getAssessments().get(0));
@@ -53,8 +53,8 @@ class SimilarityReportTest {
 	}
 
 	@Test
-	void removeReflexives() throws Exception {
-		SimilarityReport report = new SimilarityReport(Arrays.asList(assessmentAA, assessmentAB));
+	void removeReflexives() {
+		SimilarityReport report = new SimilarityReport(List.of(assessmentAA, assessmentAB));
 		SimilarityReport filtered = report.removeReflexives();
 		assertEquals(2, report.getAssessments().size());
 		assertEquals(1, filtered.getAssessments().size());
@@ -62,8 +62,8 @@ class SimilarityReportTest {
 	}
 
 	@Test
-	void removeNonReflexives() throws Exception {
-		SimilarityReport report = new SimilarityReport(Arrays.asList(assessmentAA, assessmentAB));
+	void removeNonReflexives() {
+		SimilarityReport report = new SimilarityReport(List.of(assessmentAA, assessmentAB));
 		SimilarityReport filtered = report.removeNonReflexives();
 		assertEquals(2, report.getAssessments().size());
 		assertEquals(1, filtered.getAssessments().size());
@@ -71,8 +71,8 @@ class SimilarityReportTest {
 	}
 
 	@Test
-	void selectSource() throws Exception {
-		SimilarityReport report = new SimilarityReport(Arrays.asList(assessmentBB, assessmentAA, assessmentAB, assessmentAC, assessmentBA, assessmentBC, assessmentCA, assessmentCB, assessmentCC));
+	void selectSource() {
+		SimilarityReport report = new SimilarityReport(List.of(assessmentBB, assessmentAA, assessmentAB, assessmentAC, assessmentBA, assessmentBC, assessmentCA, assessmentCB, assessmentCC));
 		SimilarityReport filtered = report.selectSource(testCaseA);
 		assertEquals(9, report.getAssessments().size());
 		assertEquals(3, filtered.getAssessments().size());
@@ -82,8 +82,8 @@ class SimilarityReportTest {
 	}
 
 	@Test
-	void unsorted() throws Exception {
-		SimilarityReport unsorted = new SimilarityReport(Arrays.asList(assessmentBB, assessmentAA, assessmentAB, assessmentAC, assessmentBA, assessmentBC, assessmentCA, assessmentCB, assessmentCC));
+	void unsorted() {
+		SimilarityReport unsorted = new SimilarityReport(List.of(assessmentBB, assessmentAA, assessmentAB, assessmentAC, assessmentBA, assessmentBC, assessmentCA, assessmentCB, assessmentCC));
 		assertEquals(9, unsorted.getAssessments().size());
 		assertEquals(assessmentBB, unsorted.getAssessments().get(0));
 		assertEquals(assessmentAA, unsorted.getAssessments().get(1));
@@ -97,8 +97,8 @@ class SimilarityReportTest {
 	}
 
 	@Test
-	void sorted() throws Exception {
-		SimilarityReport unsorted = new SimilarityReport(Arrays.asList(assessmentBB, assessmentAA, assessmentAB, assessmentAC, assessmentBA, assessmentBC, assessmentCA, assessmentCB, assessmentCC));
+	void sorted() {
+		SimilarityReport unsorted = new SimilarityReport(List.of(assessmentBB, assessmentAA, assessmentAB, assessmentAC, assessmentBA, assessmentBC, assessmentCA, assessmentCB, assessmentCC));
 		SimilarityReport sorted = unsorted.sort(new SimilarityAssessmentComparatorByScoreSourceNameAndTargetName());
 		assertEquals(9, sorted.getAssessments().size());
 		assertEquals(assessmentAA, sorted.getAssessments().get(0));
@@ -113,8 +113,8 @@ class SimilarityReportTest {
 	}
 
 	@Test
-	void existingPair() throws Exception {
-		SimilarityReport report = new SimilarityReport(Arrays.asList(assessmentBB, assessmentAA, assessmentAB, assessmentBA));
+	void existingPair() {
+		SimilarityReport report = new SimilarityReport(List.of(assessmentBB, assessmentAA, assessmentAB, assessmentBA));
 		assertEquals(assessmentAA, report.getPair(testCaseA, testCaseA));
 		assertEquals(assessmentAB, report.getPair(testCaseA, testCaseB));
 		assertEquals(assessmentBA, report.getPair(testCaseB, testCaseA));
@@ -122,20 +122,12 @@ class SimilarityReportTest {
 	}
 
 	@Test
-	void nonExistentPair() throws Exception {
-		SimilarityReport report = new SimilarityReport(Arrays.asList(assessmentBB, assessmentAA, assessmentAB, assessmentBA));
-		assertThrows(MissingPairException.class, () -> {
-			report.getPair(testCaseA, testCaseC);
-		});
-		assertThrows(MissingPairException.class, () -> {
-			report.getPair(testCaseC, testCaseA);
-		});
-		assertThrows(MissingPairException.class, () -> {
-			report.getPair(testCaseB, testCaseC);
-		});
-		assertThrows(MissingPairException.class, () -> {
-			report.getPair(testCaseC, testCaseB);
-		});
+	void nonExistentPair() {
+		SimilarityReport report = new SimilarityReport(List.of(assessmentBB, assessmentAA, assessmentAB, assessmentBA));
+		assertThrows(MissingPairException.class, () -> report.getPair(testCaseA, testCaseC));
+		assertThrows(MissingPairException.class, () -> report.getPair(testCaseC, testCaseA));
+		assertThrows(MissingPairException.class, () -> report.getPair(testCaseB, testCaseC));
+		assertThrows(MissingPairException.class, () -> report.getPair(testCaseC, testCaseB));
 	}
 
 }

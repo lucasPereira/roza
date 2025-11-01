@@ -3,7 +3,7 @@ package br.ufsc.ine.leb.roza.measurement.matrix.jplag;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.File;
-import java.util.Arrays;
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
@@ -14,8 +14,8 @@ import br.ufsc.ine.leb.roza.measurement.matrix.MatrixElementToKeyConverter;
 class JplagElementToKeyConverterTest {
 
 	@Test
-	void testCaseMaterializationToString() throws Exception {
-		TestCase testCase = new TestCase("test", Arrays.asList(), Arrays.asList());
+	void testCaseMaterializationToString() {
+		TestCase testCase = new TestCase("test", List.of(), List.of());
 		TestCaseMaterialization materialization = new TestCaseMaterialization(new File("Materialization.java"), 10, testCase);
 		MatrixElementToKeyConverter<TestCaseMaterialization, String> converter = new JplagMatrixElementToKeyConverter();
 		assertEquals(materialization.getFileName(), converter.convert(materialization));

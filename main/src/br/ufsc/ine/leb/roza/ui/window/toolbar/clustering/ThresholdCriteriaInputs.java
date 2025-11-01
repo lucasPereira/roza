@@ -19,7 +19,7 @@ public class ThresholdCriteriaInputs implements UiComponent {
 	private Hub hub;
 	private Manager manager;
 
-	private ClusteringTab toolbar;
+	private final ClusteringTab toolbar;
 
 	private JSpinner levelInput;
 	private JSpinner testsPerClassInput;
@@ -48,28 +48,26 @@ public class ThresholdCriteriaInputs implements UiComponent {
 	}
 
 	private BigDecimal getBigDecimalValue(JSpinner spiner) {
-		Double valor = (Double) spiner.getValue();
-		BigDecimal convertido = new BigDecimal(valor);
-		return convertido;
+		Double value = (Double) spiner.getValue();
+		return new BigDecimal(value);
 	}
 
 	private Integer getIntegerValue(JSpinner spiner) {
-		Integer valor = (Integer) spiner.getValue();
-		return valor;
+		return (Integer) spiner.getValue();
 	}
 
 	private void createValueChangedEvents() {
 		levelInput.addChangeListener((evento) -> {
-			Integer valor = getIntegerValue(levelInput);
-			manager.setThresholdCriteria(new LevelBasedCriteria(valor));
+			Integer value = getIntegerValue(levelInput);
+			manager.setThresholdCriteria(new LevelBasedCriteria(value));
 		});
 		testsPerClassInput.addChangeListener((evento) -> {
-			Integer valor = getIntegerValue(testsPerClassInput);
-			manager.setThresholdCriteria(new TestsPerClassCriteria(valor));
+			Integer value = getIntegerValue(testsPerClassInput);
+			manager.setThresholdCriteria(new TestsPerClassCriteria(value));
 		});
 		similarityInput.addChangeListener((evento) -> {
-			BigDecimal convertido = getBigDecimalValue(similarityInput);
-			manager.setThresholdCriteria(new SimilarityBasedCriteria(convertido));
+			BigDecimal converted = getBigDecimalValue(similarityInput);
+			manager.setThresholdCriteria(new SimilarityBasedCriteria(converted));
 		});
 	}
 
@@ -101,7 +99,7 @@ public class ThresholdCriteriaInputs implements UiComponent {
 	}
 
 	@Override
-	public void addChilds(List<UiComponent> childs) {}
+	public void addChildren(List<UiComponent> children) {}
 
 	@Override
 	public void start() {}

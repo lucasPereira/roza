@@ -1,6 +1,6 @@
 package br.ufsc.ine.leb.roza.utils;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.Assert.assertThrows;
 
 import java.util.NoSuchElementException;
@@ -18,14 +18,14 @@ public class RingTest {
 	}
 
 	@Test
-	void oneElement() throws Exception {
+	void oneElement() {
 		ring.add("one");
 		assertEquals("one", ring.next());
 		assertEquals("one", ring.next());
 	}
 
 	@Test
-	void twoElements() throws Exception {
+	void twoElements() {
 		ring.add("one");
 		ring.add("two");
 		assertEquals("one", ring.next());
@@ -35,7 +35,7 @@ public class RingTest {
 	}
 
 	@Test
-	void twoElementsSecondAddedAfterFirstIteration() throws Exception {
+	void twoElementsSecondAddedAfterFirstIteration() {
 		ring.add("one");
 		ring.next();
 		ring.add("two");
@@ -45,12 +45,12 @@ public class RingTest {
 	}
 
 	@Test
-	void empty() throws Exception {
+	void empty() {
 		assertThrows(NoSuchElementException.class, () -> ring.next());
 	}
 
 	@Test
-	void resetWithoutIterate() throws Exception {
+	void resetWithoutIterate() {
 		ring.add("one");
 		ring.add("two");
 		ring.reset();
@@ -59,7 +59,7 @@ public class RingTest {
 	}
 
 	@Test
-	void resetAfterIterating() throws Exception {
+	void resetAfterIterating() {
 		ring.add("one");
 		ring.add("two");
 		ring.next();

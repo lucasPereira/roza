@@ -12,7 +12,7 @@ import br.ufsc.ine.leb.roza.ui.window.toolbar.Toolbar;
 
 public class ParsingTab implements UiComponent {
 
-	private Toolbar toolbar;
+	private final Toolbar toolbar;
 	private JPanel panel;
 
 	public ParsingTab(Toolbar toolbar) {
@@ -26,9 +26,9 @@ public class ParsingTab implements UiComponent {
 	}
 
 	@Override
-	public void addChilds(List<UiComponent> childs) {
-		childs.add(new ParserComboBox(this));
-		childs.add(new LoadTestClassesButton(this));
+	public void addChildren(List<UiComponent> children) {
+		children.add(new ParserComboBox(this));
+		children.add(new LoadTestClassesButton(this));
 	}
 
 	@Override

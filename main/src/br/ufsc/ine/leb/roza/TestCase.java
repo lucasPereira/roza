@@ -6,10 +6,10 @@ public class TestCase {
 
 	private static Integer count = 0;
 
-	private Integer id;
-	private String name;
-	private List<Statement> fixtures;
-	private List<Statement> asserts;
+	private final Integer id;
+	private final String name;
+	private final List<Statement> fixtures;
+	private final List<Statement> asserts;
 
 	public TestCase(String name, List<Statement> fixtures, List<Statement> asserts) {
 		this.id = ++count;

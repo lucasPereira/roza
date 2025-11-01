@@ -1,7 +1,6 @@
 package br.ufsc.ine.leb.roza.loading;
 
 import java.io.File;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
@@ -12,8 +11,8 @@ import br.ufsc.ine.leb.roza.utils.FolderUtils;
 
 public class RecursiveTextFileLoader implements TextFileLoader {
 
-	private FileUtils fileUtils;
-	private FolderUtils folderUtils;
+	private final FileUtils fileUtils;
+	private final FolderUtils folderUtils;
 
 	public RecursiveTextFileLoader(String baseFolder) {
 		fileUtils = new FileUtils();
@@ -30,11 +29,11 @@ public class RecursiveTextFileLoader implements TextFileLoader {
 			TextFile textFile = new TextFile(name, content);
 			textFiles.add(textFile);
 		}
-		Collections.sort(textFiles, new TextFileComparator());
+		textFiles.sort(new TextFileComparator());
 		return textFiles;
 	}
 
-	private class TextFileComparator implements Comparator<TextFile> {
+	private static class TextFileComparator implements Comparator<TextFile> {
 
 		@Override
 		public int compare(TextFile file1, TextFile file2) {

@@ -6,8 +6,8 @@ import java.util.List;
 
 public class PrecisionRecall<T> {
 
-	private List<T> ranking;
-	private List<T> relevantSet;
+	private final List<T> ranking;
+	private final List<T> relevantSet;
 
 	public PrecisionRecall(List<T> ranking, List<T> relevantSet) {
 		this.ranking = ranking;
@@ -19,8 +19,8 @@ public class PrecisionRecall<T> {
 		if (amountOfElementsNecessaryForRecallLevel == 0) {
 			return BigDecimal.ONE;
 		}
-		Integer amountOfElementsFound = 0;
-		Integer index = 0;
+		int amountOfElementsFound = 0;
+		int index = 0;
 		while (index < ranking.size() && amountOfElementsFound < amountOfElementsNecessaryForRecallLevel) {
 			T nextElement = ranking.get(index);
 			if (relevantSet.contains(nextElement)) {
@@ -28,7 +28,7 @@ public class PrecisionRecall<T> {
 			}
 			index++;
 		}
-		Boolean foundAllElementsNecessary = amountOfElementsFound == amountOfElementsNecessaryForRecallLevel;
+		boolean foundAllElementsNecessary = amountOfElementsFound == amountOfElementsNecessaryForRecallLevel;
 		return foundAllElementsNecessary ? new BigDecimal(amountOfElementsFound).divide(new BigDecimal(index), MathContext.DECIMAL32) : BigDecimal.ZERO;
 	}
 

@@ -1,11 +1,11 @@
 package br.ufsc.ine.leb.roza.clustering;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -49,10 +49,10 @@ class ClusterJoinerWithCompleteLinkageTest {
 		dotSeven = new BigDecimal("0.7");
 		dotEight = new BigDecimal("0.8");
 		dotNine = new BigDecimal("0.9");
-		alpha = new TestCase("alpha", Arrays.asList(), Arrays.asList());
-		beta = new TestCase("beta", Arrays.asList(), Arrays.asList());
-		gamma = new TestCase("gamma", Arrays.asList(), Arrays.asList());
-		delta = new TestCase("delta", Arrays.asList(), Arrays.asList());
+		alpha = new TestCase("alpha", List.of(), List.of());
+		beta = new TestCase("beta", List.of(), List.of());
+		gamma = new TestCase("gamma", List.of(), List.of());
+		delta = new TestCase("delta", List.of(), List.of());
 		alphaCluster = new Cluster(alpha);
 		betaCluster = new Cluster(beta);
 		gammaCluster = new Cluster(gamma);
@@ -130,9 +130,7 @@ class ClusterJoinerWithCompleteLinkageTest {
 		builder.add(gamma, alpha, dotNine).add(gamma, beta, dotFive);
 		SimilarityReport report = builder.build();
 		ClustersToMerge clusters = new ClustersToMerge(collectionUtils.set(alphaCluster, betaCluster, gammaCluster));
-		TiebreakException exception = assertThrows(TiebreakException.class, () -> {
-			new ClusterJoiner(new CompleteLinkage(report), referee).join(clusters);
-		});
+		TiebreakException exception = assertThrows(TiebreakException.class, () -> new ClusterJoiner(new CompleteLinkage(report), referee).join(clusters));
 		assertEquals(3, exception.getTies().size());
 		assertTrue(exception.getTies().contains(new Combination(alphaCluster, betaCluster)));
 		assertTrue(exception.getTies().contains(new Combination(alphaCluster, gammaCluster)));

@@ -9,8 +9,8 @@ import br.ufsc.ine.leb.roza.exceptions.MissingPairException;
 
 public class Matrix<T, K, V> {
 
-	private Map<K, T> keys;
-	private Map<T, Map<T, V>> matrix;
+	private final Map<K, T> keys;
+	private final Map<T, Map<T, V>> matrix;
 
 	public Matrix(List<T> elements, MatrixElementToKeyConverter<T, K> converter, MatrixValueFactory<T, V> factory) {
 		matrix = new HashMap<>();

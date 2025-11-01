@@ -16,7 +16,7 @@ import br.ufsc.ine.leb.roza.utils.FormatterUtils;
 
 public class ClusteringLevelsTable implements UiComponent {
 
-	private ClusteringTab clusteringTab;
+	private final ClusteringTab clusteringTab;
 
 	private List<Level> levels;
 
@@ -31,7 +31,7 @@ public class ClusteringLevelsTable implements UiComponent {
 		table = new JTable();
 		hub.distributeTestsSubscribe(levels -> {
 			this.levels = levels;
-			showTable(hub);
+			showTable();
 			selectLevel(table, levels.get(0));
 			manager.selectCluster(levels.get(0).getClusters());
 		});
@@ -41,7 +41,7 @@ public class ClusteringLevelsTable implements UiComponent {
 
 			@Override
 			public void mouseClicked(MouseEvent event) {
-				Integer index = table.rowAtPoint(event.getPoint());
+				int index = table.rowAtPoint(event.getPoint());
 				Level level = levels.get(index);
 				hub.selectLevelPublish(level);
 				manager.selectCluster(level.getClusters());
@@ -54,9 +54,9 @@ public class ClusteringLevelsTable implements UiComponent {
 		table.setRowSelectionInterval(level.getStep(), level.getStep());
 	}
 
-	private void showTable(Hub hub) {
+	private void showTable() {
 		table.setModel(new DefaultTableModel(levels.size(), 2));
-		Integer number = 0;
+		int number = 0;
 		for (Level level : levels) {
 			String name = number + "";
 			BigDecimal evaluation = level.getEvaluationToThisLevel();
@@ -68,7 +68,7 @@ public class ClusteringLevelsTable implements UiComponent {
 	}
 
 	@Override
-	public void addChilds(List<UiComponent> childs) {}
+	public void addChildren(List<UiComponent> children) {}
 
 	@Override
 	public void start() {}

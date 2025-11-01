@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,65 +19,62 @@ class TestsPerClassCriteriaTest {
 	private Cluster alphaCluster;
 	private Cluster betaCluster;
 	private Cluster gammaCluster;
-	private Cluster deltaCluster;
 	private Cluster alphaBetaCluster;
 	private Cluster gammaDeltaCluster;
 
 	@BeforeEach
 	void setup() {
-		TestCase alpha = new TestCase("alpha", Arrays.asList(), Arrays.asList());
-		TestCase beta = new TestCase("beta", Arrays.asList(), Arrays.asList());
-		TestCase gamma = new TestCase("gamma", Arrays.asList(), Arrays.asList());
-		TestCase delta = new TestCase("delta", Arrays.asList(), Arrays.asList());
+		TestCase alpha = new TestCase("alpha", List.of(), List.of());
+		TestCase beta = new TestCase("beta", List.of(), List.of());
+		TestCase gamma = new TestCase("gamma", List.of(), List.of());
+		TestCase delta = new TestCase("delta", List.of(), List.of());
 		alphaCluster = new Cluster(alpha);
 		betaCluster = new Cluster(beta);
 		gammaCluster = new Cluster(gamma);
-		deltaCluster = new Cluster(delta);
+		Cluster deltaCluster = new Cluster(delta);
 		alphaBetaCluster = alphaCluster.merge(betaCluster);
 		gammaDeltaCluster = gammaCluster.merge(deltaCluster);
 	}
 
 	@Test
-	void nextLevelIsOneAndMaximumIsOne() throws Exception {
+	void nextLevelIsOneAndMaximumIsOne() {
 		ThresholdCriteria criteria = new TestsPerClassCriteria(1);
-		assertTrue(criteria.shoudlStop(1, new Combination(alphaCluster, betaCluster), BigDecimal.ONE));
+		assertTrue(criteria.shouldStop(1, new Combination(alphaCluster, betaCluster), BigDecimal.ONE));
 	}
 
 	@Test
-	void nextLevelIsOneAndMaximuIsTwo() throws Exception {
+	void nextLevelIsOneAndMaximuIsTwo() {
 		ThresholdCriteria criteria = new TestsPerClassCriteria(2);
-		assertFalse(criteria.shoudlStop(1, new Combination(alphaCluster, betaCluster), BigDecimal.ONE));
+		assertFalse(criteria.shouldStop(1, new Combination(alphaCluster, betaCluster), BigDecimal.ONE));
 	}
 
 	@Test
-	void nextLevelIsTwoAndMaximumIsTwo() throws Exception {
+	void nextLevelIsTwoAndMaximumIsTwo() {
 		ThresholdCriteria criteria = new TestsPerClassCriteria(2);
-		assertTrue(criteria.shoudlStop(2, new Combination(alphaBetaCluster, gammaCluster), BigDecimal.ONE));
+		assertTrue(criteria.shouldStop(2, new Combination(alphaBetaCluster, gammaCluster), BigDecimal.ONE));
 	}
 
 	@Test
-	void nextLevelIsTwoAndMaximumIsThree() throws Exception {
+	void nextLevelIsTwoAndMaximumIsThree() {
 		ThresholdCriteria criteria = new TestsPerClassCriteria(3);
-		assertFalse(criteria.shoudlStop(2, new Combination(alphaBetaCluster, gammaCluster), BigDecimal.ONE));
+		assertFalse(criteria.shouldStop(2, new Combination(alphaBetaCluster, gammaCluster), BigDecimal.ONE));
 	}
 
 	@Test
-	void nextLevelIsThreeAndMaximumIsThree() throws Exception {
+	void nextLevelIsThreeAndMaximumIsThree() {
 		ThresholdCriteria criteria = new TestsPerClassCriteria(3);
-		assertTrue(criteria.shoudlStop(3, new Combination(alphaBetaCluster, gammaDeltaCluster), BigDecimal.ONE));
+		assertTrue(criteria.shouldStop(3, new Combination(alphaBetaCluster, gammaDeltaCluster), BigDecimal.ONE));
 	}
 
 	@Test
-	void nextLevelIsThreeAndMaximumIsFour() throws Exception {
+	void nextLevelIsThreeAndMaximumIsFour() {
 		ThresholdCriteria criteria = new TestsPerClassCriteria(4);
-		assertFalse(criteria.shoudlStop(3, new Combination(alphaBetaCluster, gammaDeltaCluster), BigDecimal.ONE));
+		assertFalse(criteria.shouldStop(3, new Combination(alphaBetaCluster, gammaDeltaCluster), BigDecimal.ONE));
 	}
 
 	@Test
-	void lessThanOneCriteria() throws Exception {
-		assertThrows(InvalidThresholdException.class, () -> {
-			new TestsPerClassCriteria(0);
-		});
+	void lessThanOneCriteria() {
+		assertThrows(InvalidThresholdException.class, () -> new TestsPerClassCriteria(0));
 	}
 
 }

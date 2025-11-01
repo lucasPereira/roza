@@ -8,8 +8,8 @@ import br.ufsc.ine.leb.roza.Cluster;
 
 class ClusterJoiner {
 
-	private Referee referee;
-	private Linkage linkage;
+	private final Referee referee;
+	private final Linkage linkage;
 
 	public ClusterJoiner(Linkage linkage, Referee referee) {
 		this.linkage = linkage;

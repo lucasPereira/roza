@@ -5,10 +5,11 @@ import java.util.List;
 import java.util.Queue;
 
 import br.ufsc.ine.leb.roza.ui.window.Window;
+import br.ufsc.ine.leb.roza.utils.RozaLogger;
 
 public class RozaUi {
 
-	public static void main(String[] args) throws Exception {
+	public static void main(String[] args) {
 		Hub hub = new Hub();
 		Manager manager = new Manager();
 		Window window = new Window();
@@ -17,15 +18,15 @@ public class RozaUi {
 		init.add(window);
 		start.add(window);
 		while (!init.isEmpty()) {
-			List<UiComponent> childs = new LinkedList<>();
 			UiComponent component = init.remove();
 			runComponentPhase("init", () -> component.init(hub, manager));
-			runComponentPhase("addChilds", () -> component.addChilds(childs));
-			init.addAll(childs);
-			start.addAll(childs);
+			List<UiComponent> children = new LinkedList<>();
+			runComponentPhase("addChildren", () -> component.addChildren(children));
+			init.addAll(children);
+			start.addAll(children);
 		}
 		for (UiComponent component : start) {
-			runComponentPhase("start", () -> component.start());
+			runComponentPhase("start", component::start);
 		}
 	}
 
@@ -33,7 +34,7 @@ public class RozaUi {
 		try {
 			phase.run();
 		} catch (Exception exception) {
-			new RuntimeException(String.format("Failed to %s in component", name), exception).printStackTrace();
+			RozaLogger.getInstance().error(String.format("Failed to %s in component", name), exception);
 		}
 	}
 }

@@ -12,7 +12,7 @@ public class TesteAtribuicaoDeAvaliadores {
 	private Selenium selenium;
 
 	@BeforeEach
-	void configurar() throws Exception {
+	void configurar() {
 		correioEletronico = new CorreioEletronico();
 		bancoDeDados = new BancoDeDados();
 		servidor = new Servidor();
@@ -35,7 +35,7 @@ public class TesteAtribuicaoDeAvaliadores {
 	}
 
 	@Test
-	void distribuirAvaliadoresPagina() throws Exception {
+	void distribuirAvaliadoresPagina() {
 		String mensagem = "Para atribuir os avaliadores utilize o botão abaixo.";
 		String aviso = "Atribuições já existentes serão removidas.";
 		selenium.clicar("#capes-abas > ul > li:nth-child(5) > a");
@@ -46,7 +46,7 @@ public class TesteAtribuicaoDeAvaliadores {
 	}
 
 	@Test
-	void distribuirAvaliadoresComSucesso() throws Exception {
+	void distribuirAvaliadoresComSucesso() {
 		String arquivoAvaliadores = "src/test/resources/csv/avaliadores-e-coordenador-tres-exemplos.csv";
 		selenium.clicar("#capes-abas > ul > li:nth-child(3) > a");
 		selenium.selecionarArquivo(arquivoAvaliadores, "#capes-importacao-avaliadores-e-coordenador-selecao-arquivo");
@@ -77,7 +77,7 @@ public class TesteAtribuicaoDeAvaliadores {
 	}
 
 	@Test
-	void distribuirAvaliadoresSemPreencherPrazoDeAvaliacao() throws Exception {
+	void distribuirAvaliadoresSemPreencherPrazoDeAvaliacao() {
 		selenium.clicar("#capes-abas > ul > li:nth-child(5) > a");
 		selenium.fixarValor(new Utilitarios().daquiUmMes(), "input[type='text'][name='prazo-maximo']");
 		selenium.clicar("#capes-atribuicao-avaliadores-form > fieldset > div.section.formButtons.form_buttons > button");
@@ -85,7 +85,7 @@ public class TesteAtribuicaoDeAvaliadores {
 	}
 
 	@Test
-	void distribuirAvaliadoresSemCoordenadorDeArea() throws Exception {
+	void distribuirAvaliadoresSemCoordenadorDeArea() {
 		String arquivoAvaliadores = "src/test/resources/csv/avaliadores-2-coordenadores-0.csv";
 		selenium.clicar("#capes-abas > ul > li:nth-child(3) > a");
 		selenium.selecionarArquivo(arquivoAvaliadores, "#capes-importacao-avaliadores-e-coordenador-selecao-arquivo");
@@ -101,7 +101,7 @@ public class TesteAtribuicaoDeAvaliadores {
 	}
 
 	@Test
-	void distribuirAvaliadoresComMaisDeUmCoordenadorDeArea() throws Exception {
+	void distribuirAvaliadoresComMaisDeUmCoordenadorDeArea() {
 		String arquivoAvaliadores = "src/test/resources/csv/avaliadores-1-coordenadores-2.csv";
 		selenium.clicar("#capes-abas > ul > li:nth-child(3) > a");
 		selenium.selecionarArquivo(arquivoAvaliadores, "#capes-importacao-avaliadores-e-coordenador-selecao-arquivo");
@@ -117,7 +117,7 @@ public class TesteAtribuicaoDeAvaliadores {
 	}
 
 	@Test
-	void distribuirAvaliadoresSemAvaliadores() throws Exception {
+	void distribuirAvaliadoresSemAvaliadores() {
 		String arquivoAvaliadores = "src/test/resources/csv/avaliadores-0-coordenadores-1.csv";
 		selenium.clicar("#capes-abas > ul > li:nth-child(3) > a");
 		selenium.selecionarArquivo(arquivoAvaliadores, "#capes-importacao-avaliadores-e-coordenador-selecao-arquivo");
@@ -133,7 +133,7 @@ public class TesteAtribuicaoDeAvaliadores {
 	}
 
 	@Test
-	void distribuirAvaliadoresSemFichaDeAvaliacao() throws Exception {
+	void distribuirAvaliadoresSemFichaDeAvaliacao() {
 		String arquivoAvaliadores = "src/test/resources/csv/avaliadores-e-coordenador-tres-exemplos.csv";
 		selenium.clicar("#capes-abas > ul > li:nth-child(3) > a");
 		selenium.selecionarArquivo(arquivoAvaliadores, "#capes-importacao-avaliadores-e-coordenador-selecao-arquivo");
@@ -149,7 +149,7 @@ public class TesteAtribuicaoDeAvaliadores {
 	}
 
 	@Test
-	void distribuirAvaliadoresVerPrimeiraProducao() throws Exception {
+	void distribuirAvaliadoresVerPrimeiraProducao() {
 		String arquivoProducoes = "src/test/resources/csv/livros-computacao-dois-exemplos.csv";
 		selenium.clicar("#capes-abas > ul > li:nth-child(2) > a");
 		selenium.selecionarArquivo(arquivoProducoes, "#capes-importacao-livros-selecao-arquivo");
@@ -192,7 +192,7 @@ public class TesteAtribuicaoDeAvaliadores {
 	}
 
 	@Test
-	void distribuirAvaliadoresVerSegundaProducao() throws Exception {
+	void distribuirAvaliadoresVerSegundaProducao() {
 		String arquivoProducoes = "src/test/resources/csv/livros-computacao-dois-exemplos.csv";
 		selenium.clicar("#capes-abas > ul > li:nth-child(2) > a");
 		selenium.selecionarArquivo(arquivoProducoes, "#capes-importacao-livros-selecao-arquivo");
@@ -235,7 +235,7 @@ public class TesteAtribuicaoDeAvaliadores {
 	}
 
 	@Test
-	void distribuirAvaliadoresVerPrimeiraProducaoAtualizada() throws Exception {
+	void distribuirAvaliadoresVerPrimeiraProducaoAtualizada() {
 		String arquivoProducoes = "src/test/resources/csv/livros-computacao-dois-exemplos.csv";
 		selenium.clicar("#capes-abas > ul > li:nth-child(2) > a");
 		selenium.selecionarArquivo(arquivoProducoes, "#capes-importacao-livros-selecao-arquivo");
@@ -293,7 +293,7 @@ public class TesteAtribuicaoDeAvaliadores {
 	}
 
 	@Test
-	void distribuirAvaliadoresVerSegundaProducaoAtualizada() throws Exception {
+	void distribuirAvaliadoresVerSegundaProducaoAtualizada() {
 		String arquivoProducoes = "src/test/resources/csv/livros-computacao-dois-exemplos.csv";
 		selenium.clicar("#capes-abas > ul > li:nth-child(2) > a");
 		selenium.selecionarArquivo(arquivoProducoes, "#capes-importacao-livros-selecao-arquivo");
@@ -351,7 +351,7 @@ public class TesteAtribuicaoDeAvaliadores {
 	}
 
 	@AfterEach
-	void finalizar() throws Exception {
+	void finalizar() {
 		selenium.fechar();
 		servidor.finalizar();
 		correioEletronico.finalizar();

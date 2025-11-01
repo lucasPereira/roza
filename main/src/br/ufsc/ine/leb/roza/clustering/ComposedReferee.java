@@ -1,6 +1,5 @@
 package br.ufsc.ine.leb.roza.clustering;
 
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -10,13 +9,13 @@ import br.ufsc.ine.leb.roza.exceptions.TiebreakException;
 
 public class ComposedReferee implements Referee {
 
-	private List<Referee> referees;
+	private final List<Referee> referees;
 
 	public ComposedReferee(Referee... referees) {
 		if (referees.length < 2) {
 			throw new InsufficientRefereeException();
 		}
-		this.referees = Arrays.asList(referees);
+		this.referees = List.of(referees);
 	}
 
 	@Override
@@ -24,9 +23,8 @@ public class ComposedReferee implements Referee {
 		Iterator<Referee> iterator = referees.iterator();
 		while (iterator.hasNext()) {
 			try {
-				Combination combination = iterator.next().untie(elements);
-				return combination;
-			} catch (TiebreakException exception) {}
+				return iterator.next().untie(elements);
+			} catch (TiebreakException ignored) {}
 		}
 		throw new TiebreakException(elements);
 	}

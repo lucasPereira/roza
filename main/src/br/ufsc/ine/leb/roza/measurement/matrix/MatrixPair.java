@@ -2,9 +2,9 @@ package br.ufsc.ine.leb.roza.measurement.matrix;
 
 public class MatrixPair<K, V> {
 
-	private K source;
-	private K target;
-	private V value;
+	private final K source;
+	private final K target;
+	private final V value;
 
 	public MatrixPair(K source, K target, V value) {
 		this.source = source;

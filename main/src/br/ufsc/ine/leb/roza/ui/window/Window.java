@@ -15,6 +15,7 @@ import br.ufsc.ine.leb.roza.ui.UiComponent;
 import br.ufsc.ine.leb.roza.ui.window.content.Content;
 import br.ufsc.ine.leb.roza.ui.window.messages.Messages;
 import br.ufsc.ine.leb.roza.ui.window.toolbar.Toolbar;
+import br.ufsc.ine.leb.roza.utils.RozaLogger;
 
 public class Window implements UiComponent {
 
@@ -35,10 +36,10 @@ public class Window implements UiComponent {
 	}
 
 	@Override
-	public void addChilds(List<UiComponent> childs) {
-		childs.add(new Messages(this));
-		childs.add(new Toolbar(this));
-		childs.add(new Content(this));
+	public void addChildren(List<UiComponent> children) {
+		children.add(new Messages(this));
+		children.add(new Toolbar(this));
+		children.add(new Content(this));
 	}
 
 	@Override
@@ -69,7 +70,7 @@ public class Window implements UiComponent {
 			UIManager.getInstalledLookAndFeels();
 			UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
 		} catch (Exception exception) {
-			exception.printStackTrace();
+			RozaLogger.getInstance().error("Failed to start UI look and fells", exception);
 		}
 	}
 

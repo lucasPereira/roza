@@ -12,7 +12,7 @@ public class TesteAvaliacao {
 	private Selenium selenium;
 
 	@BeforeEach
-	void configurar() throws Exception {
+	void configurar() {
 		correioEletronico = new CorreioEletronico();
 		bancoDeDados = new BancoDeDados();
 		servidor = new Servidor();
@@ -67,7 +67,7 @@ public class TesteAvaliacao {
 	}
 
 	@Test
-	void avaliarAvaliador() throws Exception {
+	void avaliarAvaliador() {
 		selenium.passarOMouse("ul#navigationUser > li:nth-child(3)");
 		selenium.clicar("ul#navigationUser > li:nth-child(3) > ul > li:nth-child(2)");
 		selenium.limpar("#username");
@@ -86,7 +86,7 @@ public class TesteAvaliacao {
 	}
 
 	@Test
-	void avaliarCoordenadorDeArea() throws Exception {
+	void avaliarCoordenadorDeArea() {
 		selenium.passarOMouse("ul#navigationUser > li:nth-child(3)");
 		selenium.clicar("ul#navigationUser > li:nth-child(3) > ul > li:nth-child(2)");
 		selenium.limpar("#username");
@@ -105,7 +105,7 @@ public class TesteAvaliacao {
 	}
 
 	@AfterEach
-	void finalizar() throws Exception {
+	void finalizar() {
 		selenium.fechar();
 		servidor.finalizar();
 		correioEletronico.finalizar();

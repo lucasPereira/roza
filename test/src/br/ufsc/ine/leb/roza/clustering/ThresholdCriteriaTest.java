@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,8 +19,8 @@ class ThresholdCriteriaTest {
 
 	@BeforeEach
 	void seutp() {
-		TestCase alpha = new TestCase("alpha", Arrays.asList(), Arrays.asList());
-		TestCase beta = new TestCase("beta", Arrays.asList(), Arrays.asList());
+		TestCase alpha = new TestCase("alpha", List.of(), List.of());
+		TestCase beta = new TestCase("beta", List.of(), List.of());
 		Cluster alphaCluster = new Cluster(alpha);
 		Cluster betaCluster = new Cluster(beta);
 		combination = new Combination(alphaCluster, betaCluster);
@@ -28,15 +28,15 @@ class ThresholdCriteriaTest {
 	}
 
 	@Test
-	void alwaysStopCriteria() throws Exception {
+	void alwaysStopCriteria() {
 		ThresholdCriteria threshold = new AlwaysStopCriteria();
-		assertTrue(threshold.shoudlStop(level, combination, BigDecimal.ONE));
+		assertTrue(threshold.shouldStop(level, combination, BigDecimal.ONE));
 	}
 
 	@Test
-	void neverStopCriteria() throws Exception {
+	void neverStopCriteria() {
 		ThresholdCriteria threshold = new NeverStopCriteria();
-		assertFalse(threshold.shoudlStop(level, combination, BigDecimal.ONE));
+		assertFalse(threshold.shouldStop(level, combination, BigDecimal.ONE));
 	}
 
 }

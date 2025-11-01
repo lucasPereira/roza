@@ -3,16 +3,14 @@ package br.ufsc.ine.leb.roza.utils;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Stack;
+import java.util.*;
 
+import br.ufsc.ine.leb.roza.exceptions.FailedFileSystemOperationException;
 import br.ufsc.ine.leb.roza.utils.comparator.FileComparatorByPath;
 
 public class FolderUtils {
 
-	private String baseFolder;
+	private final String baseFolder;
 
 	public FolderUtils(String baseFolder) {
 		this.baseFolder = baseFolder;
@@ -24,12 +22,15 @@ public class FolderUtils {
 		stack.push(parent);
 		while (!stack.isEmpty()) {
 			File next = stack.pop();
-			File childs[] = next.listFiles();
-			if (childs == null || childs.length == 0) {
-				next.delete();
+			File[] children = next.listFiles();
+			if (children == null || children.length == 0) {
+				boolean success = next.delete();
+				if (!success) {
+					throw new FailedFileSystemOperationException();
+				}
 			} else {
 				stack.push(next);
-				for (File child : childs) {
+				for (File child : children) {
 					stack.push(child);
 				}
 			}
@@ -37,8 +38,12 @@ public class FolderUtils {
 	}
 
 	public void createFolder() {
-		new File(baseFolder).mkdirs();
+		boolean success = new File(baseFolder).mkdirs();
+		if (!success) {
+			throw new FailedFileSystemOperationException();
+		}
 	}
+
 
 	public void createEmptyFolder() {
 		removeRecursively();
@@ -55,12 +60,12 @@ public class FolderUtils {
 			if (next.isFile()) {
 				selectedFiles.add(next);
 			} else if (next.isDirectory()) {
-				for (File child : next.listFiles()) {
+				for (File child : Objects.requireNonNull(next.listFiles())) {
 					pending.push(child);
 				}
 			}
 		}
-		Collections.sort(selectedFiles, new FileComparatorByPath());
+		selectedFiles.sort(new FileComparatorByPath());
 		return selectedFiles;
 	}
 
@@ -76,7 +81,7 @@ public class FolderUtils {
 					selectedFiles.add(next);
 				}
 			} else if (next.isDirectory()) {
-				for (File child : next.listFiles()) {
+				for (File child : Objects.requireNonNull(next.listFiles())) {
 					pending.push(child);
 				}
 			}
@@ -87,19 +92,25 @@ public class FolderUtils {
 	public File writeContetAsString(String path, String content) {
 		try {
 			File file = new File(baseFolder, path);
-			file.createNewFile();
+			boolean success = file.createNewFile();
+			if (!success) {
+				throw new FailedFileSystemOperationException();
+			}
 			FileWriter writer = new FileWriter(file);
 			writer.write(content);
 			writer.close();
 			return file;
-		} catch (IOException excecao) {
-			throw new RuntimeException(excecao);
+		} catch (IOException exception) {
+			throw new RuntimeException(exception);
 		}
 	}
 
 	public void removeFile(String path) {
 		File file = new File(baseFolder, path);
-		file.delete();
+		boolean success = file.delete();
+		if (!success) {
+			throw new FailedFileSystemOperationException();
+		}
 	}
 
 	public String getBaseFolder() {

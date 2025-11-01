@@ -12,7 +12,7 @@ import br.ufsc.ine.leb.roza.utils.FormatterUtils;
 
 public class SimilarityAssessmentRenderer implements TableCellRenderer {
 
-	private DefaultTableCellRenderer renderer;
+	private final DefaultTableCellRenderer renderer;
 
 	public SimilarityAssessmentRenderer() {
 		renderer = new DefaultTableCellRenderer();

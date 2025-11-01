@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.File;
 import java.math.BigDecimal;
-import java.util.Arrays;
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,16 +24,16 @@ class SimianMatrixValueFactoryTest {
 	}
 
 	@Test
-	void same() throws Exception {
-		TestCase testCase = new TestCase("test", Arrays.asList(), Arrays.asList());
+	void same() {
+		TestCase testCase = new TestCase("test", List.of(), List.of());
 		TestCaseMaterialization materialization = new TestCaseMaterialization(new File("Materialization.java"), 10, testCase);
 		assertEquals(BigDecimal.ONE, factory.create(materialization, materialization).evaluate());
 	}
 
 	@Test
-	void notSame() throws Exception {
-		TestCase testCaseA = new TestCase("testA", Arrays.asList(), Arrays.asList());
-		TestCase testCaseB = new TestCase("testB", Arrays.asList(), Arrays.asList());
+	void notSame() {
+		TestCase testCaseA = new TestCase("testA", List.of(), List.of());
+		TestCase testCaseB = new TestCase("testB", List.of(), List.of());
 		TestCaseMaterialization materializationA = new TestCaseMaterialization(new File("MaterializationA.java"), 10, testCaseA);
 		TestCaseMaterialization materializationB = new TestCaseMaterialization(new File("MaterializationB.java"), 10, testCaseB);
 		assertEquals(BigDecimal.ZERO, factory.create(materializationA, materializationB).evaluate());

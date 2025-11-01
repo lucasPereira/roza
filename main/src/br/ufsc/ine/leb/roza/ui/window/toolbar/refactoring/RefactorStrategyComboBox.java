@@ -13,7 +13,7 @@ import br.ufsc.ine.leb.roza.ui.shared.ComboBoxBuilder;
 
 public class RefactorStrategyComboBox implements UiComponent {
 
-	private RefactoringTab toolbar;
+	private final RefactoringTab toolbar;
 	private JComboBox<String> combo;
 
 	public RefactorStrategyComboBox(RefactoringTab toolbar) {
@@ -22,15 +22,13 @@ public class RefactorStrategyComboBox implements UiComponent {
 
 	@Override
 	public void init(Hub hub, Manager manager) {
-		combo = new ComboBoxBuilder("Refactor Strategy").add("Simple Cluster Refactor", () -> {
-			manager.setRefactorStrategy(new SimpleClusterRefactor(new IncrementalTestClassNamingStrategy()));
-		}).build();
+		combo = new ComboBoxBuilder("Refactor Strategy").add("Simple Cluster Refactor", () -> manager.setRefactorStrategy(new SimpleClusterRefactor(new IncrementalTestClassNamingStrategy()))).build();
 		combo.setEnabled(true);
 		toolbar.addComponent(combo);
 	}
 
 	@Override
-	public void addChilds(List<UiComponent> childs) {}
+	public void addChildren(List<UiComponent> children) {}
 
 	@Override
 	public void start() {

@@ -3,7 +3,7 @@ package br.ufsc.ine.leb.roza.clustering;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,7 +28,6 @@ class AverageLinkageTest {
 	private Cluster alphaCluster;
 	private Cluster betaCluster;
 	private Cluster gammaCluster;
-	private Cluster deltaCluster;
 	private Cluster alphaBetaCluster;
 	private Cluster gammaDeltaCluster;
 
@@ -41,20 +40,20 @@ class AverageLinkageTest {
 		dotSix = new BigDecimal("0.6");
 		dotSeven = new BigDecimal("0.7");
 		dotEight = new BigDecimal("0.8");
-		alpha = new TestCase("alpha", Arrays.asList(), Arrays.asList());
-		beta = new TestCase("beta", Arrays.asList(), Arrays.asList());
-		gamma = new TestCase("gamma", Arrays.asList(), Arrays.asList());
-		delta = new TestCase("delta", Arrays.asList(), Arrays.asList());
+		alpha = new TestCase("alpha", List.of(), List.of());
+		beta = new TestCase("beta", List.of(), List.of());
+		gamma = new TestCase("gamma", List.of(), List.of());
+		delta = new TestCase("delta", List.of(), List.of());
 		alphaCluster = new Cluster(alpha);
 		betaCluster = new Cluster(beta);
 		gammaCluster = new Cluster(gamma);
-		deltaCluster = new Cluster(delta);
+		Cluster deltaCluster = new Cluster(delta);
 		alphaBetaCluster = alphaCluster.merge(betaCluster);
 		gammaDeltaCluster = gammaCluster.merge(deltaCluster);
 	}
 
 	@Test
-	void singleElementClustersWithSymmetricSimilarity() throws Exception {
+	void singleElementClustersWithSymmetricSimilarity() {
 		SimilarityReportBuilder builder = new SimilarityReportBuilder(true);
 		builder.add(alpha, beta, dotFive);
 		Linkage linkage = new AverageLinkage(builder.build());
@@ -62,7 +61,7 @@ class AverageLinkageTest {
 	}
 
 	@Test
-	void singleAndNonSingleElementClustersWithSymmetricSimilarity() throws Exception {
+	void singleAndNonSingleElementClustersWithSymmetricSimilarity() {
 		SimilarityReportBuilder builder = new SimilarityReportBuilder(true);
 		builder.add(alpha, beta, dotEight).add(alpha, gamma, dotTwo);
 		builder.add(beta, gamma, dotSix);
@@ -71,7 +70,7 @@ class AverageLinkageTest {
 	}
 
 	@Test
-	void nonSingleElementClustersWithSymmetricSimilarity() throws Exception {
+	void nonSingleElementClustersWithSymmetricSimilarity() {
 		SimilarityReportBuilder builder = new SimilarityReportBuilder(true);
 		builder.add(alpha, beta, dotEight).add(alpha, gamma, dotTwo).add(alpha, delta, dotFour);
 		builder.add(beta, gamma, dotSix).add(beta, delta, dotEight);
@@ -81,7 +80,7 @@ class AverageLinkageTest {
 	}
 
 	@Test
-	void singleElementClustersWithAsymmetricSymilarityWithTheSameValues() throws Exception {
+	void singleElementClustersWithAsymmetricSimilarityWithTheSameValues() {
 		SimilarityReportBuilder builder = new SimilarityReportBuilder(false);
 		builder.add(alpha, beta, dotFive);
 		builder.add(beta, alpha, dotFive);
@@ -90,7 +89,7 @@ class AverageLinkageTest {
 	}
 
 	@Test
-	void singleElementClustersWithAsymmetricSymilarityWithTheDistinctValues() throws Exception {
+	void singleElementClustersWithAsymmetricSimilarityWithTheDistinctValues() {
 		SimilarityReportBuilder builder = new SimilarityReportBuilder(false);
 		builder.add(alpha, beta, dotTwo);
 		builder.add(beta, alpha, dotEight);
@@ -99,7 +98,7 @@ class AverageLinkageTest {
 	}
 
 	@Test
-	void singleAndNonSingleElementClustersWithAsymmetricSimilarity() throws Exception {
+	void singleAndNonSingleElementClustersWithAsymmetricSimilarity() {
 		SimilarityReportBuilder builder = new SimilarityReportBuilder(false);
 		builder.add(alpha, beta, dotEight).add(alpha, gamma, dotTwo);
 		builder.add(beta, alpha, dotEight).add(beta, gamma, dotSix);
@@ -109,7 +108,7 @@ class AverageLinkageTest {
 	}
 
 	@Test
-	void nonSingleElementClustersWithAsymmetricSimilarity() throws Exception {
+	void nonSingleElementClustersWithAsymmetricSimilarity() {
 		SimilarityReportBuilder builder = new SimilarityReportBuilder(false);
 		builder.add(alpha, beta, dotEight).add(alpha, gamma, dotTwo).add(alpha, delta, dotThree);
 		builder.add(beta, alpha, dotEight).add(beta, gamma, dotSeven).add(beta, delta, dotTwo);

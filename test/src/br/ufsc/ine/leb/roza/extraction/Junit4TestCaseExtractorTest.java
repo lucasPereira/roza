@@ -1,8 +1,5 @@
 package br.ufsc.ine.leb.roza.extraction;
 
-import static org.junit.Assert.assertEquals;
-
-import java.util.Arrays;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -15,6 +12,8 @@ import br.ufsc.ine.leb.roza.TestCase;
 import br.ufsc.ine.leb.roza.TestClass;
 import br.ufsc.ine.leb.roza.TestMethod;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 class Junit4TestCaseExtractorTest {
 
 	private TestCaseExtractor extractor;
@@ -25,10 +24,10 @@ class Junit4TestCaseExtractorTest {
 	}
 
 	@Test
-	void oneTestMethod() throws Exception {
-		TestMethod testMethod = new TestMethod("example", Arrays.asList());
-		TestClass testClass = new TestClass("ExampleTest", Arrays.asList(), Arrays.asList(), Arrays.asList(testMethod));
-		List<TestCase> testCases = extractor.extract(Arrays.asList(testClass));
+	void oneTestMethod() {
+		TestMethod testMethod = new TestMethod("example", List.of());
+		TestClass testClass = new TestClass("ExampleTest", List.of(), List.of(), List.of(testMethod));
+		List<TestCase> testCases = extractor.extract(List.of(testClass));
 		assertEquals(1, testCases.size());
 		assertEquals("example", testCases.get(0).getName());
 		assertEquals(0, testCases.get(0).getFixtures().size());
@@ -36,11 +35,11 @@ class Junit4TestCaseExtractorTest {
 	}
 
 	@Test
-	void oneTestMethodOneSetupMethod() throws Exception {
-		TestMethod testMethod = new TestMethod("example", Arrays.asList());
-		SetupMethod setupMethod = new SetupMethod("setup", Arrays.asList());
-		TestClass testClass = new TestClass("ExampleTest", Arrays.asList(), Arrays.asList(setupMethod), Arrays.asList(testMethod));
-		List<TestCase> testCases = extractor.extract(Arrays.asList(testClass));
+	void oneTestMethodOneSetupMethod() {
+		TestMethod testMethod = new TestMethod("example", List.of());
+		SetupMethod setupMethod = new SetupMethod("setup", List.of());
+		TestClass testClass = new TestClass("ExampleTest", List.of(), List.of(setupMethod), List.of(testMethod));
+		List<TestCase> testCases = extractor.extract(List.of(testClass));
 		assertEquals(1, testCases.size());
 		assertEquals("example", testCases.get(0).getName());
 		assertEquals(0, testCases.get(0).getFixtures().size());
@@ -48,11 +47,11 @@ class Junit4TestCaseExtractorTest {
 	}
 
 	@Test
-	void oneTestMethodWithOneAssert() throws Exception {
+	void oneTestMethodWithOneAssert() {
 		Statement assertStatement = new Statement("assertEquals(0, 0);");
-		TestMethod testMethod = new TestMethod("example", Arrays.asList(assertStatement));
-		TestClass testClass = new TestClass("ExampleTest", Arrays.asList(), Arrays.asList(), Arrays.asList(testMethod));
-		List<TestCase> testCases = extractor.extract(Arrays.asList(testClass));
+		TestMethod testMethod = new TestMethod("example", List.of(assertStatement));
+		TestClass testClass = new TestClass("ExampleTest", List.of(), List.of(), List.of(testMethod));
+		List<TestCase> testCases = extractor.extract(List.of(testClass));
 		assertEquals(1, testCases.size());
 		assertEquals("example", testCases.get(0).getName());
 		assertEquals(0, testCases.get(0).getFixtures().size());
@@ -61,13 +60,13 @@ class Junit4TestCaseExtractorTest {
 	}
 
 	@Test
-	void oneTestMethodWithOneAssertOneSetupMethodWithOneFixture() throws Exception {
+	void oneTestMethodWithOneAssertOneSetupMethodWithOneFixture() {
 		Statement fixtureStatement = new Statement("sut(0);");
 		Statement assertStatement = new Statement("assertEquals(0, 0);");
-		SetupMethod setupMethod = new SetupMethod("setup", Arrays.asList(fixtureStatement));
-		TestMethod testMethod = new TestMethod("example", Arrays.asList(assertStatement));
-		TestClass testClass = new TestClass("ExampleTest", Arrays.asList(), Arrays.asList(setupMethod), Arrays.asList(testMethod));
-		List<TestCase> testCases = extractor.extract(Arrays.asList(testClass));
+		SetupMethod setupMethod = new SetupMethod("setup", List.of(fixtureStatement));
+		TestMethod testMethod = new TestMethod("example", List.of(assertStatement));
+		TestClass testClass = new TestClass("ExampleTest", List.of(), List.of(setupMethod), List.of(testMethod));
+		List<TestCase> testCases = extractor.extract(List.of(testClass));
 		assertEquals(1, testCases.size());
 		assertEquals("example", testCases.get(0).getName());
 		assertEquals(1, testCases.get(0).getFixtures().size());
@@ -77,13 +76,13 @@ class Junit4TestCaseExtractorTest {
 	}
 
 	@Test
-	void oneTestMethodWithOneAssertOneSetupMethodWithOneAssert() throws Exception {
+	void oneTestMethodWithOneAssertOneSetupMethodWithOneAssert() {
 		Statement assertStatement1 = new Statement("assertEquals(1, 1);");
 		Statement assertStatement2 = new Statement("assertEquals(2, 2);");
-		SetupMethod setupMethod = new SetupMethod("setup", Arrays.asList(assertStatement1));
-		TestMethod testMethod = new TestMethod("example", Arrays.asList(assertStatement2));
-		TestClass testClass = new TestClass("ExampleTest", Arrays.asList(), Arrays.asList(setupMethod), Arrays.asList(testMethod));
-		List<TestCase> testCases = extractor.extract(Arrays.asList(testClass));
+		SetupMethod setupMethod = new SetupMethod("setup", List.of(assertStatement1));
+		TestMethod testMethod = new TestMethod("example", List.of(assertStatement2));
+		TestClass testClass = new TestClass("ExampleTest", List.of(), List.of(setupMethod), List.of(testMethod));
+		List<TestCase> testCases = extractor.extract(List.of(testClass));
 		assertEquals(1, testCases.size());
 		assertEquals("example", testCases.get(0).getName());
 		assertEquals(0, testCases.get(0).getFixtures().size());
@@ -93,11 +92,11 @@ class Junit4TestCaseExtractorTest {
 	}
 
 	@Test
-	void oneTestMethodWithOneFixture() throws Exception {
+	void oneTestMethodWithOneFixture() {
 		Statement fixtureStatement = new Statement("sut(0);");
-		TestMethod testMethod = new TestMethod("example", Arrays.asList(fixtureStatement));
-		TestClass testClass = new TestClass("ExampleTest", Arrays.asList(), Arrays.asList(), Arrays.asList(testMethod));
-		List<TestCase> testCases = extractor.extract(Arrays.asList(testClass));
+		TestMethod testMethod = new TestMethod("example", List.of(fixtureStatement));
+		TestClass testClass = new TestClass("ExampleTest", List.of(), List.of(), List.of(testMethod));
+		List<TestCase> testCases = extractor.extract(List.of(testClass));
 		assertEquals(1, testCases.size());
 		assertEquals("example", testCases.get(0).getName());
 		assertEquals(1, testCases.get(0).getFixtures().size());
@@ -106,13 +105,13 @@ class Junit4TestCaseExtractorTest {
 	}
 
 	@Test
-	void oneTestMethodWithOneFixtureOneSetupMethodWithOneFixture() throws Exception {
+	void oneTestMethodWithOneFixtureOneSetupMethodWithOneFixture() {
 		Statement fixtureStatement1 = new Statement("sut(1);");
 		Statement fixtureStatement2 = new Statement("sut(2);");
-		SetupMethod setupMethod = new SetupMethod("setup", Arrays.asList(fixtureStatement1));
-		TestMethod testMethod = new TestMethod("example", Arrays.asList(fixtureStatement2));
-		TestClass testClass = new TestClass("ExampleTest", Arrays.asList(), Arrays.asList(setupMethod), Arrays.asList(testMethod));
-		List<TestCase> testCases = extractor.extract(Arrays.asList(testClass));
+		SetupMethod setupMethod = new SetupMethod("setup", List.of(fixtureStatement1));
+		TestMethod testMethod = new TestMethod("example", List.of(fixtureStatement2));
+		TestClass testClass = new TestClass("ExampleTest", List.of(), List.of(setupMethod), List.of(testMethod));
+		List<TestCase> testCases = extractor.extract(List.of(testClass));
 		assertEquals(1, testCases.size());
 		assertEquals("example", testCases.get(0).getName());
 		assertEquals(2, testCases.get(0).getFixtures().size());
@@ -122,13 +121,13 @@ class Junit4TestCaseExtractorTest {
 	}
 
 	@Test
-	void oneTestMethodWithOneFixtureOneSetupMethodWithOneAssert() throws Exception {
+	void oneTestMethodWithOneFixtureOneSetupMethodWithOneAssert() {
 		Statement assertStatement = new Statement("assertEquals(0, 0);");
 		Statement fixtureStatement = new Statement("sut(0);");
-		SetupMethod setupMethod = new SetupMethod("setup", Arrays.asList(assertStatement));
-		TestMethod testMethod = new TestMethod("example", Arrays.asList(fixtureStatement));
-		TestClass testClass = new TestClass("ExampleTest", Arrays.asList(), Arrays.asList(setupMethod), Arrays.asList(testMethod));
-		List<TestCase> testCases = extractor.extract(Arrays.asList(testClass));
+		SetupMethod setupMethod = new SetupMethod("setup", List.of(assertStatement));
+		TestMethod testMethod = new TestMethod("example", List.of(fixtureStatement));
+		TestClass testClass = new TestClass("ExampleTest", List.of(), List.of(setupMethod), List.of(testMethod));
+		List<TestCase> testCases = extractor.extract(List.of(testClass));
 		assertEquals(1, testCases.size());
 		assertEquals("example", testCases.get(0).getName());
 		assertEquals(1, testCases.get(0).getFixtures().size());
@@ -138,16 +137,16 @@ class Junit4TestCaseExtractorTest {
 	}
 
 	@Test
-	void setupMethodWithFieldInicialization() throws Exception {
+	void setupMethodWithFieldInicialization() {
 		Statement sutDeclaretionAndInicialization = new Statement("Sut sut = new Sut();");
 		Statement sutInicialization = new Statement("sut = new Sut();");
 		Statement saveStatement = new Statement("sut.save(0);");
 		Statement assertStatement = new Statement("assertEquals(0, sut.get(0));");
-		SetupMethod setupMethod = new SetupMethod("setup", Arrays.asList(sutInicialization));
+		SetupMethod setupMethod = new SetupMethod("setup", List.of(sutInicialization));
 		Field field = new Field("Sut", "sut");
-		TestMethod testMethod = new TestMethod("test", Arrays.asList(saveStatement, assertStatement));
-		TestClass testClass = new TestClass("", Arrays.asList(field), Arrays.asList(setupMethod), Arrays.asList(testMethod));
-		List<TestCase> testCases = extractor.extract(Arrays.asList(testClass));
+		TestMethod testMethod = new TestMethod("test", List.of(saveStatement, assertStatement));
+		TestClass testClass = new TestClass("", List.of(field), List.of(setupMethod), List.of(testMethod));
+		List<TestCase> testCases = extractor.extract(List.of(testClass));
 
 		assertEquals(1, testCases.size());
 		assertEquals("test", testCases.get(0).getName());
@@ -159,7 +158,7 @@ class Junit4TestCaseExtractorTest {
 	}
 
 	@Test
-	void complex() throws Exception {
+	void complex() {
 		Statement classASetup1Fixture1 = new Statement("sut(1);");
 		Statement classASetup1Fixture2 = new Statement("sut(2);");
 		Statement classATest1Fixture3 = new Statement("sut(3);");
@@ -172,16 +171,16 @@ class Junit4TestCaseExtractorTest {
 		Statement classATest1Assert4 = new Statement("assertEquals(4, 4);");
 		Statement classATest2Assert5 = new Statement("assertEquals(5, 5);");
 		Statement classBTest3Assert6 = new Statement("assertEquals(6, 6);");
-		SetupMethod classASetup1 = new SetupMethod("setup1", Arrays.asList(classASetup1Fixture1, classASetup1Fixture2, classASetup1Assert1, classASetup1Assert2));
-		SetupMethod classASetup2 = new SetupMethod("setup2", Arrays.asList(classASetup2Fixture5));
-		SetupMethod classBSetup3 = new SetupMethod("setup3", Arrays.asList(classBSetup3Fixture6));
-		TestMethod classATest1 = new TestMethod("test1", Arrays.asList(classATest1Fixture3, classATest1Fixture4, classATest1Assert3, classATest1Assert4));
-		TestMethod classATest2 = new TestMethod("test2", Arrays.asList(classATest2Assert5));
-		TestMethod classBTest3 = new TestMethod("test3", Arrays.asList(classBTest3Assert6));
-		TestClass classA = new TestClass("A", Arrays.asList(), Arrays.asList(classASetup1, classASetup2), Arrays.asList(classATest1, classATest2));
-		TestClass classB = new TestClass("B", Arrays.asList(), Arrays.asList(classBSetup3), Arrays.asList(classBTest3));
+		SetupMethod classASetup1 = new SetupMethod("setup1", List.of(classASetup1Fixture1, classASetup1Fixture2, classASetup1Assert1, classASetup1Assert2));
+		SetupMethod classASetup2 = new SetupMethod("setup2", List.of(classASetup2Fixture5));
+		SetupMethod classBSetup3 = new SetupMethod("setup3", List.of(classBSetup3Fixture6));
+		TestMethod classATest1 = new TestMethod("test1", List.of(classATest1Fixture3, classATest1Fixture4, classATest1Assert3, classATest1Assert4));
+		TestMethod classATest2 = new TestMethod("test2", List.of(classATest2Assert5));
+		TestMethod classBTest3 = new TestMethod("test3", List.of(classBTest3Assert6));
+		TestClass classA = new TestClass("A", List.of(), List.of(classASetup1, classASetup2), List.of(classATest1, classATest2));
+		TestClass classB = new TestClass("B", List.of(), List.of(classBSetup3), List.of(classBTest3));
 
-		List<TestCase> testCases = extractor.extract(Arrays.asList(classA, classB));
+		List<TestCase> testCases = extractor.extract(List.of(classA, classB));
 		assertEquals(3, testCases.size());
 
 		TestCase firstTestCase = testCases.get(0);
@@ -218,7 +217,7 @@ class Junit4TestCaseExtractorTest {
 	}
 
 	@Test
-	void oneTestMethodWithAllAssertsOfJunit() throws Exception {
+	void oneTestMethodWithAllAssertsOfJunit() {
 		Statement arrayEqualsAssertion = new Statement("assertArrayEquals(new Object[0], new Object[0]);");
 		Statement equalsAssertion = new Statement("assertEquals(0, 0);");
 		Statement falseAssertion = new Statement("assertFalse(false);");
@@ -228,10 +227,10 @@ class Junit4TestCaseExtractorTest {
 		Statement sameAssertion = new Statement("assertSame(null, null);");
 		Statement thatAssertion = new Statement("assertThat(null, IsNull.nullValue());");
 		Statement trueAssertion = new Statement("assertTrue(true);");
-		List<Statement> statements = Arrays.asList(arrayEqualsAssertion, equalsAssertion, falseAssertion, notNullAssertion, notSameAssertion, nullAssertion, sameAssertion, thatAssertion, trueAssertion);
+		List<Statement> statements = List.of(arrayEqualsAssertion, equalsAssertion, falseAssertion, notNullAssertion, notSameAssertion, nullAssertion, sameAssertion, thatAssertion, trueAssertion);
 		TestMethod testMethod = new TestMethod("example", statements);
-		TestClass testClass = new TestClass("ExampleTest", Arrays.asList(), Arrays.asList(), Arrays.asList(testMethod));
-		List<TestCase> testCases = extractor.extract(Arrays.asList(testClass));
+		TestClass testClass = new TestClass("ExampleTest", List.of(), List.of(), List.of(testMethod));
+		List<TestCase> testCases = extractor.extract(List.of(testClass));
 		assertEquals(1, testCases.size());
 		assertEquals("example", testCases.get(0).getName());
 		assertEquals(0, testCases.get(0).getFixtures().size());
@@ -248,7 +247,7 @@ class Junit4TestCaseExtractorTest {
 	}
 
 	@Test
-	void oneTestMethodWithAllNonStaticAssertsOfJunit() throws Exception {
+	void oneTestMethodWithAllNonStaticAssertsOfJunit() {
 		Statement arrayEqualsAssertion = new Statement("Assert.assertArrayEquals(new Object[0], new Object[0]);");
 		Statement equalsAssertion = new Statement("Assert.assertEquals(0, 0);");
 		Statement falseAssertion = new Statement("Assert.assertFalse(false);");
@@ -258,10 +257,10 @@ class Junit4TestCaseExtractorTest {
 		Statement sameAssertion = new Statement("Assert.assertSame(null, null);");
 		Statement thatAssertion = new Statement("Assert.assertThat(null, IsNull.nullValue());");
 		Statement trueAssertion = new Statement("Assert.assertTrue(true);");
-		List<Statement> statements = Arrays.asList(arrayEqualsAssertion, equalsAssertion, falseAssertion, notNullAssertion, notSameAssertion, nullAssertion, sameAssertion, thatAssertion, trueAssertion);
+		List<Statement> statements = List.of(arrayEqualsAssertion, equalsAssertion, falseAssertion, notNullAssertion, notSameAssertion, nullAssertion, sameAssertion, thatAssertion, trueAssertion);
 		TestMethod testMethod = new TestMethod("example", statements);
-		TestClass testClass = new TestClass("ExampleTest", Arrays.asList(), Arrays.asList(), Arrays.asList(testMethod));
-		List<TestCase> testCases = extractor.extract(Arrays.asList(testClass));
+		TestClass testClass = new TestClass("ExampleTest", List.of(), List.of(), List.of(testMethod));
+		List<TestCase> testCases = extractor.extract(List.of(testClass));
 		assertEquals(1, testCases.size());
 		assertEquals("example", testCases.get(0).getName());
 		assertEquals(0, testCases.get(0).getFixtures().size());

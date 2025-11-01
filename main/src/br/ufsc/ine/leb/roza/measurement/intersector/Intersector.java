@@ -8,11 +8,11 @@ import java.util.List;
 
 public class Intersector {
 
-	private List<Interval> intervals;
-	private BigDecimal length;
+	private final List<Interval> intervals;
+	private final BigDecimal length;
 
 	public Intersector(Integer length) {
-		this.intervals = new LinkedList<Interval>();
+		this.intervals = new LinkedList<>();
 		this.length = new BigDecimal(length);
 	}
 
@@ -21,10 +21,11 @@ public class Intersector {
 		for (Interval interval : intervals) {
 			sum = sum.add(interval.getLength());
 		}
-		/**
-		 * TODO: we need to reevaluate this because it considering as length the class and method declarations,
-		 * blank lines and annotations.
-		 **/
+
+		/*
+			TODO: we need to reevaluate this because it considering as length the class and method declarations,
+			blank lines and annotations.
+		 */
 		return sum.divide(length, MathContext.DECIMAL32);
 	}
 
@@ -34,7 +35,7 @@ public class Intersector {
 
 	public void addSegment(Integer start, Integer end) {
 		Interval newInterval = new Interval(start, end);
-		Interval overlaidInterval = null;
+		Interval overlaidInterval;
 		do {
 			overlaidInterval = peekOverlaidInterval(newInterval);
 			if (overlaidInterval != null) {

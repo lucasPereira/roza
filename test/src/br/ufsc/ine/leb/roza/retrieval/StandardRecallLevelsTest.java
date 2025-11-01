@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 class StandardRecallLevelsTest {
 
 	@Test
-	void iterator() throws Exception {
+	void iterator() {
 		StandardRecallLevels standard = new StandardRecallLevels();
 		Iterator<RecallLevel> iterator = standard.iterator();
 		assertEquals(new RecallLevel(0), iterator.next());

@@ -6,7 +6,7 @@ import br.ufsc.ine.leb.roza.exceptions.InvalidThresholdException;
 
 public class LevelBasedCriteria implements ThresholdCriteria {
 
-	private Integer threshold;
+	private final Integer threshold;
 
 	public LevelBasedCriteria(Integer threshold) {
 		if (threshold < 0) {
@@ -16,7 +16,7 @@ public class LevelBasedCriteria implements ThresholdCriteria {
 	}
 
 	@Override
-	public Boolean shoudlStop(Integer nextLevel, Combination combinationToNext, BigDecimal evaluationToNext) {
+	public Boolean shouldStop(Integer nextLevel, Combination combinationToNext, BigDecimal evaluationToNext) {
 		return nextLevel > threshold;
 	}
 

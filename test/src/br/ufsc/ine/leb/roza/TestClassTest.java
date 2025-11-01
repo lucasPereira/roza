@@ -3,7 +3,7 @@ package br.ufsc.ine.leb.roza;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import java.util.Arrays;
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
@@ -12,9 +12,9 @@ import br.ufsc.ine.leb.roza.exceptions.NoTestMethodException;
 class TestClassTest {
 
 	@Test
-	void withOneTestMethod() throws Exception {
-		TestMethod testMethod = new TestMethod("example", Arrays.asList());
-		TestClass testClass = new TestClass("ExampleTest", Arrays.asList(), Arrays.asList(), Arrays.asList(testMethod));
+	void withOneTestMethod() {
+		TestMethod testMethod = new TestMethod("example", List.of());
+		TestClass testClass = new TestClass("ExampleTest", List.of(), List.of(), List.of(testMethod));
 
 		assertEquals("ExampleTest", testClass.getName());
 		assertEquals(0, testClass.getFields().size());
@@ -24,10 +24,10 @@ class TestClassTest {
 	}
 
 	@Test
-	void withOneTestMethodAndOneSetupMethod() throws Exception {
-		SetupMethod setupMethod = new SetupMethod("setup", Arrays.asList());
-		TestMethod testMethod = new TestMethod("example", Arrays.asList());
-		TestClass testClass = new TestClass("ExampleTest", Arrays.asList(), Arrays.asList(setupMethod), Arrays.asList(testMethod));
+	void withOneTestMethodAndOneSetupMethod() {
+		SetupMethod setupMethod = new SetupMethod("setup", List.of());
+		TestMethod testMethod = new TestMethod("example", List.of());
+		TestClass testClass = new TestClass("ExampleTest", List.of(), List.of(setupMethod), List.of(testMethod));
 
 		assertEquals("ExampleTest", testClass.getName());
 		assertEquals(0, testClass.getFields().size());
@@ -38,14 +38,14 @@ class TestClassTest {
 	}
 
 	@Test
-	void withOneTestMethodOneSetupMethodAndOneField() throws Exception {
+	void withOneTestMethodOneSetupMethodAndOneField() {
 		Statement inicializationStatement = new Statement("sut = new Sut();");
 		Statement saveStatement = new Statement("sut.save(0);");
 		Statement assertStatement = new Statement("assertEquals(0, sut.get(0));");
 		Field field = new Field("Sut", "sut");
-		SetupMethod setupMethod = new SetupMethod("setup", Arrays.asList(inicializationStatement));
-		TestMethod testMethod = new TestMethod("test", Arrays.asList(saveStatement, assertStatement));
-		TestClass testClass = new TestClass("ExampleTest", Arrays.asList(field), Arrays.asList(setupMethod), Arrays.asList(testMethod));
+		SetupMethod setupMethod = new SetupMethod("setup", List.of(inicializationStatement));
+		TestMethod testMethod = new TestMethod("test", List.of(saveStatement, assertStatement));
+		TestClass testClass = new TestClass("ExampleTest", List.of(field), List.of(setupMethod), List.of(testMethod));
 
 		assertEquals("ExampleTest", testClass.getName());
 		assertEquals(1, testClass.getFields().size());
@@ -57,10 +57,8 @@ class TestClassTest {
 	}
 
 	@Test
-	void withoutTestMethods() throws Exception {
-		assertThrows(NoTestMethodException.class, () -> {
-			new TestClass("ExampleTest", Arrays.asList(), Arrays.asList(), Arrays.asList());
-		});
+	void withoutTestMethods() {
+		assertThrows(NoTestMethodException.class, () -> new TestClass("ExampleTest", List.of(), List.of(), List.of()));
 	}
 
 }

@@ -5,10 +5,10 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.Arrays;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
 
 class ClusterTest {
 
@@ -18,13 +18,13 @@ class ClusterTest {
 
 	@BeforeEach
 	void setup() {
-		alpha = new TestCase("alpha", Arrays.asList(), Arrays.asList());
-		beta = new TestCase("beta", Arrays.asList(), Arrays.asList());
-		gamma = new TestCase("gamma", Arrays.asList(), Arrays.asList());
+		alpha = new TestCase("alpha", List.of(), List.of());
+		beta = new TestCase("beta", List.of(), List.of());
+		gamma = new TestCase("gamma", List.of(), List.of());
 	}
 
 	@Test
-	void cluster() throws Exception {
+	void cluster() {
 		Cluster alphaCluster = new Cluster(alpha);
 		assertEquals(1, alphaCluster.getTestCases().size());
 		assertTrue(alphaCluster.getTestCases().contains(alpha));
@@ -34,7 +34,7 @@ class ClusterTest {
 	}
 
 	@Test
-	void mergeClusterWithItself() throws Exception {
+	void mergeClusterWithItself() {
 		Cluster alphaCluster = new Cluster(alpha);
 		Cluster alphaMergedAlpha = alphaCluster.merge(alphaCluster);
 		assertEquals(1, alphaMergedAlpha.getTestCases().size());
@@ -44,7 +44,7 @@ class ClusterTest {
 	}
 
 	@Test
-	void mergeClustersWithTheSameElement() throws Exception {
+	void mergeClustersWithTheSameElement() {
 		Cluster alphaCluster = new Cluster(alpha);
 		Cluster alphaMergedAlpha = alphaCluster.merge(new Cluster(alpha));
 		assertEquals(1, alphaMergedAlpha.getTestCases().size());
@@ -54,7 +54,7 @@ class ClusterTest {
 	}
 
 	@Test
-	void mergeClustersWithDistincElements() throws Exception {
+	void mergeClustersWithDistincElements() {
 		Cluster alphaCluster = new Cluster(alpha);
 		Cluster betaCluster = new Cluster(beta);
 		Cluster alphaMergedBeta = alphaCluster.merge(betaCluster);
@@ -72,7 +72,7 @@ class ClusterTest {
 	}
 
 	@Test
-	void mergeClustersWithDistincElementsAndDistinctSizes() throws Exception {
+	void mergeClustersWithDistincElementsAndDistinctSizes() {
 		Cluster alphaCluster = new Cluster(alpha);
 		Cluster betaCluster = new Cluster(beta);
 		Cluster gammaCluster = new Cluster(gamma);
@@ -94,7 +94,7 @@ class ClusterTest {
 	}
 
 	@Test
-	void mergeClustersWithOneEqualElementsAndOneDistincElement() throws Exception {
+	void mergeClustersWithOneEqualElementsAndOneDistincElement() {
 		Cluster alphaCluster = new Cluster(alpha);
 		Cluster betaCluster = new Cluster(beta);
 		Cluster gammaCluster = new Cluster(gamma);

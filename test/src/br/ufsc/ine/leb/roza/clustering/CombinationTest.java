@@ -2,7 +2,7 @@ package br.ufsc.ine.leb.roza.clustering;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.util.Arrays;
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,8 +19,8 @@ class CombinationTest {
 
 	@BeforeEach
 	void setup() {
-		TestCase alpha = new TestCase("alpha", Arrays.asList(), Arrays.asList());
-		TestCase beta = new TestCase("beta", Arrays.asList(), Arrays.asList());
+		TestCase alpha = new TestCase("alpha", List.of(), List.of());
+		TestCase beta = new TestCase("beta", List.of(), List.of());
 		alphaCluster = new Cluster(alpha);
 		betaCluster = new Cluster(beta);
 		alphaBetaCombination = new Combination(alphaCluster, betaCluster);
@@ -28,7 +28,7 @@ class CombinationTest {
 	}
 
 	@Test
-	void alphaBeta() throws Exception {
+	void alphaBeta() {
 		assertEquals(alphaCluster, alphaBetaCombination.getFirst());
 		assertEquals(betaCluster, alphaBetaCombination.getSecond());
 		assertEquals(alphaBetaCombination, new Combination(alphaCluster, betaCluster));
@@ -37,7 +37,7 @@ class CombinationTest {
 	}
 
 	@Test
-	void betaAlpha() throws Exception {
+	void betaAlpha() {
 		assertEquals(betaCluster, betaAlphaCombination.getFirst());
 		assertEquals(alphaCluster, betaAlphaCombination.getSecond());
 		assertEquals(betaAlphaCombination, new Combination(betaCluster, alphaCluster));

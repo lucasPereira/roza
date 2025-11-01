@@ -11,7 +11,7 @@ import br.ufsc.ine.leb.roza.ui.shared.ComboBoxBuilder;
 
 public class ThresholdCriteriaComboBox implements UiComponent {
 
-	private ClusteringTab toolbar;
+	private final ClusteringTab toolbar;
 	private JComboBox<String> combo;
 
 	public ThresholdCriteriaComboBox(ClusteringTab toolbar) {
@@ -21,16 +21,16 @@ public class ThresholdCriteriaComboBox implements UiComponent {
 	@Override
 	public void init(Hub hub, Manager manager) {
 		ComboBoxBuilder builder = new ComboBoxBuilder("Theshold Criteria");
-		builder.add("Level Based Criteria", () -> hub.selectLevelBasedCriteriaPublish());
-		builder.add("Test per Class Criteria", () -> hub.selectTestsPerClassCriteriaPublish());
-		builder.add("Similarity Based Criteria", () -> hub.selectSimilarityBasedCriteriaPublish());
-		builder.add("Never stop", () -> hub.selectNeverStopCriteriaPublish());
+		builder.add("Level Based Criteria", hub::selectLevelBasedCriteriaPublish);
+		builder.add("Test per Class Criteria", hub::selectTestsPerClassCriteriaPublish);
+		builder.add("Similarity Based Criteria", hub::selectSimilarityBasedCriteriaPublish);
+		builder.add("Never stop", hub::selectNeverStopCriteriaPublish);
 		combo = builder.build();
 		toolbar.addComponent(combo);
 	}
 
 	@Override
-	public void addChilds(List<UiComponent> childs) {}
+	public void addChildren(List<UiComponent> children) {}
 
 	@Override
 	public void start() {

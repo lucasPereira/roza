@@ -9,7 +9,7 @@ import br.ufsc.ine.leb.roza.measurement.configuration.Configurations;
 
 public class SimianConfigurations extends AbstractConfigurations implements Configurations {
 
-	private SimianIntegerConfiguration threshold;
+	private final SimianIntegerConfiguration threshold;
 
 	public SimianConfigurations() {
 		threshold = new SimianIntegerConfiguration("threshold", 6, "Matches will contain at least the specified number of lines");
@@ -20,7 +20,7 @@ public class SimianConfigurations extends AbstractConfigurations implements Conf
 		List<Configuration> configurations = new LinkedList<>();
 		configurations.add(threshold);
 		configurations.add(new SimianBooleanConfiguration("ignoreCurlyBraces", true, "Curly braces are ignored"));
-		configurations.add(new SimianBooleanConfiguration("ignoreIdentifiers", false, "Completely ignores all identfiers"));
+		configurations.add(new SimianBooleanConfiguration("ignoreIdentifiers", false, "Completely ignores all identifiers"));
 		configurations.add(new SimianBooleanConfiguration("ignoreStrings", false, "\"abc\" and \"def\" would both match"));
 		configurations.add(new SimianBooleanConfiguration("ignoreNumbers", false, "1 and 576 would both match"));
 		configurations.add(new SimianBooleanConfiguration("ignoreCharacters", false, "'A' and 'Z' would both match"));
@@ -33,7 +33,7 @@ public class SimianConfigurations extends AbstractConfigurations implements Conf
 		configurations.add(new SimianStringConfiguration("ignoreBlocks", "0:0", "Ignores all lines between specified start/end markers"));
 		configurations.add(new SimianBooleanConfiguration("ignoreIdentifierCase", false, "MyVariableName and myvariablename would both match"));
 		configurations.add(new SimianBooleanConfiguration("ignoreStringCase", false, "\"Hello, World\" and \"HELLO, WORLD\" would both match"));
-		configurations.add(new SimianBooleanConfiguration("ignoreCharacterCase", false, "'A' and 'a'would both match"));
+		configurations.add(new SimianBooleanConfiguration("ignoreCharacterCase", false, "'A' and 'a' would both match"));
 		configurations.add(new SimianBooleanConfiguration("ignoreSubtypeNames", false, "BufferedReader, StringReader and Reader would all match"));
 		configurations.add(new SimianBooleanConfiguration("ignoreModifiers", true, "public, protected, static, etc"));
 		configurations.add(new SimianBooleanConfiguration("balanceParentheses", true, "Ensures that expressions inside parenthesis that are split across multiple physical lines are considered as one"));
@@ -47,8 +47,7 @@ public class SimianConfigurations extends AbstractConfigurations implements Conf
 	}
 
 	public SimianConfigurations threshold(Integer value) {
-		ensureThat(value != null);
-		ensureThat(value >= 2);
+		ensureThat(value != null && value >= 2);
 		threshold.setValue(value);
 		return this;
 	}

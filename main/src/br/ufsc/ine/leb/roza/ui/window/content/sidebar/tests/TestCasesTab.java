@@ -13,7 +13,7 @@ import br.ufsc.ine.leb.roza.ui.window.content.sidebar.Sidebar;
 public class TestCasesTab implements UiComponent {
 
 	private JSplitPane panel;
-	private Sidebar sidebar;
+	private final Sidebar sidebar;
 
 	public TestCasesTab(Sidebar sidebar) {
 		this.sidebar = sidebar;
@@ -28,9 +28,9 @@ public class TestCasesTab implements UiComponent {
 	}
 
 	@Override
-	public void addChilds(List<UiComponent> childs) {
-		childs.add(new TestCaseList(this));
-		childs.add(new TestCaseCode(this));
+	public void addChildren(List<UiComponent> children) {
+		children.add(new TestCaseList(this));
+		children.add(new TestCaseCode(this));
 	}
 
 	@Override

@@ -20,13 +20,13 @@ class SimianIntegerConfigurationTest {
 	}
 
 	@Test
-	void nameAndDescription() throws Exception {
+	void nameAndDescription() {
 		assertEquals("threshold", configuration.getName());
 		assertEquals("Matches will contain at least the specified number of lines", configuration.getDescription());
 	}
 
 	@Test
-	void create() throws Exception {
+	void create() {
 		configuration.addArgument(arguments);
 		assertEquals(6, configuration.getValue().intValue());
 		assertEquals(1, arguments.size());
@@ -34,7 +34,7 @@ class SimianIntegerConfigurationTest {
 	}
 
 	@Test
-	void change() throws Exception {
+	void change() {
 		configuration.setValue(2);
 		configuration.addArgument(arguments);
 		assertEquals(2, configuration.getValue().intValue());

@@ -2,7 +2,6 @@ package br.ufsc.ine.leb.roza.materialization;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -28,20 +27,19 @@ class Junit4WithoutAssertionsTestCaseMaterializerTest {
 	}
 
 	@Test
-	void oneTestCase() throws Exception {
+	void oneTestCase() {
 		Statement fixtureStatement = new Statement("sut(0);");
 		Statement assertStatement = new Statement("assertEquals(0, 0);");
-		TestCase testCase = new TestCase("example", Arrays.asList(fixtureStatement), Arrays.asList(assertStatement));
-		MaterializationReport report = materializer.materialize(Arrays.asList(testCase));
-		List<TestCaseMaterialization> materializations = report.getMaterializations();
+		TestCase testCase = new TestCase("example", List.of(fixtureStatement), List.of(assertStatement));
+		MaterializationReport report = materializer.materialize(List.of(testCase));
+		List<TestCaseMaterialization> materializations = report.getMaterialization();
 
-		StringBuilder generatedClass = new StringBuilder();
-		generatedClass.append("public class TestClass1ExampleTest {\n\n");
-		generatedClass.append("\t@Test()\n");
-		generatedClass.append("\tpublic void example() {\n");
-		generatedClass.append("\t\tsut(0);\n");
-		generatedClass.append("\t}\n");
-		generatedClass.append("}\n");
+		String generatedClass = "public class TestClass1ExampleTest {\n\n" +
+			"\t@Test()\n" +
+			"\tpublic void example() {\n" +
+			"\t\tsut(0);\n" +
+			"\t}\n" +
+			"}\n";
 
 		assertEquals("main/exec/materializer", report.getBaseFolder());
 		assertEquals(1, materializations.size());
@@ -49,35 +47,33 @@ class Junit4WithoutAssertionsTestCaseMaterializerTest {
 		assertEquals(7, materializations.get(0).getLength().intValue());
 		assertEquals("TestClass1ExampleTest.java", materializations.get(0).getFileName());
 		assertEquals("main/exec/materializer/TestClass1ExampleTest.java", materializations.get(0).getFilePath());
-		assertEquals(generatedClass.toString(), fileUtils.readContetAsString(materializations.get(0).getFilePath()));
+		assertEquals(generatedClass, fileUtils.readContetAsString(materializations.get(0).getFilePath()));
 	}
 
 	@Test
-	void twoTetCases() throws Exception {
+	void twoTetCases() {
 		Statement fixtureStatement1 = new Statement("sut(1);");
 		Statement assertStatement1 = new Statement("assertEquals(1, 1);");
-		TestCase testCase1 = new TestCase("example1", Arrays.asList(fixtureStatement1), Arrays.asList(assertStatement1));
+		TestCase testCase1 = new TestCase("example1", List.of(fixtureStatement1), List.of(assertStatement1));
 		Statement fixtureStatement2 = new Statement("sut(2);");
 		Statement assertStatement2 = new Statement("assertEquals(2, 2);");
-		TestCase testCase2 = new TestCase("example2", Arrays.asList(fixtureStatement2), Arrays.asList(assertStatement2));
-		MaterializationReport report = materializer.materialize(Arrays.asList(testCase1, testCase2));
-		List<TestCaseMaterialization> materializations = report.getMaterializations();
+		TestCase testCase2 = new TestCase("example2", List.of(fixtureStatement2), List.of(assertStatement2));
+		MaterializationReport report = materializer.materialize(List.of(testCase1, testCase2));
+		List<TestCaseMaterialization> materializations = report.getMaterialization();
 
-		StringBuilder generatedClass1 = new StringBuilder();
-		generatedClass1.append("public class TestClass1Example1Test {\n\n");
-		generatedClass1.append("\t@Test()\n");
-		generatedClass1.append("\tpublic void example1() {\n");
-		generatedClass1.append("\t\tsut(1);\n");
-		generatedClass1.append("\t}\n");
-		generatedClass1.append("}\n");
+		String generatedClass1 = "public class TestClass1Example1Test {\n\n" +
+			"\t@Test()\n" +
+			"\tpublic void example1() {\n" +
+			"\t\tsut(1);\n" +
+			"\t}\n" +
+			"}\n";
 
-		StringBuilder generatedClass2 = new StringBuilder();
-		generatedClass2.append("public class TestClass2Example2Test {\n\n");
-		generatedClass2.append("\t@Test()\n");
-		generatedClass2.append("\tpublic void example2() {\n");
-		generatedClass2.append("\t\tsut(2);\n");
-		generatedClass2.append("\t}\n");
-		generatedClass2.append("}\n");
+		String generatedClass2 = "public class TestClass2Example2Test {\n\n" +
+			"\t@Test()\n" +
+			"\tpublic void example2() {\n" +
+			"\t\tsut(2);\n" +
+			"\t}\n" +
+			"}\n";
 
 		assertEquals("main/exec/materializer", report.getBaseFolder());
 		assertEquals(2, materializations.size());
@@ -89,36 +85,34 @@ class Junit4WithoutAssertionsTestCaseMaterializerTest {
 		assertEquals("TestClass2Example2Test.java", materializations.get(1).getFileName());
 		assertEquals("main/exec/materializer/TestClass1Example1Test.java", materializations.get(0).getFilePath());
 		assertEquals("main/exec/materializer/TestClass2Example2Test.java", materializations.get(1).getFilePath());
-		assertEquals(generatedClass1.toString(), fileUtils.readContetAsString(materializations.get(0).getFilePath()));
-		assertEquals(generatedClass2.toString(), fileUtils.readContetAsString(materializations.get(1).getFilePath()));
+		assertEquals(generatedClass1, fileUtils.readContetAsString(materializations.get(0).getFilePath()));
+		assertEquals(generatedClass2, fileUtils.readContetAsString(materializations.get(1).getFilePath()));
 	}
 
 	@Test
-	void twoTetCasesWithTheSameName() throws Exception {
+	void twoTetCasesWithTheSameName() {
 		Statement fixtureStatement1 = new Statement("sut(1);");
 		Statement assertStatement1 = new Statement("assertEquals(1, 1);");
-		TestCase testCase1 = new TestCase("example", Arrays.asList(fixtureStatement1), Arrays.asList(assertStatement1));
+		TestCase testCase1 = new TestCase("example", List.of(fixtureStatement1), List.of(assertStatement1));
 		Statement fixtureStatement2 = new Statement("sut(2);");
 		Statement assertStatement2 = new Statement("assertEquals(2, 2);");
-		TestCase testCase2 = new TestCase("example", Arrays.asList(fixtureStatement2), Arrays.asList(assertStatement2));
-		MaterializationReport report = materializer.materialize(Arrays.asList(testCase1, testCase2));
-		List<TestCaseMaterialization> materializations = report.getMaterializations();
+		TestCase testCase2 = new TestCase("example", List.of(fixtureStatement2), List.of(assertStatement2));
+		MaterializationReport report = materializer.materialize(List.of(testCase1, testCase2));
+		List<TestCaseMaterialization> materializations = report.getMaterialization();
 
-		StringBuilder generatedClass1 = new StringBuilder();
-		generatedClass1.append("public class TestClass1ExampleTest {\n\n");
-		generatedClass1.append("\t@Test()\n");
-		generatedClass1.append("\tpublic void example() {\n");
-		generatedClass1.append("\t\tsut(1);\n");
-		generatedClass1.append("\t}\n");
-		generatedClass1.append("}\n");
+		String generatedClass1 = "public class TestClass1ExampleTest {\n\n" +
+			"\t@Test()\n" +
+			"\tpublic void example() {\n" +
+			"\t\tsut(1);\n" +
+			"\t}\n" +
+			"}\n";
 
-		StringBuilder generatedClass2 = new StringBuilder();
-		generatedClass2.append("public class TestClass2ExampleTest {\n\n");
-		generatedClass2.append("\t@Test()\n");
-		generatedClass2.append("\tpublic void example() {\n");
-		generatedClass2.append("\t\tsut(2);\n");
-		generatedClass2.append("\t}\n");
-		generatedClass2.append("}\n");
+		String generatedClass2 = "public class TestClass2ExampleTest {\n\n" +
+			"\t@Test()\n" +
+			"\tpublic void example() {\n" +
+			"\t\tsut(2);\n" +
+			"\t}\n" +
+			"}\n";
 
 		assertEquals("main/exec/materializer", report.getBaseFolder());
 		assertEquals(2, materializations.size());
@@ -130,8 +124,8 @@ class Junit4WithoutAssertionsTestCaseMaterializerTest {
 		assertEquals("TestClass2ExampleTest.java", materializations.get(1).getFileName());
 		assertEquals("main/exec/materializer/TestClass1ExampleTest.java", materializations.get(0).getFilePath());
 		assertEquals("main/exec/materializer/TestClass2ExampleTest.java", materializations.get(1).getFilePath());
-		assertEquals(generatedClass1.toString(), fileUtils.readContetAsString(materializations.get(0).getFilePath()));
-		assertEquals(generatedClass2.toString(), fileUtils.readContetAsString(materializations.get(1).getFilePath()));
+		assertEquals(generatedClass1, fileUtils.readContetAsString(materializations.get(0).getFilePath()));
+		assertEquals(generatedClass2, fileUtils.readContetAsString(materializations.get(1).getFilePath()));
 	}
 
 }

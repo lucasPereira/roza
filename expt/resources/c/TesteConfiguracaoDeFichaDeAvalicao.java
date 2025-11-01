@@ -12,7 +12,7 @@ public class TesteConfiguracaoDeFichaDeAvalicao {
 	private Selenium selenium;
 
 	@BeforeEach
-	void configurar() throws Exception {
+	void configurar() {
 		correioEletronico = new CorreioEletronico();
 		bancoDeDados = new BancoDeDados();
 		servidor = new Servidor();
@@ -36,7 +36,7 @@ public class TesteConfiguracaoDeFichaDeAvalicao {
 	}
 
 	@Test
-	void cadastrarFichaDeAvaliacaoPagina() throws Exception {
+	void cadastrarFichaDeAvaliacaoPagina() {
 		String mensagem = "Para cadastrar a ficha de avaliação utilize o botão abaixo. Para cada um dos indicadores abaixo é possível defenir o seu peso e a pontuação de cada uma das categorias pertencentes ao indicador em questão. A pontuação efetiva de cada categoria consistirá da multiplicação do peso do indicador (valor inteiro ou decimal separado por vírgula) pela pontuação da categoria (valor inteiro). O somatório da pontuação efetiva máxima da cada indicador não poderá ultrapassar 100, sendo que para efeito de cálculo não serão contabilizados os indicadores extras: premiação, indicação como obra referência e tradução para outros idiomas.";
 		String aviso = "Caso a ficha de avaliação já exista, então a mesma será recadastrada.";
 		selenium.assegurarTexto(mensagem, "#capes-configuracao-ficha-avaliacao-form > fieldset > div:nth-child(1) > p:nth-of-type(1)");
@@ -45,7 +45,7 @@ public class TesteConfiguracaoDeFichaDeAvalicao {
 	}
 
 	@Test
-	void cadastrarFichaDeAvaliacaoComSucesso() throws Exception {
+	void cadastrarFichaDeAvaliacaoComSucesso() {
 		StringBuilder mensagem = new StringBuilder();
 		mensagem.append("Configuração realizada com sucesso\n\n");
 		mensagem.append("Pontuação máxima: 100");
@@ -62,7 +62,7 @@ public class TesteConfiguracaoDeFichaDeAvalicao {
 	}
 
 	@Test
-	void cadastrarFichaDeAvaliacaoSomatorioDePontosAcimaDe100() throws Exception {
+	void cadastrarFichaDeAvaliacaoSomatorioDePontosAcimaDe100() {
 		StringBuilder mensagem = new StringBuilder();
 		mensagem.append("A pontuação máxima dos indicadores não pode ultrapassar 100 (não são considerados neste cálculo os indicadores extras: premiação, indicação como obra referência e tradução para outros idiomas)\n\n");
 		mensagem.append("Pontuação máxima atual: 120");
@@ -71,7 +71,7 @@ public class TesteConfiguracaoDeFichaDeAvalicao {
 	}
 
 	@Test
-	void cadastrarFichaDeAvaliacaoDuasVezesComSucesso() throws Exception {
+	void cadastrarFichaDeAvaliacaoDuasVezesComSucesso() {
 		selenium.limpar("#capes-configuracao-ficha-avaliacao-form  input[name=indicador-idioma]");
 		selenium.digitar("0", "#capes-configuracao-ficha-avaliacao-form  input[name=indicador-idioma]");
 		selenium.limpar("#capes-configuracao-ficha-avaliacao-form  input[name=indicador-editora]");
@@ -90,7 +90,7 @@ public class TesteConfiguracaoDeFichaDeAvalicao {
 	}
 
 	@Test
-	void cadastrarFichaDeAvaliacaoVerFichaDeAvaliacao() throws Exception {
+	void cadastrarFichaDeAvaliacaoVerFichaDeAvaliacao() {
 		selenium.limpar("#capes-configuracao-ficha-avaliacao-form  input[name=indicador-idioma]");
 		selenium.digitar("0", "#capes-configuracao-ficha-avaliacao-form  input[name=indicador-idioma]");
 		selenium.limpar("#capes-configuracao-ficha-avaliacao-form  input[name=indicador-editora]");
@@ -108,7 +108,7 @@ public class TesteConfiguracaoDeFichaDeAvalicao {
 	}
 
 	@Test
-	void cadastrarFichaDeAvaliacaoVerFormulario() throws Exception {
+	void cadastrarFichaDeAvaliacaoVerFormulario() {
 		selenium.limpar("#capes-configuracao-ficha-avaliacao-form  input[name=indicador-idioma]");
 		selenium.digitar("0", "#capes-configuracao-ficha-avaliacao-form  input[name=indicador-idioma]");
 		selenium.limpar("#capes-configuracao-ficha-avaliacao-form  input[name=indicador-editora]");
@@ -127,7 +127,7 @@ public class TesteConfiguracaoDeFichaDeAvalicao {
 	}
 
 	@Test
-	void cadastrarFichaDeAvaliacaoVerFichaDeAvaliacaoRecadastrada() throws Exception {
+	void cadastrarFichaDeAvaliacaoVerFichaDeAvaliacaoRecadastrada() {
 		selenium.limpar("#capes-configuracao-ficha-avaliacao-form  input[name=indicador-idioma]");
 		selenium.digitar("0", "#capes-configuracao-ficha-avaliacao-form  input[name=indicador-idioma]");
 		selenium.limpar("#capes-configuracao-ficha-avaliacao-form  input[name=indicador-editora]");
@@ -150,7 +150,7 @@ public class TesteConfiguracaoDeFichaDeAvalicao {
 	}
 
 	@AfterEach
-	void finalizar() throws Exception {
+	void finalizar() {
 		selenium.fechar();
 		servidor.finalizar();
 		correioEletronico.finalizar();

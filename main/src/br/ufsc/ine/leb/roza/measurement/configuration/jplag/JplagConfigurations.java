@@ -10,18 +10,21 @@ import br.ufsc.ine.leb.roza.measurement.configuration.Configurations;
 
 public class JplagConfigurations extends AbstractConfigurations implements Configurations {
 
-	private JplagIntegerConfiguration sensitivity;
-	private JplagStringConfiguration results;
-	private JplagStringConfiguration log;
-	private JplagStringConfiguration sources;
+	private final JplagIntegerConfiguration sensitivity;
+	private final JplagStringConfiguration results;
+	private final JplagStringConfiguration log;
+	private final JplagStringConfiguration sources;
 
 	public JplagConfigurations() {
 		sensitivity = new JplagIntegerConfiguration("t", 1, "Tune the sensitivity of the comparison");
 		results = new JplagStringConfiguration("r", null, "Name of directory in which the web pages will be stored");
 		log = new JplagStringConfiguration("o", null, "Output file of the parser log");
-		sources = new JplagStringConfiguration("s", null, "Look at files in subdirs too");
-		sources("main/exec/materializer");
-		results("main/exec/measurer");
+		sources = new JplagStringConfiguration("s", null, "Look at files in subfolders too");
+
+		String measurerFolder = "main/exec/measurer";
+		results.setValue(measurerFolder);
+		log.setValue(new File(measurerFolder, "log.txt").getPath());
+		sources.setValue("main/exec/materializer");
 	}
 
 	@Override
@@ -47,22 +50,8 @@ public class JplagConfigurations extends AbstractConfigurations implements Confi
 	}
 
 	public JplagConfigurations sensitivity(Integer value) {
-		ensureThat(value != null);
-		ensureThat(value > 0);
+		ensureThat(value != null && value > 0);
 		sensitivity.setValue(value);
-		return this;
-	}
-
-	private JplagConfigurations results(String value) {
-		ensureThat(value != null);
-		results.setValue(value);
-		log.setValue(new File(value, "log.txt").getPath());
-		return this;
-	}
-
-	private JplagConfigurations sources(String value) {
-		ensureThat(value != null);
-		sources.setValue(value);
 		return this;
 	}
 

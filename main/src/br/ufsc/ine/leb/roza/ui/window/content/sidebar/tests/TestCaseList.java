@@ -6,8 +6,6 @@ import javax.swing.DefaultListModel;
 import javax.swing.JList;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 
 import br.ufsc.ine.leb.roza.TestCase;
 import br.ufsc.ine.leb.roza.ui.Hub;
@@ -17,7 +15,7 @@ import br.ufsc.ine.leb.roza.ui.model.TestCaseRenderer;
 
 public class TestCaseList implements UiComponent {
 
-	private TestCasesTab testCasesTab;
+	private final TestCasesTab testCasesTab;
 
 	public TestCaseList(TestCasesTab testsTab) {
 		this.testCasesTab = testsTab;
@@ -29,30 +27,23 @@ public class TestCaseList implements UiComponent {
 		JScrollPane scroller = new JScrollPane(list);
 		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		testCasesTab.addTopComponent(scroller);
-		hub.loadTestClassesSubscribe(testClasses -> {
-			list.setModel(new DefaultListModel<>());
-		});
+		hub.loadTestClassesSubscribe(testClasses -> list.setModel(new DefaultListModel<>()));
 		hub.extractTestCasesSubscribe(testCases -> {
 			DefaultListModel<TestCase> model = new DefaultListModel<>();
 			list.setModel(model);
 			list.setCellRenderer(new TestCaseRenderer());
-			testCases.forEach(testCase -> model.addElement(testCase));
+			testCases.forEach(model::addElement);
 		});
-		list.addListSelectionListener(new ListSelectionListener() {
-
-			@Override
-			public void valueChanged(ListSelectionEvent event) {
-				TestCase testCase = list.getSelectedValue();
-				if (testCase != null && !event.getValueIsAdjusting()) {
-					hub.selectTestCasePublish(testCase);
-				}
+		list.addListSelectionListener(event -> {
+			TestCase testCase = list.getSelectedValue();
+			if (testCase != null && !event.getValueIsAdjusting()) {
+				hub.selectTestCasePublish(testCase);
 			}
-
 		});
 	}
 
 	@Override
-	public void addChilds(List<UiComponent> childs) {}
+	public void addChildren(List<UiComponent> children) {}
 
 	@Override
 	public void start() {}

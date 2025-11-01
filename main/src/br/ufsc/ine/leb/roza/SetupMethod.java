@@ -4,8 +4,8 @@ import java.util.List;
 
 public class SetupMethod {
 
-	private String name;
-	private List<Statement> statements;
+	private final String name;
+	private final List<Statement> statements;
 
 	public SetupMethod(String name, List<Statement> statements) {
 		this.name = name;

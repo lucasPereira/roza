@@ -1,7 +1,6 @@
 package br.ufsc.ine.leb.roza.expt.a;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -21,17 +20,18 @@ import br.ufsc.ine.leb.roza.measurement.matrix.MatrixTestCaseToStringConverter;
 import br.ufsc.ine.leb.roza.measurement.matrix.MatrixValueFactory;
 import br.ufsc.ine.leb.roza.parsing.Junit5TestClassParser;
 import br.ufsc.ine.leb.roza.parsing.TestClassParser;
+import br.ufsc.ine.leb.roza.utils.RozaLogger;
 
 public class GroundTruth {
 
-	private Matrix<TestCase, String, Integer> matrix;
-	private List<TestCase> testCases;
+	private final Matrix<TestCase, String, Integer> matrix;
+	private final List<TestCase> testCases;
 
 	public GroundTruth() {
 		TextFileLoader loader = new RecursiveTextFileLoader("expt/resources/a");
 		TestClassParser parser = new Junit5TestClassParser();
-		List<String> assercoes = Arrays.asList("assegurarTexto", "assegurarValor", "assegurarQuantidadeDeElementos", "assegurarConteudoDeArquivoBaixado", "assegurarNaoMarcado", "assegurarMarcado", "assegurarMarcacao");
-		TestCaseExtractor extractor = new JunitTestCaseExtractor(assercoes);
+		List<String> assertions = List.of("assegurarTexto", "assegurarValor", "assegurarQuantidadeDeElementos", "assegurarConteudoDeArquivoBaixado", "assegurarNaoMarcado", "assegurarMarcado", "assegurarMarcacao");
+		TestCaseExtractor extractor = new JunitTestCaseExtractor(assertions);
 		List<TextFile> files = loader.load();
 		List<TestClass> classes = parser.parse(files);
 		testCases = extractor.extract(classes);
@@ -49,68 +49,19 @@ public class GroundTruth {
 	}
 
 	private void all(Matrix<TestCase, String, Integer> matrix) {
-		List<String> all = new LinkedList<String>();
-		all.add("importarProducoesPagina");
-		all.add("importarProducoesComSucesso");
-		all.add("importarProducoesDuasVezesComSucesso");
-		all.add("importarProducoesSemArquivo");
-		all.add("importarProducoesArquivoVazio");
-		all.add("importarProducoesArquivoSemCabecalho");
-		all.add("importarProducoesArquivoSemIdentificador");
-		all.add("importarProducoesVerSubmissoesDeImportacaoComSucesso");
-		all.add("importarProducoesVerSubmissoesDeDuasImportacoesDiferentesComSucesso");
-		all.add("importarAvaliadoresCoordenadorPagina");
-		all.add("importarAvaliadoresCoordenadorComSucesso");
-		all.add("importarAvaliadoresCoordenadorDuasVezesComSucesso");
-		all.add("importarAvaliadoresCoordenadorSemArquivo");
-		all.add("importarAvaliadoresCoordenadorArquivoVazio");
-		all.add("importarAvaliadoresCoordenadorArquivoSemCabecalho");
-		all.add("importarAvaliadoresCoordenadorArquivoSemDocumento");
-		all.add("importarAvaliadoresCoordenadorVerAvaliadoresDeImportacao");
-		all.add("importarAvaliadoresCoordenadorVerCoordenadorDeImportacao");
-		all.add("importarAvaliadoresCoordenadorVerAvaliadoresDeSegundaImportacaoComDadosAtualizados");
-		all.add("importarAvaliadoresCoordenadorVerCoordenadorDeSegundaImportacaoComDadosAtualizados");
-		all.add("importarAvaliadoresCoordenadorVerAvaliadoresDeSegundaImportacaoDeDuasImportacoesEmAreaDiferenteComDadosAtualizados");
-		all.add("importarAvaliadoresCoordenadorVerCoordenadorDeSegundaImportacaoDeDuasImportacoesEmAreaDiferenteComDadosAtualizados");
-		all.add("importarAvaliadoresCoordenadorVerAvaliadoresDePrimeiraImportacaoDeDuasImportacoesEmAreaDiferenteComDadosAtualizados");
-		all.add("importarAvaliadoresCoordenadorVerCoordenadorDePrimeiraImportacaoDeDuasImportacoesEmAreaDiferenteComDadosAtualizados");
-		all.add("cadastrarFichaDeAvaliacaoPagina");
-		all.add("cadastrarFichaDeAvaliacaoComSucesso");
-		all.add("cadastrarFichaDeAvaliacaoSomatorioDePontosAcimaDe100");
-		all.add("cadastrarFichaDeAvaliacaoDuasVezesComSucesso");
-		all.add("cadastrarFichaDeAvaliacaoVerFichaDeAvaliacao");
-		all.add("cadastrarFichaDeAvaliacaoVerFormulario");
-		all.add("cadastrarFichaDeAvaliacaoVerFichaDeAvaliacaoRecadastrada");
-		all.add("distribuirAvaliadoresPagina");
-		all.add("distribuirAvaliadoresComSucesso");
-		all.add("distribuirAvaliadoresSemPreencherPrazoDeAvaliacao");
-		all.add("distribuirAvaliadoresSemCoordenadorDeArea");
-		all.add("distribuirAvaliadoresComMaisDeUmCoordenadorDeArea");
-		all.add("distribuirAvaliadoresSemAvaliadores");
-		all.add("distribuirAvaliadoresSemFichaDeAvaliacao");
-		all.add("distribuirAvaliadoresVerPrimeiraProducao");
-		all.add("distribuirAvaliadoresVerSegundaProducao");
-		all.add("distribuirAvaliadoresVerPrimeiraProducaoAtualizada");
-		all.add("distribuirAvaliadoresVerSegundaProducaoAtualizada");
-		all.add("avaliarAvaliador");
-		all.add("avaliarCoordenadorDeArea");
-		all.add("pluginsPaginaGeral");
-		all.add("pluginsPaginaDoPlugin");
-		populate(matrix, all, 3);
+		List<String> allTests = new LinkedList<>();
+		allTests.addAll(getProductionImportTests());
+		allTests.addAll(getReviewerImportTests());
+		allTests.addAll(getEvaluationFormTests());
+		allTests.addAll(getReviewerDistributionTests());
+		allTests.addAll(getAssessmentTests());
+		allTests.addAll(getPluginTests());
+		populate(matrix, allTests, 3);
 	}
 
 	private void productionImport(Matrix<TestCase, String, Integer> matrix) {
-		List<String> productionImport = new LinkedList<String>();
-		productionImport.add("importarProducoesPagina");
-		productionImport.add("importarProducoesComSucesso");
-		productionImport.add("importarProducoesDuasVezesComSucesso");
-		productionImport.add("importarProducoesSemArquivo");
-		productionImport.add("importarProducoesArquivoVazio");
-		productionImport.add("importarProducoesArquivoSemCabecalho");
-		productionImport.add("importarProducoesArquivoSemIdentificador");
-		productionImport.add("importarProducoesVerSubmissoesDeImportacaoComSucesso");
-		productionImport.add("importarProducoesVerSubmissoesDeDuasImportacoesDiferentesComSucesso");
-		populate(matrix, productionImport, 19);
+		List<String> tests = getProductionImportTests();
+		populate(matrix, tests, 19);
 		matrix.set("importarProducoesPagina", "importarProducoesPagina", 21);
 		matrix.set("importarProducoesComSucesso", "importarProducoesComSucesso", 25);
 		matrix.set("importarProducoesComSucesso", "importarProducoesDuasVezesComSucesso", 22);
@@ -134,24 +85,23 @@ public class GroundTruth {
 		matrix.set("importarProducoesVerSubmissoesDeDuasImportacoesDiferentesComSucesso", "importarProducoesVerSubmissoesDeImportacaoComSucesso", 23);
 	}
 
+	private static List<String> getProductionImportTests() {
+		List<String> tests = new LinkedList<>();
+		tests.add("importarProducoesPagina");
+		tests.add("importarProducoesComSucesso");
+		tests.add("importarProducoesDuasVezesComSucesso");
+		tests.add("importarProducoesSemArquivo");
+		tests.add("importarProducoesArquivoVazio");
+		tests.add("importarProducoesArquivoSemCabecalho");
+		tests.add("importarProducoesArquivoSemIdentificador");
+		tests.add("importarProducoesVerSubmissoesDeImportacaoComSucesso");
+		tests.add("importarProducoesVerSubmissoesDeDuasImportacoesDiferentesComSucesso");
+		return tests;
+	}
+
 	private void reviewerImport(Matrix<TestCase, String, Integer> matrix) {
-		List<String> reviewerImport = new LinkedList<String>();
-		reviewerImport.add("importarAvaliadoresCoordenadorPagina");
-		reviewerImport.add("importarAvaliadoresCoordenadorComSucesso");
-		reviewerImport.add("importarAvaliadoresCoordenadorDuasVezesComSucesso");
-		reviewerImport.add("importarAvaliadoresCoordenadorSemArquivo");
-		reviewerImport.add("importarAvaliadoresCoordenadorArquivoVazio");
-		reviewerImport.add("importarAvaliadoresCoordenadorArquivoSemCabecalho");
-		reviewerImport.add("importarAvaliadoresCoordenadorArquivoSemDocumento");
-		reviewerImport.add("importarAvaliadoresCoordenadorVerAvaliadoresDeImportacao");
-		reviewerImport.add("importarAvaliadoresCoordenadorVerCoordenadorDeImportacao");
-		reviewerImport.add("importarAvaliadoresCoordenadorVerAvaliadoresDeSegundaImportacaoComDadosAtualizados");
-		reviewerImport.add("importarAvaliadoresCoordenadorVerCoordenadorDeSegundaImportacaoComDadosAtualizados");
-		reviewerImport.add("importarAvaliadoresCoordenadorVerAvaliadoresDeSegundaImportacaoDeDuasImportacoesEmAreaDiferenteComDadosAtualizados");
-		reviewerImport.add("importarAvaliadoresCoordenadorVerCoordenadorDeSegundaImportacaoDeDuasImportacoesEmAreaDiferenteComDadosAtualizados");
-		reviewerImport.add("importarAvaliadoresCoordenadorVerAvaliadoresDePrimeiraImportacaoDeDuasImportacoesEmAreaDiferenteComDadosAtualizados");
-		reviewerImport.add("importarAvaliadoresCoordenadorVerCoordenadorDePrimeiraImportacaoDeDuasImportacoesEmAreaDiferenteComDadosAtualizados");
-		populate(matrix, reviewerImport, 19);
+		List<String> tests = getReviewerImportTests();
+		populate(matrix, tests, 19);
 		matrix.set("importarAvaliadoresCoordenadorPagina", "importarAvaliadoresCoordenadorPagina", 22);
 		matrix.set("importarAvaliadoresCoordenadorComSucesso", "importarAvaliadoresCoordenadorComSucesso", 28);
 		matrix.set("importarAvaliadoresCoordenadorDuasVezesComSucesso", "importarAvaliadoresCoordenadorDuasVezesComSucesso", 33);
@@ -241,16 +191,29 @@ public class GroundTruth {
 		matrix.set("importarAvaliadoresCoordenadorVerCoordenadorDePrimeiraImportacaoDeDuasImportacoesEmAreaDiferenteComDadosAtualizados", "importarAvaliadoresCoordenadorVerAvaliadoresDePrimeiraImportacaoDeDuasImportacoesEmAreaDiferenteComDadosAtualizados", 39);
 	}
 
+	private static List<String> getReviewerImportTests() {
+		List<String> tests = new LinkedList<>();
+		tests.add("importarAvaliadoresCoordenadorPagina");
+		tests.add("importarAvaliadoresCoordenadorComSucesso");
+		tests.add("importarAvaliadoresCoordenadorDuasVezesComSucesso");
+		tests.add("importarAvaliadoresCoordenadorSemArquivo");
+		tests.add("importarAvaliadoresCoordenadorArquivoVazio");
+		tests.add("importarAvaliadoresCoordenadorArquivoSemCabecalho");
+		tests.add("importarAvaliadoresCoordenadorArquivoSemDocumento");
+		tests.add("importarAvaliadoresCoordenadorVerAvaliadoresDeImportacao");
+		tests.add("importarAvaliadoresCoordenadorVerCoordenadorDeImportacao");
+		tests.add("importarAvaliadoresCoordenadorVerAvaliadoresDeSegundaImportacaoComDadosAtualizados");
+		tests.add("importarAvaliadoresCoordenadorVerCoordenadorDeSegundaImportacaoComDadosAtualizados");
+		tests.add("importarAvaliadoresCoordenadorVerAvaliadoresDeSegundaImportacaoDeDuasImportacoesEmAreaDiferenteComDadosAtualizados");
+		tests.add("importarAvaliadoresCoordenadorVerCoordenadorDeSegundaImportacaoDeDuasImportacoesEmAreaDiferenteComDadosAtualizados");
+		tests.add("importarAvaliadoresCoordenadorVerAvaliadoresDePrimeiraImportacaoDeDuasImportacoesEmAreaDiferenteComDadosAtualizados");
+		tests.add("importarAvaliadoresCoordenadorVerCoordenadorDePrimeiraImportacaoDeDuasImportacoesEmAreaDiferenteComDadosAtualizados");
+		return tests;
+	}
+
 	private void evaluationForm(Matrix<TestCase, String, Integer> matrix) {
-		List<String> evaluationForm = new LinkedList<String>();
-		evaluationForm.add("cadastrarFichaDeAvaliacaoPagina");
-		evaluationForm.add("cadastrarFichaDeAvaliacaoComSucesso");
-		evaluationForm.add("cadastrarFichaDeAvaliacaoSomatorioDePontosAcimaDe100");
-		evaluationForm.add("cadastrarFichaDeAvaliacaoDuasVezesComSucesso");
-		evaluationForm.add("cadastrarFichaDeAvaliacaoVerFichaDeAvaliacao");
-		evaluationForm.add("cadastrarFichaDeAvaliacaoVerFormulario");
-		evaluationForm.add("cadastrarFichaDeAvaliacaoVerFichaDeAvaliacaoRecadastrada");
-		populate(matrix, evaluationForm, 19);
+		List<String> tests = getEvaluationFormTests();
+		populate(matrix, tests, 19);
 		matrix.set("cadastrarFichaDeAvaliacaoPagina", "cadastrarFichaDeAvaliacaoPagina", 21);
 		matrix.set("cadastrarFichaDeAvaliacaoComSucesso", "cadastrarFichaDeAvaliacaoComSucesso", 31);
 		matrix.set("cadastrarFichaDeAvaliacaoComSucesso", "cadastrarFichaDeAvaliacaoSomatorioDePontosAcimaDe100", 20);
@@ -274,20 +237,21 @@ public class GroundTruth {
 		matrix.set("cadastrarFichaDeAvaliacaoVerFichaDeAvaliacaoRecadastrada", "cadastrarFichaDeAvaliacaoVerFormulario", 25);
 	}
 
+	private static List<String> getEvaluationFormTests() {
+		List<String> tests = new LinkedList<>();
+		tests.add("cadastrarFichaDeAvaliacaoPagina");
+		tests.add("cadastrarFichaDeAvaliacaoComSucesso");
+		tests.add("cadastrarFichaDeAvaliacaoSomatorioDePontosAcimaDe100");
+		tests.add("cadastrarFichaDeAvaliacaoDuasVezesComSucesso");
+		tests.add("cadastrarFichaDeAvaliacaoVerFichaDeAvaliacao");
+		tests.add("cadastrarFichaDeAvaliacaoVerFormulario");
+		tests.add("cadastrarFichaDeAvaliacaoVerFichaDeAvaliacaoRecadastrada");
+		return tests;
+	}
+
 	private void reviewerDistribution(Matrix<TestCase, String, Integer> matrix) {
-		List<String> reviewerDistribution = new LinkedList<String>();
-		reviewerDistribution.add("distribuirAvaliadoresPagina");
-		reviewerDistribution.add("distribuirAvaliadoresComSucesso");
-		reviewerDistribution.add("distribuirAvaliadoresSemPreencherPrazoDeAvaliacao");
-		reviewerDistribution.add("distribuirAvaliadoresSemCoordenadorDeArea");
-		reviewerDistribution.add("distribuirAvaliadoresComMaisDeUmCoordenadorDeArea");
-		reviewerDistribution.add("distribuirAvaliadoresSemAvaliadores");
-		reviewerDistribution.add("distribuirAvaliadoresSemFichaDeAvaliacao");
-		reviewerDistribution.add("distribuirAvaliadoresVerPrimeiraProducao");
-		reviewerDistribution.add("distribuirAvaliadoresVerSegundaProducao");
-		reviewerDistribution.add("distribuirAvaliadoresVerPrimeiraProducaoAtualizada");
-		reviewerDistribution.add("distribuirAvaliadoresVerSegundaProducaoAtualizada");
-		populate(matrix, reviewerDistribution, 18);
+		List<String> tests = getReviewerDistributionTests();
+		populate(matrix, tests, 18);
 		matrix.set("distribuirAvaliadoresPagina", "distribuirAvaliadoresPagina", 21);
 		matrix.set("distribuirAvaliadoresComSucesso", "distribuirAvaliadoresComSucesso", 41);
 		matrix.set("distribuirAvaliadoresComSucesso", "distribuirAvaliadoresSemFichaDeAvaliacao", 24);
@@ -315,24 +279,50 @@ public class GroundTruth {
 		matrix.set("distribuirAvaliadoresVerSegundaProducaoAtualizada", "distribuirAvaliadoresVerPrimeiraProducaoAtualizada", 60);
 	}
 
+	private static List<String> getReviewerDistributionTests() {
+		List<String> tests = new LinkedList<>();
+		tests.add("distribuirAvaliadoresPagina");
+		tests.add("distribuirAvaliadoresComSucesso");
+		tests.add("distribuirAvaliadoresSemPreencherPrazoDeAvaliacao");
+		tests.add("distribuirAvaliadoresSemCoordenadorDeArea");
+		tests.add("distribuirAvaliadoresComMaisDeUmCoordenadorDeArea");
+		tests.add("distribuirAvaliadoresSemAvaliadores");
+		tests.add("distribuirAvaliadoresSemFichaDeAvaliacao");
+		tests.add("distribuirAvaliadoresVerPrimeiraProducao");
+		tests.add("distribuirAvaliadoresVerSegundaProducao");
+		tests.add("distribuirAvaliadoresVerPrimeiraProducaoAtualizada");
+		tests.add("distribuirAvaliadoresVerSegundaProducaoAtualizada");
+		return tests;
+	}
+
 	private void assessment(Matrix<TestCase, String, Integer> matrix) {
-		List<String> assessment = new LinkedList<String>();
-		assessment.add("avaliarAvaliador");
-		assessment.add("avaliarCoordenadorDeArea");
-		populate(matrix, assessment, 46);
+		List<String> tests = getAssessmentTests();
+		populate(matrix, tests, 46);
 		matrix.set("avaliarAvaliador", "avaliarAvaliador", 58);
 		matrix.set("avaliarAvaliador", "avaliarCoordenadorDeArea", 49);
 		matrix.set("avaliarCoordenadorDeArea", "avaliarCoordenadorDeArea", 58);
 		matrix.set("avaliarCoordenadorDeArea", "avaliarAvaliador", 49);
 	}
 
+	private static List<String> getAssessmentTests() {
+		List<String> tests = new LinkedList<>();
+		tests.add("avaliarAvaliador");
+		tests.add("avaliarCoordenadorDeArea");
+		return tests;
+	}
+
 	private void plugin(Matrix<TestCase, String, Integer> matrix) {
-		List<String> plugin = new LinkedList<String>();
-		plugin.add("pluginsPaginaGeral");
-		plugin.add("pluginsPaginaDoPlugin");
-		populate(matrix, plugin, 17);
+		List<String> tests = getPluginTests();
+		populate(matrix, tests, 17);
 		matrix.set("pluginsPaginaGeral", "pluginsPaginaGeral", 17);
 		matrix.set("pluginsPaginaDoPlugin", "pluginsPaginaDoPlugin", 18);
+	}
+
+	private static List<String> getPluginTests() {
+		List<String> tests = new LinkedList<>();
+		tests.add("pluginsPaginaGeral");
+		tests.add("pluginsPaginaDoPlugin");
+		return tests;
 	}
 
 	private void populate(Matrix<TestCase, String, Integer> matrix, List<String> elements, Integer reusedFixtures) {
@@ -345,7 +335,7 @@ public class GroundTruth {
 		}
 	}
 
-	public List<TestCase> getRelevanteElements(List<TestCase> testCases, TestCase source) {
+	public List<TestCase> getRelevantElements(List<TestCase> testCases, TestCase source) {
 		List<TestCase> result = new ArrayList<>();
 		for (TestCase target : testCases) {
 			if (!source.equals(target) && matrix.get(source.getName(), target.getName()) > 3) {
@@ -355,24 +345,24 @@ public class GroundTruth {
 		return result;
 	}
 
-	public void findInconsistences() {
+	public void findInconsistencies() {
 		for (MatrixPair<TestCase, Integer> pair : matrix.getPairs()) {
 			if (pair.getValue() == null) {
 				logMissingPair(pair);
 			}
 		}
-		Integer errors = 0;
+		int errors = 0;
 		for (TestCase source : testCases) {
 			List<Statement> sourceFixtures = source.getFixtures();
 			for (TestCase target : testCases) {
 				Integer commonFixtures = countCommonFixtures(sourceFixtures, target);
 				Integer truth = matrix.get(source.getName(), target.getName());
-				Boolean inconsistent = !truth.equals(commonFixtures);
+				boolean inconsistent = !truth.equals(commonFixtures);
 				if (inconsistent) {
 					errors++;
 				}
 				if (inconsistent && errors == 1) {
-					logInconsistence(source, target, commonFixtures, truth);
+					logInconsistency(source, target, commonFixtures, truth);
 				}
 			}
 		}
@@ -380,10 +370,10 @@ public class GroundTruth {
 	}
 
 	private Integer countCommonFixtures(List<Statement> sourceFixtures, TestCase target) {
-		Boolean contiguous = true;
+		boolean contiguous = true;
 		List<Statement> targetFixtures = target.getFixtures();
 		Integer commonFixtures = 0;
-		for (Integer index = 0; contiguous && index < sourceFixtures.size() && index < targetFixtures.size(); index++) {
+		for (int index = 0; contiguous && index < sourceFixtures.size() && index < targetFixtures.size(); index++) {
 			Statement sourceFixture = sourceFixtures.get(index);
 			Statement targetFixture = targetFixtures.get(index);
 			contiguous = sourceFixture.equals(targetFixture);
@@ -395,18 +385,19 @@ public class GroundTruth {
 	}
 
 	private void logSummary(Integer errors) {
-		System.out.println(String.format("Pairs: %d", matrix.getPairs().size()));
-		System.out.println(String.format("Errors: %d", errors));
+		RozaLogger.getInstance().info(String.format("Pairs: %d", matrix.getPairs().size()));
+		RozaLogger.getInstance().info(String.format("Errors: %d", errors));
 	}
 
-	private void logInconsistence(TestCase source, TestCase target, Integer commonFixtures, Integer truth) {
-		System.out.println(String.format("%s --> %s (%d:%d)", source.getName(), target.getName(), truth, commonFixtures));
-		System.out.println(source.getFixtures());
-		System.out.println(target.getFixtures());
+
+	private void logInconsistency(TestCase source, TestCase target, Integer commonFixtures, Integer truth) {
+		RozaLogger.getInstance().warning(String.format("%s --> %s (%d:%d)", source.getName(), target.getName(), truth, commonFixtures));
+		RozaLogger.getInstance().warning(source.getFixtures().toString());
+		RozaLogger.getInstance().warning(target.getFixtures().toString());
 	}
 
 	private void logMissingPair(MatrixPair<TestCase, Integer> pair) {
-		System.out.println(String.format("Missing: %s -> %s", pair.getSource().getName(), pair.getTarget().getName()));
+		RozaLogger.getInstance().warning(String.format("Missing: %s -> %s", pair.getSource().getName(), pair.getTarget().getName()));
 	}
 
 }

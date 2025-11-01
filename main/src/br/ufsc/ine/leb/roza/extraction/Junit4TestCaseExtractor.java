@@ -1,11 +1,12 @@
 package br.ufsc.ine.leb.roza.extraction;
 
-import java.util.Arrays;
+
+import java.util.List;
 
 public class Junit4TestCaseExtractor extends JunitTestCaseExtractor implements TestCaseExtractor {
 
 	public Junit4TestCaseExtractor() {
-		super(Arrays.asList("assertArrayEquals", "assertEquals", "assertFalse", "assertNotNull", "assertNotSame", "assertNull", "assertSame", "assertThat", "assertTrue"));
+		super(List.of("assertArrayEquals", "assertEquals", "assertFalse", "assertNotNull", "assertNotSame", "assertNull", "assertSame", "assertThat", "assertTrue"));
 	}
 
 }

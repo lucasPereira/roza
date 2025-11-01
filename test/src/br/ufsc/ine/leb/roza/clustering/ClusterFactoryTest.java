@@ -3,7 +3,7 @@ package br.ufsc.ine.leb.roza.clustering;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -23,8 +23,8 @@ class ClusterFactoryTest {
 
 	@BeforeEach
 	void setup() {
-		TestCase alpha = new TestCase("alpha", Arrays.asList(), Arrays.asList());
-		TestCase beta = new TestCase("beta", Arrays.asList(), Arrays.asList());
+		TestCase alpha = new TestCase("alpha", List.of(), List.of());
+		TestCase beta = new TestCase("beta", List.of(), List.of());
 		report = new SimilarityReportBuilder(true).add(alpha).add(beta).complete().build();
 		alphaCluster = new Cluster(alpha);
 		betaCluster = new Cluster(beta);
@@ -32,7 +32,7 @@ class ClusterFactoryTest {
 	}
 
 	@Test
-	void create() throws Exception {
+	void create() {
 		Set<Cluster> clusters = factory.create(report);
 		assertEquals(2, clusters.size());
 		assertTrue(clusters.contains(alphaCluster));

@@ -10,22 +10,22 @@ import br.ufsc.ine.leb.roza.measurement.configuration.Configurations;
 
 public class DeckardConfigurations extends AbstractConfigurations implements Configurations {
 
-	private DeckardIntegerConfiguration minTokens;
-	private DeckardIntegerConfiguration stride;
-	private DeckardDoubleConfiguration similarity;
-	private Boolean isDockerMode;
+	private final DeckardIntegerConfiguration minTokens;
+	private final DeckardIntegerConfiguration stride;
+	private final DeckardDoubleConfiguration similarity;
+	private final Boolean isDockerMode;
 
-	private static String SRC_DIR_PATH = "exec/materializer";
-	private static String RESULTS_DIR_PATH = "exec/measurer";
-	private static String VECTOR_DIR_PATH =  RESULTS_DIR_PATH + "/vectors";
-	private static String CLUSTER_DIR_PATH = RESULTS_DIR_PATH + "/cluster";
-	private static String TIME_DIR_PATH= RESULTS_DIR_PATH + "/times";
+	private static final String SRC_DIR_PATH = "exec/materializer";
+	private static final String RESULTS_DIR_PATH = "exec/measurer";
+	private static final String VECTOR_DIR_PATH =  RESULTS_DIR_PATH + "/vectors";
+	private static final String CLUSTER_DIR_PATH = RESULTS_DIR_PATH + "/cluster";
+	private static final String TIME_DIR_PATH= RESULTS_DIR_PATH + "/times";
 
 	public DeckardConfigurations(boolean isDockerMode) {
 		this.isDockerMode = isDockerMode;
 		minTokens = new DeckardIntegerConfiguration("MIN_TOKENS", 1, "Minimum token count to suppress vectors for small sub-trees");
 		stride = new DeckardIntegerConfiguration("STRIDE", 0, "Width of the sliding window and how far it moves in each step");
-		similarity = new DeckardDoubleConfiguration("SIMILARITY", 1.0, "Similarity thresold based on editing distance");
+		similarity = new DeckardDoubleConfiguration("SIMILARITY", 1.0, "Similarity threshold based on editing distance");
 	}
 
 	@Override
@@ -56,23 +56,20 @@ public class DeckardConfigurations extends AbstractConfigurations implements Con
 	}
 
 	public DeckardConfigurations minTokens(Integer value) {
-		ensureThat(value != null);
-		ensureThat(value > 0);
+		ensureThat(value != null && value > 0);
 		minTokens.setValue(value);
 		return this;
 	}
 
 	public DeckardConfigurations stride(Integer value) {
-		ensureThat(value != null);
-		ensureThat(value >= 0);
+		ensureThat(value != null && value >= 0);
 		stride.setValue(value);
 		return this;
 	}
 
 	public DeckardConfigurations similarity(Double value) {
 		ensureThat(value != null);
-		ensureThat(value >= 0);
-		ensureThat(value <= 1);
+		ensureThat(value != null && value >= 0 && value <= 1);
 		similarity.setValue(value);
 		return this;
 	}

@@ -1,7 +1,5 @@
 package br.ufsc.ine.leb.roza.ui.shared;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -9,11 +7,11 @@ import javax.swing.JComboBox;
 
 public class ComboBoxBuilder {
 
-	private JComboBox<String> combo;
-	private List<ComboBoxListener> listeners;
+	private final JComboBox<String> combo;
+	private final List<ComboBoxListener> listeners;
 
 	public ComboBoxBuilder(String title) {
-		combo = new JComboBox<String>();
+		combo = new JComboBox<>();
 		combo.setToolTipText(title);
 		listeners = new LinkedList<>();
 	}
@@ -25,14 +23,9 @@ public class ComboBoxBuilder {
 	}
 
 	public JComboBox<String> build() {
-		combo.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent event) {
-				Integer selected = combo.getSelectedIndex();
-				listeners.get(selected).execute();
-			}
-
+		combo.addActionListener(event -> {
+			int selected = combo.getSelectedIndex();
+			listeners.get(selected).execute();
 		});
 		combo.setMaximumSize(combo.getPreferredSize());
 		return combo;

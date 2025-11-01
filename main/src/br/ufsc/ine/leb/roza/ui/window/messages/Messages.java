@@ -2,8 +2,6 @@ package br.ufsc.ine.leb.roza.ui.window.messages;
 
 import java.awt.Color;
 import java.awt.FlowLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -20,8 +18,8 @@ import br.ufsc.ine.leb.roza.ui.window.Window;
 
 public class Messages implements UiComponent {
 
-	private Window window;
-	private List<MessageModel> messages;
+	private final Window window;
+	private final List<MessageModel> messages;
 	private Integer index;
 	private JPanel panel;
 	private JLabel messageLabel;
@@ -58,25 +56,15 @@ public class Messages implements UiComponent {
 			displayCurrent();
 			updateButtonsState();
 		});
-		previous.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent event) {
-				index--;
-				displayCurrent();
-				updateButtonsState();
-			}
-
+		previous.addActionListener(event -> {
+			index--;
+			displayCurrent();
+			updateButtonsState();
 		});
-		next.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent event) {
-				index++;
-				displayCurrent();
-				updateButtonsState();
-			}
-
+		next.addActionListener(event -> {
+			index++;
+			displayCurrent();
+			updateButtonsState();
 		});
 		counterLabel.setBackground(Color.DARK_GRAY);
 		counterLabel.setOpaque(true);
@@ -90,8 +78,8 @@ public class Messages implements UiComponent {
 	}
 
 	private void updateButtonsState() {
-		previous.setEnabled(index > 0 ? true : false);
-		next.setEnabled(index < messages.size() - 1 ? true : false);
+		previous.setEnabled(index > 0);
+		next.setEnabled(index < messages.size() - 1);
 	}
 
 	private void displayCurrent() {
@@ -102,7 +90,7 @@ public class Messages implements UiComponent {
 	}
 
 	@Override
-	public void addChilds(List<UiComponent> childs) {}
+	public void addChildren(List<UiComponent> children) {}
 
 	@Override
 	public void start() {}

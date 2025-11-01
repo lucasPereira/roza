@@ -2,8 +2,8 @@ package br.ufsc.ine.leb.roza.measurement.configuration;
 
 public abstract class AbstractConfiguration implements Configuration {
 
-	private String name;
-	private String description;
+	private final String name;
+	private final String description;
 
 	public AbstractConfiguration(String name, String description) {
 		this.name = name;

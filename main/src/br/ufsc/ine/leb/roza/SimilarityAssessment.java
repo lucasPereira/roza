@@ -6,21 +6,21 @@ import br.ufsc.ine.leb.roza.exceptions.InvalidSimilarityScoreException;
 
 public class SimilarityAssessment {
 
-	private TestCase source;
-	private TestCase target;
-	private BigDecimal score;
+	private final TestCase source;
+	private final TestCase target;
+	private final BigDecimal score;
 
 	SimilarityAssessment(TestCase source, TestCase target, BigDecimal score) {
 		this.source = source;
 		this.target = target;
 		this.score = score;
-		assertSimilariyScoreIsValid();
+		assertSimilarityScoreIsValid();
 	}
 
-	private void assertSimilariyScoreIsValid() {
+	private void assertSimilarityScoreIsValid() {
 		Boolean isLessThanZero = score.compareTo(BigDecimal.ZERO) < 0;
-		Boolean isGreatherThantOne = score.compareTo(BigDecimal.ONE) > 0;
-		if (isLessThanZero || isGreatherThantOne) {
+		Boolean isGreaterThantOne = score.compareTo(BigDecimal.ONE) > 0;
+		if (isLessThanZero || isGreaterThantOne) {
 			throw new InvalidSimilarityScoreException();
 		}
 	}

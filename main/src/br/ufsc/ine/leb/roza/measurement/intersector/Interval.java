@@ -7,8 +7,8 @@ import br.ufsc.ine.leb.roza.exceptions.InvalidIntervalException;
 
 public class Interval {
 
-	private Integer start;
-	private Integer end;
+	private final Integer start;
+	private final Integer end;
 
 	public Interval(Integer start, Integer end) {
 		if (start <= 0 || end <= 0 || end < start) {

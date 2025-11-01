@@ -2,7 +2,6 @@ package br.ufsc.ine.leb.roza.parsing;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -27,13 +26,13 @@ class Junit5TestClassParserTest {
 	}
 
 	@Test
-	void withoutFiles() throws Exception {
-		assertEquals(0, parser.parse(Arrays.asList()).size());
+	void withoutFiles() {
+		assertEquals(0, parser.parse(List.of()).size());
 	}
 
 	@Test
-	void oneTestMethod() throws Exception {
-		List<TestClass> testClasses = parser.parse(Arrays.asList(oneTestMethod));
+	void oneTestMethod() {
+		List<TestClass> testClasses = parser.parse(List.of(oneTestMethod));
 		assertEquals(1, testClasses.size());
 		assertEquals("OneTestMethod", testClasses.get(0).getName());
 		assertEquals(0, testClasses.get(0).getFields().size());
@@ -45,9 +44,9 @@ class Junit5TestClassParserTest {
 	}
 
 	@Test
-	void oneTestMethodOneMethod() throws Exception {
+	void oneTestMethodOneMethod() {
 		TextFile oneTestMethodOneMethod = new TextFile("OneTestMethodOneMethod.java", "public class OneTestMethodOneMethod { public void example1() { System.out.println(0); } @Test public void example2() { assertEquals(2, 2); } }") {};
-		List<TestClass> testClasses = parser.parse(Arrays.asList(oneTestMethodOneMethod));
+		List<TestClass> testClasses = parser.parse(List.of(oneTestMethodOneMethod));
 		assertEquals(1, testClasses.size());
 		assertEquals("OneTestMethodOneMethod", testClasses.get(0).getName());
 		assertEquals(0, testClasses.get(0).getFields().size());
@@ -59,9 +58,9 @@ class Junit5TestClassParserTest {
 	}
 
 	@Test
-	void twoTestMethods() throws Exception {
+	void twoTestMethods() {
 		TextFile twoTestMethods = new TextFile("TwoTestMethods.java", "public class TwoTestMethods { @Test public void example1() { assertEquals(1, 1); } @Test public void example2() { assertEquals(2, 2); } }") {};
-		List<TestClass> testClasses = parser.parse(Arrays.asList(twoTestMethods));
+		List<TestClass> testClasses = parser.parse(List.of(twoTestMethods));
 		assertEquals(1, testClasses.size());
 		assertEquals("TwoTestMethods", testClasses.get(0).getName());
 		assertEquals(0, testClasses.get(0).getFields().size());
@@ -76,9 +75,9 @@ class Junit5TestClassParserTest {
 	}
 
 	@Test
-	void oneSetupMethodOneTestMethod() throws Exception {
+	void oneSetupMethodOneTestMethod() {
 		TextFile oneSetupMethodOneTestMethod = new TextFile("OneSetupMethodOneTestMethod.java", "public class OneSetupMethodOneTestMethod { @BeforeEach public void setup() { System.out.println(0); System.out.println(1); } @Test public void example() { assertEquals(0, 0); assertEquals(1, 1); } }") {};
-		List<TestClass> testClasses = parser.parse(Arrays.asList(oneSetupMethodOneTestMethod));
+		List<TestClass> testClasses = parser.parse(List.of(oneSetupMethodOneTestMethod));
 		assertEquals(1, testClasses.size());
 		assertEquals("OneSetupMethodOneTestMethod", testClasses.get(0).getName());
 		assertEquals(0, testClasses.get(0).getFields().size());
@@ -95,9 +94,9 @@ class Junit5TestClassParserTest {
 	}
 
 	@Test
-	void oneFieldOneSetupMethodOneTestMethod() throws Exception {
+	void oneFieldOneSetupMethodOneTestMethod() {
 		TextFile oneFieldOneSetupMethodOneTestMethod = new TextFile("OneFieldOneSetupMethodOneTestMethod.java", "public class OneFieldOneSetupMethodOneTestMethod { private Sut sut; @BeforeEach public void setup() { sut = new Sut(); sut.save(0); } @Test public void example() { assertEquals(0, 0); assertEquals(1, 1); } }") {};
-		List<TestClass> testClasses = parser.parse(Arrays.asList(oneFieldOneSetupMethodOneTestMethod));
+		List<TestClass> testClasses = parser.parse(List.of(oneFieldOneSetupMethodOneTestMethod));
 		assertEquals(1, testClasses.size());
 		assertEquals("OneFieldOneSetupMethodOneTestMethod", testClasses.get(0).getName());
 		assertEquals(1, testClasses.get(0).getFields().size());
@@ -116,14 +115,14 @@ class Junit5TestClassParserTest {
 	}
 
 	@Test
-	void oneMethod() throws Exception {
-		List<TestClass> testClasses = parser.parse(Arrays.asList(oneMethod));
+	void oneMethod() {
+		List<TestClass> testClasses = parser.parse(List.of(oneMethod));
 		assertEquals(0, testClasses.size());
 	}
 
 	@Test
-	void oneJavaClassOneTestClass() throws Exception {
-		List<TestClass> testClasses = parser.parse(Arrays.asList(oneMethod, oneTestMethod));
+	void oneJavaClassOneTestClass() {
+		List<TestClass> testClasses = parser.parse(List.of(oneMethod, oneTestMethod));
 		assertEquals(1, testClasses.size());
 		assertEquals("OneTestMethod", testClasses.get(0).getName());
 		assertEquals(0, testClasses.get(0).getFields().size());
@@ -135,9 +134,9 @@ class Junit5TestClassParserTest {
 	}
 
 	@Test
-	void oneTestMethodWithWhile() throws Exception {
+	void oneTestMethodWithWhile() {
 		TextFile oneTestMethoWithWhile = new TextFile("OneTestMethodWithWhile.java", "public class OneTestMethodWithWhile { @Test public void example() { while (1 == 0) { System.out.println(0); } assertEquals(0, 0); } }");
-		List<TestClass> testClasses = parser.parse(Arrays.asList(oneTestMethoWithWhile));
+		List<TestClass> testClasses = parser.parse(List.of(oneTestMethoWithWhile));
 		assertEquals(1, testClasses.size());
 		assertEquals("OneTestMethodWithWhile", testClasses.get(0).getName());
 		assertEquals(0, testClasses.get(0).getFields().size());
@@ -150,7 +149,7 @@ class Junit5TestClassParserTest {
 	}
 
 	@Test
-	void multipleFiedlsAndVariables() throws Exception {
+	void multipleFiedlsAndVariables() {
 		TextFile oneTestMethoWithWhile = new TextFile("MultipleFieldsAndVariables.java", "public class MultipleFieldsAndVariables {"
 				+ "Integer firstField = 15;"
 				+ "List<Integer> secondField = new ArrayList<>();"
@@ -164,7 +163,7 @@ class Junit5TestClassParserTest {
 				+ "fourthField = 40;"
 				+ "}"
 				+ "}");
-		List<TestClass> testClasses = parser.parse(Arrays.asList(oneTestMethoWithWhile));
+		List<TestClass> testClasses = parser.parse(List.of(oneTestMethoWithWhile));
 		assertEquals(1, testClasses.size());
 		assertEquals("MultipleFieldsAndVariables", testClasses.get(0).getName());
 		assertEquals(5, testClasses.get(0).getFields().size());

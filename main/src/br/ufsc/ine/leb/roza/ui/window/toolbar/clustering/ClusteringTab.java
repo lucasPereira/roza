@@ -12,7 +12,7 @@ import br.ufsc.ine.leb.roza.ui.window.toolbar.Toolbar;
 
 public class ClusteringTab implements UiComponent {
 
-	private Toolbar toolbar;
+	private final Toolbar toolbar;
 	private JPanel panel;
 
 	public ClusteringTab(Toolbar toolbar) {
@@ -26,12 +26,12 @@ public class ClusteringTab implements UiComponent {
 	}
 
 	@Override
-	public void addChilds(List<UiComponent> childs) {
-		childs.add(new LinkageComboBox(this));
-		childs.add(new RefereeComboBox(this));
-		childs.add(new ThresholdCriteriaComboBox(this));
-		childs.add(new ThresholdCriteriaInputs(this));
-		childs.add(new DistributeTestsButton(this));
+	public void addChildren(List<UiComponent> children) {
+		children.add(new LinkageComboBox(this));
+		children.add(new RefereeComboBox(this));
+		children.add(new ThresholdCriteriaComboBox(this));
+		children.add(new ThresholdCriteriaInputs(this));
+		children.add(new DistributeTestsButton(this));
 	}
 
 	@Override

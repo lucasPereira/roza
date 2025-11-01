@@ -5,8 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -24,9 +24,9 @@ class LevelTest {
 
 	@BeforeEach
 	void setup() {
-		TestCase alpha = new TestCase("alpha", Arrays.asList(), Arrays.asList());
-		TestCase beta = new TestCase("beta", Arrays.asList(), Arrays.asList());
-		TestCase gamma = new TestCase("gamma", Arrays.asList(), Arrays.asList());
+		TestCase alpha = new TestCase("alpha", List.of(), List.of());
+		TestCase beta = new TestCase("beta", List.of(), List.of());
+		TestCase gamma = new TestCase("gamma", List.of(), List.of());
 		alphaCluster = new Cluster(alpha);
 		betaCluster = new Cluster(beta);
 		gammaCluster = new Cluster(gamma);
@@ -34,7 +34,7 @@ class LevelTest {
 	}
 
 	@Test
-	void levelZeroWithoutElements() throws Exception {
+	void levelZeroWithoutElements() {
 		Set<Cluster> clusters = new HashSet<>();
 		Level zero = new Level(clusters);
 
@@ -44,7 +44,7 @@ class LevelTest {
 	}
 
 	@Test
-	void levelZeroWithOneElement() throws Exception {
+	void levelZeroWithOneElement() {
 		Set<Cluster> clusters = new HashSet<>();
 		clusters.add(alphaCluster);
 		Level zero = new Level(clusters);
@@ -56,7 +56,7 @@ class LevelTest {
 	}
 
 	@Test
-	void levelOne() throws Exception {
+	void levelOne() {
 		Set<Cluster> clustersZero = new HashSet<>();
 		clustersZero.add(alphaCluster);
 		clustersZero.add(betaCluster);

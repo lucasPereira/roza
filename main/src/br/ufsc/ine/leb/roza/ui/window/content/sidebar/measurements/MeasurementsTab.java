@@ -13,7 +13,7 @@ import br.ufsc.ine.leb.roza.ui.window.content.sidebar.Sidebar;
 
 public class MeasurementsTab implements UiComponent {
 
-	private Sidebar sidebar;
+	private final Sidebar sidebar;
 	private JPanel panel;
 	private Component bottom;
 	private Component middle;
@@ -36,10 +36,10 @@ public class MeasurementsTab implements UiComponent {
 	}
 
 	@Override
-	public void addChilds(List<UiComponent> childs) {
-		childs.add(new SelectTestCasesMeasurementPanel(this));
-		childs.add(new MatrixMeasurementPanel(this));
-		childs.add(new CompareTestCasesMeasurementPanel(this));
+	public void addChildren(List<UiComponent> children) {
+		children.add(new SelectTestCasesMeasurementPanel(this));
+		children.add(new MatrixMeasurementPanel(this));
+		children.add(new CompareTestCasesMeasurementPanel(this));
 	}
 
 	@Override

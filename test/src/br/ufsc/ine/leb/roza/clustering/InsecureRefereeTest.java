@@ -3,7 +3,7 @@ package br.ufsc.ine.leb.roza.clustering;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import java.util.Arrays;
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,10 +23,10 @@ class InsecureRefereeTest {
 
 	@BeforeEach
 	void setup() {
-		TestCase alpha = new TestCase("alpha", Arrays.asList(), Arrays.asList());
-		TestCase beta = new TestCase("beta", Arrays.asList(), Arrays.asList());
-		TestCase gamma = new TestCase("gamma", Arrays.asList(), Arrays.asList());
-		TestCase delta = new TestCase("delta", Arrays.asList(), Arrays.asList());
+		TestCase alpha = new TestCase("alpha", List.of(), List.of());
+		TestCase beta = new TestCase("beta", List.of(), List.of());
+		TestCase gamma = new TestCase("gamma", List.of(), List.of());
+		TestCase delta = new TestCase("delta", List.of(), List.of());
 		Cluster alphaCluster = new Cluster(alpha);
 		Cluster betaCluster = new Cluster(beta);
 		Cluster gammaCluster = new Cluster(gamma);
@@ -39,18 +39,18 @@ class InsecureRefereeTest {
 	}
 
 	@Test
-	void zero() throws Exception {
+	void zero() {
 		assertThrows(NoCombinationToChooseException.class, () -> referee.untie(collectionUtils.set()));
 	}
 
 	@Test
-	void one() throws Exception {
+	void one() {
 		Combination chosen = referee.untie(collectionUtils.set(alphaBetaCombinedDelta));
 		assertEquals(chosen, alphaBetaCombinedDelta);
 	}
 
 	@Test
-	void two() throws Exception {
+	void two() {
 		assertThrows(TiebreakException.class, () -> referee.untie(collectionUtils.set(gammaCombinedDelta, alphaBetaCombinedDelta)));
 	}
 

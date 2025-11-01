@@ -2,7 +2,6 @@ package br.ufsc.ine.leb.roza.ui.window.content.sidebar.measurements;
 
 import java.awt.Font;
 import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.math.BigDecimal;
 import java.util.List;
@@ -28,7 +27,7 @@ public class SelectTestCasesMeasurementPanel implements UiComponent {
 
 	private static final String DEFAULT_SCORE = "0";
 
-	private MeasurementsTab measurementsTab;
+	private final MeasurementsTab measurementsTab;
 	private SimilarityReport similarityReport;
 
 	public SelectTestCasesMeasurementPanel(MeasurementsTab measurementsTab) {
@@ -95,23 +94,18 @@ public class SelectTestCasesMeasurementPanel implements UiComponent {
 	}
 
 	private ActionListener createComboListener(Hub hub, JComboBox<TestCase> sourceCombo, JComboBox<TestCase> targetCombo) {
-		return new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent event) {
-				TestCase source = (TestCase) sourceCombo.getSelectedItem();
-				TestCase target = (TestCase) targetCombo.getSelectedItem();
-				if (source != null && target != null) {
-					SimilarityAssessment assessment = similarityReport.getPair(source, target);
-					hub.compareTestCasePublish(assessment);
-				}
+		return event -> {
+			TestCase source = (TestCase) sourceCombo.getSelectedItem();
+			TestCase target = (TestCase) targetCombo.getSelectedItem();
+			if (source != null && target != null) {
+				SimilarityAssessment assessment = similarityReport.getPair(source, target);
+				hub.compareTestCasePublish(assessment);
 			}
-
 		};
 	}
 
 	@Override
-	public void addChilds(List<UiComponent> childs) {}
+	public void addChildren(List<UiComponent> children) {}
 
 	@Override
 	public void start() {}

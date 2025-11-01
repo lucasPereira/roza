@@ -12,7 +12,7 @@ public abstract class TestClassAbstractModel<T> extends AbstractTableModel {
 
 	private static final long serialVersionUID = 1L;
 
-	private TestClass testClass;
+	private final TestClass testClass;
 
 	protected abstract List<Supplier<String>> getColumnTitleMappers();
 
@@ -36,15 +36,13 @@ public abstract class TestClassAbstractModel<T> extends AbstractTableModel {
 
 	@Override
 	public final String getColumnName(int column) {
-		String text = getColumnTitleMappers().get(column).get();
-		return text;
+		return getColumnTitleMappers().get(column).get();
 	}
 
 	@Override
 	public final Object getValueAt(int rowIndex, int columnIndex) {
 		T element = getElements(testClass).get(rowIndex);
-		String text = getValueMappers().get(columnIndex).apply(element);
-		return text;
+		return getValueMappers().get(columnIndex).apply(element);
 	}
 
 }

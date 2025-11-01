@@ -2,7 +2,6 @@ package br.ufsc.ine.leb.roza.refactoring;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -17,24 +16,23 @@ import br.ufsc.ine.leb.roza.TestClass;
 
 public class SimpleClusterRefactorTest {
 
-	private TestClassNamingStrategy namingStrategy;
 	private ClusterRefactor refactor;
 
 	@BeforeEach
 	void setup() {
-		namingStrategy = new IncrementalTestClassNamingStrategy();
+		TestClassNamingStrategy namingStrategy = new IncrementalTestClassNamingStrategy();
 		refactor = new SimpleClusterRefactor(namingStrategy);
 	}
 
 	@Test
-	void withoutClusters() throws Exception {
+	void withoutClusters() {
 		List<TestClass> classes = refactor.refactor(new HashSet<>());
 		assertEquals(0, classes.size());
 	}
 
 	@Test
-	void oneClusterWithOneEmptyTest() throws Exception {
-		TestCase alpha = new TestCase("alpha", Arrays.asList(), Arrays.asList());
+	void oneClusterWithOneEmptyTest() {
+		TestCase alpha = new TestCase("alpha", List.of(), List.of());
 		Cluster alphaCluster = new Cluster(alpha);
 
 		Set<Cluster> clusters = new HashSet<>();
@@ -51,11 +49,11 @@ public class SimpleClusterRefactorTest {
 	}
 
 	@Test
-	void oneClusterWithTwoEmptyTests() throws Exception {
-		TestCase alpha = new TestCase("alpha", Arrays.asList(), Arrays.asList());
+	void oneClusterWithTwoEmptyTests() {
+		TestCase alpha = new TestCase("alpha", List.of(), List.of());
 		Cluster alphaCluster = new Cluster(alpha);
 
-		TestCase beta = new TestCase("beta", Arrays.asList(), Arrays.asList());
+		TestCase beta = new TestCase("beta", List.of(), List.of());
 		Cluster betaCluster = new Cluster(beta);
 
 		Cluster alphaBetaCluster = alphaCluster.merge(betaCluster);
@@ -75,11 +73,11 @@ public class SimpleClusterRefactorTest {
 	}
 
 	@Test
-	void twoClustersWithOneEmptyTestEach() throws Exception {
-		TestCase alpha = new TestCase("alpha", Arrays.asList(), Arrays.asList());
+	void twoClustersWithOneEmptyTestEach() {
+		TestCase alpha = new TestCase("alpha", List.of(), List.of());
 		Cluster alphaCluster = new Cluster(alpha);
 
-		TestCase beta = new TestCase("beta", Arrays.asList(), Arrays.asList());
+		TestCase beta = new TestCase("beta", List.of(), List.of());
 		Cluster betaCluster = new Cluster(beta);
 
 		Set<Cluster> clusters = new HashSet<>();
@@ -105,10 +103,10 @@ public class SimpleClusterRefactorTest {
 	}
 
 	@Test
-	void oneClusterWithOneNonEmptyTest() throws Exception {
+	void oneClusterWithOneNonEmptyTest() {
 		Statement fixture = new Statement("Integer value = 10;");
 		Statement assertion = new Statement("assertEquals(10, value);");
-		TestCase alpha = new TestCase("alpha", Arrays.asList(fixture), Arrays.asList(assertion));
+		TestCase alpha = new TestCase("alpha", List.of(fixture), List.of(assertion));
 		Cluster alphaCluster = new Cluster(alpha);
 
 		Set<Cluster> clusters = new HashSet<>();
@@ -127,15 +125,15 @@ public class SimpleClusterRefactorTest {
 	}
 
 	@Test
-	void oneClustersWithTwoNonEmptyTests() throws Exception {
+	void oneClustersWithTwoNonEmptyTests() {
 		Statement fixtureAlpha = new Statement("Integer value = 10;");
 		Statement assertionAlpha = new Statement("assertEquals(10, value);");
-		TestCase alpha = new TestCase("alpha", Arrays.asList(fixtureAlpha), Arrays.asList(assertionAlpha));
+		TestCase alpha = new TestCase("alpha", List.of(fixtureAlpha), List.of(assertionAlpha));
 		Cluster alphaCluster = new Cluster(alpha);
 
 		Statement fixtureBeta = new Statement("Integer value = 20;");
 		Statement assertionBeta = new Statement("assertEquals(20, value);");
-		TestCase beta = new TestCase("beta", Arrays.asList(fixtureBeta), Arrays.asList(assertionBeta));
+		TestCase beta = new TestCase("beta", List.of(fixtureBeta), List.of(assertionBeta));
 		Cluster betaCluster = new Cluster(beta);
 
 		Cluster alphaBetaCluster = alphaCluster.merge(betaCluster);
@@ -162,15 +160,15 @@ public class SimpleClusterRefactorTest {
 	}
 
 	@Test
-	void oneClustersWithTwoNonEmptyTestsAndReusableStatement() throws Exception {
+	void oneClustersWithTwoNonEmptyTestsAndReusableStatement() {
 		Statement fixtureAlpha = new Statement("System.out.println(0);");
 		Statement assertionAlpha = new Statement("assertTrue(true);");
-		TestCase alpha = new TestCase("alpha", Arrays.asList(fixtureAlpha), Arrays.asList(assertionAlpha));
+		TestCase alpha = new TestCase("alpha", List.of(fixtureAlpha), List.of(assertionAlpha));
 		Cluster alphaCluster = new Cluster(alpha);
 
 		Statement fixtureBeta = new Statement("System.out.println(0);");
 		Statement assertionBeta = new Statement("assertTrue(true);");
-		TestCase beta = new TestCase("beta", Arrays.asList(fixtureBeta), Arrays.asList(assertionBeta));
+		TestCase beta = new TestCase("beta", List.of(fixtureBeta), List.of(assertionBeta));
 		Cluster betaCluster = new Cluster(beta);
 
 		Cluster alphaBetaCluster = alphaCluster.merge(betaCluster);
@@ -199,15 +197,15 @@ public class SimpleClusterRefactorTest {
 	}
 
 	@Test
-	void oneClustersWithTwoNonEmptyTestsAndReusableStatementAndFixture() throws Exception {
+	void oneClustersWithTwoNonEmptyTestsAndReusableStatementAndFixture() {
 		Statement fixtureAlpha = new Statement("Integer value = 10;");
 		Statement assertionAlpha = new Statement("assertEquals(value, 10);");
-		TestCase alpha = new TestCase("alpha", Arrays.asList(fixtureAlpha), Arrays.asList(assertionAlpha));
+		TestCase alpha = new TestCase("alpha", List.of(fixtureAlpha), List.of(assertionAlpha));
 		Cluster alphaCluster = new Cluster(alpha);
 
 		Statement fixtureBeta = new Statement("Integer value = 10;");
 		Statement assertionBeta = new Statement("assertEquals(\"10\", value.toString());");
-		TestCase beta = new TestCase("beta", Arrays.asList(fixtureBeta), Arrays.asList(assertionBeta));
+		TestCase beta = new TestCase("beta", List.of(fixtureBeta), List.of(assertionBeta));
 		Cluster betaCluster = new Cluster(beta);
 
 		Statement fixture = new Statement("value = 10;");

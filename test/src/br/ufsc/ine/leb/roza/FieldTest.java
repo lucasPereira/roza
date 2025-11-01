@@ -1,14 +1,16 @@
 package br.ufsc.ine.leb.roza;
 
-import static org.junit.Assert.assertNull;
-import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 class FieldTest {
 
 	@Test
-	void withoutInitialization() throws Exception {
+	void withoutInitialization() {
 		Field field = new Field("Sut", "sut");
 		assertEquals("Sut", field.getType());
 		assertEquals("sut", field.getName());
@@ -16,7 +18,7 @@ class FieldTest {
 	}
 
 	@Test
-	void withInitialization() throws Exception {
+	void withInitialization() {
 		Statement initialization = new Statement("new Sut();");
 		Field field = new Field("Sut", "sut", initialization);
 		assertEquals("Sut", field.getType());
@@ -25,13 +27,13 @@ class FieldTest {
 	}
 
 	@Test
-	void equal() throws Exception {
+	void equal() {
 		assertEquals(new Field("Sut", "sut"), new Field("Sut", "sut"), "Withtout initialization");
 		assertEquals(new Field("Sut", "sut", new Statement("new Sut();")), new Field("Sut", "sut", new Statement("new Sut();")), "With initialization");
 	}
 
 	@Test
-	void notEqual() throws Exception {
+	void notEqual() {
 		assertNotEquals(new Field("Sut", "sut"), new Field("Sut", "tus"), "Without initialization, same type, different names");
 		assertNotEquals(new Field("Tus", "sut"), new Field("Sut", "sut"), "Without initialization, same name, different types");
 		assertNotEquals(new Field("Integer", "value1", new Statement("10;")), new Field("Integer", "value2", new Statement("10;")), "With same initialization, same type, different names");

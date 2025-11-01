@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.Arrays;
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,9 +23,9 @@ class ClustersToMergeTest {
 
 	@BeforeEach
 	void setup() {
-		TestCase alpha = new TestCase("alpha", Arrays.asList(), Arrays.asList());
-		TestCase beta = new TestCase("beta", Arrays.asList(), Arrays.asList());
-		TestCase gamma = new TestCase("gamma", Arrays.asList(), Arrays.asList());
+		TestCase alpha = new TestCase("alpha", List.of(), List.of());
+		TestCase beta = new TestCase("beta", List.of(), List.of());
+		TestCase gamma = new TestCase("gamma", List.of(), List.of());
 		alphaCluster = new Cluster(alpha);
 		betaCluster = new Cluster(beta);
 		gammaCluster = new Cluster(gamma);
@@ -33,21 +33,17 @@ class ClustersToMergeTest {
 	}
 
 	@Test
-	void zeroElements() throws Exception {
-		assertThrows(NoClustersToMergeException.class, () -> {
-			new ClustersToMerge(collectionUtils.set());
-		});
+	void zeroElements() {
+		assertThrows(NoClustersToMergeException.class, () -> new ClustersToMerge(collectionUtils.set()));
 	}
 
 	@Test
-	void oneElement() throws Exception {
-		assertThrows(NoClustersToMergeException.class, () -> {
-			new ClustersToMerge(collectionUtils.set(alphaCluster));
-		});
+	void oneElement() {
+		assertThrows(NoClustersToMergeException.class, () -> new ClustersToMerge(collectionUtils.set(alphaCluster)));
 	}
 
 	@Test
-	void twoElements() throws Exception {
+	void twoElements() {
 		ClustersToMerge clusters = new ClustersToMerge(collectionUtils.set(alphaCluster, betaCluster));
 		Combination alphaBetaCombination = new Combination(alphaCluster, betaCluster);
 		Combination betaAlphaCombination = new Combination(betaCluster, alphaCluster);
@@ -57,7 +53,7 @@ class ClustersToMergeTest {
 	}
 
 	@Test
-	void threeElements() throws Exception {
+	void threeElements() {
 		ClustersToMerge clusters = new ClustersToMerge(collectionUtils.set(alphaCluster, betaCluster, gammaCluster));
 		Combination alphaBetaCombination = new Combination(alphaCluster, betaCluster);
 		Combination alphaGammaCombination = new Combination(alphaCluster, gammaCluster);

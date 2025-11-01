@@ -1,7 +1,6 @@
 package br.ufsc.ine.leb.roza.ui.window.toolbar.parsing;
 
 import java.io.File;
-import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.JButton;
@@ -16,7 +15,7 @@ import br.ufsc.ine.leb.roza.ui.UiComponent;
 
 public class LoadTestClassesButton implements UiComponent {
 
-	private ParsingTab toolbar;
+	private final ParsingTab toolbar;
 	private JButton button;
 
 	public LoadTestClassesButton(ParsingTab toolbar) {
@@ -33,10 +32,10 @@ public class LoadTestClassesButton implements UiComponent {
 			chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 			chooser.setFileFilter(new FileNameExtensionFilter("Java", "java"));
 			chooser.setMultiSelectionEnabled(true);
-			Integer result = chooser.showOpenDialog(SwingUtilities.getRoot(button));
+			int result = chooser.showOpenDialog(SwingUtilities.getRoot(button));
 			if (result == JFileChooser.APPROVE_OPTION) {
 				File[] files = chooser.getSelectedFiles();
-				List<TestClass> classes = manager.loadClasses(Arrays.asList(files));
+				List<TestClass> classes = manager.loadClasses(List.of(files));
 				hub.loadTestClassesPublish(classes);
 				hub.infoMessagePublish(String.format("Loaded classes: %d", classes.size()));
 			}
@@ -45,7 +44,7 @@ public class LoadTestClassesButton implements UiComponent {
 	}
 
 	@Override
-	public void addChilds(List<UiComponent> childs) {}
+	public void addChildren(List<UiComponent> children) {}
 
 	@Override
 	public void start() {}

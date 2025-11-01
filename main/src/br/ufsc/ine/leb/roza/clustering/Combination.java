@@ -1,13 +1,14 @@
 package br.ufsc.ine.leb.roza.clustering;
 
-import java.util.Arrays;
 
 import br.ufsc.ine.leb.roza.Cluster;
 
+import java.util.List;
+
 public class Combination {
 
-	private Cluster first;
-	private Cluster second;
+	private final Cluster first;
+	private final Cluster second;
 
 	public Combination(Cluster first, Cluster second) {
 		this.first = first;
@@ -40,7 +41,7 @@ public class Combination {
 
 	@Override
 	public String toString() {
-		return Arrays.asList(first, second).toString();
+		return List.of(first, second).toString();
 	}
 
 }

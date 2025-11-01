@@ -20,13 +20,13 @@ class JplagStringConfigurationTest {
 	}
 
 	@Test
-	void nameAndDescription() throws Exception {
+	void nameAndDescription() {
 		assertEquals("l", configuration.getName());
 		assertEquals("Language", configuration.getDescription());
 	}
 
 	@Test
-	void create() throws Exception {
+	void create() {
 		configuration.addArgument(arguments);
 		assertEquals("java17", configuration.getValue());
 		assertEquals(2, arguments.size());
@@ -35,7 +35,7 @@ class JplagStringConfigurationTest {
 	}
 
 	@Test
-	void change() throws Exception {
+	void change() {
 		configuration.setValue("python3");
 		configuration.addArgument(arguments);
 		assertEquals("python3", configuration.getValue());

@@ -8,8 +8,8 @@ import br.ufsc.ine.leb.roza.TestCase;
 
 class Pairing {
 
-	private Cluster first;
-	private Cluster second;
+	private final Cluster first;
+	private final Cluster second;
 
 	public Pairing(Cluster first, Cluster second) {
 		this.first = first;

@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,8 +26,8 @@ class SimilarityBasedCriteriaTest {
 
 	@BeforeEach
 	void setup() {
-		TestCase alpha = new TestCase("alpha", Arrays.asList(), Arrays.asList());
-		TestCase beta = new TestCase("beta", Arrays.asList(), Arrays.asList());
+		TestCase alpha = new TestCase("alpha", List.of(), List.of());
+		TestCase beta = new TestCase("beta", List.of(), List.of());
 		Cluster alphaCluster = new Cluster(alpha);
 		Cluster betaCluster = new Cluster(beta);
 		combination = new Combination(alphaCluster, betaCluster);
@@ -40,32 +40,28 @@ class SimilarityBasedCriteriaTest {
 	}
 
 	@Test
-	void zeroSimilarity() throws Exception {
-		assertTrue(new SimilarityBasedCriteria(BigDecimal.ZERO).shoudlStop(level, combination, BigDecimal.ZERO));
-		assertTrue(new SimilarityBasedCriteria(dotOne).shoudlStop(level, combination, BigDecimal.ZERO));
+	void zeroSimilarity() {
+		assertTrue(new SimilarityBasedCriteria(BigDecimal.ZERO).shouldStop(level, combination, BigDecimal.ZERO));
+		assertTrue(new SimilarityBasedCriteria(dotOne).shouldStop(level, combination, BigDecimal.ZERO));
 	}
 
 	@Test
-	void oneSimilarity() throws Exception {
-		assertFalse(new SimilarityBasedCriteria(dotNine).shoudlStop(level, combination, BigDecimal.ONE));
-		assertTrue(new SimilarityBasedCriteria(BigDecimal.ONE).shoudlStop(level, combination, BigDecimal.ONE));
+	void oneSimilarity() {
+		assertFalse(new SimilarityBasedCriteria(dotNine).shouldStop(level, combination, BigDecimal.ONE));
+		assertTrue(new SimilarityBasedCriteria(BigDecimal.ONE).shouldStop(level, combination, BigDecimal.ONE));
 	}
 
 	@Test
-	void zeroPointFiveSimilarity() throws Exception {
-		assertFalse(new SimilarityBasedCriteria(dotFour).shoudlStop(level, combination, dotFive));
-		assertTrue(new SimilarityBasedCriteria(dotFive).shoudlStop(level, combination, dotFive));
-		assertTrue(new SimilarityBasedCriteria(dotSix).shoudlStop(level, combination, dotFive));
+	void zeroPointFiveSimilarity() {
+		assertFalse(new SimilarityBasedCriteria(dotFour).shouldStop(level, combination, dotFive));
+		assertTrue(new SimilarityBasedCriteria(dotFive).shouldStop(level, combination, dotFive));
+		assertTrue(new SimilarityBasedCriteria(dotSix).shouldStop(level, combination, dotFive));
 	}
 
 	@Test
-	void outOfRangeThresholds() throws Exception {
-		assertThrows(InvalidThresholdException.class, () -> {
-			new SimilarityBasedCriteria(new BigDecimal("-0.1"));
-		});
-		assertThrows(InvalidThresholdException.class, () -> {
-			new SimilarityBasedCriteria(new BigDecimal("1.1"));
-		});
+	void outOfRangeThresholds() {
+		assertThrows(InvalidThresholdException.class, () -> new SimilarityBasedCriteria(new BigDecimal("-0.1")));
+		assertThrows(InvalidThresholdException.class, () -> new SimilarityBasedCriteria(new BigDecimal("1.1")));
 	}
 
 }

@@ -10,7 +10,7 @@ import br.ufsc.ine.leb.roza.TestClass;
 
 public class TestClassRenderer implements ListCellRenderer<TestClass> {
 
-	private DefaultListCellRenderer defaultRederer;
+	private final DefaultListCellRenderer defaultRederer;
 
 	public TestClassRenderer() {
 		defaultRederer = new DefaultListCellRenderer();

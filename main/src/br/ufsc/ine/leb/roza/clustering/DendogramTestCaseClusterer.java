@@ -13,9 +13,9 @@ import br.ufsc.ine.leb.roza.exceptions.TiebreakException;
 
 public class DendogramTestCaseClusterer implements TestCaseClusterer {
 
-	private Linkage linkage;
-	private Referee referee;
-	private ThresholdCriteria criteria;
+	private final Linkage linkage;
+	private final Referee referee;
+	private final ThresholdCriteria criteria;
 
 	public DendogramTestCaseClusterer(Linkage linkage, Referee referee, ThresholdCriteria criteria) {
 		this.linkage = linkage;
@@ -35,7 +35,7 @@ public class DendogramTestCaseClusterer implements TestCaseClusterer {
 		List<Level> levels = new ArrayList<>();
 		Level currentLevel = new Level(currentClusters);
 		levels.add(currentLevel);
-		Boolean shouldContinue = currentClusters.size() > 1;
+		boolean shouldContinue = currentClusters.size() > 1;
 		while (shouldContinue) {
 			ClustersToMerge clustersToMerge = new ClustersToMerge(currentClusters);
 			try {
@@ -48,8 +48,8 @@ public class DendogramTestCaseClusterer implements TestCaseClusterer {
 				Set<Cluster> nextClusters = currentClusters.stream().filter(cluster -> !cluster.equals(first) && !cluster.equals(second)).collect(Collectors.toSet());
 				nextClusters.add(merged);
 				Level nextLevel = new Level(currentLevel, nextClusters, evaluation);
-				Boolean thresholdReached = criteria.shoudlStop(nextLevel.getStep(), combination, evaluation);
-				Boolean hasClustersToMerge = nextClusters.size() > 1;
+				Boolean thresholdReached = criteria.shouldStop(nextLevel.getStep(), combination, evaluation);
+				boolean hasClustersToMerge = nextClusters.size() > 1;
 				shouldContinue = !thresholdReached && hasClustersToMerge;
 				if (!thresholdReached) {
 					levels.add(nextLevel);

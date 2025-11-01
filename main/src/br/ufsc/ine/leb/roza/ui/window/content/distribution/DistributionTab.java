@@ -12,7 +12,7 @@ import br.ufsc.ine.leb.roza.ui.window.content.Content;
 
 public class DistributionTab implements UiComponent {
 
-	private Content content;
+	private final Content content;
 	private JTabbedPane panel;
 
 	public DistributionTab(Content content) {
@@ -43,9 +43,9 @@ public class DistributionTab implements UiComponent {
 	}
 
 	@Override
-	public void addChilds(List<UiComponent> childs) {
-		childs.add(new ClustersPanel(this));
-		childs.add(new GraphCanvas(this));
+	public void addChildren(List<UiComponent> children) {
+		children.add(new ClustersPanel(this));
+		children.add(new GraphCanvas(this));
 	}
 
 	@Override

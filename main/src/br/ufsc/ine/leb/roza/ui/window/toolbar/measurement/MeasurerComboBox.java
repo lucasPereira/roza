@@ -1,4 +1,4 @@
-package br.ufsc.ine.leb.roza.ui.window.toolbar.measuring;
+package br.ufsc.ine.leb.roza.ui.window.toolbar.measurement;
 
 import java.util.List;
 
@@ -19,10 +19,10 @@ import br.ufsc.ine.leb.roza.ui.shared.ComboBoxBuilder;
 
 public class MeasurerComboBox implements UiComponent {
 
-	private MeasuringTab toolbar;
+	private final MeasurementTab toolbar;
 	private JComboBox<String> combo;
 
-	public MeasurerComboBox(MeasuringTab toolbar) {
+	public MeasurerComboBox(MeasurementTab toolbar) {
 		this.toolbar = toolbar;
 	}
 
@@ -33,9 +33,7 @@ public class MeasurerComboBox implements UiComponent {
 			hub.unselectDeckardMetricPublish();
 			hub.unselectJplagMetricPublish();
 			hub.unselectSimianMetricPublish();
-		}).add("LCS", () -> {
-			manager.setSimilarityMeasurer(new LcsSimilarityMeasurer());
-		}).add("Deckard", () -> {
+		}).add("LCS", () -> manager.setSimilarityMeasurer(new LcsSimilarityMeasurer())).add("Deckard", () -> {
 			DeckardConfigurations settings = new DeckardConfigurations(true);
 			manager.setSimilarityMeasurer(new DeckardSimilarityMeasurer(settings));
 			hub.unselectJplagMetricPublish();
@@ -52,24 +50,20 @@ public class MeasurerComboBox implements UiComponent {
 			hub.unselectDeckardMetricPublish();
 			hub.unselectSimianMetricPublish();
 			hub.selectJplagMetricPublish();
-			hub.changeJplagSettingsSubscribe(sensitivity -> {
-				settings.sensitivity(sensitivity);
-			});
+			hub.changeJplagSettingsSubscribe(settings::sensitivity);
 		}).add("Simian", () -> {
 			SimianConfigurations settings = new SimianConfigurations();
 			manager.setSimilarityMeasurer(new SimianSimilarityMeasurer(settings));
 			hub.unselectDeckardMetricPublish();
 			hub.unselectJplagMetricPublish();
 			hub.selectSimianMetricPublish();
-			hub.changeSimianSettingsSubscribe(threshold -> {
-				settings.threshold(threshold);
-			});
+			hub.changeSimianSettingsSubscribe(settings::threshold);
 		}).build();
 		toolbar.addComponent(combo);
 	}
 
 	@Override
-	public void addChilds(List<UiComponent> childs) {}
+	public void addChildren(List<UiComponent> children) {}
 
 	@Override
 	public void start() {

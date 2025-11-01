@@ -23,8 +23,6 @@ import br.ufsc.ine.leb.roza.materialization.TestCaseMaterializer;
 import br.ufsc.ine.leb.roza.measurement.SimilarityMeasurer;
 import br.ufsc.ine.leb.roza.parsing.TestClassParser;
 import br.ufsc.ine.leb.roza.refactoring.ClusterRefactor;
-import br.ufsc.ine.leb.roza.refactoring.IncrementalTestClassNamingStrategy;
-import br.ufsc.ine.leb.roza.refactoring.SimpleClusterRefactor;
 import br.ufsc.ine.leb.roza.selection.JavaExtensionTextFileSelector;
 import br.ufsc.ine.leb.roza.selection.TextFileSelector;
 import br.ufsc.ine.leb.roza.utils.FolderUtils;
@@ -45,6 +43,7 @@ public class Manager {
 	private SimilarityReport similarityReport;
 	private Set<Cluster> clusters;
 	private List<TestClass> refactoredTestClasses;
+	private ClusterRefactor refactor;
 
 	public Manager() {}
 
@@ -74,12 +73,10 @@ public class Manager {
 
 	public List<Level> distributeTests() {
 		DendogramTestCaseClusterer clustering = new DendogramTestCaseClusterer(linkageFactory.create(similarityReport), referee, threshold);
-		List<Level> levels = clustering.generateLevels(similarityReport);
-		return levels;
+		return clustering.generateLevels(similarityReport);
 	}
 
 	public List<TestClass> refactorClusters() {
-		SimpleClusterRefactor refactor = new SimpleClusterRefactor(new IncrementalTestClassNamingStrategy());
 		refactoredTestClasses = refactor.refactor(clusters);
 		return refactoredTestClasses;
 	}
@@ -117,6 +114,6 @@ public class Manager {
 		this.threshold = theshold;
 	}
 
-	public void setRefactorStrategy(ClusterRefactor refactorStrategy) {}
+	public void setRefactorStrategy(ClusterRefactor refactor) { this.refactor = refactor; }
 
 }

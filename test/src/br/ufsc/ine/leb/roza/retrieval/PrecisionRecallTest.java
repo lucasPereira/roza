@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
-import java.util.Arrays;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -77,9 +76,9 @@ class PrecisionRecallTest {
 	}
 
 	@Test
-	void rankingEqualsRelevantSet() throws Exception {
-		List<Character> ranking = Arrays.asList('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j');
-		List<Character> relevantSet = Arrays.asList('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j');
+	void rankingEqualsRelevantSet() {
+		List<Character> ranking = List.of('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j');
+		List<Character> relevantSet = List.of('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j');
 		PrecisionRecall<Character> precisionRecall = new PrecisionRecall<>(ranking, relevantSet);
 		assertEquals(BigDecimal.ONE, precisionRecall.precisionAtRecallLevel(zeroPercent));
 		assertEquals(BigDecimal.ONE, precisionRecall.precisionAtRecallLevel(tenPercent));
@@ -95,9 +94,9 @@ class PrecisionRecallTest {
 	}
 
 	@Test
-	void missingFirstElement() throws Exception {
-		List<Character> ranking = Arrays.asList('x', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j');
-		List<Character> relevantSet = Arrays.asList('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j');
+	void missingFirstElement() {
+		List<Character> ranking = List.of('x', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j');
+		List<Character> relevantSet = List.of('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j');
 		PrecisionRecall<Character> precisionRecall = new PrecisionRecall<>(ranking, relevantSet);
 		assertEquals(BigDecimal.ONE, precisionRecall.precisionAtRecallLevel(zeroPercent));
 		assertEquals(oneOfTwo, precisionRecall.precisionAtRecallLevel(tenPercent));
@@ -113,9 +112,9 @@ class PrecisionRecallTest {
 	}
 
 	@Test
-	void missingLastElement() throws Exception {
-		List<Character> ranking = Arrays.asList('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'x');
-		List<Character> relevantSet = Arrays.asList('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j');
+	void missingLastElement() {
+		List<Character> ranking = List.of('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'x');
+		List<Character> relevantSet = List.of('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j');
 		PrecisionRecall<Character> precisionRecall = new PrecisionRecall<>(ranking, relevantSet);
 		assertEquals(BigDecimal.ONE, precisionRecall.precisionAtRecallLevel(zeroPercent));
 		assertEquals(BigDecimal.ONE, precisionRecall.precisionAtRecallLevel(tenPercent));
@@ -131,9 +130,9 @@ class PrecisionRecallTest {
 	}
 
 	@Test
-	void oneHitOneMiss() throws Exception {
-		List<Character> ranking = Arrays.asList('a', 'x', 'c', 'x', 'e', 'x', 'g', 'x', 'i', 'x');
-		List<Character> relevantSet = Arrays.asList('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j');
+	void oneHitOneMiss() {
+		List<Character> ranking = List.of('a', 'x', 'c', 'x', 'e', 'x', 'g', 'x', 'i', 'x');
+		List<Character> relevantSet = List.of('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j');
 		PrecisionRecall<Character> precisionRecall = new PrecisionRecall<>(ranking, relevantSet);
 		assertEquals(BigDecimal.ONE, precisionRecall.precisionAtRecallLevel(zeroPercent));
 		assertEquals(BigDecimal.ONE, precisionRecall.precisionAtRecallLevel(tenPercent));
@@ -149,9 +148,9 @@ class PrecisionRecallTest {
 	}
 
 	@Test
-	void oneMissOneHit() throws Exception {
-		List<Character> ranking = Arrays.asList('x', 'b', 'x', 'd', 'x', 'f', 'x', 'h', 'x', 'j');
-		List<Character> relevantSet = Arrays.asList('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j');
+	void oneMissOneHit() {
+		List<Character> ranking = List.of('x', 'b', 'x', 'd', 'x', 'f', 'x', 'h', 'x', 'j');
+		List<Character> relevantSet = List.of('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j');
 		PrecisionRecall<Character> precisionRecall = new PrecisionRecall<>(ranking, relevantSet);
 		assertEquals(BigDecimal.ONE, precisionRecall.precisionAtRecallLevel(zeroPercent));
 		assertEquals(oneOfTwo, precisionRecall.precisionAtRecallLevel(tenPercent));
@@ -167,9 +166,9 @@ class PrecisionRecallTest {
 	}
 
 	@Test
-	void rankingHalfOfRelevantSetWithOneMiss() throws Exception {
-		List<Character> ranking = Arrays.asList('a', 'b', 'x', 'd', 'e');
-		List<Character> relevantSet = Arrays.asList('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j');
+	void rankingHalfOfRelevantSetWithOneMiss() {
+		List<Character> ranking = List.of('a', 'b', 'x', 'd', 'e');
+		List<Character> relevantSet = List.of('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j');
 		PrecisionRecall<Character> precisionRecall = new PrecisionRecall<>(ranking, relevantSet);
 		assertEquals(BigDecimal.ONE, precisionRecall.precisionAtRecallLevel(zeroPercent));
 		assertEquals(BigDecimal.ONE, precisionRecall.precisionAtRecallLevel(tenPercent));
@@ -185,9 +184,9 @@ class PrecisionRecallTest {
 	}
 
 	@Test
-	void rankingTwiceOfRelevantSetWithOneMiss() throws Exception {
-		List<Character> ranking = Arrays.asList('a', 'b', 'x', 'd', 'e', 'f', 'g', 'h', 'i', 'j');
-		List<Character> relevantSet = Arrays.asList('a', 'b', 'c', 'd', 'e');
+	void rankingTwiceOfRelevantSetWithOneMiss() {
+		List<Character> ranking = List.of('a', 'b', 'x', 'd', 'e', 'f', 'g', 'h', 'i', 'j');
+		List<Character> relevantSet = List.of('a', 'b', 'c', 'd', 'e');
 		PrecisionRecall<Character> precisionRecall = new PrecisionRecall<>(ranking, relevantSet);
 		assertEquals(BigDecimal.ONE, precisionRecall.precisionAtRecallLevel(zeroPercent));
 		assertEquals(BigDecimal.ONE, precisionRecall.precisionAtRecallLevel(tenPercent));
@@ -203,9 +202,9 @@ class PrecisionRecallTest {
 	}
 
 	@Test
-	void firstHalfOfRankinIncorret() throws Exception {
-		List<Character> ranking = Arrays.asList('x', 'x', 'x', 'x', 'x', 'a', 'b', 'c', 'd', 'e');
-		List<Character> relevantSet = Arrays.asList('a', 'b', 'c', 'd', 'e');
+	void firstHalfOfRankinIncorret() {
+		List<Character> ranking = List.of('x', 'x', 'x', 'x', 'x', 'a', 'b', 'c', 'd', 'e');
+		List<Character> relevantSet = List.of('a', 'b', 'c', 'd', 'e');
 		PrecisionRecall<Character> precisionRecall = new PrecisionRecall<>(ranking, relevantSet);
 		assertEquals(BigDecimal.ONE, precisionRecall.precisionAtRecallLevel(zeroPercent));
 		assertEquals(BigDecimal.ONE, precisionRecall.precisionAtRecallLevel(tenPercent));

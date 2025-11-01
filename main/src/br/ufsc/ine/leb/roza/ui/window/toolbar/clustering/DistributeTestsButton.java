@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 
 import javax.swing.JButton;
 
+import br.ufsc.ine.leb.roza.TestCase;
 import br.ufsc.ine.leb.roza.clustering.Level;
 import br.ufsc.ine.leb.roza.exceptions.ClusteringLevelGenerationException;
 import br.ufsc.ine.leb.roza.ui.Hub;
@@ -13,7 +14,7 @@ import br.ufsc.ine.leb.roza.ui.UiComponent;
 
 public class DistributeTestsButton implements UiComponent {
 
-	private ClusteringTab toolbar;
+	private final ClusteringTab toolbar;
 
 	public DistributeTestsButton(ClusteringTab toolbar) {
 		this.toolbar = toolbar;
@@ -27,12 +28,12 @@ public class DistributeTestsButton implements UiComponent {
 			List<Level> levels;
 			try {
 				levels = manager.distributeTests();
-				hub.infoMessagePublish(String.format("Clustering performed"));
+				hub.infoMessagePublish("Clustering performed");
 			} catch (ClusteringLevelGenerationException exception) {
 				levels = exception.getLevels();
-				List<String> ties = exception.getTibreakException().getTies().stream().map(tie -> {
-					List<String> first = tie.getFirst().getTestCases().stream().map(test -> test.toString()).collect(Collectors.toList());
-					List<String> second = tie.getSecond().getTestCases().stream().map(test -> test.toString()).collect(Collectors.toList());
+				List<String> ties = exception.getTiebreakException().getTies().stream().map(tie -> {
+					List<String> first = tie.getFirst().getTestCases().stream().map(TestCase::toString).collect(Collectors.toList());
+					List<String> second = tie.getSecond().getTestCases().stream().map(TestCase::toString).collect(Collectors.toList());
 					String firstMessage = String.join(", ", first);
 					String secondMessage = String.join(", ", second);
 					return String.format("<li><strong>first</strong>: %s, <strong>second</strong>: %s</li>", firstMessage, secondMessage);
@@ -46,7 +47,7 @@ public class DistributeTestsButton implements UiComponent {
 	}
 
 	@Override
-	public void addChilds(List<UiComponent> childs) {}
+	public void addChildren(List<UiComponent> children) {}
 
 	@Override
 	public void start() {}

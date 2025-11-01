@@ -2,7 +2,7 @@ package br.ufsc.ine.leb.roza;
 
 public class Statement {
 
-	private String text;
+	private final String text;
 
 	public Statement(String text) {
 		this.text = text;

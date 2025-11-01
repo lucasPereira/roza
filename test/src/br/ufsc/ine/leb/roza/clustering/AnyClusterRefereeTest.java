@@ -6,7 +6,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import java.util.Arrays;
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,10 +26,10 @@ class AnyClusterRefereeTest {
 
 	@BeforeEach
 	void setup() {
-		TestCase alpha = new TestCase("alpha", Arrays.asList(), Arrays.asList());
-		TestCase beta = new TestCase("beta", Arrays.asList(), Arrays.asList());
-		TestCase gamma = new TestCase("gamma", Arrays.asList(), Arrays.asList());
-		TestCase delta = new TestCase("delta", Arrays.asList(), Arrays.asList());
+		TestCase alpha = new TestCase("alpha", List.of(), List.of());
+		TestCase beta = new TestCase("beta", List.of(), List.of());
+		TestCase gamma = new TestCase("gamma", List.of(), List.of());
+		TestCase delta = new TestCase("delta", List.of(), List.of());
 		Cluster alphaCluster = new Cluster(alpha);
 		Cluster betaCluster = new Cluster(beta);
 		Cluster gammaCluster = new Cluster(gamma);
@@ -43,24 +43,24 @@ class AnyClusterRefereeTest {
 	}
 
 	@Test
-	void withoutElements() throws Exception {
+	void withoutElements() {
 		assertThrows(NoCombinationToChooseException.class, () -> referee.untie(collectionUtils.set()));
 	}
 
 	@Test
-	void chooseUnique() throws Exception {
+	void chooseUnique() {
 		Combination chosen = referee.untie(collectionUtils.set(alphaCombinedBeta));
 		assertEquals(chosen, alphaCombinedBeta);
 	}
 
 	@Test
-	void chooseAnyWithClustersOfSameSize() throws Exception {
+	void chooseAnyWithClustersOfSameSize() {
 		Combination chosen =  referee.untie(collectionUtils.set(alphaCombinedBeta, gammaCombinedDelta));
 		assertThat(chosen, anyOf(equalTo(alphaCombinedBeta), equalTo(gammaCombinedDelta)));
 	}
 
 	@Test
-	void chooseAnyWithClustersOfDiffrentSize() throws Exception {
+	void chooseAnyWithClustersOfDiffrentSize() {
 		Combination chosen =  referee.untie(collectionUtils.set(alphaBetaCombinedDelta, gammaCombinedDelta));
 		assertThat(chosen, anyOf(equalTo(alphaBetaCombinedDelta), equalTo(gammaCombinedDelta)));
 	}

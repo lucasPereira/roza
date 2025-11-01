@@ -8,8 +8,8 @@ public class SimilarityAssessmentComparatorBySourceAndTargetNames implements Com
 
 	@Override
 	public int compare(SimilarityAssessment assessment1, SimilarityAssessment assessment2) {
-		Integer sourceComparison = assessment1.getSource().getName().compareTo(assessment2.getSource().getName());
-		Integer targetComparison = assessment1.getTarget().getName().compareTo(assessment2.getTarget().getName());
+		int sourceComparison = assessment1.getSource().getName().compareTo(assessment2.getSource().getName());
+		int targetComparison = assessment1.getTarget().getName().compareTo(assessment2.getTarget().getName());
 		return sourceComparison == 0 ? targetComparison : sourceComparison;
 	}
 

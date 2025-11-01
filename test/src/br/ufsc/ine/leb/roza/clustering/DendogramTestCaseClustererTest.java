@@ -1,12 +1,11 @@
 package br.ufsc.ine.leb.roza.clustering;
 
-import static org.junit.Assert.assertNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -37,9 +36,9 @@ class DendogramTestCaseClustererTest {
 	void setup() {
 		dotOne = new BigDecimal("0.1");
 		dotFive = new BigDecimal("0.5");
-		alpha = new TestCase("alpha", Arrays.asList(), Arrays.asList());
-		beta = new TestCase("beta", Arrays.asList(), Arrays.asList());
-		gamma = new TestCase("gamma", Arrays.asList(), Arrays.asList());
+		alpha = new TestCase("alpha", List.of(), List.of());
+		beta = new TestCase("beta", List.of(), List.of());
+		gamma = new TestCase("gamma", List.of(), List.of());
 		clusterAlpha = new Cluster(alpha);
 		clusterBeta = new Cluster(beta);
 		clusterGamma = new Cluster(gamma);
@@ -48,7 +47,7 @@ class DendogramTestCaseClustererTest {
 	}
 
 	@Test
-	void zeroTests() throws Exception {
+	void zeroTests() {
 		SimilarityReport report = new SimilarityReportBuilder(true).build();
 		Referee referee = new InsecureReferee();
 		Linkage linkage = new SingleLinkage(report);
@@ -68,7 +67,7 @@ class DendogramTestCaseClustererTest {
 	}
 
 	@Test
-	void oneTestStopingInLevelOneBecauseItHasntClustersToMerge() throws Exception {
+	void oneTestStopingInLevelOneBecauseItHasntClustersToMerge() {
 		SimilarityReport report = new SimilarityReportBuilder(true).add(alpha).build();
 		Referee referee = new InsecureReferee();
 		Linkage linkage = new SingleLinkage(report);
@@ -90,7 +89,7 @@ class DendogramTestCaseClustererTest {
 	}
 
 	@Test
-	void twoTestsStopingInLevelZeroBecauseThresholdCriteria() throws Exception {
+	void twoTestsStopingInLevelZeroBecauseThresholdCriteria() {
 		SimilarityReport report = new SimilarityReportBuilder(true).add(alpha).add(beta).complete().build();
 		Referee referee = new InsecureReferee();
 		Linkage linkage = new SingleLinkage(report);
@@ -114,7 +113,7 @@ class DendogramTestCaseClustererTest {
 	}
 
 	@Test
-	void twoTestsStopingInLevelOneBecauseItHasntClustersToMerge() throws Exception {
+	void twoTestsStopingInLevelOneBecauseItHasntClustersToMerge() {
 		SimilarityReport report = new SimilarityReportBuilder(true).add(alpha).add(beta).complete().build();
 		Referee referee = new InsecureReferee();
 		Linkage linkage = new SingleLinkage(report);
@@ -143,7 +142,7 @@ class DendogramTestCaseClustererTest {
 	}
 
 	@Test
-	void threeTestsStopingInLevelOneBecauseThresholdCriteria() throws Exception {
+	void threeTestsStopingInLevelOneBecauseThresholdCriteria() {
 		SimilarityReport report = new SimilarityReportBuilder(true).add(alpha, beta, dotFive).add(gamma).complete().build();
 		Referee referee = new InsecureReferee();
 		Linkage linkage = new SingleLinkage(report);
@@ -175,7 +174,7 @@ class DendogramTestCaseClustererTest {
 	}
 
 	@Test
-	void threeTestsStopingInLevelTwoBecauseItHasntClustersToMerge() throws Exception {
+	void threeTestsStopingInLevelTwoBecauseItHasntClustersToMerge() {
 		SimilarityReport report = new SimilarityReportBuilder(true).add(alpha, beta, dotFive).add(gamma).complete().build();
 		Referee referee = new InsecureReferee();
 		Linkage linkage = new SingleLinkage(report);
@@ -212,7 +211,7 @@ class DendogramTestCaseClustererTest {
 	}
 
 	@Test
-	void threDistinctTestsWithTiebreak() throws Exception {
+	void threDistinctTestsWithTiebreak() {
 		SimilarityReport report = new SimilarityReportBuilder(true).add(alpha).add(beta).add(gamma).complete().build();
 		Referee referee = new InsecureReferee();
 		Linkage linkage = new SingleLinkage(report);
@@ -220,7 +219,7 @@ class DendogramTestCaseClustererTest {
 		DendogramTestCaseClusterer clusterer = new DendogramTestCaseClusterer(linkage, referee, criteria);
 		ClusteringLevelGenerationException exception = assertThrows(ClusteringLevelGenerationException.class, () -> clusterer.cluster(report));
 
-		TiebreakException tiebreak = exception.getTibreakException();
+		TiebreakException tiebreak = exception.getTiebreakException();
 		assertEquals(3, tiebreak.getTies().size());
 		assertTrue(tiebreak.getTies().contains(new Combination(clusterAlpha, clusterBeta)));
 		assertTrue(tiebreak.getTies().contains(new Combination(clusterAlpha, clusterGamma)));

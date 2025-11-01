@@ -20,13 +20,13 @@ class DeckardStringConfigurationTest {
 	}
 
 	@Test
-	void nameAndDescription() throws Exception {
+	void nameAndDescription() {
 		assertEquals("FILE_PATTERN", configuration.getName());
 		assertEquals("Input file name pattern", configuration.getDescription());
 	}
 
 	@Test
-	void create() throws Exception {
+	void create() {
 		configuration.addArgument(arguments);
 		assertEquals("*.java", configuration.getValue());
 		assertEquals(1, arguments.size());
@@ -34,7 +34,7 @@ class DeckardStringConfigurationTest {
 	}
 
 	@Test
-	void change() throws Exception {
+	void change() {
 		configuration.setValue("*.c");
 		configuration.addArgument(arguments);
 		assertEquals("*.c", configuration.getValue());

@@ -11,7 +11,7 @@ import br.ufsc.ine.leb.roza.ui.UiComponent;
 
 public class NextLevelButton implements UiComponent {
 
-	private ClusteringTab clusteringTab;
+	private final ClusteringTab clusteringTab;
 	private Level selected;
 	private List<Level> levels;
 
@@ -43,7 +43,7 @@ public class NextLevelButton implements UiComponent {
 	}
 
 	@Override
-	public void addChilds(List<UiComponent> childs) {}
+	public void addChildren(List<UiComponent> children) {}
 
 	@Override
 	public void start() {}

@@ -2,7 +2,6 @@ package br.ufsc.ine.leb.roza.ui.window.content.sidebar.measurements;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.JScrollPane;
@@ -19,7 +18,7 @@ import br.ufsc.ine.leb.roza.ui.model.SimilarityReportModel;
 
 public class MatrixMeasurementPanel implements UiComponent {
 
-	private MeasurementsTab measurementsTab;
+	private final MeasurementsTab measurementsTab;
 
 	public MatrixMeasurementPanel(MeasurementsTab measurementsTab) {
 		this.measurementsTab = measurementsTab;
@@ -32,12 +31,8 @@ public class MatrixMeasurementPanel implements UiComponent {
 		table.setDefaultRenderer(SimilarityAssessment.class, new SimilarityAssessmentRenderer());
 		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		measurementsTab.addMiddleComponent(scroll);
-		hub.loadTestClassesSubscribe(testClasses -> {
-			reset(table);
-		});
-		hub.extractTestCasesSubscribe(testCases -> {
-			reset(table);
-		});
+		hub.loadTestClassesSubscribe(testClasses -> reset(table));
+		hub.extractTestCasesSubscribe(testCases -> reset(table));
 		hub.measureTestsSubscribe(similarityReport -> {
 			SimilarityReportModel model = new SimilarityReportModel(similarityReport);
 			table.setModel(model);
@@ -45,8 +40,8 @@ public class MatrixMeasurementPanel implements UiComponent {
 
 				@Override
 				public void mouseClicked(MouseEvent event) {
-					Integer row = table.rowAtPoint(event.getPoint());
-					Integer col = table.columnAtPoint(event.getPoint());
+					int row = table.rowAtPoint(event.getPoint());
+					int col = table.columnAtPoint(event.getPoint());
 					SimilarityAssessment assessment = model.getValueAt(row, col);
 					hub.compareTestCasePublish(assessment);
 				}
@@ -59,11 +54,11 @@ public class MatrixMeasurementPanel implements UiComponent {
 
 	private void reset(JTable table) {
 		table.setModel(new DefaultTableModel());
-		Arrays.asList(table.getMouseListeners()).forEach(listener -> table.removeMouseListener(listener));
+		List.of(table.getMouseListeners()).forEach(table::removeMouseListener);
 	}
 
 	@Override
-	public void addChilds(List<UiComponent> childs) {}
+	public void addChildren(List<UiComponent> children) {}
 
 	@Override
 	public void start() {}

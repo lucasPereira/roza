@@ -20,16 +20,16 @@ import br.ufsc.ine.leb.roza.utils.FolderUtils;
 public abstract class Junit4TestCaseMaterializer implements TestCaseMaterializer {
 
 	private Integer counter;
-	private FolderUtils foldereUtils;
+	private final FolderUtils folderUtils;
 
 	public Junit4TestCaseMaterializer(String baseFolder) {
 		counter = 1;
-		foldereUtils = new FolderUtils(baseFolder);
+		folderUtils = new FolderUtils(baseFolder);
 	}
 
 	@Override
 	public final MaterializationReport materialize(List<TestCase> tests) {
-		List<TestCaseMaterialization> materializations = new LinkedList<>();
+		List<TestCaseMaterialization> materializationList = new LinkedList<>();
 		tests.forEach((testCase) -> {
 			String className = createClassName(testCase.getName());
 			String classFileName = createClassFileName(className);
@@ -37,9 +37,7 @@ public abstract class Junit4TestCaseMaterializer implements TestCaseMaterializer
 			ClassOrInterfaceDeclaration javaClass = javaUnit.addClass(className).setPublic(true);
 			MethodDeclaration javaMethod = javaClass.addMethod(testCase.getName()).setPublic(true).addAnnotation("Test");
 			BlockStmt javaMethodBody = new BlockStmt();
-			testCase.getFixtures().forEach((fixture) -> {
-				javaMethodBody.addStatement(JavaParser.parseStatement(fixture.getText()));
-			});
+			testCase.getFixtures().forEach((fixture) -> javaMethodBody.addStatement(JavaParser.parseStatement(fixture.getText())));
 			addAssertions(testCase, javaMethodBody);
 			javaMethod.setBody(javaMethodBody);
 			PrettyPrinterConfiguration configuration = new PrettyPrinterConfiguration();
@@ -47,11 +45,11 @@ public abstract class Junit4TestCaseMaterializer implements TestCaseMaterializer
 			configuration.setIndentSize(1);
 			String code = javaUnit.toString(configuration);
 			Integer length = code.split(configuration.getEndOfLineCharacter()).length;
-			File file = foldereUtils.writeContetAsString(classFileName, code);
+			File file = folderUtils.writeContetAsString(classFileName, code);
 			TestCaseMaterialization materialization = new TestCaseMaterialization(file, length, testCase);
-			materializations.add(materialization);
+			materializationList.add(materialization);
 		});
-		return new MaterializationReport(foldereUtils.getBaseFolder(), materializations);
+		return new MaterializationReport(folderUtils.getBaseFolder(), materializationList);
 	}
 
 	protected abstract void addAssertions(TestCase testCase, BlockStmt javaMethodBody);
@@ -61,9 +59,9 @@ public abstract class Junit4TestCaseMaterializer implements TestCaseMaterializer
 	}
 
 	private String createClassName(String testName) {
-		Character firstLetter = testName.charAt(0);
+		char firstLetter = testName.charAt(0);
 		String otherLetters = testName.substring(1);
-		return String.format("TestClass%d%s%sTest", counter++, firstLetter.toString().toUpperCase(), otherLetters);
+		return String.format("TestClass%d%s%sTest", counter++, Character.toString(firstLetter).toUpperCase(), otherLetters);
 	}
 
 }

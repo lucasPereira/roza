@@ -15,7 +15,7 @@ import br.ufsc.ine.leb.roza.utils.FolderUtils;
 
 public class WriteRefactoredTestClassesButton implements UiComponent {
 
-	private RefactoringTab toolbar;
+	private final RefactoringTab toolbar;
 	private JButton button;
 
 	public WriteRefactoredTestClassesButton(RefactoringTab toolbar) {
@@ -32,7 +32,7 @@ public class WriteRefactoredTestClassesButton implements UiComponent {
 			chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 			chooser.setAcceptAllFileFilterUsed(false);
 			chooser.setMultiSelectionEnabled(false);
-			Integer result = chooser.showOpenDialog(SwingUtilities.getRoot(button));
+			int result = chooser.showOpenDialog(SwingUtilities.getRoot(button));
 			if (result == JFileChooser.APPROVE_OPTION) {
 				String baseFolder = chooser.getSelectedFile().getAbsolutePath();
 				new FolderUtils(baseFolder).createEmptyFolder();
@@ -44,7 +44,7 @@ public class WriteRefactoredTestClassesButton implements UiComponent {
 	}
 
 	@Override
-	public void addChilds(List<UiComponent> childs) {}
+	public void addChildren(List<UiComponent> children) {}
 
 	@Override
 	public void start() {}

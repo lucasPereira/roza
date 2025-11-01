@@ -9,7 +9,7 @@ import br.ufsc.ine.leb.roza.exceptions.MissingPairException;
 
 public class SimilarityReport {
 
-	private List<SimilarityAssessment> assessments;
+	private final List<SimilarityAssessment> assessments;
 
 	SimilarityReport(List<SimilarityAssessment> assessments) {
 		this.assessments = new ArrayList<>(assessments);
@@ -50,8 +50,8 @@ public class SimilarityReport {
 	}
 
 	public SimilarityReport sort(Comparator<SimilarityAssessment> comparator) {
-		List<SimilarityAssessment> ordered = new ArrayList<SimilarityAssessment>(assessments);
-		Collections.sort(ordered, comparator);
+		List<SimilarityAssessment> ordered = new ArrayList<>(assessments);
+		ordered.sort(comparator);
 		return new SimilarityReport(ordered);
 	}
 

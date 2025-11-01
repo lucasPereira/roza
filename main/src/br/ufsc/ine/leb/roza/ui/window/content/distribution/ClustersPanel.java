@@ -24,9 +24,9 @@ import br.ufsc.ine.leb.roza.utils.comparator.TestCaseComparatorByName;
 
 public class ClustersPanel implements UiComponent {
 
-	private DistributionTab distributionTab;
+	private final DistributionTab distributionTab;
 	private JPanel container;
-	private Ring<Color> colors;
+	private final Ring<Color> colors;
 
 	public ClustersPanel(DistributionTab distributionTab) {
 		this.distributionTab = distributionTab;
@@ -45,18 +45,12 @@ public class ClustersPanel implements UiComponent {
 		container = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		JScrollPane scroll = new JScrollPane(container);
 		distributionTab.addComponent("Clusters", scroll);
-		hub.loadTestClassesSubscribe(classes -> {
-			clear();
-		});
-		hub.extractTestCasesSubscribe(testCases -> {
-			clear();
-		});
-		hub.measureTestsSubscribe(similarityReport -> {
-			clear();
-		});
+		hub.loadTestClassesSubscribe(classes -> clear());
+		hub.extractTestCasesSubscribe(testCases -> clear());
+		hub.measureTestsSubscribe(similarityReport -> clear());
 		hub.distributeTestsSubscribe(levels -> {
 			clear();
-			colors.shuffe();
+			colors.shuffle();
 			showLevel(levels.get(0));
 		});
 		hub.selectLevelSubscribe(level -> {
@@ -72,20 +66,20 @@ public class ClustersPanel implements UiComponent {
 
 	private void showLevel(Level level) {
 		JPanel panel = new JPanel();
-		panel.setLayout(new WrapLayout(WrapLayout.LEFT));
+		panel.setLayout(new WrapLayout());
 		List<Cluster> clusters = new ArrayList<>(level.getClusters());
-		Collections.sort(clusters, new ClusterComparatorBySizeAndTestName());
+		clusters.sort(new ClusterComparatorBySizeAndTestName());
 		Collections.reverse(clusters);
 		for (Cluster cluster : clusters) {
 			List<TestCase> tests = new ArrayList<>(cluster.getTestCases());
 			Collections.reverse(tests);
-			Collections.sort(tests, new TestCaseComparatorByName());
+			tests.sort(new TestCaseComparatorByName());
 			JPanel clusterPanel = new JPanel();
 			Color color = (tests.size() > 1) ? colors.next() : Color.DARK_GRAY;
 			clusterPanel.setBackground(color);
-			String lists = "";
+			StringBuilder lists = new StringBuilder();
 			for (TestCase test : tests) {
-				lists += "<ul>" + test.getName() + "</ul>";
+				lists.append("<ul>").append(test.getName()).append("</ul>");
 			}
 			JLabel label = new JLabel("<html>" + lists + "</html>");
 			label.setForeground(Color.WHITE);
@@ -99,7 +93,7 @@ public class ClustersPanel implements UiComponent {
 	}
 
 	@Override
-	public void addChilds(List<UiComponent> childs) {}
+	public void addChildren(List<UiComponent> children) {}
 
 	@Override
 	public void start() {}

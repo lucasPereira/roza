@@ -14,7 +14,7 @@ import br.ufsc.ine.leb.roza.ui.window.content.sidebar.Sidebar;
 
 public class ClusteringTab implements UiComponent {
 
-	private Sidebar sidebar;
+	private final Sidebar sidebar;
 
 	private JPanel container;
 	private JTable table;
@@ -32,10 +32,10 @@ public class ClusteringTab implements UiComponent {
 	}
 
 	@Override
-	public void addChilds(List<UiComponent> childs) {
-		childs.add(new PreviousLevelButton(this));
-		childs.add(new NextLevelButton(this));
-		childs.add(new ClusteringLevelsTable(this));
+	public void addChildren(List<UiComponent> children) {
+		children.add(new PreviousLevelButton(this));
+		children.add(new NextLevelButton(this));
+		children.add(new ClusteringLevelsTable(this));
 	}
 
 	@Override

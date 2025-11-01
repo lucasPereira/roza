@@ -13,34 +13,34 @@ import br.ufsc.ine.leb.roza.ui.model.DeckardSettingsConsumer;
 
 public class Hub {
 
-	private List<Consumer<List<TestClass>>> loadTestClassesListeners;
-	private List<Consumer<TestClass>> selectTestClassListeners;
+	private final List<Consumer<List<TestClass>>> loadTestClassesListeners;
+	private final List<Consumer<TestClass>> selectTestClassListeners;
 
-	private List<Consumer<List<TestCase>>> extractTestCasesListeners;
-	private List<Consumer<TestCase>> selectTestCaseListeners;
+	private final List<Consumer<List<TestCase>>> extractTestCasesListeners;
+	private final List<Consumer<TestCase>> selectTestCaseListeners;
 
-	private List<Runnable> selectDeckardMetricListeners;
-	private List<Runnable> unselectDeckardMetricListeners;
-	private List<DeckardSettingsConsumer> changeDeckardSettingsListeners;
-	private List<Runnable> selectJplagMetricListeners;
-	private List<Runnable> unselectJplagMetricListeners;
-	private List<Consumer<Integer>> changeJplagSettingsListeners;
-	private List<Runnable> selectSimianMetricListeners;
-	private List<Runnable> unselectSimianMetricListeners;
-	private List<Consumer<Integer>> changeSimianSettingsListeners;
-	private List<Consumer<SimilarityReport>> measureTestCaseListeners;
-	private List<Consumer<SimilarityAssessment>> compareTestCaseListeners;
+	private final List<Runnable> selectDeckardMetricListeners;
+	private final List<Runnable> unselectDeckardMetricListeners;
+	private final List<DeckardSettingsConsumer> changeDeckardSettingsListeners;
+	private final List<Runnable> selectJplagMetricListeners;
+	private final List<Runnable> unselectJplagMetricListeners;
+	private final List<Consumer<Integer>> changeJplagSettingsListeners;
+	private final List<Runnable> selectSimianMetricListeners;
+	private final List<Runnable> unselectSimianMetricListeners;
+	private final List<Consumer<Integer>> changeSimianSettingsListeners;
+	private final List<Consumer<SimilarityReport>> measureTestCaseListeners;
+	private final List<Consumer<SimilarityAssessment>> compareTestCaseListeners;
 
-	private List<Runnable> selectLevelBasedCriteriaListeners;
-	private List<Runnable> selectTestsPerClassCriteriaListeners;
-	private List<Runnable> selectSimilarityBasedCriteriaListeners;
-	private List<Runnable> selectNeverStopCriteriaListeners;
+	private final List<Runnable> selectLevelBasedCriteriaListeners;
+	private final List<Runnable> selectTestsPerClassCriteriaListeners;
+	private final List<Runnable> selectSimilarityBasedCriteriaListeners;
+	private final List<Runnable> selectNeverStopCriteriaListeners;
 
-	private List<Consumer<List<Level>>> distributeTestsListeners;
-	private List<Consumer<Level>> selectLevelListeners;
+	private final List<Consumer<List<Level>>> distributeTestsListeners;
+	private final List<Consumer<Level>> selectLevelListeners;
 
-	private List<Consumer<String>> infoMessageListeners;
-	private List<Consumer<String>> errorMessageListeners;
+	private final List<Consumer<String>> infoMessageListeners;
+	private final List<Consumer<String>> errorMessageListeners;
 
 	public Hub() {
 		loadTestClassesListeners = new LinkedList<>();
@@ -106,7 +106,7 @@ public class Hub {
 	}
 
 	public void selectDeckardMetricPublish() {
-		selectDeckardMetricListeners.forEach(listener -> listener.run());
+		selectDeckardMetricListeners.forEach(Runnable::run);
 	}
 
 	public void selectDeckardMetricSubscribe(Runnable listener) {
@@ -114,7 +114,7 @@ public class Hub {
 	}
 
 	public void unselectDeckardMetricPublish() {
-		unselectDeckardMetricListeners.forEach(listener -> listener.run());
+		unselectDeckardMetricListeners.forEach(Runnable::run);
 	}
 
 	public void unselectDeckardMetricSubscribe(Runnable listener) {
@@ -130,7 +130,7 @@ public class Hub {
 	}
 
 	public void selectJplagMetricPublish() {
-		selectJplagMetricListeners.forEach(listener -> listener.run());
+		selectJplagMetricListeners.forEach(Runnable::run);
 	}
 
 	public void selectJplagMetricSubscribe(Runnable listener) {
@@ -138,7 +138,7 @@ public class Hub {
 	}
 
 	public void unselectJplagMetricPublish() {
-		unselectJplagMetricListeners.forEach(listener -> listener.run());
+		unselectJplagMetricListeners.forEach(Runnable::run);
 	}
 
 	public void unselectJplagMetricSubscribe(Runnable listener) {
@@ -154,7 +154,7 @@ public class Hub {
 	}
 
 	public void selectSimianMetricPublish() {
-		selectSimianMetricListeners.forEach(listener -> listener.run());
+		selectSimianMetricListeners.forEach(Runnable::run);
 	}
 
 	public void selectSimianMetricSubscribe(Runnable listener) {
@@ -162,7 +162,7 @@ public class Hub {
 	}
 
 	public void unselectSimianMetricPublish() {
-		unselectSimianMetricListeners.forEach(listener -> listener.run());
+		unselectSimianMetricListeners.forEach(Runnable::run);
 	}
 
 	public void unselectSimianMetricSubscribe(Runnable listener) {
@@ -194,7 +194,7 @@ public class Hub {
 	}
 
 	public void selectLevelBasedCriteriaPublish() {
-		selectLevelBasedCriteriaListeners.forEach(listener -> listener.run());
+		selectLevelBasedCriteriaListeners.forEach(Runnable::run);
 	}
 
 	public void selectLevelBasedCriteriaSubscribe(Runnable listener) {
@@ -202,7 +202,7 @@ public class Hub {
 	}
 
 	public void selectTestsPerClassCriteriaPublish() {
-		selectTestsPerClassCriteriaListeners.forEach(listener -> listener.run());
+		selectTestsPerClassCriteriaListeners.forEach(Runnable::run);
 	}
 
 	public void selectTestsPerClassCriteriaSubscribe(Runnable listener) {
@@ -210,7 +210,7 @@ public class Hub {
 	}
 
 	public void selectSimilarityBasedCriteriaPublish() {
-		selectSimilarityBasedCriteriaListeners.forEach(listener -> listener.run());
+		selectSimilarityBasedCriteriaListeners.forEach(Runnable::run);
 	}
 
 	public void selectSimilarityBasedCriteriaSubscribe(Runnable listener) {
@@ -218,7 +218,7 @@ public class Hub {
 	}
 
 	public void selectNeverStopCriteriaPublish() {
-		selectNeverStopCriteriaListeners.forEach(listener -> listener.run());
+		selectNeverStopCriteriaListeners.forEach(Runnable::run);
 	}
 
 	public void selectNeverStopCriteriaSubscribe(Runnable listener) {

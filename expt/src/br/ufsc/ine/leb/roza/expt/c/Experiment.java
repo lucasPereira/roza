@@ -1,7 +1,6 @@
 package br.ufsc.ine.leb.roza.expt.c;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -40,6 +39,7 @@ import br.ufsc.ine.leb.roza.selection.JavaExtensionTextFileSelector;
 import br.ufsc.ine.leb.roza.selection.TextFileSelector;
 import br.ufsc.ine.leb.roza.utils.FolderUtils;
 import br.ufsc.ine.leb.roza.utils.MathUtils;
+import br.ufsc.ine.leb.roza.utils.RozaLogger;
 
 public class Experiment {
 
@@ -60,65 +60,63 @@ public class Experiment {
 
 		List<Linkage> linkages = createLinkages(report);
 		List<Referee> referees = createReferees();
-		List<ThresholdCriteria> criterias = createThresholdCriterias();
-		execute(linkages, referees, criterias, report);
+		List<ThresholdCriteria> criteria = createThresholdCriteria();
+		execute(linkages, referees, criteria, report);
 	}
 
 	private static List<Linkage> createLinkages(SimilarityReport report) {
 		SingleLinkage single = new SingleLinkage(report);
 		CompleteLinkage complete = new CompleteLinkage(report);
 		AverageLinkage average = new AverageLinkage(report);
-		List<Linkage> linkages = Arrays.asList(single, complete, average);
-		return linkages;
+		return List.of(single, complete, average);
 	}
 
 	private static List<Referee> createReferees() {
 		InsecureReferee insecure = new InsecureReferee();
 		BiggestClusterReferee biggest = new BiggestClusterReferee();
 		SmallestClusterReferee smallest = new SmallestClusterReferee();
-		List<Referee> referees = Arrays.asList(insecure, biggest, smallest);
-		return referees;
+		return List.of(insecure, biggest, smallest);
 	}
 
-	private static List<ThresholdCriteria> createThresholdCriterias() {
-		List<ThresholdCriteria> criterias = new LinkedList<ThresholdCriteria>();
-		addLevelBasedCriteria(criterias);
-		addSimilarityBasedCriteria(criterias);
-		addTestPerClassCriteria(criterias);
-		return criterias;
+	private static List<ThresholdCriteria> createThresholdCriteria() {
+		List<ThresholdCriteria> criteria = new LinkedList<>();
+		addLevelBasedCriteria(criteria);
+		addSimilarityBasedCriteria(criteria);
+		addTestPerClassCriteria(criteria);
+		return criteria;
 	}
 
-	private static void addLevelBasedCriteria(List<ThresholdCriteria> criterias) {
-		for (Integer index = 1; index <= 46; index++) {
+	private static void addLevelBasedCriteria(List<ThresholdCriteria> criteria) {
+		for (int index = 1; index <= 46; index++) {
 			ThresholdCriteria level = new LevelBasedCriteria(index);
-			criterias.add(level);
+			criteria.add(level);
 		}
 	}
 
-	private static void addSimilarityBasedCriteria(List<ThresholdCriteria> criterias) {
-		criterias.add(new SimilarityBasedCriteria(BigDecimal.ZERO));
-		for (Integer index = 1; index <= 10; index++) {
+	private static void addSimilarityBasedCriteria(List<ThresholdCriteria> criteria) {
+		criteria.add(new SimilarityBasedCriteria(BigDecimal.ZERO));
+		for (int index = 1; index <= 10; index++) {
 			BigDecimal degree = new MathUtils().oneOver(index);
 			ThresholdCriteria similarity = new SimilarityBasedCriteria(degree);
-			criterias.add(similarity);
+			criteria.add(similarity);
 		}
 	}
 
-	private static void addTestPerClassCriteria(List<ThresholdCriteria> criterias) {
-		for (Integer index = 1; index <= 46; index++) {
+	private static void addTestPerClassCriteria(List<ThresholdCriteria> criteria) {
+		for (int index = 1; index <= 46; index++) {
 			ThresholdCriteria level = new TestsPerClassCriteria(index);
-			criterias.add(level);
+			criteria.add(level);
 		}
 	}
 
-	private static void execute(List<Linkage> linkages, List<Referee> referees, List<ThresholdCriteria> criterias,
+	private static void execute(List<Linkage> linkages, List<Referee> referees, List<ThresholdCriteria> criteriaList,
 			SimilarityReport report) {
 		for (Linkage linkage : linkages) {
 			for (Referee referee : referees) {
-				for (ThresholdCriteria criteria : criterias) {
+				for (ThresholdCriteria criteria : criteriaList) {
 					TestCaseClusterer clusterer = new DendogramTestCaseClusterer(linkage, referee, criteria);
 					Set<Cluster> clusters = clusterer.cluster(report);
-					System.out.println(String.format("%s %s %s %s", linkage, referee, criteria, clusters.size()));
+					RozaLogger.getInstance().info(String.format("%s %s %s %s", linkage, referee, criteria, clusters.size()));
 				}
 			}
 		}

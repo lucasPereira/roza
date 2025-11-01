@@ -15,18 +15,18 @@ public class LcsSimilarityMeasurer extends AbstractSimilarityMeasurer implements
 
 	@Override
 	public SimilarityReport measureMoreThanOne(MaterializationReport materializationReport, SimilarityReportBuilder builder) {
-		List<TestCaseMaterialization> materializations = materializationReport.getMaterializations();
-		for (TestCaseMaterialization sourceMaterialization : materializations) {
+		List<TestCaseMaterialization> materialization = materializationReport.getMaterialization();
+		for (TestCaseMaterialization sourceMaterialization : materialization) {
 			TestCase source = sourceMaterialization.getTestCase();
 			List<Statement> sourceFixtures = source.getFixtures();
-			for (TestCaseMaterialization targetMaterialization : materializations) {
+			for (TestCaseMaterialization targetMaterialization : materialization) {
 				TestCase target = targetMaterialization.getTestCase();
 				if (!source.equals(target)) {
 					List<Statement> targetFixtures = target.getFixtures();
 					Integer commonFixtures = lcs(sourceFixtures, targetFixtures);
-					Integer reusedFixtures = commonFixtures * 2;
-					Integer sourceOnlyFixtures = sourceFixtures.size() - commonFixtures;
-					Integer targetOnlyFixtures = targetFixtures.size() - commonFixtures;
+					int reusedFixtures = commonFixtures * 2;
+					int sourceOnlyFixtures = sourceFixtures.size() - commonFixtures;
+					int targetOnlyFixtures = targetFixtures.size() - commonFixtures;
 					BigDecimal totalFixtures = new BigDecimal(reusedFixtures + sourceOnlyFixtures + targetOnlyFixtures);
 					BigDecimal score = source.equals(target) ? BigDecimal.ONE : (totalFixtures.equals(BigDecimal.ZERO) ? BigDecimal.ZERO : new BigDecimal(reusedFixtures).divide(totalFixtures, MathContext.DECIMAL32));
 					builder.add(source, target, score);
@@ -37,11 +37,11 @@ public class LcsSimilarityMeasurer extends AbstractSimilarityMeasurer implements
 	}
 
 	private Integer lcs(List<Statement> sourceFixtures, List<Statement> targetFixtures) {
-		Integer sizeSource = sourceFixtures.size();
-		Integer sizeTarget = targetFixtures.size();
+		int sizeSource = sourceFixtures.size();
+		int sizeTarget = targetFixtures.size();
 		Integer[][] matrix = new Integer[sizeSource + 1][sizeTarget + 1];
-		Integer indexSource = null;
-		Integer indexTarget = null;
+		int indexSource;
+		int indexTarget;
 		if (sizeSource == 0 || sizeTarget == 0) {
 			return 0;
 		}

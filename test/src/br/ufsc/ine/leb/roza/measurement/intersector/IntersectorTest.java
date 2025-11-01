@@ -31,13 +31,13 @@ class IntersectorTest {
 	}
 
 	@Test
-	void withoutIntersection() throws Exception {
+	void withoutIntersection() {
 		assertEquals(BigDecimal.ZERO, intersector.evaluate());
 		assertEquals(0, intersector.getIntervals().size());
 	}
 
 	@Test
-	void oneFullSegment() throws Exception {
+	void oneFullSegment() {
 		intersector.addSegment(1, 10);
 		assertEquals(BigDecimal.ONE, intersector.evaluate());
 		assertEquals(1, intersector.getIntervals().size());
@@ -45,7 +45,7 @@ class IntersectorTest {
 	}
 
 	@Test
-	void oneSegmentInTheBegin() throws Exception {
+	void oneSegmentInTheBegin() {
 		intersector.addSegment(1, 5);
 		assertEquals(new BigDecimal("0.5"), intersector.evaluate());
 		assertEquals(1, intersector.getIntervals().size());
@@ -53,7 +53,7 @@ class IntersectorTest {
 	}
 
 	@Test
-	void oneSegmentInTheEnd() throws Exception {
+	void oneSegmentInTheEnd() {
 		intersector.addSegment(10, 10);
 		assertEquals(new BigDecimal("0.1"), intersector.evaluate());
 		assertEquals(1, intersector.getIntervals().size());
@@ -61,7 +61,7 @@ class IntersectorTest {
 	}
 
 	@Test
-	void twoSegments() throws Exception {
+	void twoSegments() {
 		intersector.addSegment(1, 3);
 		intersector.addSegment(8, 10);
 		assertEquals(new BigDecimal("0.6"), intersector.evaluate());
@@ -71,7 +71,7 @@ class IntersectorTest {
 	}
 
 	@Test
-	void twoSegmentsWithOverlap() throws Exception {
+	void twoSegmentsWithOverlap() {
 		intersector.addSegment(4, 6);
 		intersector.addSegment(5, 7);
 		assertEquals(new BigDecimal("0.4"), intersector.evaluate());
@@ -80,7 +80,7 @@ class IntersectorTest {
 	}
 
 	@Test
-	void threeSegmentsWithOverlap() throws Exception {
+	void threeSegmentsWithOverlap() {
 		intersector.addSegment(3, 4);
 		intersector.addSegment(6, 7);
 		intersector.addSegment(4, 6);

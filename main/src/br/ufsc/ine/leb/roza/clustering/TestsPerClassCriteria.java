@@ -6,7 +6,7 @@ import br.ufsc.ine.leb.roza.exceptions.InvalidThresholdException;
 
 public class TestsPerClassCriteria implements ThresholdCriteria {
 
-	private Integer threshold;
+	private final Integer threshold;
 
 	public TestsPerClassCriteria(Integer threshold) {
 		if (threshold < 1) {
@@ -16,8 +16,8 @@ public class TestsPerClassCriteria implements ThresholdCriteria {
 	}
 
 	@Override
-	public Boolean shoudlStop(Integer nextLevel, Combination combinationToNext, BigDecimal evaluationToNext) {
-		Integer nextSize = combinationToNext.getFirst().getTestCases().size() + combinationToNext.getSecond().getTestCases().size();
+	public Boolean shouldStop(Integer nextLevel, Combination combinationToNext, BigDecimal evaluationToNext) {
+		int nextSize = combinationToNext.getFirst().getTestCases().size() + combinationToNext.getSecond().getTestCases().size();
 		return nextSize > threshold;
 	}
 

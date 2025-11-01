@@ -18,7 +18,7 @@ import br.ufsc.ine.leb.roza.TestMethod;
 
 public class JunitTestCaseExtractor implements TestCaseExtractor {
 
-	private List<String> assertions;
+	private final List<String> assertions;
 
 	public JunitTestCaseExtractor(List<String> assertions) {
 		this.assertions = assertions;
@@ -27,11 +27,7 @@ public class JunitTestCaseExtractor implements TestCaseExtractor {
 	@Override
 	public final List<TestCase> extract(List<TestClass> testClasses) {
 		List<TestCase> testCases = new LinkedList<>();
-		testClasses.forEach((testClass) -> {
-			testClass.getTestMethods().forEach((testMethod) -> {
-				extractTestCase(testCases, testClass, testMethod);
-			});
-		});
+		testClasses.forEach((testClass) -> testClass.getTestMethods().forEach((testMethod) -> extractTestCase(testCases, testClass, testMethod)));
 		return testCases;
 	}
 
@@ -49,28 +45,26 @@ public class JunitTestCaseExtractor implements TestCaseExtractor {
 	}
 
 	private List<Statement> extractStatements(TestClass testClass, TestMethod testMethod) {
-		List<Statement> statements = new LinkedList<Statement>();
-		testClass.getSetupMethods().forEach((setupMethod) -> {
-			setupMethod.getStatements().forEach((statement) -> {
-				Statement addedStatement = statement;
-				Optional<AssignExpr> assign = JavaParser.parseStatement(statement.getText()).toExpressionStmt().get().getExpression().toAssignExpr();
-				if (assign.isPresent()) {
-					AssignExpr assignExpression = assign.get();
-					for (Field field : testClass.getFields()) {
-						if (assignExpression.getTarget().toString().equals(field.getName())) {
-							addedStatement = new Statement(String.format("%s %s", field.getType(), statement.getText()));
-						}
+		List<Statement> statements = new LinkedList<>();
+		testClass.getSetupMethods().forEach((setupMethod) -> setupMethod.getStatements().forEach((statement) -> {
+			Statement addedStatement = statement;
+			Optional<AssignExpr> assign = JavaParser.parseStatement(statement.getText()).toExpressionStmt().orElseThrow().getExpression().toAssignExpr();
+			if (assign.isPresent()) {
+				AssignExpr assignExpression = assign.get();
+				for (Field field : testClass.getFields()) {
+					if (assignExpression.getTarget().toString().equals(field.getName())) {
+						addedStatement = new Statement(String.format("%s %s", field.getType(), statement.getText()));
 					}
 				}
-				statements.add(addedStatement);
-			});
-		});
+			}
+			statements.add(addedStatement);
+		}));
 		statements.addAll(testMethod.getStatements());
 		return statements;
 	}
 
 	private Boolean statementIsAssertion(Statement statement) {
-		Optional<MethodCallExpr> methodCall = JavaParser.parseStatement(statement.getText()).toExpressionStmt().get().getExpression().toMethodCallExpr();
+		Optional<MethodCallExpr> methodCall = JavaParser.parseStatement(statement.getText()).toExpressionStmt().orElseThrow().getExpression().toMethodCallExpr();
 		if (methodCall.isPresent()) {
 			MethodCallExpr methodCallExpression = methodCall.get();
 			SimpleName name = methodCallExpression.getName();

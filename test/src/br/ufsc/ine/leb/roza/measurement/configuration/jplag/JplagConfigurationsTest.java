@@ -18,7 +18,7 @@ class JplagConfigurationsTest {
 	}
 
 	@Test
-	void configurations() throws Exception {
+	void configurations() {
 		assertEquals(11, configurations.getAll().size());
 
 		assertEquals("t", configurations.getAll().get(0).getName());
@@ -52,11 +52,11 @@ class JplagConfigurationsTest {
 		assertEquals("Name of directory in which the web pages will be stored", configurations.getAll().get(9).getDescription());
 
 		assertEquals("s", configurations.getAll().get(10).getName());
-		assertEquals("Look at files in subdirs too", configurations.getAll().get(10).getDescription());
+		assertEquals("Look at files in subfolders too", configurations.getAll().get(10).getDescription());
 	}
 
 	@Test
-	void defaultValues() throws Exception {
+	void defaultValues() {
 		assertEquals(13, configurations.getAllAsArguments().size());
 
 		assertEquals("-t", configurations.getAllAsArguments().get(0));
@@ -81,7 +81,7 @@ class JplagConfigurationsTest {
 	}
 
 	@Test
-	void changeValues() throws Exception {
+	void changeValues() {
 		configurations.sensitivity(2);
 
 		assertEquals(13, configurations.getAllAsArguments().size());
@@ -108,20 +108,14 @@ class JplagConfigurationsTest {
 	}
 
 	@Test
-	void sensitivityShouldBeLargerThanZero() throws Exception {
-		assertThrows(InvalidConfigurationException.class, () -> {
-			configurations.sensitivity(-1);
-		});
-		assertThrows(InvalidConfigurationException.class, () -> {
-			configurations.sensitivity(0);
-		});
-		assertThrows(InvalidConfigurationException.class, () -> {
-			configurations.sensitivity(null);
-		});
+	void sensitivityShouldBeLargerThanZero() {
+		assertThrows(InvalidConfigurationException.class, () -> configurations.sensitivity(-1));
+		assertThrows(InvalidConfigurationException.class, () -> configurations.sensitivity(0));
+		assertThrows(InvalidConfigurationException.class, () -> configurations.sensitivity(null));
 	}
 
 	@Test
-	void getConfigurations() throws Exception {
+	void getConfigurations() {
 		assertEquals("main/exec/measurer", configurations.results());
 	}
 

@@ -11,13 +11,13 @@ public abstract class AbstractSimilarityMeasurer implements SimilarityMeasurer {
 
 	@Override
 	public final SimilarityReport measure(MaterializationReport materializationReport) {
-		List<TestCaseMaterialization> materializations = materializationReport.getMaterializations();
+		List<TestCaseMaterialization> materialization = materializationReport.getMaterialization();
 		SimilarityReportBuilder builder = new SimilarityReportBuilder(false);
-		if (materializations.size() == 0) {
+		if (materialization.isEmpty()) {
 			return builder.build();
 		}
-		if (materializations.size() == 1) {
-			return builder.add(materializations.iterator().next().getTestCase()).build();
+		if (materialization.size() == 1) {
+			return builder.add(materialization.iterator().next().getTestCase()).build();
 		}
 		return measureMoreThanOne(materializationReport, builder);
 	}

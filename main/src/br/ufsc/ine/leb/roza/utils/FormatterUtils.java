@@ -9,8 +9,8 @@ import br.ufsc.ine.leb.roza.retrieval.RecallLevel;
 
 public class FormatterUtils {
 
-	private Locale locale = Locale.forLanguageTag("pt-BR");
-	private DecimalFormatSymbols decimalFormatSymbol = DecimalFormatSymbols.getInstance(locale);
+	private final Locale locale = Locale.forLanguageTag("pt-BR");
+	private final DecimalFormatSymbols decimalFormatSymbol = DecimalFormatSymbols.getInstance(locale);
 
 	public String fractionNumberForCsv(BigDecimal value) {
 		DecimalFormat formatter = new DecimalFormat();

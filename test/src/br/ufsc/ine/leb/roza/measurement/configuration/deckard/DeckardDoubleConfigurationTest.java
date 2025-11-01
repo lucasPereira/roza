@@ -20,13 +20,13 @@ class DeckardDoubleConfigurationTest {
 	}
 
 	@Test
-	void nameAndDescription() throws Exception {
+	void nameAndDescription() {
 		assertEquals("SIMILARITY", configuration.getName());
 		assertEquals("Similarity thresold based on editing distance", configuration.getDescription());
 	}
 
 	@Test
-	void create() throws Exception {
+	void create() {
 		configuration.addArgument(arguments);
 		assertEquals(1, configuration.getValue().doubleValue());
 		assertEquals(1, arguments.size());
@@ -34,7 +34,7 @@ class DeckardDoubleConfigurationTest {
 	}
 
 	@Test
-	void change() throws Exception {
+	void change() {
 		configuration.setValue(0.5);
 		configuration.addArgument(arguments);
 		assertEquals(0.5, configuration.getValue().doubleValue());

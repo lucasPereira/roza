@@ -1,9 +1,8 @@
 package br.ufsc.ine.leb.roza.writing;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.File;
-import java.util.Arrays;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -33,16 +32,16 @@ public class JUnit4TestClassWriterTest {
 	}
 
 	@Test
-	void withoutClasses() throws Exception {
-		writer.write(Arrays.asList());
+	void withoutClasses() {
+		writer.write(List.of());
 		assertEquals(0, folderUtils.listFilesRecursively().size());
 	}
 
 	@Test
-	void emptyTestMethod() throws Exception {
-		TestMethod test = new TestMethod("alpha", Arrays.asList());
-		TestClass alpha = new TestClass("Alpha", Arrays.asList(), Arrays.asList(), Arrays.asList(test));
-		writer.write(Arrays.asList(alpha));
+	void emptyTestMethod() {
+		TestMethod test = new TestMethod("alpha", List.of());
+		TestClass alpha = new TestClass("Alpha", List.of(), List.of(), List.of(test));
+		writer.write(List.of(alpha));
 
 		CodeStringBuilder refactored = new CodeStringBuilder();
 		refactored.add("import org.junit.Test;");
@@ -61,12 +60,12 @@ public class JUnit4TestClassWriterTest {
 	}
 
 	@Test
-	void testMethodWithStatements() throws Exception {
+	void testMethodWithStatements() {
 		Statement fixture = new Statement("int a = 10;");
 		Statement assertion = new Statement("assertEquals(10, a);");
-		TestMethod test = new TestMethod("alpha", Arrays.asList(fixture, assertion));
-		TestClass alpha = new TestClass("Alpha", Arrays.asList(), Arrays.asList(), Arrays.asList(test));
-		writer.write(Arrays.asList(alpha));
+		TestMethod test = new TestMethod("alpha", List.of(fixture, assertion));
+		TestClass alpha = new TestClass("Alpha", List.of(), List.of(), List.of(test));
+		writer.write(List.of(alpha));
 
 		CodeStringBuilder refactored = new CodeStringBuilder();
 		refactored.add("import org.junit.Test;");
@@ -87,11 +86,11 @@ public class JUnit4TestClassWriterTest {
 	}
 
 	@Test
-	void emptySetupMethod() throws Exception {
-		SetupMethod setup = new SetupMethod("setup", Arrays.asList());
-		TestMethod test = new TestMethod("alpha", Arrays.asList());
-		TestClass alpha = new TestClass("Alpha", Arrays.asList(), Arrays.asList(setup), Arrays.asList(test));
-		writer.write(Arrays.asList(alpha));
+	void emptySetupMethod() {
+		SetupMethod setup = new SetupMethod("setup", List.of());
+		TestMethod test = new TestMethod("alpha", List.of());
+		TestClass alpha = new TestClass("Alpha", List.of(), List.of(setup), List.of(test));
+		writer.write(List.of(alpha));
 
 		CodeStringBuilder refactored = new CodeStringBuilder();
 		refactored.add("import org.junit.Before;");
@@ -115,14 +114,14 @@ public class JUnit4TestClassWriterTest {
 	}
 
 	@Test
-	void setupMethodWithFixture() throws Exception {
+	void setupMethodWithFixture() {
 		Field field = new Field("int", "a");
 		Statement fixture = new Statement("a = 10;");
 		Statement assertion = new Statement("assertEquals(10, a);");
-		SetupMethod setup = new SetupMethod("setup", Arrays.asList(fixture));
-		TestMethod test = new TestMethod("alpha", Arrays.asList(assertion));
-		TestClass alpha = new TestClass("Alpha", Arrays.asList(field), Arrays.asList(setup), Arrays.asList(test));
-		writer.write(Arrays.asList(alpha));
+		SetupMethod setup = new SetupMethod("setup", List.of(fixture));
+		TestMethod test = new TestMethod("alpha", List.of(assertion));
+		TestClass alpha = new TestClass("Alpha", List.of(field), List.of(setup), List.of(test));
+		writer.write(List.of(alpha));
 
 		CodeStringBuilder refactored = new CodeStringBuilder();
 		refactored.add("import org.junit.Before;");
@@ -150,12 +149,12 @@ public class JUnit4TestClassWriterTest {
 	}
 
 	@Test
-	void fieldInitialization() throws Exception {
+	void fieldInitialization() {
 		Field field = new Field("int", "a", new Statement("10"));
 		Statement assertion = new Statement("assertEquals(10, a);");
-		TestMethod test = new TestMethod("alpha", Arrays.asList(assertion));
-		TestClass alpha = new TestClass("Alpha", Arrays.asList(field), Arrays.asList(), Arrays.asList(test));
-		writer.write(Arrays.asList(alpha));
+		TestMethod test = new TestMethod("alpha", List.of(assertion));
+		TestClass alpha = new TestClass("Alpha", List.of(field), List.of(), List.of(test));
+		writer.write(List.of(alpha));
 
 		CodeStringBuilder refactored = new CodeStringBuilder();
 		refactored.add("import org.junit.Test;");
@@ -177,23 +176,13 @@ public class JUnit4TestClassWriterTest {
 	}
 
 	@Test
-	void twoTestClassesOneWithTwoSetupMethodsAndTwoTestMethodsAndOtherWithOneEmptyTestMethod() throws Exception {
-		Field filedAlphaOne = new Field("int", "a");
-		Field filedAlphaTwo = new Field("int", "b");
-		Statement fixtureAlphaOne = new Statement("a = 10;");
-		Statement fixtureAlphaTwo = new Statement("b = 20;");
-		Statement assertionAlphaOne = new Statement("assertEquals(10, a);");
-		Statement assertionAlphaTwo = new Statement("assertEquals(20, b);");
-		SetupMethod setupAlphaOne = new SetupMethod("setupAlphaOne", Arrays.asList(fixtureAlphaOne));
-		SetupMethod setupAlphaTwo = new SetupMethod("setupAlphaTwo", Arrays.asList(fixtureAlphaTwo));
-		TestMethod testAlphaOne = new TestMethod("testAlphaOne", Arrays.asList(assertionAlphaOne));
-		TestMethod testAlphaTwo = new TestMethod("testAlphaTwo", Arrays.asList(assertionAlphaTwo));
-		TestClass alpha = new TestClass("Alpha", Arrays.asList(filedAlphaOne, filedAlphaTwo), Arrays.asList(setupAlphaOne, setupAlphaTwo), Arrays.asList(testAlphaOne, testAlphaTwo));
+	void twoTestClassesOneWithTwoSetupMethodsAndTwoTestMethodsAndOtherWithOneEmptyTestMethod() {
+		TestClass alpha = getTestClass();
 
-		TestMethod testBeta = new TestMethod("testBeta", Arrays.asList());
-		TestClass beta = new TestClass("Beta", Arrays.asList(), Arrays.asList(), Arrays.asList(testBeta));
+		TestMethod testBeta = new TestMethod("testBeta", List.of());
+		TestClass beta = new TestClass("Beta", List.of(), List.of(), List.of(testBeta));
 
-		writer.write(Arrays.asList(alpha, beta));
+		writer.write(List.of(alpha, beta));
 
 		CodeStringBuilder refactoredAlpha = new CodeStringBuilder();
 		refactoredAlpha.add("import org.junit.Before;");
@@ -242,6 +231,20 @@ public class JUnit4TestClassWriterTest {
 		assertEquals(refactoredAlpha.toString(), fileUtils.readContetAsString(written.get(0)));
 		assertEquals("Beta.java", written.get(1).getName());
 		assertEquals(refactoredBeta.toString(), fileUtils.readContetAsString(written.get(1)));
+	}
+
+	private static TestClass getTestClass() {
+		Field filedAlphaOne = new Field("int", "a");
+		Field filedAlphaTwo = new Field("int", "b");
+		Statement fixtureAlphaOne = new Statement("a = 10;");
+		Statement fixtureAlphaTwo = new Statement("b = 20;");
+		Statement assertionAlphaOne = new Statement("assertEquals(10, a);");
+		Statement assertionAlphaTwo = new Statement("assertEquals(20, b);");
+		SetupMethod setupAlphaOne = new SetupMethod("setupAlphaOne", List.of(fixtureAlphaOne));
+		SetupMethod setupAlphaTwo = new SetupMethod("setupAlphaTwo", List.of(fixtureAlphaTwo));
+		TestMethod testAlphaOne = new TestMethod("testAlphaOne", List.of(assertionAlphaOne));
+		TestMethod testAlphaTwo = new TestMethod("testAlphaTwo", List.of(assertionAlphaTwo));
+		return new TestClass("Alpha", List.of(filedAlphaOne, filedAlphaTwo), List.of(setupAlphaOne, setupAlphaTwo), List.of(testAlphaOne, testAlphaTwo));
 	}
 
 }

@@ -9,7 +9,7 @@ import br.ufsc.ine.leb.roza.TestCase;
 
 public class CompleteLinkage implements Linkage {
 
-	private SimilarityReport report;
+	private final SimilarityReport report;
 
 	public CompleteLinkage(SimilarityReport report) {
 		this.report = report;

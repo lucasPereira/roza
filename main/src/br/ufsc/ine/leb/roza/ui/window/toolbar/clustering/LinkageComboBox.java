@@ -15,7 +15,7 @@ import br.ufsc.ine.leb.roza.ui.shared.ComboBoxBuilder;
 
 public class LinkageComboBox implements UiComponent {
 
-	private ClusteringTab toolbar;
+	private final ClusteringTab toolbar;
 	private JComboBox<String> combo;
 
 	public LinkageComboBox(ClusteringTab toolbar) {
@@ -34,7 +34,7 @@ public class LinkageComboBox implements UiComponent {
 	}
 
 	@Override
-	public void addChilds(List<UiComponent> childs) {}
+	public void addChildren(List<UiComponent> children) {}
 
 	@Override
 	public void start() {

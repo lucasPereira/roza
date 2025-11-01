@@ -12,7 +12,7 @@ import br.ufsc.ine.leb.roza.ui.window.toolbar.Toolbar;
 
 public class RefactoringTab implements UiComponent {
 
-	private Toolbar toolbar;
+	private final Toolbar toolbar;
 	private JPanel panel;
 
 	public RefactoringTab(Toolbar toolbar) {
@@ -26,9 +26,9 @@ public class RefactoringTab implements UiComponent {
 	}
 
 	@Override
-	public void addChilds(List<UiComponent> childs) {
-		childs.add(new RefactorStrategyComboBox(this));
-		childs.add(new WriteRefactoredTestClassesButton(this));
+	public void addChildren(List<UiComponent> children) {
+		children.add(new RefactorStrategyComboBox(this));
+		children.add(new WriteRefactoredTestClassesButton(this));
 	}
 
 	@Override

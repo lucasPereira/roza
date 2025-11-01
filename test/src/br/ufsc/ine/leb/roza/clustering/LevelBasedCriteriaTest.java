@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,9 +23,9 @@ class LevelBasedCriteriaTest {
 
 	@BeforeEach
 	void seutp() {
-		TestCase alpha = new TestCase("alpha", Arrays.asList(), Arrays.asList());
-		TestCase beta = new TestCase("beta", Arrays.asList(), Arrays.asList());
-		TestCase gamma = new TestCase("gamma", Arrays.asList(), Arrays.asList());
+		TestCase alpha = new TestCase("alpha", List.of(), List.of());
+		TestCase beta = new TestCase("beta", List.of(), List.of());
+		TestCase gamma = new TestCase("gamma", List.of(), List.of());
 		alphaCluster = new Cluster(alpha);
 		betaCluster = new Cluster(beta);
 		gammaCluster = new Cluster(gamma);
@@ -33,34 +33,32 @@ class LevelBasedCriteriaTest {
 	}
 
 	@Test
-	void nextLevelIsOneAndMaximumLevelIsZero() throws Exception {
+	void nextLevelIsOneAndMaximumLevelIsZero() {
 		ThresholdCriteria threshold = new LevelBasedCriteria(0);
-		assertTrue(threshold.shoudlStop(1, new Combination(alphaCluster, betaCluster), BigDecimal.ONE));
+		assertTrue(threshold.shouldStop(1, new Combination(alphaCluster, betaCluster), BigDecimal.ONE));
 	}
 
 	@Test
-	void nextLevelIsOneAndMaximumLevelIsOne() throws Exception {
+	void nextLevelIsOneAndMaximumLevelIsOne() {
 		ThresholdCriteria threshold = new LevelBasedCriteria(1);
-		assertFalse(threshold.shoudlStop(1, new Combination(alphaCluster, betaCluster), BigDecimal.ONE));
+		assertFalse(threshold.shouldStop(1, new Combination(alphaCluster, betaCluster), BigDecimal.ONE));
 	}
 
 	@Test
-	void nextLevelIsTwoAndMaximumLevelIsOne() throws Exception {
+	void nextLevelIsTwoAndMaximumLevelIsOne() {
 		ThresholdCriteria threshold = new LevelBasedCriteria(1);
-		assertTrue(threshold.shoudlStop(2, new Combination(alphaBetaCluster, gammaCluster), BigDecimal.ONE));
+		assertTrue(threshold.shouldStop(2, new Combination(alphaBetaCluster, gammaCluster), BigDecimal.ONE));
 	}
 
 	@Test
-	void nextLevelIsTwoAndMaximumLevelIsTwo() throws Exception {
+	void nextLevelIsTwoAndMaximumLevelIsTwo() {
 		ThresholdCriteria threshold = new LevelBasedCriteria(2);
-		assertFalse(threshold.shoudlStop(2, new Combination(alphaBetaCluster, gammaCluster), BigDecimal.ONE));
+		assertFalse(threshold.shouldStop(2, new Combination(alphaBetaCluster, gammaCluster), BigDecimal.ONE));
 	}
 
 	@Test
-	void cantStopAtNegativeLevel() throws Exception {
-		assertThrows(InvalidThresholdException.class, () -> {
-			new LevelBasedCriteria(-1);
-		});
+	void cantStopAtNegativeLevel() {
+		assertThrows(InvalidThresholdException.class, () -> new LevelBasedCriteria(-1));
 	}
 
 }
