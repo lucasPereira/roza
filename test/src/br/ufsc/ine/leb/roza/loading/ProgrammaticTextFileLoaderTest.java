@@ -11,14 +11,14 @@ import org.junit.jupiter.api.Test;
 import br.ufsc.ine.leb.roza.TextFile;
 import br.ufsc.ine.leb.roza.utils.FolderUtils;
 
-class ProgramaticTextFileLoaderTest {
+class ProgrammaticTextFileLoaderTest {
 
 	private TextFileLoader loader;
 
 	@BeforeEach
 	void setup() {
 		List<File> files = new FolderUtils("test/resources/loader").listFilesRecursively();
-		loader = new ProgramaticTextFileLoader(files);
+		loader = new ProgrammaticTextFileLoader(files);
 	}
 
 	@Test

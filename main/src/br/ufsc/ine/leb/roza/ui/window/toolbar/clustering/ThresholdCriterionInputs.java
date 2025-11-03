@@ -6,15 +6,15 @@ import java.util.List;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 
-import br.ufsc.ine.leb.roza.clustering.LevelBasedCriteria;
-import br.ufsc.ine.leb.roza.clustering.NeverStopCriteria;
-import br.ufsc.ine.leb.roza.clustering.SimilarityBasedCriteria;
-import br.ufsc.ine.leb.roza.clustering.TestsPerClassCriteria;
+import br.ufsc.ine.leb.roza.clustering.LevelBasedCriterion;
+import br.ufsc.ine.leb.roza.clustering.NeverStopCriterion;
+import br.ufsc.ine.leb.roza.clustering.SimilarityBasedCriterion;
+import br.ufsc.ine.leb.roza.clustering.TestsPerClassCriterion;
 import br.ufsc.ine.leb.roza.ui.Hub;
 import br.ufsc.ine.leb.roza.ui.Manager;
 import br.ufsc.ine.leb.roza.ui.UiComponent;
 
-public class ThresholdCriteriaInputs implements UiComponent {
+public class ThresholdCriterionInputs implements UiComponent {
 
 	private Hub hub;
 	private Manager manager;
@@ -25,7 +25,7 @@ public class ThresholdCriteriaInputs implements UiComponent {
 	private JSpinner testsPerClassInput;
 	private JSpinner similarityInput;
 
-	public ThresholdCriteriaInputs(ClusteringTab toolbar) {
+	public ThresholdCriterionInputs(ClusteringTab toolbar) {
 		this.toolbar = toolbar;
 	}
 
@@ -59,42 +59,42 @@ public class ThresholdCriteriaInputs implements UiComponent {
 	private void createValueChangedEvents() {
 		levelInput.addChangeListener((evento) -> {
 			Integer value = getIntegerValue(levelInput);
-			manager.setThresholdCriteria(new LevelBasedCriteria(value));
+			manager.setThresholdCriterion(new LevelBasedCriterion(value));
 		});
 		testsPerClassInput.addChangeListener((evento) -> {
 			Integer value = getIntegerValue(testsPerClassInput);
-			manager.setThresholdCriteria(new TestsPerClassCriteria(value));
+			manager.setThresholdCriterion(new TestsPerClassCriterion(value));
 		});
 		similarityInput.addChangeListener((evento) -> {
 			BigDecimal converted = getBigDecimalValue(similarityInput);
-			manager.setThresholdCriteria(new SimilarityBasedCriteria(converted));
+			manager.setThresholdCriterion(new SimilarityBasedCriterion(converted));
 		});
 	}
 
 	private void createSelectionEvents() {
-		hub.selectLevelBasedCriteriaSubscribe(() -> {
+		hub.selectLevelBasedCriterionSubscribe(() -> {
 			levelInput.setVisible(true);
 			testsPerClassInput.setVisible(false);
 			similarityInput.setVisible(false);
-			manager.setThresholdCriteria(new LevelBasedCriteria(getIntegerValue(levelInput)));
+			manager.setThresholdCriterion(new LevelBasedCriterion(getIntegerValue(levelInput)));
 		});
-		hub.selectTestsPerClassCriteriaSubscribe(() -> {
+		hub.selectTestsPerClassCriterionSubscribe(() -> {
 			levelInput.setVisible(false);
 			testsPerClassInput.setVisible(true);
 			similarityInput.setVisible(false);
-			manager.setThresholdCriteria(new TestsPerClassCriteria(getIntegerValue(testsPerClassInput)));
+			manager.setThresholdCriterion(new TestsPerClassCriterion(getIntegerValue(testsPerClassInput)));
 		});
-		hub.selectSimilarityBasedCriteriaSubscribe(() -> {
+		hub.selectSimilarityBasedCriterionSubscribe(() -> {
 			levelInput.setVisible(false);
 			testsPerClassInput.setVisible(false);
 			similarityInput.setVisible(true);
-			manager.setThresholdCriteria(new SimilarityBasedCriteria(getBigDecimalValue(similarityInput)));
+			manager.setThresholdCriterion(new SimilarityBasedCriterion(getBigDecimalValue(similarityInput)));
 		});
-		hub.selectNeverStopCriteriaSubscribe(() -> {
+		hub.selectNeverStopCriterionSubscribe(() -> {
 			levelInput.setVisible(false);
 			testsPerClassInput.setVisible(false);
 			similarityInput.setVisible(false);
-			manager.setThresholdCriteria(new NeverStopCriteria());
+			manager.setThresholdCriterion(new NeverStopCriterion());
 		});
 	}
 

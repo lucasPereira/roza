@@ -14,7 +14,7 @@ import br.ufsc.ine.leb.roza.Cluster;
 import br.ufsc.ine.leb.roza.TestCase;
 import br.ufsc.ine.leb.roza.exceptions.InvalidThresholdException;
 
-class SimilarityBasedCriteriaTest {
+class SimilarityBasedCriterionTest {
 
 	private BigDecimal dotOne;
 	private BigDecimal dotFour;
@@ -41,27 +41,27 @@ class SimilarityBasedCriteriaTest {
 
 	@Test
 	void zeroSimilarity() {
-		assertTrue(new SimilarityBasedCriteria(BigDecimal.ZERO).shouldStop(level, combination, BigDecimal.ZERO));
-		assertTrue(new SimilarityBasedCriteria(dotOne).shouldStop(level, combination, BigDecimal.ZERO));
+		assertTrue(new SimilarityBasedCriterion(BigDecimal.ZERO).shouldStop(level, combination, BigDecimal.ZERO));
+		assertTrue(new SimilarityBasedCriterion(dotOne).shouldStop(level, combination, BigDecimal.ZERO));
 	}
 
 	@Test
 	void oneSimilarity() {
-		assertFalse(new SimilarityBasedCriteria(dotNine).shouldStop(level, combination, BigDecimal.ONE));
-		assertTrue(new SimilarityBasedCriteria(BigDecimal.ONE).shouldStop(level, combination, BigDecimal.ONE));
+		assertFalse(new SimilarityBasedCriterion(dotNine).shouldStop(level, combination, BigDecimal.ONE));
+		assertTrue(new SimilarityBasedCriterion(BigDecimal.ONE).shouldStop(level, combination, BigDecimal.ONE));
 	}
 
 	@Test
 	void zeroPointFiveSimilarity() {
-		assertFalse(new SimilarityBasedCriteria(dotFour).shouldStop(level, combination, dotFive));
-		assertTrue(new SimilarityBasedCriteria(dotFive).shouldStop(level, combination, dotFive));
-		assertTrue(new SimilarityBasedCriteria(dotSix).shouldStop(level, combination, dotFive));
+		assertFalse(new SimilarityBasedCriterion(dotFour).shouldStop(level, combination, dotFive));
+		assertTrue(new SimilarityBasedCriterion(dotFive).shouldStop(level, combination, dotFive));
+		assertTrue(new SimilarityBasedCriterion(dotSix).shouldStop(level, combination, dotFive));
 	}
 
 	@Test
 	void outOfRangeThresholds() {
-		assertThrows(InvalidThresholdException.class, () -> new SimilarityBasedCriteria(new BigDecimal("-0.1")));
-		assertThrows(InvalidThresholdException.class, () -> new SimilarityBasedCriteria(new BigDecimal("1.1")));
+		assertThrows(InvalidThresholdException.class, () -> new SimilarityBasedCriterion(new BigDecimal("-0.1")));
+		assertThrows(InvalidThresholdException.class, () -> new SimilarityBasedCriterion(new BigDecimal("1.1")));
 	}
 
 }

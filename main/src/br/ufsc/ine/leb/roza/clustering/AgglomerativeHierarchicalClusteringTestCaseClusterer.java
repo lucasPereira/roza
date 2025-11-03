@@ -11,16 +11,16 @@ import br.ufsc.ine.leb.roza.SimilarityReport;
 import br.ufsc.ine.leb.roza.exceptions.ClusteringLevelGenerationException;
 import br.ufsc.ine.leb.roza.exceptions.TiebreakException;
 
-public class DendogramTestCaseClusterer implements TestCaseClusterer {
+public class AgglomerativeHierarchicalClusteringTestCaseClusterer implements TestCaseClusterer {
 
 	private final Linkage linkage;
 	private final Referee referee;
-	private final ThresholdCriteria criteria;
+	private final ThresholdCriterion criterion;
 
-	public DendogramTestCaseClusterer(Linkage linkage, Referee referee, ThresholdCriteria criteria) {
+	public AgglomerativeHierarchicalClusteringTestCaseClusterer(Linkage linkage, Referee referee, ThresholdCriterion criterion) {
 		this.linkage = linkage;
 		this.referee = referee;
-		this.criteria = criteria;
+		this.criterion = criterion;
 	}
 
 	@Override
@@ -48,7 +48,7 @@ public class DendogramTestCaseClusterer implements TestCaseClusterer {
 				Set<Cluster> nextClusters = currentClusters.stream().filter(cluster -> !cluster.equals(first) && !cluster.equals(second)).collect(Collectors.toSet());
 				nextClusters.add(merged);
 				Level nextLevel = new Level(currentLevel, nextClusters, evaluation);
-				Boolean thresholdReached = criteria.shouldStop(nextLevel.getStep(), combination, evaluation);
+				Boolean thresholdReached = criterion.shouldStop(nextLevel.getStep(), combination, evaluation);
 				boolean hasClustersToMerge = nextClusters.size() > 1;
 				shouldContinue = !thresholdReached && hasClustersToMerge;
 				if (!thresholdReached) {

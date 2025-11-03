@@ -31,10 +31,10 @@ public class Hub {
 	private final List<Consumer<SimilarityReport>> measureTestCaseListeners;
 	private final List<Consumer<SimilarityAssessment>> compareTestCaseListeners;
 
-	private final List<Runnable> selectLevelBasedCriteriaListeners;
-	private final List<Runnable> selectTestsPerClassCriteriaListeners;
-	private final List<Runnable> selectSimilarityBasedCriteriaListeners;
-	private final List<Runnable> selectNeverStopCriteriaListeners;
+	private final List<Runnable> selectLevelBasedCriterionListeners;
+	private final List<Runnable> selectTestsPerClassCriterionListeners;
+	private final List<Runnable> selectSimilarityBasedCriterionListeners;
+	private final List<Runnable> selectNeverStopCriterionListeners;
 
 	private final List<Consumer<List<Level>>> distributeTestsListeners;
 	private final List<Consumer<Level>> selectLevelListeners;
@@ -61,10 +61,10 @@ public class Hub {
 		measureTestCaseListeners = new LinkedList<>();
 		compareTestCaseListeners = new LinkedList<>();
 
-		selectLevelBasedCriteriaListeners = new LinkedList<>();
-		selectTestsPerClassCriteriaListeners = new LinkedList<>();
-		selectSimilarityBasedCriteriaListeners = new LinkedList<>();
-		selectNeverStopCriteriaListeners = new LinkedList<>();
+		selectLevelBasedCriterionListeners = new LinkedList<>();
+		selectTestsPerClassCriterionListeners = new LinkedList<>();
+		selectSimilarityBasedCriterionListeners = new LinkedList<>();
+		selectNeverStopCriterionListeners = new LinkedList<>();
 
 		distributeTestsListeners = new LinkedList<>();
 		selectLevelListeners = new LinkedList<>();
@@ -193,36 +193,36 @@ public class Hub {
 		compareTestCaseListeners.add(listener);
 	}
 
-	public void selectLevelBasedCriteriaPublish() {
-		selectLevelBasedCriteriaListeners.forEach(Runnable::run);
+	public void selectLevelBasedCriterionPublish() {
+		selectLevelBasedCriterionListeners.forEach(Runnable::run);
 	}
 
-	public void selectLevelBasedCriteriaSubscribe(Runnable listener) {
-		selectLevelBasedCriteriaListeners.add(listener);
+	public void selectLevelBasedCriterionSubscribe(Runnable listener) {
+		selectLevelBasedCriterionListeners.add(listener);
 	}
 
-	public void selectTestsPerClassCriteriaPublish() {
-		selectTestsPerClassCriteriaListeners.forEach(Runnable::run);
+	public void selectTestsPerClassCriterionPublish() {
+		selectTestsPerClassCriterionListeners.forEach(Runnable::run);
 	}
 
-	public void selectTestsPerClassCriteriaSubscribe(Runnable listener) {
-		selectTestsPerClassCriteriaListeners.add(listener);
+	public void selectTestsPerClassCriterionSubscribe(Runnable listener) {
+		selectTestsPerClassCriterionListeners.add(listener);
 	}
 
-	public void selectSimilarityBasedCriteriaPublish() {
-		selectSimilarityBasedCriteriaListeners.forEach(Runnable::run);
+	public void selectSimilarityBasedCriterionPublish() {
+		selectSimilarityBasedCriterionListeners.forEach(Runnable::run);
 	}
 
-	public void selectSimilarityBasedCriteriaSubscribe(Runnable listener) {
-		selectSimilarityBasedCriteriaListeners.add(listener);
+	public void selectSimilarityBasedCriterionSubscribe(Runnable listener) {
+		selectSimilarityBasedCriterionListeners.add(listener);
 	}
 
-	public void selectNeverStopCriteriaPublish() {
-		selectNeverStopCriteriaListeners.forEach(Runnable::run);
+	public void selectNeverStopCriterionPublish() {
+		selectNeverStopCriterionListeners.forEach(Runnable::run);
 	}
 
-	public void selectNeverStopCriteriaSubscribe(Runnable listener) {
-		selectNeverStopCriteriaListeners.add(listener);
+	public void selectNeverStopCriterionSubscribe(Runnable listener) {
+		selectNeverStopCriterionListeners.add(listener);
 	}
 
 	public void distributeTestsPublish(List<Level> levels) {

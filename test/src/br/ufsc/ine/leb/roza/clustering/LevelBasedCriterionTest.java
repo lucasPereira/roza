@@ -14,7 +14,7 @@ import br.ufsc.ine.leb.roza.Cluster;
 import br.ufsc.ine.leb.roza.TestCase;
 import br.ufsc.ine.leb.roza.exceptions.InvalidThresholdException;
 
-class LevelBasedCriteriaTest {
+class LevelBasedCriterionTest {
 
 	private Cluster alphaCluster;
 	private Cluster betaCluster;
@@ -34,31 +34,31 @@ class LevelBasedCriteriaTest {
 
 	@Test
 	void nextLevelIsOneAndMaximumLevelIsZero() {
-		ThresholdCriteria threshold = new LevelBasedCriteria(0);
+		ThresholdCriterion threshold = new LevelBasedCriterion(0);
 		assertTrue(threshold.shouldStop(1, new Combination(alphaCluster, betaCluster), BigDecimal.ONE));
 	}
 
 	@Test
 	void nextLevelIsOneAndMaximumLevelIsOne() {
-		ThresholdCriteria threshold = new LevelBasedCriteria(1);
+		ThresholdCriterion threshold = new LevelBasedCriterion(1);
 		assertFalse(threshold.shouldStop(1, new Combination(alphaCluster, betaCluster), BigDecimal.ONE));
 	}
 
 	@Test
 	void nextLevelIsTwoAndMaximumLevelIsOne() {
-		ThresholdCriteria threshold = new LevelBasedCriteria(1);
+		ThresholdCriterion threshold = new LevelBasedCriterion(1);
 		assertTrue(threshold.shouldStop(2, new Combination(alphaBetaCluster, gammaCluster), BigDecimal.ONE));
 	}
 
 	@Test
 	void nextLevelIsTwoAndMaximumLevelIsTwo() {
-		ThresholdCriteria threshold = new LevelBasedCriteria(2);
+		ThresholdCriterion threshold = new LevelBasedCriterion(2);
 		assertFalse(threshold.shouldStop(2, new Combination(alphaBetaCluster, gammaCluster), BigDecimal.ONE));
 	}
 
 	@Test
 	void cantStopAtNegativeLevel() {
-		assertThrows(InvalidThresholdException.class, () -> new LevelBasedCriteria(-1));
+		assertThrows(InvalidThresholdException.class, () -> new LevelBasedCriterion(-1));
 	}
 
 }

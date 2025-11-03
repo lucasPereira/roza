@@ -5,11 +5,11 @@ import java.util.List;
 
 import br.ufsc.ine.leb.roza.exceptions.InvalidThresholdException;
 
-public class ComposedCriteria implements ThresholdCriteria {
+public class ComposedCriterion implements ThresholdCriterion {
 
-	private final List<ThresholdCriteria> thresholds;
+	private final List<ThresholdCriterion> thresholds;
 
-	public ComposedCriteria(ThresholdCriteria... threshold) {
+	public ComposedCriterion(ThresholdCriterion... threshold) {
 		this.thresholds = List.of(threshold);
 		if (threshold.length < 2) {
 			throw new InvalidThresholdException();
@@ -18,7 +18,7 @@ public class ComposedCriteria implements ThresholdCriteria {
 
 	@Override
 	public Boolean shouldStop(Integer nextLevel, Combination combinationToNext, BigDecimal evaluationToNext) {
-		for (ThresholdCriteria threshold : thresholds) {
+		for (ThresholdCriterion threshold : thresholds) {
 			if (threshold.shouldStop(nextLevel, combinationToNext, evaluationToNext)) {
 				return true;
 			}

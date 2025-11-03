@@ -8,12 +8,12 @@ import java.util.List;
 import br.ufsc.ine.leb.roza.TextFile;
 import br.ufsc.ine.leb.roza.utils.FileUtils;
 
-public class ProgramaticTextFileLoader implements TextFileLoader {
+public class ProgrammaticTextFileLoader implements TextFileLoader {
 
 	private final List<File> files;
 	private final FileUtils fileUtils;
 
-	public ProgramaticTextFileLoader(List<File> files) {
+	public ProgrammaticTextFileLoader(List<File> files) {
 		this.files = files;
 		this.fileUtils = new FileUtils();
 	}

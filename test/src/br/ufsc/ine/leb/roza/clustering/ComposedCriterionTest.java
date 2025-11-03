@@ -14,7 +14,7 @@ import br.ufsc.ine.leb.roza.Cluster;
 import br.ufsc.ine.leb.roza.TestCase;
 import br.ufsc.ine.leb.roza.exceptions.InvalidThresholdException;
 
-public class ComposedCriteriaTest {
+public class ComposedCriterionTest {
 
 	private Cluster alphaCluster;
 	private Cluster betaCluster;
@@ -29,47 +29,47 @@ public class ComposedCriteriaTest {
 
 	@Test
 	public void shouldNotBeEmpty() {
-		assertThrows(InvalidThresholdException.class, ComposedCriteria::new);
+		assertThrows(InvalidThresholdException.class, ComposedCriterion::new);
 	}
 
 	@Test
 	public void shouldHaveMoreThanOneElement() {
-		assertThrows(InvalidThresholdException.class, () -> new ComposedCriteria(new LevelBasedCriteria(1)));
+		assertThrows(InvalidThresholdException.class, () -> new ComposedCriterion(new LevelBasedCriterion(1)));
 	}
 
 	@Test
 	void shouldNotStopInAny() {
-		ThresholdCriteria threshold = new ComposedCriteria(new LevelBasedCriteria(1), new TestsPerClassCriteria(2));
+		ThresholdCriterion threshold = new ComposedCriterion(new LevelBasedCriterion(1), new TestsPerClassCriterion(2));
 		assertFalse(threshold.shouldStop(1, new Combination(alphaCluster, betaCluster), BigDecimal.ONE));
 	}
 
 	@Test
 	void shouldStopInFirstLevelBased() {
-		ThresholdCriteria threshold = new ComposedCriteria(new LevelBasedCriteria(0), new TestsPerClassCriteria(2));
+		ThresholdCriterion threshold = new ComposedCriterion(new LevelBasedCriterion(0), new TestsPerClassCriterion(2));
 		assertTrue(threshold.shouldStop(1, new Combination(alphaCluster, betaCluster), BigDecimal.ONE));
 	}
 
 	@Test
 	void shouldStopInSecondTestsPerClass() {
-		ThresholdCriteria threshold = new ComposedCriteria(new LevelBasedCriteria(1), new TestsPerClassCriteria(1));
+		ThresholdCriterion threshold = new ComposedCriterion(new LevelBasedCriterion(1), new TestsPerClassCriterion(1));
 		assertTrue(threshold.shouldStop(1, new Combination(alphaCluster, betaCluster), BigDecimal.ONE));
 	}
 
 	@Test
 	void shouldStopInFirstTestsPerClassBased() {
-		ThresholdCriteria threshold = new ComposedCriteria(new TestsPerClassCriteria(1), new LevelBasedCriteria(1));
+		ThresholdCriterion threshold = new ComposedCriterion(new TestsPerClassCriterion(1), new LevelBasedCriterion(1));
 		assertTrue(threshold.shouldStop(1, new Combination(alphaCluster, betaCluster), BigDecimal.ONE));
 	}
 
 	@Test
 	void shouldStopInSecondLevelBased() {
-		ThresholdCriteria threshold = new ComposedCriteria(new TestsPerClassCriteria(2), new LevelBasedCriteria(0));
+		ThresholdCriterion threshold = new ComposedCriterion(new TestsPerClassCriterion(2), new LevelBasedCriterion(0));
 		assertTrue(threshold.shouldStop(1, new Combination(alphaCluster, betaCluster), BigDecimal.ONE));
 	}
 
 	@Test
 	void shouldStopInBoth() {
-		ThresholdCriteria threshold = new ComposedCriteria(new TestsPerClassCriteria(1), new LevelBasedCriteria(0));
+		ThresholdCriterion threshold = new ComposedCriterion(new TestsPerClassCriterion(1), new LevelBasedCriterion(0));
 		assertTrue(threshold.shouldStop(1, new Combination(alphaCluster, betaCluster), BigDecimal.ONE));
 	}
 

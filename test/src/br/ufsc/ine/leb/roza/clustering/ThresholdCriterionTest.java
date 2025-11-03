@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 import br.ufsc.ine.leb.roza.Cluster;
 import br.ufsc.ine.leb.roza.TestCase;
 
-class ThresholdCriteriaTest {
+class ThresholdCriterionTest {
 
 	private Combination combination;
 	private Integer level;
@@ -28,14 +28,14 @@ class ThresholdCriteriaTest {
 	}
 
 	@Test
-	void alwaysStopCriteria() {
-		ThresholdCriteria threshold = new AlwaysStopCriteria();
+	void alwaysStopCriterion() {
+		ThresholdCriterion threshold = new AlwaysStopCriterion();
 		assertTrue(threshold.shouldStop(level, combination, BigDecimal.ONE));
 	}
 
 	@Test
-	void neverStopCriteria() {
-		ThresholdCriteria threshold = new NeverStopCriteria();
+	void neverStopCriterion() {
+		ThresholdCriterion threshold = new NeverStopCriterion();
 		assertFalse(threshold.shouldStop(level, combination, BigDecimal.ONE));
 	}
 

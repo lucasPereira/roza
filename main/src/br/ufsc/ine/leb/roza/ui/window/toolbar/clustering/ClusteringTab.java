@@ -29,8 +29,8 @@ public class ClusteringTab implements UiComponent {
 	public void addChildren(List<UiComponent> children) {
 		children.add(new LinkageComboBox(this));
 		children.add(new RefereeComboBox(this));
-		children.add(new ThresholdCriteriaComboBox(this));
-		children.add(new ThresholdCriteriaInputs(this));
+		children.add(new ThresholdCriterionComboBox(this));
+		children.add(new ThresholdCriterionInputs(this));
 		children.add(new DistributeTestsButton(this));
 	}
 

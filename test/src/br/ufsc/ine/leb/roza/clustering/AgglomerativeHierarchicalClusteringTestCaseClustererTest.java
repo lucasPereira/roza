@@ -19,7 +19,7 @@ import br.ufsc.ine.leb.roza.TestCase;
 import br.ufsc.ine.leb.roza.exceptions.ClusteringLevelGenerationException;
 import br.ufsc.ine.leb.roza.exceptions.TiebreakException;
 
-class DendogramTestCaseClustererTest {
+class AgglomerativeHierarchicalClusteringTestCaseClustererTest {
 
 	private TestCase alpha;
 	private TestCase beta;
@@ -51,8 +51,8 @@ class DendogramTestCaseClustererTest {
 		SimilarityReport report = new SimilarityReportBuilder(true).build();
 		Referee referee = new InsecureReferee();
 		Linkage linkage = new SingleLinkage(report);
-		ThresholdCriteria criteria = new NeverStopCriteria();
-		DendogramTestCaseClusterer clusterer = new DendogramTestCaseClusterer(linkage, referee, criteria);
+		ThresholdCriterion criterion = new NeverStopCriterion();
+		AgglomerativeHierarchicalClusteringTestCaseClusterer clusterer = new AgglomerativeHierarchicalClusteringTestCaseClusterer(linkage, referee, criterion);
 		List<Level> levels = clusterer.generateLevels(report);
 		Set<Cluster> clusters = clusterer.cluster(report);
 
@@ -71,8 +71,8 @@ class DendogramTestCaseClustererTest {
 		SimilarityReport report = new SimilarityReportBuilder(true).add(alpha).build();
 		Referee referee = new InsecureReferee();
 		Linkage linkage = new SingleLinkage(report);
-		ThresholdCriteria criteria = new NeverStopCriteria();
-		DendogramTestCaseClusterer clusterer = new DendogramTestCaseClusterer(linkage, referee, criteria);
+		ThresholdCriterion criterion = new NeverStopCriterion();
+		AgglomerativeHierarchicalClusteringTestCaseClusterer clusterer = new AgglomerativeHierarchicalClusteringTestCaseClusterer(linkage, referee, criterion);
 		List<Level> levels = clusterer.generateLevels(report);
 		Set<Cluster> clusters = clusterer.cluster(report);
 
@@ -89,12 +89,12 @@ class DendogramTestCaseClustererTest {
 	}
 
 	@Test
-	void twoTestsStopingInLevelZeroBecauseThresholdCriteria() {
+	void twoTestsStopingInLevelZeroBecauseThresholdCriterion() {
 		SimilarityReport report = new SimilarityReportBuilder(true).add(alpha).add(beta).complete().build();
 		Referee referee = new InsecureReferee();
 		Linkage linkage = new SingleLinkage(report);
-		ThresholdCriteria criteria = new AlwaysStopCriteria();
-		DendogramTestCaseClusterer clusterer = new DendogramTestCaseClusterer(linkage, referee, criteria);
+		ThresholdCriterion criterion = new AlwaysStopCriterion();
+		AgglomerativeHierarchicalClusteringTestCaseClusterer clusterer = new AgglomerativeHierarchicalClusteringTestCaseClusterer(linkage, referee, criterion);
 		List<Level> levels = clusterer.generateLevels(report);
 		Set<Cluster> clusters = clusterer.cluster(report);
 
@@ -117,8 +117,8 @@ class DendogramTestCaseClustererTest {
 		SimilarityReport report = new SimilarityReportBuilder(true).add(alpha).add(beta).complete().build();
 		Referee referee = new InsecureReferee();
 		Linkage linkage = new SingleLinkage(report);
-		ThresholdCriteria criteria = new NeverStopCriteria();
-		DendogramTestCaseClusterer clusterer = new DendogramTestCaseClusterer(linkage, referee, criteria);
+		ThresholdCriterion criterion = new NeverStopCriterion();
+		AgglomerativeHierarchicalClusteringTestCaseClusterer clusterer = new AgglomerativeHierarchicalClusteringTestCaseClusterer(linkage, referee, criterion);
 		List<Level> levels = clusterer.generateLevels(report);
 		Set<Cluster> clusters = clusterer.cluster(report);
 
@@ -142,12 +142,12 @@ class DendogramTestCaseClustererTest {
 	}
 
 	@Test
-	void threeTestsStopingInLevelOneBecauseThresholdCriteria() {
+	void threeTestsStopingInLevelOneBecauseThresholdCriterion() {
 		SimilarityReport report = new SimilarityReportBuilder(true).add(alpha, beta, dotFive).add(gamma).complete().build();
 		Referee referee = new InsecureReferee();
 		Linkage linkage = new SingleLinkage(report);
-		ThresholdCriteria criteria = new SimilarityBasedCriteria(dotOne);
-		DendogramTestCaseClusterer clusterer = new DendogramTestCaseClusterer(linkage, referee, criteria);
+		ThresholdCriterion criterion = new SimilarityBasedCriterion(dotOne);
+		AgglomerativeHierarchicalClusteringTestCaseClusterer clusterer = new AgglomerativeHierarchicalClusteringTestCaseClusterer(linkage, referee, criterion);
 		List<Level> levels = clusterer.generateLevels(report);
 		Set<Cluster> clusters = clusterer.cluster(report);
 
@@ -178,8 +178,8 @@ class DendogramTestCaseClustererTest {
 		SimilarityReport report = new SimilarityReportBuilder(true).add(alpha, beta, dotFive).add(gamma).complete().build();
 		Referee referee = new InsecureReferee();
 		Linkage linkage = new SingleLinkage(report);
-		ThresholdCriteria criteria = new NeverStopCriteria();
-		DendogramTestCaseClusterer clusterer = new DendogramTestCaseClusterer(linkage, referee, criteria);
+		ThresholdCriterion criterion = new NeverStopCriterion();
+		AgglomerativeHierarchicalClusteringTestCaseClusterer clusterer = new AgglomerativeHierarchicalClusteringTestCaseClusterer(linkage, referee, criterion);
 		List<Level> levels = clusterer.generateLevels(report);
 		Set<Cluster> clusters = clusterer.cluster(report);
 
@@ -215,8 +215,8 @@ class DendogramTestCaseClustererTest {
 		SimilarityReport report = new SimilarityReportBuilder(true).add(alpha).add(beta).add(gamma).complete().build();
 		Referee referee = new InsecureReferee();
 		Linkage linkage = new SingleLinkage(report);
-		ThresholdCriteria criteria = new NeverStopCriteria();
-		DendogramTestCaseClusterer clusterer = new DendogramTestCaseClusterer(linkage, referee, criteria);
+		ThresholdCriterion criterion = new NeverStopCriterion();
+		AgglomerativeHierarchicalClusteringTestCaseClusterer clusterer = new AgglomerativeHierarchicalClusteringTestCaseClusterer(linkage, referee, criterion);
 		ClusteringLevelGenerationException exception = assertThrows(ClusteringLevelGenerationException.class, () -> clusterer.cluster(report));
 
 		TiebreakException tiebreak = exception.getTiebreakException();

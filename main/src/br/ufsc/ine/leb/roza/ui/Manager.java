@@ -10,13 +10,13 @@ import br.ufsc.ine.leb.roza.SimilarityReport;
 import br.ufsc.ine.leb.roza.TestCase;
 import br.ufsc.ine.leb.roza.TestClass;
 import br.ufsc.ine.leb.roza.TextFile;
-import br.ufsc.ine.leb.roza.clustering.DendogramTestCaseClusterer;
+import br.ufsc.ine.leb.roza.clustering.AgglomerativeHierarchicalClusteringTestCaseClusterer;
 import br.ufsc.ine.leb.roza.clustering.Level;
 import br.ufsc.ine.leb.roza.clustering.LinkageFactory;
 import br.ufsc.ine.leb.roza.clustering.Referee;
-import br.ufsc.ine.leb.roza.clustering.ThresholdCriteria;
+import br.ufsc.ine.leb.roza.clustering.ThresholdCriterion;
 import br.ufsc.ine.leb.roza.extraction.TestCaseExtractor;
-import br.ufsc.ine.leb.roza.loading.ProgramaticTextFileLoader;
+import br.ufsc.ine.leb.roza.loading.ProgrammaticTextFileLoader;
 import br.ufsc.ine.leb.roza.loading.TextFileLoader;
 import br.ufsc.ine.leb.roza.materialization.Junit4WithoutAssertionsTestCaseMaterializer;
 import br.ufsc.ine.leb.roza.materialization.TestCaseMaterializer;
@@ -36,7 +36,7 @@ public class Manager {
 	private SimilarityMeasurer measurer;
 	private LinkageFactory linkageFactory;
 	private Referee referee;
-	private ThresholdCriteria threshold;
+	private ThresholdCriterion threshold;
 
 	private List<TestClass> testClasses;
 	private List<TestCase> testCases;
@@ -49,7 +49,7 @@ public class Manager {
 
 	public List<TestClass> loadClasses(List<File> files) {
 		new FolderUtils("main/exec/materializer").createEmptyFolder();
-		TextFileLoader loader = new ProgramaticTextFileLoader(files);
+		TextFileLoader loader = new ProgrammaticTextFileLoader(files);
 		TextFileSelector selector = new JavaExtensionTextFileSelector();
 		List<TextFile> textFiles = loader.load();
 		List<TextFile> seletedTextFiles = selector.select(textFiles);
@@ -72,7 +72,7 @@ public class Manager {
 	}
 
 	public List<Level> distributeTests() {
-		DendogramTestCaseClusterer clustering = new DendogramTestCaseClusterer(linkageFactory.create(similarityReport), referee, threshold);
+		AgglomerativeHierarchicalClusteringTestCaseClusterer clustering = new AgglomerativeHierarchicalClusteringTestCaseClusterer(linkageFactory.create(similarityReport), referee, threshold);
 		return clustering.generateLevels(similarityReport);
 	}
 
@@ -110,7 +110,7 @@ public class Manager {
 		this.referee = referee;
 	}
 
-	public void setThresholdCriteria(ThresholdCriteria theshold) {
+	public void setThresholdCriterion(ThresholdCriterion theshold) {
 		this.threshold = theshold;
 	}
 

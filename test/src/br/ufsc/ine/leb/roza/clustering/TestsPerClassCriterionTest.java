@@ -14,7 +14,7 @@ import br.ufsc.ine.leb.roza.Cluster;
 import br.ufsc.ine.leb.roza.TestCase;
 import br.ufsc.ine.leb.roza.exceptions.InvalidThresholdException;
 
-class TestsPerClassCriteriaTest {
+class TestsPerClassCriterionTest {
 
 	private Cluster alphaCluster;
 	private Cluster betaCluster;
@@ -38,43 +38,43 @@ class TestsPerClassCriteriaTest {
 
 	@Test
 	void nextLevelIsOneAndMaximumIsOne() {
-		ThresholdCriteria criteria = new TestsPerClassCriteria(1);
-		assertTrue(criteria.shouldStop(1, new Combination(alphaCluster, betaCluster), BigDecimal.ONE));
+		ThresholdCriterion criterion = new TestsPerClassCriterion(1);
+		assertTrue(criterion.shouldStop(1, new Combination(alphaCluster, betaCluster), BigDecimal.ONE));
 	}
 
 	@Test
 	void nextLevelIsOneAndMaximuIsTwo() {
-		ThresholdCriteria criteria = new TestsPerClassCriteria(2);
-		assertFalse(criteria.shouldStop(1, new Combination(alphaCluster, betaCluster), BigDecimal.ONE));
+		ThresholdCriterion criterion = new TestsPerClassCriterion(2);
+		assertFalse(criterion.shouldStop(1, new Combination(alphaCluster, betaCluster), BigDecimal.ONE));
 	}
 
 	@Test
 	void nextLevelIsTwoAndMaximumIsTwo() {
-		ThresholdCriteria criteria = new TestsPerClassCriteria(2);
-		assertTrue(criteria.shouldStop(2, new Combination(alphaBetaCluster, gammaCluster), BigDecimal.ONE));
+		ThresholdCriterion criterion = new TestsPerClassCriterion(2);
+		assertTrue(criterion.shouldStop(2, new Combination(alphaBetaCluster, gammaCluster), BigDecimal.ONE));
 	}
 
 	@Test
 	void nextLevelIsTwoAndMaximumIsThree() {
-		ThresholdCriteria criteria = new TestsPerClassCriteria(3);
-		assertFalse(criteria.shouldStop(2, new Combination(alphaBetaCluster, gammaCluster), BigDecimal.ONE));
+		ThresholdCriterion criterion = new TestsPerClassCriterion(3);
+		assertFalse(criterion.shouldStop(2, new Combination(alphaBetaCluster, gammaCluster), BigDecimal.ONE));
 	}
 
 	@Test
 	void nextLevelIsThreeAndMaximumIsThree() {
-		ThresholdCriteria criteria = new TestsPerClassCriteria(3);
-		assertTrue(criteria.shouldStop(3, new Combination(alphaBetaCluster, gammaDeltaCluster), BigDecimal.ONE));
+		ThresholdCriterion criterion = new TestsPerClassCriterion(3);
+		assertTrue(criterion.shouldStop(3, new Combination(alphaBetaCluster, gammaDeltaCluster), BigDecimal.ONE));
 	}
 
 	@Test
 	void nextLevelIsThreeAndMaximumIsFour() {
-		ThresholdCriteria criteria = new TestsPerClassCriteria(4);
-		assertFalse(criteria.shouldStop(3, new Combination(alphaBetaCluster, gammaDeltaCluster), BigDecimal.ONE));
+		ThresholdCriterion criterion = new TestsPerClassCriterion(4);
+		assertFalse(criterion.shouldStop(3, new Combination(alphaBetaCluster, gammaDeltaCluster), BigDecimal.ONE));
 	}
 
 	@Test
-	void lessThanOneCriteria() {
-		assertThrows(InvalidThresholdException.class, () -> new TestsPerClassCriteria(0));
+	void lessThanOneCriterion() {
+		assertThrows(InvalidThresholdException.class, () -> new TestsPerClassCriterion(0));
 	}
 
 }

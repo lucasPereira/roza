@@ -9,22 +9,22 @@ import br.ufsc.ine.leb.roza.ui.Manager;
 import br.ufsc.ine.leb.roza.ui.UiComponent;
 import br.ufsc.ine.leb.roza.ui.shared.ComboBoxBuilder;
 
-public class ThresholdCriteriaComboBox implements UiComponent {
+public class ThresholdCriterionComboBox implements UiComponent {
 
 	private final ClusteringTab toolbar;
 	private JComboBox<String> combo;
 
-	public ThresholdCriteriaComboBox(ClusteringTab toolbar) {
+	public ThresholdCriterionComboBox(ClusteringTab toolbar) {
 		this.toolbar = toolbar;
 	}
 
 	@Override
 	public void init(Hub hub, Manager manager) {
-		ComboBoxBuilder builder = new ComboBoxBuilder("Theshold Criteria");
-		builder.add("Level Based Criteria", hub::selectLevelBasedCriteriaPublish);
-		builder.add("Test per Class Criteria", hub::selectTestsPerClassCriteriaPublish);
-		builder.add("Similarity Based Criteria", hub::selectSimilarityBasedCriteriaPublish);
-		builder.add("Never stop", hub::selectNeverStopCriteriaPublish);
+		ComboBoxBuilder builder = new ComboBoxBuilder("Theshold Criterion");
+		builder.add("Level Based Criterion", hub::selectLevelBasedCriterionPublish);
+		builder.add("Test per Class Criterion", hub::selectTestsPerClassCriterionPublish);
+		builder.add("Similarity Based Criterion", hub::selectSimilarityBasedCriterionPublish);
+		builder.add("Never stop", hub::selectNeverStopCriterionPublish);
 		combo = builder.build();
 		toolbar.addComponent(combo);
 	}

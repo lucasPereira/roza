@@ -4,12 +4,12 @@ import java.math.BigDecimal;
 
 import br.ufsc.ine.leb.roza.exceptions.InvalidThresholdException;
 
-public class TestsPerClassCriteria implements ThresholdCriteria {
+public class LevelBasedCriterion implements ThresholdCriterion {
 
 	private final Integer threshold;
 
-	public TestsPerClassCriteria(Integer threshold) {
-		if (threshold < 1) {
+	public LevelBasedCriterion(Integer threshold) {
+		if (threshold < 0) {
 			throw new InvalidThresholdException();
 		}
 		this.threshold = threshold;
@@ -17,8 +17,7 @@ public class TestsPerClassCriteria implements ThresholdCriteria {
 
 	@Override
 	public Boolean shouldStop(Integer nextLevel, Combination combinationToNext, BigDecimal evaluationToNext) {
-		int nextSize = combinationToNext.getFirst().getTestCases().size() + combinationToNext.getSecond().getTestCases().size();
-		return nextSize > threshold;
+		return nextLevel > threshold;
 	}
 
 	@Override

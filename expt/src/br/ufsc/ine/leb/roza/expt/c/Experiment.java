@@ -14,17 +14,17 @@ import br.ufsc.ine.leb.roza.TextFile;
 import br.ufsc.ine.leb.roza.clustering.AverageLinkage;
 import br.ufsc.ine.leb.roza.clustering.BiggestClusterReferee;
 import br.ufsc.ine.leb.roza.clustering.CompleteLinkage;
-import br.ufsc.ine.leb.roza.clustering.DendogramTestCaseClusterer;
+import br.ufsc.ine.leb.roza.clustering.AgglomerativeHierarchicalClusteringTestCaseClusterer;
 import br.ufsc.ine.leb.roza.clustering.InsecureReferee;
-import br.ufsc.ine.leb.roza.clustering.LevelBasedCriteria;
+import br.ufsc.ine.leb.roza.clustering.LevelBasedCriterion;
 import br.ufsc.ine.leb.roza.clustering.Linkage;
 import br.ufsc.ine.leb.roza.clustering.Referee;
-import br.ufsc.ine.leb.roza.clustering.SimilarityBasedCriteria;
+import br.ufsc.ine.leb.roza.clustering.SimilarityBasedCriterion;
 import br.ufsc.ine.leb.roza.clustering.SingleLinkage;
 import br.ufsc.ine.leb.roza.clustering.SmallestClusterReferee;
 import br.ufsc.ine.leb.roza.clustering.TestCaseClusterer;
-import br.ufsc.ine.leb.roza.clustering.TestsPerClassCriteria;
-import br.ufsc.ine.leb.roza.clustering.ThresholdCriteria;
+import br.ufsc.ine.leb.roza.clustering.TestsPerClassCriterion;
+import br.ufsc.ine.leb.roza.clustering.ThresholdCriterion;
 import br.ufsc.ine.leb.roza.extraction.Junit4TestCaseExtractor;
 import br.ufsc.ine.leb.roza.extraction.TestCaseExtractor;
 import br.ufsc.ine.leb.roza.loading.RecursiveTextFileLoader;
@@ -60,7 +60,7 @@ public class Experiment {
 
 		List<Linkage> linkages = createLinkages(report);
 		List<Referee> referees = createReferees();
-		List<ThresholdCriteria> criteria = createThresholdCriteria();
+		List<ThresholdCriterion> criteria = createThresholdCriteria();
 		execute(linkages, referees, criteria, report);
 	}
 
@@ -78,45 +78,45 @@ public class Experiment {
 		return List.of(insecure, biggest, smallest);
 	}
 
-	private static List<ThresholdCriteria> createThresholdCriteria() {
-		List<ThresholdCriteria> criteria = new LinkedList<>();
-		addLevelBasedCriteria(criteria);
-		addSimilarityBasedCriteria(criteria);
-		addTestPerClassCriteria(criteria);
+	private static List<ThresholdCriterion> createThresholdCriteria() {
+		List<ThresholdCriterion> criteria = new LinkedList<>();
+		addLevelBasedCriterion(criteria);
+		addSimilarityBasedCriterion(criteria);
+		addTestPerClassCriterion(criteria);
 		return criteria;
 	}
 
-	private static void addLevelBasedCriteria(List<ThresholdCriteria> criteria) {
+	private static void addLevelBasedCriterion(List<ThresholdCriterion> criteria) {
 		for (int index = 1; index <= 46; index++) {
-			ThresholdCriteria level = new LevelBasedCriteria(index);
+			ThresholdCriterion level = new LevelBasedCriterion(index);
 			criteria.add(level);
 		}
 	}
 
-	private static void addSimilarityBasedCriteria(List<ThresholdCriteria> criteria) {
-		criteria.add(new SimilarityBasedCriteria(BigDecimal.ZERO));
+	private static void addSimilarityBasedCriterion(List<ThresholdCriterion> criteria) {
+		criteria.add(new SimilarityBasedCriterion(BigDecimal.ZERO));
 		for (int index = 1; index <= 10; index++) {
 			BigDecimal degree = new MathUtils().oneOver(index);
-			ThresholdCriteria similarity = new SimilarityBasedCriteria(degree);
+			ThresholdCriterion similarity = new SimilarityBasedCriterion(degree);
 			criteria.add(similarity);
 		}
 	}
 
-	private static void addTestPerClassCriteria(List<ThresholdCriteria> criteria) {
+	private static void addTestPerClassCriterion(List<ThresholdCriterion> criteria) {
 		for (int index = 1; index <= 46; index++) {
-			ThresholdCriteria level = new TestsPerClassCriteria(index);
+			ThresholdCriterion level = new TestsPerClassCriterion(index);
 			criteria.add(level);
 		}
 	}
 
-	private static void execute(List<Linkage> linkages, List<Referee> referees, List<ThresholdCriteria> criteriaList,
+	private static void execute(List<Linkage> linkages, List<Referee> referees, List<ThresholdCriterion> criteria,
 			SimilarityReport report) {
 		for (Linkage linkage : linkages) {
 			for (Referee referee : referees) {
-				for (ThresholdCriteria criteria : criteriaList) {
-					TestCaseClusterer clusterer = new DendogramTestCaseClusterer(linkage, referee, criteria);
+				for (ThresholdCriterion criterion : criteria) {
+					TestCaseClusterer clusterer = new AgglomerativeHierarchicalClusteringTestCaseClusterer(linkage, referee, criterion);
 					Set<Cluster> clusters = clusterer.cluster(report);
-					RozaLogger.getInstance().info(String.format("%s %s %s %s", linkage, referee, criteria, clusters.size()));
+					RozaLogger.getInstance().info(String.format("%s %s %s %s", linkage, referee, criterion, clusters.size()));
 				}
 			}
 		}
