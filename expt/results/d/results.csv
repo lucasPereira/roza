@@ -1,0 +1,17 @@
+Project;Original classes;Refactored classes;Original classes attributes;Refactored classes attributes;Original classes setup methods;Refactored classes setup methods;Original classes test methods;Refactored classes test methods;Original classes statements;Refactored classes statements;Original unique duplicates;Refactored unique duplicates;Original total duplicates;Refactored total duplicates
+1;4;6;9;1;3;1;8;8;21;20;2;2;3;2
+2;3;12;25;19;1;8;35;35;143;112;26;17;63;26
+3;1;1;6;6;1;1;10;10;23;23;4;4;5;5
+4;5;8;5;4;1;3;14;14;30;22;5;1;10;1
+5;6;5;12;15;6;5;19;19;53;47;9;5;13;6
+6;5;7;3;3;1;1;11;11;31;31;1;1;2;2
+7;4;7;17;4;4;4;23;23;58;59;12;12;15;15
+8;5;6;3;5;2;3;14;14;23;19;6;4;10;6
+9;5;10;6;1;4;5;32;32;62;60;9;9;18;16
+10;5;7;2;4;1;2;11;11;26;26;4;2;4;2
+11;5;3;12;4;5;3;28;28;23;37;4;4;6;20
+12;6;10;5;6;3;4;31;31;71;67;11;9;22;16
+13;5;12;2;8;2;5;19;19;42;37;7;5;12;6
+14;5;7;3;6;2;3;14;14;26;16;6;1;11;2
+15;5;7;8;7;4;6;23;23;43;45;8;7;15;15
+16;4;4;4;6;3;3;15;15;55;53;12;12;26;24

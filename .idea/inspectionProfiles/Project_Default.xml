@@ -4,6 +4,9 @@
     <inspection_tool class="EqualsWithItself" enabled="true" level="WARNING" enabled_by_default="true">
       <option name="ignoreNonFinalClassesInTest" value="true" />
     </inspection_tool>
+    <inspection_tool class="ExtractMethodRecommender" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="minLength" value="809" />
+    </inspection_tool>
     <inspection_tool class="SpellCheckingInspection" enabled="false" level="TYPO" enabled_by_default="false">
       <option name="processCode" value="true" />
       <option name="processLiterals" value="true" />

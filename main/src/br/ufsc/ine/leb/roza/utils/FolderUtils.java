@@ -24,9 +24,11 @@ public class FolderUtils {
 			File next = stack.pop();
 			File[] children = next.listFiles();
 			if (children == null || children.length == 0) {
-				boolean success = next.delete();
-				if (!success) {
-					throw new FailedFileSystemOperationException();
+				if (next.exists()) {
+					boolean success = next.delete();
+					if (!success) {
+						throw new FailedFileSystemOperationException();
+					}
 				}
 			} else {
 				stack.push(next);

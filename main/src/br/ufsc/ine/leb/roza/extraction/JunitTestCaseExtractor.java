@@ -15,6 +15,7 @@ import br.ufsc.ine.leb.roza.Statement;
 import br.ufsc.ine.leb.roza.TestCase;
 import br.ufsc.ine.leb.roza.TestClass;
 import br.ufsc.ine.leb.roza.TestMethod;
+import com.github.javaparser.ast.stmt.ExpressionStmt;
 
 public class JunitTestCaseExtractor implements TestCaseExtractor {
 
@@ -63,8 +64,12 @@ public class JunitTestCaseExtractor implements TestCaseExtractor {
 		return statements;
 	}
 
-	private Boolean statementIsAssertion(Statement statement) {
-		Optional<MethodCallExpr> methodCall = JavaParser.parseStatement(statement.getText()).toExpressionStmt().orElseThrow().getExpression().toMethodCallExpr();
+	public Boolean statementIsAssertion(Statement statement) {
+		Optional<ExpressionStmt> expressionStmtement = JavaParser.parseStatement(statement.getText()).toExpressionStmt();
+		if (expressionStmtement.isEmpty()) {
+			return false;
+		}
+		Optional<MethodCallExpr> methodCall = expressionStmtement.orElseThrow().getExpression().toMethodCallExpr();
 		if (methodCall.isPresent()) {
 			MethodCallExpr methodCallExpression = methodCall.get();
 			SimpleName name = methodCallExpression.getName();

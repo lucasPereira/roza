@@ -25,3 +25,13 @@ Uses distinct similarity metrics to exemplify the measurement of Róża.
 ## `c`: clustering experiment
 
 In development.
+
+## `d`: refactoring experiment.
+
+- Set of source test classes: `expt/resources/d`
+- Code responsible to execute the example: `expt/src/br/ufsc/ine/leb/roza/expt/d/Example.java`
+- Similarity metric: LCCSS
+- Clustering:
+  - Average linkage
+  - Insecure referee
+  - Similarity based criterion

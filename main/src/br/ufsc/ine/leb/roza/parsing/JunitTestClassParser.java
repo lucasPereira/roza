@@ -97,6 +97,7 @@ public class JunitTestClassParser implements TestClassParser {
 		PrettyPrinterConfiguration configuration = new PrettyPrinterConfiguration();
 		configuration.setEndOfLineCharacter(" ");
 		configuration.setIndentSize(0);
+		configuration.setPrintComments(false);
 		List<Statement> statements = new LinkedList<>();
 		parsedMethod.getBody().orElseThrow().getStatements().forEach(statement -> {
 			if (statement.isExpressionStmt()) {

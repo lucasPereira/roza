@@ -15,10 +15,10 @@ public class CommaSeparatedValues {
 		text = new StringBuilder();
 	}
 
-	public void addLine(String... columns) {
-		Iterator<String> iterator = List.of(columns).iterator();
+	public void addLine(Object... columns) {
+		Iterator<Object> iterator = List.of(columns).iterator();
 		while (iterator.hasNext()) {
-			String column = iterator.next();
+			String column = iterator.next().toString();
 			String delimiter = iterator.hasNext() ? columnSeparator : lineBreak;
 			text.append(column);
 			text.append(delimiter);

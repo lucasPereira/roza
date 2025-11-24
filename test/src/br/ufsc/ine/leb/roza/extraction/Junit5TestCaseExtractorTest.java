@@ -304,4 +304,19 @@ class Junit5TestCaseExtractorTest {
 		assertEquals(doNotThrowStatement, testCases.get(0).getAsserts().get(15));
 	}
 
+	@Test
+	void nonExpressionStatement() {
+		Statement forStatement = new Statement("for (int index = 0; index < 10; index++) { System.out.prinln(index); }");
+		Statement whileStatement = new Statement("while (true) { System.out.prinln(true); }");
+		TestMethod testMethod = new TestMethod("example", List.of(forStatement, whileStatement));
+		TestClass testClass = new TestClass("ExampleTest", List.of(), List.of(), List.of(testMethod));
+		List<TestCase> testCases = extractor.extract(List.of(testClass));
+		assertEquals(1, testCases.size());
+		assertEquals("example", testCases.get(0).getName());
+		assertEquals(2, testCases.get(0).getFixtures().size());
+		assertEquals(forStatement, testCases.get(0).getFixtures().get(0));
+		assertEquals(whileStatement, testCases.get(0).getFixtures().get(1));
+		assertEquals(0, testCases.get(0).getAsserts().size());
+	}
+
 }

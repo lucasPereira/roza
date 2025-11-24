@@ -149,6 +149,20 @@ class Junit4TestClassParserTest {
 	}
 
 	@Test
+	void oneTestMethodWithComment() {
+		TextFile oneTestMethoWithWhile = new TextFile("OneTestMethodWithComment.java", "public class OneTestMethodWithComment { @Test public void example() { /** coment 1 */ assertEquals(0, 0); } } // coment 2 ");
+		List<TestClass> testClasses = parser.parse(List.of(oneTestMethoWithWhile));
+		assertEquals(1, testClasses.size());
+		assertEquals("OneTestMethodWithComment", testClasses.get(0).getName());
+		assertEquals(0, testClasses.get(0).getFields().size());
+		assertEquals(0, testClasses.get(0).getSetupMethods().size());
+		assertEquals(1, testClasses.get(0).getTestMethods().size());
+		assertEquals("example", testClasses.get(0).getTestMethods().get(0).getName());
+		assertEquals(1, testClasses.get(0).getTestMethods().get(0).getStatements().size());
+		assertEquals("assertEquals(0, 0);", testClasses.get(0).getTestMethods().get(0).getStatements().get(0).getText());
+	}
+
+	@Test
 	void multipleFiedlsAndVariables() {
 		TextFile oneTestMethoWithWhile = new TextFile("MultipleFieldsAndVariables.java", "public class MultipleFieldsAndVariables {"
 				+ "Integer firstField = 15;"
