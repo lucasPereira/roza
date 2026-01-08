@@ -1,0 +1,5 @@
+Test;shouldWithdrawFromAccount;shouldNotAllowToCloseAnAccountWithPositiveBalance;shouldNotAllowToWithdrawMoreThanBalance;shouldCloseAccount
+shouldWithdrawFromAccount;1;0.8571429;0.7692308;0.1818182
+shouldNotAllowToCloseAnAccountWithPositiveBalance;0.8571429;1;0.7692308;0.1818182
+shouldNotAllowToWithdrawMoreThanBalance;0.7692308;0.7692308;1;0.2
+shouldCloseAccount;0.1818182;0.1818182;0.2;1

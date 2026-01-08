@@ -18,7 +18,7 @@ Uses distinct similarity metrics to evaluate the capability of each metric to id
 
 Uses distinct similarity metrics to exemplify the measurement of Róża.
 
-- Set of source test classes: `expt/resources/a`
+- Set of source test classes: `expt/resources/b`
 - Code responsible to execute the example: `expt/src/br/ufsc/ine/leb/roza/expt/b/Example.java`
 - Similarity matrix: `expt/results/b/examples.csv`
 
@@ -29,7 +29,17 @@ In development.
 ## `d`: refactoring experiment.
 
 - Set of source test classes: `expt/resources/d`
-- Code responsible to execute the example: `expt/src/br/ufsc/ine/leb/roza/expt/d/Example.java`
+- Code responsible to execute the example: `expt/src/br/ufsc/ine/leb/roza/expt/d/Experiment.java`
+- Similarity metric: LCCSS
+- Clustering:
+  - Average linkage
+  - Insecure referee
+  - Similarity based criterion
+
+## `e`: banking system use case
+
+- Set of source test classes: `expt/resources/e`
+- Code responsible to execute the example: `expt/src/br/ufsc/ine/leb/roza/expt/e/Experiment.java`
 - Similarity metric: LCCSS
 - Clustering:
   - Average linkage
