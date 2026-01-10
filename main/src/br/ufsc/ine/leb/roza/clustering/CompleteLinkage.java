@@ -32,7 +32,7 @@ public class CompleteLinkage implements Linkage {
 
 	@Override
 	public String toString() {
-		return getClass().getSimpleName();
+		return "Complete linkage";
 	}
 
 }

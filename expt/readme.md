@@ -24,24 +24,26 @@ Uses distinct similarity metrics to exemplify the measurement of Róża.
 
 ## `c`: clustering experiment
 
-In development.
+Combine distinct linkage, referee and criterion to evaluate the capability of each combination refactor the code by the implicit setup strategy.
 
-## `d`: refactoring experiment.
+- Set of source test classes: `expt/resources/c`
+- Code responsible to execute the example: `expt/src/br/ufsc/ine/leb/roza/expt/c/Experiment.java`
+- Original test classes metrics: `expt/results/c/original.csv`
+- Refactored test classes metrics: `expt/results/c/refactored.csv`
+
+## `d`: refactoring experiment
+
+Refactor the test code to measure the level of reuse. 16 programs from undergraduate students were selected to be refactored. Refactor using LCCSS, average linkage, any cluster referee and similarity based criterion (0.4).
 
 - Set of source test classes: `expt/resources/d`
 - Code responsible to execute the example: `expt/src/br/ufsc/ine/leb/roza/expt/d/Experiment.java`
-- Similarity metric: LCCSS
-- Clustering:
-  - Average linkage
-  - Insecure referee
-  - Similarity based criterion
+- Code metrics: `expt/results/d/results.csv`
 
 ## `e`: banking system use case
 
-- Set of source test classes: `expt/resources/e`
+Use case of a banking system to exemplify the capability of Róża to refactor candidates by the implicit setup strategy. Refactor using LCCSS, average linkage, any cluster referee and similarity based criterion (0.4).
+
+- Source test classes: `expt/resources/e/BankAccountWithDuplicationTest.java`
 - Code responsible to execute the example: `expt/src/br/ufsc/ine/leb/roza/expt/e/Experiment.java`
-- Similarity metric: LCCSS
-- Clustering:
-  - Average linkage
-  - Insecure referee
-  - Similarity based criterion
+- Refactored classes: `expt/results/e/RefactoredTestClasse1.java` and `expt/results/e/RefactoredTestClasse2.java`
+- Similarity matrix: `expt/results/e/similarity-matrix.csv`

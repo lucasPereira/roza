@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
+import br.ufsc.ine.leb.roza.utils.RozaLogger;
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.expr.AssignExpr;
 import com.github.javaparser.ast.expr.MethodCallExpr;
@@ -49,12 +50,15 @@ public class JunitTestCaseExtractor implements TestCaseExtractor {
 		List<Statement> statements = new LinkedList<>();
 		testClass.getSetupMethods().forEach((setupMethod) -> setupMethod.getStatements().forEach((statement) -> {
 			Statement addedStatement = statement;
-			Optional<AssignExpr> assign = JavaParser.parseStatement(statement.getText()).toExpressionStmt().orElseThrow().getExpression().toAssignExpr();
-			if (assign.isPresent()) {
-				AssignExpr assignExpression = assign.get();
-				for (Field field : testClass.getFields()) {
-					if (assignExpression.getTarget().toString().equals(field.getName())) {
-						addedStatement = new Statement(String.format("%s %s", field.getType(), statement.getText()));
+			Optional<ExpressionStmt> expression = JavaParser.parseStatement(statement.getText()).toExpressionStmt();
+			if (expression.isPresent()) {
+				Optional<AssignExpr> assign = expression.get().getExpression().toAssignExpr();
+				if (assign.isPresent()) {
+					AssignExpr assignExpression = assign.get();
+					for (Field field : testClass.getFields()) {
+						if (assignExpression.getTarget().toString().equals(field.getName())) {
+							addedStatement = new Statement(String.format("%s %s", field.getType(), statement.getText()));
+						}
 					}
 				}
 			}

@@ -22,7 +22,7 @@ public class SimilarityBasedCriterion implements ThresholdCriterion {
 
 	@Override
 	public String toString() {
-		return String.format("%s(%s)", getClass().getSimpleName(), threshold);
+		return String.format("%s", threshold);
 	}
 
 }

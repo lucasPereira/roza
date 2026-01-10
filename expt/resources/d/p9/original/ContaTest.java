@@ -9,7 +9,7 @@ import br.ufsc.ine.leb.sistemaBancario.Agencia;
 import br.ufsc.ine.leb.sistemaBancario.Conta;
 import br.ufsc.ine.leb.sistemaBancario.Entrada;
 import br.ufsc.ine.leb.sistemaBancario.Transacao;
-import br.ufsc.ine.leb.sistemaBancario.ValorMonetario;;
+import br.ufsc.ine.leb.sistemaBancario.ValorMonetario;
 
 public class ContaTest {
 	

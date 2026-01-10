@@ -11,4 +11,8 @@ public class BiggestClusterReferee extends SizeClusterReferee implements Referee
 		return current.compareTo(chosenValue);
 	}
 
+	@Override
+	public String toString() {
+		return "Biggest cluster";
+	}
 }

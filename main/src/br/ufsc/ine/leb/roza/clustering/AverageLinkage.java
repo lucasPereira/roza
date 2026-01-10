@@ -34,7 +34,7 @@ public class AverageLinkage implements Linkage {
 
 	@Override
 	public String toString() {
-		return getClass().getSimpleName();
+		return "Average linkage";
 	}
 
 }

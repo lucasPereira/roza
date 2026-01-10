@@ -6,7 +6,7 @@ import org.junit.Test;
 
 import br.ufsc.ine.leb.sistemaBancario.Moeda;
 import br.ufsc.ine.leb.sistemaBancario.ValorMonetario;
-import br.ufsc.ine.leb.sistemaBancario.Dinheiro;;
+import br.ufsc.ine.leb.sistemaBancario.Dinheiro;
 
 public class DinheiroTest {
 

@@ -29,4 +29,8 @@ public class ComposedReferee implements Referee {
 		throw new TiebreakException(elements);
 	}
 
+	@Override
+	public String toString() {
+		return referees.get(0).toString();
+	}
 }

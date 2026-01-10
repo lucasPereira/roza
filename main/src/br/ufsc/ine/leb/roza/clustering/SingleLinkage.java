@@ -32,7 +32,7 @@ public class SingleLinkage implements Linkage {
 
 	@Override
 	public String toString() {
-		return getClass().getSimpleName();
+		return "Single linkage";
 	}
 
 }

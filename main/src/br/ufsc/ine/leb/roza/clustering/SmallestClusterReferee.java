@@ -11,4 +11,8 @@ public class SmallestClusterReferee extends SizeClusterReferee implements Refere
 		return -current.compareTo(chosenValue);
 	}
 
+	@Override
+	public String toString() {
+		return "Smallest cluster";
+	}
 }
