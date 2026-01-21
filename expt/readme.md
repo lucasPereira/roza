@@ -31,7 +31,7 @@ Combine distinct linkage, referee and criterion to evaluate the capability of ea
 - Original test classes metrics: `expt/results/c/original.csv`
 - Refactored test classes metrics: `expt/results/c/refactored.csv`
 
-## `d`: refactoring experiment
+## `d`: refactoring experiment 1
 
 Refactor the test code to measure the level of reuse. 16 programs from undergraduate students were selected to be refactored. Refactor using LCCSS, average linkage, any cluster referee and similarity based criterion (0.4).
 
@@ -47,3 +47,11 @@ Use case of a banking system to exemplify the capability of Róża to refactor c
 - Code responsible to execute the example: `expt/src/br/ufsc/ine/leb/roza/expt/e/Experiment.java`
 - Refactored classes: `expt/results/e/RefactoredTestClasse1.java` and `expt/results/e/RefactoredTestClasse2.java`
 - Similarity matrix: `expt/results/e/similarity-matrix.csv`
+
+## `f`: refactoring experiment 2
+
+Refactor the test code to measure the level of reuse. 47 programs from undergraduate students were selected to be refactored. Refactor using LCCSS, complete linkage, biggest and any cluster referees and similarity based criterion (0.4).
+
+- Set of source test classes: `expt/resources/f`
+- Code responsible to execute the example: `expt/src/br/ufsc/ine/leb/roza/expt/f/Experiment.java`
+- Code metrics: `expt/results/f/results.csv`
