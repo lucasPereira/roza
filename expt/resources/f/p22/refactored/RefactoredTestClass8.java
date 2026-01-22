@@ -3,22 +3,22 @@ import org.junit.Test;
 
 public class RefactoredTestClass8 {
 
-	private Funcionario funcionario;
+	private Projeto projeto;
 
 	@Before()
 	public void setup() {
-		funcionario = new Funcionario("Matheus");
+		projeto = new Projeto("Projeto");
 	}
 
 	@Test()
-	public void adicionaProjeto1() {
-		Projeto projeto01 = new Projeto("Projeto01");
-		funcionario.adicionaProjeto(projeto01);
-		assertTrue(funcionario.listaProjeto(projeto01));
+	public void adicionaOcorrenciaA() {
+		Ocorrencia ocorrenciaA = new Ocorrencia("Ocorrencia A");
+		projeto.adicionaOcorrencia(ocorrenciaA);
+		assertTrue(projeto.temOcorrencia(ocorrenciaA));
 	}
 
 	@Test()
-	public void criafuncionario() {
-		assertEquals("Matheus", funcionario.Nome());
+	public void criaProjeto() {
+		assertEquals("Projeto", projeto.Nome());
 	}
 }

@@ -3,10 +3,10 @@ import org.junit.Test;
 public class RefactoredTestClass3 {
 
 	@Test()
-	public void adicionaOcorrenciaA() {
-		Projeto projeto = new Projeto("Projeto");
-		Ocorrencia ocorrenciaA = new Ocorrencia("Ocorrencia A");
-		projeto.adicionaOcorrencia(ocorrenciaA);
-		assertTrue(projeto.temOcorrencia(ocorrenciaA));
+	public void adicionaProjeto1() {
+		Empresa empresa = new Empresa("empresa");
+		Projeto projeto1 = new Projeto("Projeto01");
+		empresa.adicionaProjeto(projeto1);
+		assertTrue(empresa.temProjeto(projeto1));
 	}
 }

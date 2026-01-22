@@ -4,9 +4,9 @@ public class RefactoredTestClass4 {
 
 	@Test()
 	public void adicionaProjeto1() {
-		Empresa empresa = new Empresa("empresa");
-		Projeto projeto1 = new Projeto("Projeto01");
-		empresa.adicionaProjeto(projeto1);
-		assertTrue(empresa.temProjeto(projeto1));
+		Funcionario funcionario = new Funcionario("Matheus");
+		Projeto projeto01 = new Projeto("Projeto01");
+		funcionario.adicionaProjeto(projeto01);
+		assertTrue(funcionario.listaProjeto(projeto01));
 	}
 }
