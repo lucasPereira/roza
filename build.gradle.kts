@@ -23,29 +23,27 @@ application {
 sourceSets {
     main {
         java {
-            setSrcDirs(listOf("main/src"))
+            setSrcDirs(listOf("src/main/java"))
         }
     }
     test {
         java {
-            setSrcDirs(listOf("test/src"))
+            setSrcDirs(listOf("src/test/java"))
+        }
+        resources {
+            setSrcDirs(listOf("src/test/resources"))
         }
     }
     create("expt") {
         java {
-            setSrcDirs(listOf("expt/src"))
+            setSrcDirs(listOf("src/expt/java"))
+        }
+        resources {
+            setSrcDirs(listOf("src/expt/resources"))
         }
         compileClasspath += sourceSets.main.get().output
         runtimeClasspath += sourceSets.main.get().output
     }
-}
-
-val exptImplementation: Configuration? by configurations.getting {
-    extendsFrom(configurations.implementation.get())
-}
-
-val exptRuntimeOnly: Configuration? by configurations.getting {
-    extendsFrom(configurations.runtimeOnly.get())
 }
 
 dependencies {
@@ -69,6 +67,13 @@ dependencies {
 
 tasks.test {
     useJUnitPlatform()
+}
+
+tasks.register<JavaExec>("runRozaUi") {
+    group = "application"
+    description = "Runs the Roza UI."
+    classpath = sourceSets.main.get().runtimeClasspath
+    mainClass.set("br.ufsc.ine.leb.roza.ui.RozaUi")
 }
 
 fun registerExperimentTask(
@@ -104,7 +109,7 @@ registerExperimentTask("runExperimentH", "Runs experiment h, which compares orig
 
 spotless {
     java {
-        target("main/src/**/*.java", "test/src/**/*.java", "expt/src/**/*.java")
+        target("src/main/java/**/*.java", "src/test/java/**/*.java", "src/expt/java/**/*.java")
         removeUnusedImports()
         trimTrailingWhitespace()
         endWithNewline()
