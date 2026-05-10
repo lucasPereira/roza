@@ -4,8 +4,8 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import br.ufsc.ine.leb.roza.core.Field;
-import br.ufsc.ine.leb.roza.core.TestClass;
+import br.ufsc.ine.leb.roza.core.legacy.Field;
+import br.ufsc.ine.leb.roza.core.legacy.TestClass;
 
 public class TestClassFieldsModel extends TestClassAbstractModel<Field> {
 

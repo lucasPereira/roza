@@ -13,9 +13,9 @@ import org.graphstream.ui.swing_viewer.DefaultView;
 import org.graphstream.ui.swing_viewer.SwingViewer;
 import org.graphstream.ui.view.Viewer;
 
-import br.ufsc.ine.leb.roza.core.Cluster;
-import br.ufsc.ine.leb.roza.core.TestCase;
-import br.ufsc.ine.leb.roza.core.clustering.Level;
+import br.ufsc.ine.leb.roza.core.legacy.Cluster;
+import br.ufsc.ine.leb.roza.core.legacy.TestCase;
+import br.ufsc.ine.leb.roza.core.legacy.clustering.Level;
 import br.ufsc.ine.leb.roza.ui.Hub;
 import br.ufsc.ine.leb.roza.ui.Manager;
 import br.ufsc.ine.leb.roza.ui.UiComponent;

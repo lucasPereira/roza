@@ -15,7 +15,7 @@ import br.ufsc.ine.leb.roza.ui.UiComponent;
 import br.ufsc.ine.leb.roza.ui.window.content.Content;
 import br.ufsc.ine.leb.roza.ui.window.messages.Messages;
 import br.ufsc.ine.leb.roza.ui.window.toolbar.Toolbar;
-import br.ufsc.ine.leb.roza.core.utils.RozaLogger;
+import br.ufsc.ine.leb.roza.core.legacy.utils.RozaLogger;
 
 public class Window implements UiComponent {
 

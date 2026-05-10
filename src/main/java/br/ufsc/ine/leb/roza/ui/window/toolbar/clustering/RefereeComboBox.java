@@ -4,11 +4,11 @@ import java.util.List;
 
 import javax.swing.JComboBox;
 
-import br.ufsc.ine.leb.roza.core.clustering.AnyClusterReferee;
-import br.ufsc.ine.leb.roza.core.clustering.BiggestClusterReferee;
-import br.ufsc.ine.leb.roza.core.clustering.ComposedReferee;
-import br.ufsc.ine.leb.roza.core.clustering.InsecureReferee;
-import br.ufsc.ine.leb.roza.core.clustering.SmallestClusterReferee;
+import br.ufsc.ine.leb.roza.core.legacy.clustering.AnyClusterReferee;
+import br.ufsc.ine.leb.roza.core.legacy.clustering.BiggestClusterReferee;
+import br.ufsc.ine.leb.roza.core.legacy.clustering.ComposedReferee;
+import br.ufsc.ine.leb.roza.core.legacy.clustering.InsecureReferee;
+import br.ufsc.ine.leb.roza.core.legacy.clustering.SmallestClusterReferee;
 import br.ufsc.ine.leb.roza.ui.Hub;
 import br.ufsc.ine.leb.roza.ui.Manager;
 import br.ufsc.ine.leb.roza.ui.UiComponent;

@@ -1,0 +1,45 @@
+package br.ufsc.ine.leb.roza.core.legacy.loading;
+
+import java.io.File;
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
+
+import br.ufsc.ine.leb.roza.core.legacy.TextFile;
+import br.ufsc.ine.leb.roza.core.legacy.utils.FileUtils;
+import br.ufsc.ine.leb.roza.core.legacy.utils.FolderUtils;
+
+public class RecursiveTextFileLoader implements TextFileLoader {
+
+	private final FileUtils fileUtils;
+	private final FolderUtils folderUtils;
+
+	public RecursiveTextFileLoader(String baseFolder) {
+		fileUtils = new FileUtils();
+		folderUtils = new FolderUtils(baseFolder);
+	}
+
+	@Override
+	public List<TextFile> load() {
+		List<TextFile> textFiles = new LinkedList<>();
+		List<File> files = folderUtils.listFilesRecursively();
+		for (File file : files) {
+			String name = file.getName();
+			String content = fileUtils.readContetAsString(file);
+			TextFile textFile = new TextFile(name, content);
+			textFiles.add(textFile);
+		}
+		textFiles.sort(new TextFileComparator());
+		return textFiles;
+	}
+
+	private static class TextFileComparator implements Comparator<TextFile> {
+
+		@Override
+		public int compare(TextFile file1, TextFile file2) {
+			return file1.getName().compareTo(file2.getName());
+		}
+
+	}
+
+}

@@ -1,0 +1,40 @@
+package br.ufsc.ine.leb.roza.core.legacy.clustering;
+
+import java.util.HashSet;
+import java.util.Set;
+
+import br.ufsc.ine.leb.roza.core.legacy.Cluster;
+import br.ufsc.ine.leb.roza.core.legacy.TestCase;
+
+class Pairing {
+
+	private final Cluster first;
+	private final Cluster second;
+
+	public Pairing(Cluster first, Cluster second) {
+		this.first = first;
+		this.second = second;
+	}
+
+	public Set<Pair> getPairs() {
+		Set<Pair> pairs = new HashSet<>();
+		for (TestCase firstTestCase : first.getTestCases()) {
+			for (TestCase secondTestCase : second.getTestCases()) {
+				pairs.add(new Pair(firstTestCase, secondTestCase));
+				pairs.add(new Pair(secondTestCase, firstTestCase));
+			}
+		}
+		return pairs;
+	}
+
+	public Set<Pair> getPairsWithoutRepetition() {
+		Set<Pair> pairs = new HashSet<>();
+		for (TestCase firstTestCase : first.getTestCases()) {
+			for (TestCase secondTestCase : second.getTestCases()) {
+				pairs.add(new Pair(firstTestCase, secondTestCase));
+			}
+		}
+		return pairs;
+	}
+
+}

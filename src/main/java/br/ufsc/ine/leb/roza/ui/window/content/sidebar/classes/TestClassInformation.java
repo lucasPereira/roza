@@ -7,7 +7,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.table.TableModel;
 
-import br.ufsc.ine.leb.roza.core.TestClass;
+import br.ufsc.ine.leb.roza.core.legacy.TestClass;
 import br.ufsc.ine.leb.roza.ui.Hub;
 import br.ufsc.ine.leb.roza.ui.Manager;
 import br.ufsc.ine.leb.roza.ui.UiComponent;

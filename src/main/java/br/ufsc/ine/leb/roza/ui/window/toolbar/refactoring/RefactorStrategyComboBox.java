@@ -4,8 +4,8 @@ import java.util.List;
 
 import javax.swing.JComboBox;
 
-import br.ufsc.ine.leb.roza.core.refactoring.IncrementalTestClassNamingStrategy;
-import br.ufsc.ine.leb.roza.core.refactoring.SimpleClusterRefactor;
+import br.ufsc.ine.leb.roza.core.legacy.refactoring.IncrementalTestClassNamingStrategy;
+import br.ufsc.ine.leb.roza.core.legacy.refactoring.SimpleClusterRefactor;
 import br.ufsc.ine.leb.roza.ui.Hub;
 import br.ufsc.ine.leb.roza.ui.Manager;
 import br.ufsc.ine.leb.roza.ui.UiComponent;

@@ -6,7 +6,7 @@ import javax.swing.DefaultListCellRenderer;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 
-import br.ufsc.ine.leb.roza.core.TestCase;
+import br.ufsc.ine.leb.roza.core.legacy.TestCase;
 
 public class TestCaseRenderer implements ListCellRenderer<TestCase> {
 

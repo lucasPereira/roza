@@ -1,0 +1,47 @@
+package br.ufsc.ine.leb.roza.core.legacy.measurement.configuration.jplag;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.util.LinkedList;
+import java.util.List;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+class JplagStringConfigurationTest {
+
+	private JplagStringConfiguration configuration;
+	private List<String> arguments;
+
+	@BeforeEach
+	void setup() {
+		configuration = new JplagStringConfiguration("l", "java17", "Language");
+		arguments = new LinkedList<>();
+	}
+
+	@Test
+	void nameAndDescription() {
+		assertEquals("l", configuration.getName());
+		assertEquals("Language", configuration.getDescription());
+	}
+
+	@Test
+	void create() {
+		configuration.addArgument(arguments);
+		assertEquals("java17", configuration.getValue());
+		assertEquals(2, arguments.size());
+		assertEquals("-l", arguments.get(0));
+		assertEquals("java17", arguments.get(1));
+	}
+
+	@Test
+	void change() {
+		configuration.setValue("python3");
+		configuration.addArgument(arguments);
+		assertEquals("python3", configuration.getValue());
+		assertEquals(2, arguments.size());
+		assertEquals("-l", arguments.get(0));
+		assertEquals("python3", arguments.get(1));
+	}
+
+}

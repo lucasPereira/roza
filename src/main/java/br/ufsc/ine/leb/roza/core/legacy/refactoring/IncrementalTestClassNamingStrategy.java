@@ -1,0 +1,18 @@
+package br.ufsc.ine.leb.roza.core.legacy.refactoring;
+
+
+
+public class IncrementalTestClassNamingStrategy implements TestClassNamingStrategy {
+
+	private Integer counter;
+
+	public IncrementalTestClassNamingStrategy() {
+		counter = 0;
+	}
+
+	@Override
+	public String nominate() {
+		return String.format("RefactoredTestClass%d", ++counter);
+	}
+
+}

@@ -1,0 +1,23 @@
+package br.ufsc.ine.leb.roza.core.legacy.clustering;
+
+import java.math.BigDecimal;
+
+public class WinnerCombination {
+
+	private final Combination combination;
+	private final BigDecimal evaluation;
+
+	public WinnerCombination(Combination combination, BigDecimal evaluation) {
+		this.combination = combination;
+		this.evaluation = evaluation;
+	}
+
+	public Combination getCombination() {
+		return combination;
+	}
+
+	public BigDecimal getEvaluation() {
+		return evaluation;
+	}
+
+}

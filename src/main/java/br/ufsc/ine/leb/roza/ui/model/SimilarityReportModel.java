@@ -5,10 +5,10 @@ import java.util.List;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableModel;
 
-import br.ufsc.ine.leb.roza.core.SimilarityAssessment;
-import br.ufsc.ine.leb.roza.core.SimilarityReport;
-import br.ufsc.ine.leb.roza.core.TestCase;
-import br.ufsc.ine.leb.roza.core.utils.ReportUtils;
+import br.ufsc.ine.leb.roza.core.legacy.SimilarityAssessment;
+import br.ufsc.ine.leb.roza.core.legacy.SimilarityReport;
+import br.ufsc.ine.leb.roza.core.legacy.TestCase;
+import br.ufsc.ine.leb.roza.core.legacy.utils.ReportUtils;
 
 public class SimilarityReportModel extends AbstractTableModel implements TableModel {
 

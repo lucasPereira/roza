@@ -1,8 +1,8 @@
 package br.ufsc.ine.leb.roza.ui.window.toolbar.decomposition;
 
-import br.ufsc.ine.leb.roza.core.extraction.Junit4TestCaseExtractor;
-import br.ufsc.ine.leb.roza.core.extraction.Junit5TestCaseExtractor;
-import br.ufsc.ine.leb.roza.core.extraction.JunitTestCaseExtractor;
+import br.ufsc.ine.leb.roza.core.legacy.extraction.Junit4TestCaseExtractor;
+import br.ufsc.ine.leb.roza.core.legacy.extraction.Junit5TestCaseExtractor;
+import br.ufsc.ine.leb.roza.core.legacy.extraction.JunitTestCaseExtractor;
 import br.ufsc.ine.leb.roza.ui.Hub;
 import br.ufsc.ine.leb.roza.ui.Manager;
 import br.ufsc.ine.leb.roza.ui.UiComponent;
