@@ -1,0 +1,13 @@
+Algorithm;Subject;Tests;Linkage;Status;Levels;Final Clusters;Runtime Millis;Generated Candidates;Linkage Evaluations;Peak Used Memory Bytes
+Optimized;Apache Commons Lang;50;Single linkage;completed;50;1;5;2401;2401;7629544
+Optimized;Apache Commons Lang;50;Complete linkage;completed;50;1;2;2401;2401;4432904
+Optimized;Apache Commons Lang;50;Average linkage;completed;50;1;564;2401;2401;230165048
+Optimized;Apache Commons Lang;100;Single linkage;completed;100;1;11;9801;9801;12511936
+Optimized;Apache Commons Lang;100;Complete linkage;completed;100;1;5;9801;9801;7099264
+Optimized;Apache Commons Lang;100;Average linkage;completed;100;1;2219;9801;9801;156357104
+Optimized;Apache Commons Lang;150;Single linkage;completed;150;1;39;22201;22201;30344656
+Optimized;Apache Commons Lang;150;Complete linkage;completed;150;1;13;22201;22201;11427800
+Optimized;Apache Commons Lang;150;Average linkage;completed;150;1;5055;22201;22201;184274128
+Optimized;Apache Commons Lang;200;Single linkage;completed;200;1;89;39601;39601;27738528
+Optimized;Apache Commons Lang;200;Complete linkage;completed;200;1;25;39601;39601;16418728
+Optimized;Apache Commons Lang;200;Average linkage;completed;200;1;9063;39601;39601;146370424

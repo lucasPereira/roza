@@ -8,7 +8,6 @@ import br.ufsc.ine.leb.roza.TestClass;
 import br.ufsc.ine.leb.roza.TextFile;
 import br.ufsc.ine.leb.roza.clustering.AgglomerativeHierarchicalClusteringTestCaseClusterer;
 import br.ufsc.ine.leb.roza.clustering.AnyClusterReferee;
-import br.ufsc.ine.leb.roza.clustering.AverageLinkage;
 import br.ufsc.ine.leb.roza.clustering.BiggestClusterReferee;
 import br.ufsc.ine.leb.roza.clustering.CompleteLinkage;
 import br.ufsc.ine.leb.roza.clustering.ComposedReferee;

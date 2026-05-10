@@ -1,7 +1,6 @@
 package br.ufsc.ine.leb.roza.clustering;
 
 import java.math.BigDecimal;
-import java.util.Set;
 
 import br.ufsc.ine.leb.roza.Cluster;
 import br.ufsc.ine.leb.roza.SimilarityReport;
@@ -19,14 +18,13 @@ public class AverageLinkage implements Linkage {
 	@Override
 	public BigDecimal evaluate(Cluster first, Cluster second) {
 		BigDecimal averageDistance = BigDecimal.ZERO;
-		Set<Pair> pairs = new Pairing(first, second).getPairsWithoutRepetition();
-		for (Pair pair : pairs) {
-			TestCase firstTest = pair.getFirst();
-			TestCase secondTest = pair.getSecond();
-			BigDecimal firstSecondDistance = report.getPair(firstTest, secondTest).getScore();
-			BigDecimal secondFirstDistance = report.getPair(secondTest, firstTest).getScore();
-			BigDecimal distance = firstSecondDistance.compareTo(secondFirstDistance) > 0 ? firstSecondDistance : secondFirstDistance;
-			averageDistance = averageDistance.add(distance);
+		for (TestCase firstTest : first.getTestCases()) {
+			for (TestCase secondTest : second.getTestCases()) {
+				BigDecimal firstSecondDistance = report.getPair(firstTest, secondTest).getScore();
+				BigDecimal secondFirstDistance = report.getPair(secondTest, firstTest).getScore();
+				BigDecimal distance = firstSecondDistance.compareTo(secondFirstDistance) > 0 ? firstSecondDistance : secondFirstDistance;
+				averageDistance = averageDistance.add(distance);
+			}
 		}
 		BigDecimal dimension = new MathUtils().oneOver(first.getTestCases().size() * second.getTestCases().size());
 		return dimension.multiply(averageDistance);

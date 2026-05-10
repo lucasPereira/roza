@@ -71,6 +71,35 @@ tasks.test {
     useJUnitPlatform()
 }
 
+fun registerExperimentTask(
+    taskName: String,
+    taskDescription: String,
+    experimentMainClass: String,
+    experimentArgs: List<String> = emptyList(),
+) {
+    tasks.register<JavaExec>(taskName) {
+        group = "verification"
+        description = taskDescription
+        classpath = sourceSets["expt"].runtimeClasspath
+        mainClass.set(experimentMainClass)
+        args(experimentArgs)
+    }
+}
+
+registerExperimentTask("runExperimentA", "Runs experiment a, which compares similarity metrics for reuse-oriented refactoring candidates.", "br.ufsc.ine.leb.roza.expt.a.Experiment")
+
+registerExperimentTask("runExperimentB", "Runs experiment b, which generates a compact similarity measurement example.", "br.ufsc.ine.leb.roza.expt.b.Examples")
+
+registerExperimentTask("runExperimentC", "Runs experiment c, which compares clustering configurations for implicit-setup refactoring.", "br.ufsc.ine.leb.roza.expt.c.Experiment")
+
+registerExperimentTask("runExperimentD", "Runs experiment d, which measures reuse after refactoring 16 student programs.", "br.ufsc.ine.leb.roza.expt.d.Experiment")
+
+registerExperimentTask("runExperimentE", "Runs experiment e, which refactors the banking-system use case.", "br.ufsc.ine.leb.roza.expt.e.Experiment")
+
+registerExperimentTask("runExperimentF", "Runs experiment f, which measures reuse after refactoring 47 student programs.", "br.ufsc.ine.leb.roza.expt.f.Experiment")
+
+registerExperimentTask("runExperimentG", "Runs experiment g, which benchmarks baseline and optimized clustering scalability on Apache Commons Lang.", "br.ufsc.ine.leb.roza.expt.g.Experiment")
+
 spotless {
     java {
         target("main/src/**/*.java", "test/src/**/*.java", "expt/src/**/*.java")

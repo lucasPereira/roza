@@ -1,0 +1,13 @@
+Algorithm;Subject;Tests;Linkage;Status;Levels;Final Clusters;Runtime Millis;Generated Candidates;Linkage Evaluations;Peak Used Memory Bytes
+Baseline;Apache Commons Lang;50;Single linkage;completed;50;1;21;20825;20825;16002016
+Baseline;Apache Commons Lang;50;Complete linkage;completed;50;1;14;20825;20825;17027184
+Baseline;Apache Commons Lang;50;Average linkage;completed;50;1;4538;20825;20825;116834288
+Baseline;Apache Commons Lang;100;Single linkage;completed;100;1;65;166650;166650;20466944
+Baseline;Apache Commons Lang;100;Complete linkage;completed;100;1;63;166650;166650;45806448
+Baseline;Apache Commons Lang;100;Average linkage;completed;100;1;36060;166650;166650;185056544
+Baseline;Apache Commons Lang;150;Single linkage;completed;150;1;216;562475;562475;37895296
+Baseline;Apache Commons Lang;150;Complete linkage;completed;150;1;212;562475;562475;240409968
+Baseline;Apache Commons Lang;150;Average linkage;skipped: baseline runtime exceeds practical limit;;;0;0;0;0
+Baseline;Apache Commons Lang;200;Single linkage;skipped: baseline runtime exceeds practical limit;;;0;0;0;0
+Baseline;Apache Commons Lang;200;Complete linkage;skipped: baseline runtime exceeds practical limit;;;0;0;0;0
+Baseline;Apache Commons Lang;200;Average linkage;skipped: baseline runtime exceeds practical limit;;;0;0;0;0

@@ -1,0 +1,9 @@
+Tests;Linkage;Baseline Runtime Millis;Optimized Runtime Millis;Runtime Speedup;Baseline Candidates;Optimized Candidates;Candidate Reduction
+50;Single linkage;21;5;4.20;20825;2401;8.67
+50;Complete linkage;14;2;7.00;20825;2401;8.67
+50;Average linkage;4538;564;8.05;20825;2401;8.67
+100;Single linkage;65;11;5.91;166650;9801;17.00
+100;Complete linkage;63;5;12.60;166650;9801;17.00
+100;Average linkage;36060;2219;16.25;166650;9801;17.00
+150;Single linkage;216;39;5.54;562475;22201;25.34
+150;Complete linkage;212;13;16.31;562475;22201;25.34

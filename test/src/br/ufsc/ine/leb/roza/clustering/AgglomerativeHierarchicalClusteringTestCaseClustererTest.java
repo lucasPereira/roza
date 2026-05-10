@@ -211,6 +211,22 @@ class AgglomerativeHierarchicalClusteringTestCaseClustererTest {
 	}
 
 	@Test
+	void threeTestsRecordsIncrementalCandidateStatistics() {
+		SimilarityReport report = new SimilarityReportBuilder(true).add(alpha, beta, dotFive).add(gamma).complete().build();
+		Referee referee = new InsecureReferee();
+		Linkage linkage = new SingleLinkage(report);
+		ThresholdCriterion criterion = new NeverStopCriterion();
+		ClusteringStatistics statistics = new ClusteringStatistics();
+		AgglomerativeHierarchicalClusteringTestCaseClusterer clusterer = new AgglomerativeHierarchicalClusteringTestCaseClusterer(linkage, referee, criterion, statistics);
+		List<Level> levels = clusterer.generateLevels(report);
+
+		assertEquals(3, levels.size());
+		assertEquals(4, statistics.getGeneratedCandidates());
+		assertEquals(4, statistics.getLinkageEvaluations());
+		assertEquals(2, statistics.getSelectedMerges());
+	}
+
+	@Test
 	void threDistinctTestsWithTiebreak() {
 		SimilarityReport report = new SimilarityReportBuilder(true).add(alpha).add(beta).add(gamma).complete().build();
 		Referee referee = new InsecureReferee();

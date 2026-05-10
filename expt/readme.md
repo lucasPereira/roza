@@ -1,57 +1,45 @@
 # Experiments
 
-Each letter identify an experiment. The description of each experiment is defined below.
+Each letter identifies one experiment. The sections below explain what each experiment does, where its input data is stored, which Java class executes it, and which result files are produced.
 
-## `a`: similarity measurement experiment
+## `a`: comparing similarity metrics for refactoring candidates
 
-Uses distinct similarity metrics to evaluate the capability of each metric to identify refactoring candidates by the implicit setup strategy. The metrics used are: JPlag, Siman, Deckard, LCS and LCCSS.
+Experiment `a` compares similarity metrics for identifying test cases that are candidates for reuse-oriented refactoring through the implicit setup strategy. It uses the source test classes in `expt/resources/a`, defines the expected relevant pairs in `expt/src/br/ufsc/ine/leb/roza/expt/a/GroundTruth.java`, and is executed by `expt/src/br/ufsc/ine/leb/roza/expt/a/Experiment.java`. The evaluated metrics are JPlag, Simian, Deckard, LCS, and LCCSS.
 
-- Set of source test classes: `expt/resources/a`
-- Code containing the definition of the control matrix: `expt/src/br/ufsc/ine/leb/roza/expt/a/GroundTruth.java`
-- Code responsible to execute the experiment: `expt/src/br/ufsc/ine/leb/roza/expt/a/Experiment.java`
-- Rankings of similarity for each configuration variant: `expt/results/a/matrix`
-- Precision/recall curves for each configuration variant: `expt/results/a/precision-recall-curve`
-- Average precision/recall curves for each configuration variant: `expt/results/a/average-precision-recall-curve`
-- Average precision/recall curve for the best configuration variant of each metric: `expt/results/a/average-precision-recall-curve.csv`
+The generated results in `expt/results/a/matrix` contain the similarity rankings for each metric configuration. The files in `expt/results/a/precision-recall-curve` contain the precision and recall curves for each configuration, while `expt/results/a/average-precision-recall-curve` contains the averaged curves. The consolidated file `expt/results/a/average-precision-recall-curve.csv` summarizes the best average precision/recall curve for each metric.
 
-## `b`: similarity measurement example
+## `b`: example of similarity measurement
 
-Uses distinct similarity metrics to exemplify the measurement of Róża.
+Experiment `b` is a compact example of how Róża computes similarity between test cases. It reads the source test classes from `expt/resources/b` and is executed by `expt/src/br/ufsc/ine/leb/roza/expt/b/Examples.java`.
 
-- Set of source test classes: `expt/resources/b`
-- Code responsible to execute the example: `expt/src/br/ufsc/ine/leb/roza/expt/b/Example.java`
-- Similarity matrix: `expt/results/b/examples.csv`
+The output file `expt/results/b/examples.csv` contains the generated similarity matrix, making this experiment useful for inspecting the measurement process on a small and easy-to-read dataset.
 
-## `c`: clustering experiment
+## `c`: clustering configurations on the SAAS project
 
-Combine distinct linkage, referee and criterion to evaluate the capability of each combination refactor the code by the implicit setup strategy.
+Experiment `c` evaluates how different clustering configurations affect refactoring results for the implicit setup strategy. It reads the source test classes from `expt/resources/c`, measures similarity with LCCSS, and combines linkage strategies, referee strategies, and stopping criteria in `expt/src/br/ufsc/ine/leb/roza/expt/c/Experiment.java`.
 
-- Set of source test classes: `expt/resources/c`
-- Code responsible to execute the example: `expt/src/br/ufsc/ine/leb/roza/expt/c/Experiment.java`
-- Original test classes metrics: `expt/results/c/original.csv`
-- Refactored test classes metrics: `expt/results/c/refactored.csv`
+The file `expt/results/c/original.csv` contains the baseline metrics for the original test classes, including the number of classes, tests, statements, unique duplicated statements, and total duplicated statements. The file `expt/results/c/refactored.csv` contains the corresponding metrics after refactoring for each clustering configuration, allowing the configurations to be compared by their effect on code reuse.
 
-## `d`: refactoring experiment 1
+## `d`: reuse measurement on 16 student programs
 
-Refactor the test code to measure the level of reuse. 16 programs from undergraduate students were selected to be refactored. Refactor using LCCSS, average linkage, any cluster referee and similarity based criterion (0.4).
+Experiment `d` measures reuse after automatically refactoring 16 undergraduate student programs. The original projects are stored in `expt/resources/d`, and `expt/src/br/ufsc/ine/leb/roza/expt/d/Experiment.java` executes the refactoring using LCCSS, average linkage, the any-cluster referee, and a similarity-based threshold criterion of 0.4.
 
-- Set of source test classes: `expt/resources/d`
-- Code responsible to execute the example: `expt/src/br/ufsc/ine/leb/roza/expt/d/Experiment.java`
-- Code metrics: `expt/results/d/results.csv`
+During execution, the experiment writes the generated refactored test classes into the corresponding `refactored` folders under `expt/resources/d`. The file `expt/results/d/results.csv` contains the before-and-after code metrics for each project, while `expt/results/d/analysis.ods` stores the spreadsheet used to analyze the experiment results.
 
-## `e`: banking system use case
+## `e`: banking system refactoring use case
 
-Use case of a banking system to exemplify the capability of Róża to refactor candidates by the implicit setup strategy. Refactor using LCCSS, average linkage, any cluster referee and similarity based criterion (0.4).
+Experiment `e` is a banking-system use case that demonstrates the complete refactoring pipeline on a small test suite. It starts from `expt/resources/e/BankAccountWithDuplicationTest.java` and is executed by `expt/src/br/ufsc/ine/leb/roza/expt/e/Experiment.java` using LCCSS, average linkage, the any-cluster referee, and a similarity-based threshold criterion of 0.4.
 
-- Source test classes: `expt/resources/e/BankAccountWithDuplicationTest.java`
-- Code responsible to execute the example: `expt/src/br/ufsc/ine/leb/roza/expt/e/Experiment.java`
-- Refactored classes: `expt/results/e/RefactoredTestClasse1.java` and `expt/results/e/RefactoredTestClasse2.java`
-- Similarity matrix: `expt/results/e/similarity-matrix.csv`
+The file `expt/results/e/similarity-matrix.csv` contains the pairwise similarity scores used by the clustering stage. The files `expt/results/e/RefactoredTestClass1.java` and `expt/results/e/RefactoredTestClass2.java` contain the refactored test classes produced by Róża.
 
-## `f`: refactoring experiment 2
+## `f`: reuse measurement on 47 student programs
 
-Refactor the test code to measure the level of reuse. 47 programs from undergraduate students were selected to be refactored. Refactor using LCCSS, complete linkage, biggest and any cluster referees and similarity based criterion (0.4).
+Experiment `f` extends the reuse measurement from experiment `d` to 47 undergraduate student programs. The projects are stored in `expt/resources/f`, and `expt/src/br/ufsc/ine/leb/roza/expt/f/Experiment.java` executes the refactoring with LCCSS, complete linkage, a composed referee that first prioritizes the biggest cluster and then falls back to any cluster, and a similarity-based threshold criterion of 0.4.
 
-- Set of source test classes: `expt/resources/f`
-- Code responsible to execute the example: `expt/src/br/ufsc/ine/leb/roza/expt/f/Experiment.java`
-- Code metrics: `expt/results/f/results.csv`
+The experiment writes the generated refactored classes into the corresponding `refactored` folders under `expt/resources/f`. The file `expt/results/f/results.csv` contains before-and-after metrics for each project, including classes, attributes, setup methods, test methods, statements, unique duplicated statements, and total duplicated statements.
+
+## `g`: clustering scalability on Apache Commons Lang
+
+Experiment `g` measures dendrogram construction scalability using JUnit 5 tests extracted from Apache Commons Lang. The benchmark corpus in `expt/resources/g` contains only the copied test source files needed to extract the benchmark subset used by the experiment, up to the largest configured case of 200 tests; the external project is not included as a dependency and does not need to be compiled or executed. Files from the `org.apache.commons.lang3` package are stored directly in `expt/resources/g`, while subpackages such as `concurrent` and `exception` are preserved as subfolders. The benchmark is implemented in `expt/src/br/ufsc/ine/leb/roza/expt/g/Experiment.java`, which runs the baseline strategy, the optimized strategy, and the comparison step in sequence.
+
+The file `expt/results/g/baseline.csv` contains the measurements for the legacy candidate-generation strategy, including runtime, generated merge candidates, linkage evaluations, levels, final clusters, and memory usage. The file `expt/results/g/optimized.csv` contains the same metrics for the optimized incremental candidate-management strategy. The file `expt/results/g/comparison.csv` summarizes the comparable baseline and optimized runs, including runtime speedup and candidate-count reduction.

@@ -16,11 +16,17 @@ public class AgglomerativeHierarchicalClusteringTestCaseClusterer implements Tes
 	private final Linkage linkage;
 	private final Referee referee;
 	private final ThresholdCriterion criterion;
+	private final ClusteringStatistics statistics;
 
 	public AgglomerativeHierarchicalClusteringTestCaseClusterer(Linkage linkage, Referee referee, ThresholdCriterion criterion) {
+		this(linkage, referee, criterion, new ClusteringStatistics());
+	}
+
+	public AgglomerativeHierarchicalClusteringTestCaseClusterer(Linkage linkage, Referee referee, ThresholdCriterion criterion, ClusteringStatistics statistics) {
 		this.linkage = linkage;
 		this.referee = referee;
 		this.criterion = criterion;
+		this.statistics = statistics;
 	}
 
 	@Override
@@ -30,16 +36,15 @@ public class AgglomerativeHierarchicalClusteringTestCaseClusterer implements Tes
 	}
 
 	public List<Level> generateLevels(SimilarityReport report) {
-		ClusterJoiner joiner = new ClusterJoiner(linkage, referee);
 		Set<Cluster> currentClusters = new ClusterFactory().create(report);
+		MergeCandidateQueue mergeCandidates = new MergeCandidateQueue(currentClusters, linkage, referee, statistics);
 		List<Level> levels = new ArrayList<>();
 		Level currentLevel = new Level(currentClusters);
 		levels.add(currentLevel);
 		boolean shouldContinue = currentClusters.size() > 1;
 		while (shouldContinue) {
-			ClustersToMerge clustersToMerge = new ClustersToMerge(currentClusters);
 			try {
-				WinnerCombination winner = joiner.join(clustersToMerge);
+				WinnerCombination winner = mergeCandidates.next();
 				Combination combination = winner.getCombination();
 				BigDecimal evaluation = winner.getEvaluation();
 				Cluster first = combination.getFirst();
@@ -55,6 +60,7 @@ public class AgglomerativeHierarchicalClusteringTestCaseClusterer implements Tes
 					levels.add(nextLevel);
 				}
 				if (shouldContinue) {
+					mergeCandidates.merge(first, second, merged);
 					currentLevel = nextLevel;
 					currentClusters = nextClusters;
 				}

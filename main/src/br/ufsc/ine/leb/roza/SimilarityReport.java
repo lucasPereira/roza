@@ -3,16 +3,23 @@ package br.ufsc.ine.leb.roza;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import br.ufsc.ine.leb.roza.exceptions.MissingPairException;
 
 public class SimilarityReport {
 
 	private final List<SimilarityAssessment> assessments;
+	private final Map<TestCase, Map<TestCase, SimilarityAssessment>> index;
 
 	SimilarityReport(List<SimilarityAssessment> assessments) {
 		this.assessments = new ArrayList<>(assessments);
+		this.index = new HashMap<>();
+		for (SimilarityAssessment assessment : assessments) {
+			index.computeIfAbsent(assessment.getSource(), source -> new HashMap<>()).put(assessment.getTarget(), assessment);
+		}
 	}
 
 	public List<SimilarityAssessment> getAssessments() {
@@ -56,10 +63,9 @@ public class SimilarityReport {
 	}
 
 	public SimilarityAssessment getPair(TestCase source, TestCase target) {
-		for (SimilarityAssessment assessment : assessments) {
-			if (assessment.getSource().equals(source) && assessment.getTarget().equals(target)) {
-				return assessment;
-			}
+		Map<TestCase, SimilarityAssessment> sourceAssessments = index.get(source);
+		if (sourceAssessments != null && sourceAssessments.containsKey(target)) {
+			return sourceAssessments.get(target);
 		}
 		throw new MissingPairException(source, target);
 	}
