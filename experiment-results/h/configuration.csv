@@ -9,5 +9,7 @@ File limit value;all
 Similarity metric;LCCSS
 Global linkage;Complete linkage
 Global referee;ComposedReferee(BiggestClusterReferee, AnyClusterReferee)
-Global threshold;0.4
+Candidate global threshold;0.4
+Global thresholds evaluated;0.2, 0.3, 0.4, 0.5
+Threshold list environment variable;ROZA_EXPERIMENT_H_GLOBAL_THRESHOLDS
 Local-only baseline;Refactor each original test class independently without redistributing tests across classes

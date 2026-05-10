@@ -55,24 +55,30 @@ public class Experiment {
 	private static final String RESULTS = "experiment-results/h";
 	private static final String MATERIALIZER_OUTPUT = "output/materializer/h";
 	private static final String FILE_LIMIT_ENVIRONMENT_VARIABLE = "ROZA_EXPERIMENT_H_MAX_FILES";
-	private static final BigDecimal SIMILARITY_THRESHOLD = BigDecimal.valueOf(0.4);
+	private static final String GLOBAL_THRESHOLDS_ENVIRONMENT_VARIABLE = "ROZA_EXPERIMENT_H_GLOBAL_THRESHOLDS";
+	private static final BigDecimal CANDIDATE_SIMILARITY_THRESHOLD = new BigDecimal("0.4");
+	private static final List<BigDecimal> DEFAULT_GLOBAL_THRESHOLDS = List.of(new BigDecimal("0.2"), new BigDecimal("0.3"), CANDIDATE_SIMILARITY_THRESHOLD, new BigDecimal("0.5"));
 
 	public static void main(String[] args) {
 		new FolderUtils(RESULTS).createEmptyFolder();
 		new FolderUtils(MATERIALIZER_OUTPUT).createEmptyFolder();
 
 		SubjectData subject = loadSubject();
+		List<BigDecimal> globalThresholds = getGlobalThresholds();
 		writeSkippedFiles(subject);
-		writeConfiguration();
+		writeConfiguration(globalThresholds);
 
 		List<ExperimentRow> rows = new ArrayList<>();
-		rows.add(measure("Original", subject.classes, subject, 0));
+		rows.add(measure("Original", null, subject.classes, subject, 0));
 		long localStarted = System.nanoTime();
 		List<TestClass> localOnlyClasses = refactorLocally(subject.classes);
-		rows.add(measure("Local-only refactoring", localOnlyClasses, subject, elapsedMillis(localStarted)));
-		long globalStarted = System.nanoTime();
-		List<TestClass> rozaClasses = refactorGlobally(subject.tests);
-		rows.add(measure("Roza global clustering", rozaClasses, subject, elapsedMillis(globalStarted)));
+		rows.add(measure("Local-only refactoring", null, localOnlyClasses, subject, elapsedMillis(localStarted)));
+		for (BigDecimal threshold : globalThresholds) {
+			System.out.printf("Running global clustering with threshold %s.%n", threshold);
+			long globalStarted = System.nanoTime();
+			List<TestClass> rozaClasses = refactorGlobally(subject.tests, threshold);
+			rows.add(measure(String.format("Roza global clustering (threshold %s)", threshold), threshold, rozaClasses, subject, elapsedMillis(globalStarted)));
+		}
 		writeSummary(rows);
 	}
 
@@ -120,14 +126,14 @@ public class Experiment {
 		return refactor.refactor(localClusters);
 	}
 
-	private static List<TestClass> refactorGlobally(List<TestCase> tests) {
+	private static List<TestClass> refactorGlobally(List<TestCase> tests, BigDecimal threshold) {
 		TestCaseMaterializer materializer = new Junit4WithoutAssertionsTestCaseMaterializer(MATERIALIZER_OUTPUT);
 		MaterializationReport materialization = materializer.materialize(tests);
 		SimilarityMeasurer measurer = new LccssSimilarityMeasurer();
 		SimilarityReport report = measurer.measure(materialization);
 		Linkage linkage = new CompleteLinkage(report);
 		Referee referee = new ComposedReferee(new BiggestClusterReferee(), new AnyClusterReferee());
-		ThresholdCriterion criterion = new SimilarityBasedCriterion(SIMILARITY_THRESHOLD);
+		ThresholdCriterion criterion = new SimilarityBasedCriterion(threshold);
 		TestCaseClusterer clusterer = new AgglomerativeHierarchicalClusteringTestCaseClusterer(linkage, referee, criterion);
 		Set<Cluster> clusters = clusterer.cluster(report);
 		TestClassNamingStrategy namingStrategy = new IncrementalTestClassNamingStrategy();
@@ -143,12 +149,12 @@ public class Experiment {
 		return cluster;
 	}
 
-	private static ExperimentRow measure(String strategy, List<TestClass> classes, SubjectData subject, long runtimeMillis) {
+	private static ExperimentRow measure(String strategy, BigDecimal globalThreshold, List<TestClass> classes, SubjectData subject, long runtimeMillis) {
 		StatementCount statementCount = countStatements(classes);
 		long attributes = classes.stream().mapToLong(testClass -> testClass.getFields().size()).sum();
 		long setupMethods = classes.stream().mapToLong(testClass -> testClass.getSetupMethods().size()).sum();
 		long testMethods = classes.stream().mapToLong(testClass -> testClass.getTestMethods().size()).sum();
-		return new ExperimentRow(strategy, subject.javaFiles, subject.skippedFiles.size(), classes.size(), attributes, setupMethods, testMethods, statementCount.statementCount, statementCount.uniqueDuplicateCount, statementCount.totalDuplicateCount, runtimeMillis);
+		return new ExperimentRow(strategy, globalThreshold, subject.javaFiles, subject.skippedFiles.size(), classes.size(), attributes, setupMethods, testMethods, statementCount.statementCount, statementCount.uniqueDuplicateCount, statementCount.totalDuplicateCount, runtimeMillis);
 	}
 
 	private static StatementCount countStatements(List<TestClass> testClasses) {
@@ -195,11 +201,12 @@ public class Experiment {
 	private static void writeSummary(List<ExperimentRow> rows) {
 		int originalTotalDuplicates = rows.get(0).totalDuplicates;
 		CommaSeparatedValues csv = new CommaSeparatedValues();
-		csv.addLine("Strategy", "Subject", "Java files", "Skipped files", "Classes", "Attributes", "Setup methods", "Test methods", "Statements", "Unique duplicates", "Total duplicates", "Total duplicate reduction", "Total duplicate reduction percent", "Runtime millis");
+		csv.addLine("Strategy", "Global threshold", "Subject", "Java files", "Skipped files", "Classes", "Attributes", "Setup methods", "Test methods", "Tests per class", "Statements", "Unique duplicates", "Total duplicates", "Total duplicate reduction", "Total duplicate reduction percent", "Runtime millis");
 		for (ExperimentRow row : rows) {
 			int reduction = originalTotalDuplicates - row.totalDuplicates;
 			BigDecimal reductionPercent = percentage(reduction, originalTotalDuplicates);
-			csv.addLine(row.strategy, SUBJECT, row.javaFiles, row.skippedFiles, row.classes, row.attributes, row.setupMethods, row.testMethods, row.statements, row.uniqueDuplicates, row.totalDuplicates, reduction, reductionPercent, row.runtimeMillis);
+			BigDecimal testsPerClass = ratio(row.testMethods, row.classes);
+			csv.addLine(row.strategy, formatThreshold(row.globalThreshold), SUBJECT, row.javaFiles, row.skippedFiles, row.classes, row.attributes, row.setupMethods, row.testMethods, testsPerClass, row.statements, row.uniqueDuplicates, row.totalDuplicates, reduction, reductionPercent, row.runtimeMillis);
 		}
 		new FolderUtils(RESULTS).writeContetAsString("summary.csv", csv.getContent());
 	}
@@ -213,7 +220,7 @@ public class Experiment {
 		new FolderUtils(RESULTS).writeContetAsString("skipped-files.csv", csv.getContent());
 	}
 
-	private static void writeConfiguration() {
+	private static void writeConfiguration(List<BigDecimal> globalThresholds) {
 		CommaSeparatedValues csv = new CommaSeparatedValues();
 		csv.addLine("Property", "Value");
 		csv.addLine("Subject", SUBJECT);
@@ -226,9 +233,29 @@ public class Experiment {
 		csv.addLine("Similarity metric", "LCCSS");
 		csv.addLine("Global linkage", "Complete linkage");
 		csv.addLine("Global referee", "ComposedReferee(BiggestClusterReferee, AnyClusterReferee)");
-		csv.addLine("Global threshold", SIMILARITY_THRESHOLD);
+		csv.addLine("Candidate global threshold", CANDIDATE_SIMILARITY_THRESHOLD);
+		csv.addLine("Global thresholds evaluated", joinThresholds(globalThresholds));
+		csv.addLine("Threshold list environment variable", GLOBAL_THRESHOLDS_ENVIRONMENT_VARIABLE);
 		csv.addLine("Local-only baseline", "Refactor each original test class independently without redistributing tests across classes");
 		new FolderUtils(RESULTS).writeContetAsString("configuration.csv", csv.getContent());
+	}
+
+	private static List<BigDecimal> getGlobalThresholds() {
+		String value = System.getenv(GLOBAL_THRESHOLDS_ENVIRONMENT_VARIABLE);
+		if (value == null || value.isBlank()) {
+			return DEFAULT_GLOBAL_THRESHOLDS;
+		}
+		List<BigDecimal> thresholds = new ArrayList<>();
+		for (String token : value.split(",")) {
+			String threshold = token.trim();
+			if (!threshold.isEmpty()) {
+				thresholds.add(new BigDecimal(threshold));
+			}
+		}
+		if (thresholds.isEmpty()) {
+			return DEFAULT_GLOBAL_THRESHOLDS;
+		}
+		return thresholds;
 	}
 
 	private static int getFileLimit() {
@@ -244,6 +271,28 @@ public class Experiment {
 			return BigDecimal.ZERO;
 		}
 		return BigDecimal.valueOf(numerator).multiply(BigDecimal.valueOf(100)).divide(BigDecimal.valueOf(denominator), 2, RoundingMode.HALF_UP);
+	}
+
+	private static BigDecimal ratio(long numerator, int denominator) {
+		if (denominator == 0) {
+			return BigDecimal.ZERO;
+		}
+		return BigDecimal.valueOf(numerator).divide(BigDecimal.valueOf(denominator), 2, RoundingMode.HALF_UP);
+	}
+
+	private static String joinThresholds(List<BigDecimal> thresholds) {
+		List<String> values = new ArrayList<>();
+		for (BigDecimal threshold : thresholds) {
+			values.add(formatThreshold(threshold));
+		}
+		return String.join(", ", values);
+	}
+
+	private static String formatThreshold(BigDecimal threshold) {
+		if (threshold == null) {
+			return "";
+		}
+		return threshold.stripTrailingZeros().toPlainString();
 	}
 
 	private static long elapsedMillis(long started) {
@@ -301,6 +350,7 @@ public class Experiment {
 	private static class ExperimentRow {
 
 		private final String strategy;
+		private final BigDecimal globalThreshold;
 		private final int javaFiles;
 		private final int skippedFiles;
 		private final int classes;
@@ -312,8 +362,9 @@ public class Experiment {
 		private final int totalDuplicates;
 		private final long runtimeMillis;
 
-		private ExperimentRow(String strategy, int javaFiles, int skippedFiles, int classes, long attributes, long setupMethods, long testMethods, int statements, int uniqueDuplicates, int totalDuplicates, long runtimeMillis) {
+		private ExperimentRow(String strategy, BigDecimal globalThreshold, int javaFiles, int skippedFiles, int classes, long attributes, long setupMethods, long testMethods, int statements, int uniqueDuplicates, int totalDuplicates, long runtimeMillis) {
 			this.strategy = strategy;
+			this.globalThreshold = globalThreshold;
 			this.javaFiles = javaFiles;
 			this.skippedFiles = skippedFiles;
 			this.classes = classes;
