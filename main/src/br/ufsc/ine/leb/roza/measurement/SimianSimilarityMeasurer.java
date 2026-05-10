@@ -33,7 +33,7 @@ public class SimianSimilarityMeasurer extends AbstractSimilarityMeasurer impleme
 
 	public SimianSimilarityMeasurer(SimianConfigurations configurations) {
 		this.configurations = configurations;
-		this.resultsFolder = "main/exec/measurer";
+		this.resultsFolder = "output/measurer";
 	}
 
 	@Override

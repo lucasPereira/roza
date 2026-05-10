@@ -71,13 +71,13 @@ class JplagConfigurationsTest {
 		assertEquals("-vl", configurations.getAllAsArguments().get(6));
 
 		assertEquals("-o", configurations.getAllAsArguments().get(7));
-		assertEquals("main/exec/measurer/log.txt", configurations.getAllAsArguments().get(8));
+		assertEquals("output/measurer/log.txt", configurations.getAllAsArguments().get(8));
 
 		assertEquals("-r", configurations.getAllAsArguments().get(9));
-		assertEquals("main/exec/measurer", configurations.getAllAsArguments().get(10));
+		assertEquals("output/measurer", configurations.getAllAsArguments().get(10));
 
 		assertEquals("-s", configurations.getAllAsArguments().get(11));
-		assertEquals("main/exec/materializer", configurations.getAllAsArguments().get(12));
+		assertEquals("output/materializer", configurations.getAllAsArguments().get(12));
 	}
 
 	@Test
@@ -98,13 +98,13 @@ class JplagConfigurationsTest {
 		assertEquals("-vl", configurations.getAllAsArguments().get(6));
 
 		assertEquals("-o", configurations.getAllAsArguments().get(7));
-		assertEquals("main/exec/measurer/log.txt", configurations.getAllAsArguments().get(8));
+		assertEquals("output/measurer/log.txt", configurations.getAllAsArguments().get(8));
 
 		assertEquals("-r", configurations.getAllAsArguments().get(9));
-		assertEquals("main/exec/measurer", configurations.getAllAsArguments().get(10));
+		assertEquals("output/measurer", configurations.getAllAsArguments().get(10));
 
 		assertEquals("-s", configurations.getAllAsArguments().get(11));
-		assertEquals("main/exec/materializer", configurations.getAllAsArguments().get(12));
+		assertEquals("output/materializer", configurations.getAllAsArguments().get(12));
 	}
 
 	@Test
@@ -116,7 +116,7 @@ class JplagConfigurationsTest {
 
 	@Test
 	void getConfigurations() {
-		assertEquals("main/exec/measurer", configurations.results());
+		assertEquals("output/measurer", configurations.results());
 	}
 
 }

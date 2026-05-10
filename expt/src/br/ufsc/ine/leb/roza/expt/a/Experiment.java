@@ -115,13 +115,13 @@ public class Experiment {
 	}
 
 	private static void evaluateMeasure(String fileName, SimilarityMeasurer measurer) {
-		new FolderUtils("main/exec/materializer").createEmptyFolder();
-		new FolderUtils("main/exec/measurer").createEmptyFolder();
+		new FolderUtils("output/materializer").createEmptyFolder();
+		new FolderUtils("output/measurer").createEmptyFolder();
 
 		TextFileLoader loader = new RecursiveTextFileLoader("expt/resources/a");
 		TestClassParser parser = new Junit5TestClassParser();
 		TestCaseExtractor extractor = new JunitTestCaseExtractor(List.of("assegurarTexto", "assegurarValor", "assegurarQuantidadeDeElementos", "assegurarConteudoDeArquivoBaixado", "assegurarNaoMarcado", "assegurarMarcado", "assegurarMarcacao"));
-		TestCaseMaterializer materializer = new Junit4WithoutAssertionsTestCaseMaterializer("main/exec/materializer");
+		TestCaseMaterializer materializer = new Junit4WithoutAssertionsTestCaseMaterializer("output/materializer");
 		List<TextFile> files = loader.load();
 		List<TestClass> testClasses = parser.parse(files);
 		List<TestCase> testCases = extractor.extract(testClasses);

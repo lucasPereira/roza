@@ -74,10 +74,10 @@ class DeckardConfigurationsTest {
 		assertEquals("export STRIDE=0", configurations.getAllAsArguments().get(1));
 		assertEquals("export SIMILARITY=1.0", configurations.getAllAsArguments().get(2));
 		assertEquals("export FILE_PATTERN=*.java", configurations.getAllAsArguments().get(3));
-		assertEquals("export SRC_DIR=" + new File("main/exec/materializer").getAbsolutePath(), configurations.getAllAsArguments().get(4));
-		assertEquals("export VECTOR_DIR=" + new File("main/exec/measurer/vectors").getAbsolutePath(), configurations.getAllAsArguments().get(5));
-		assertEquals("export CLUSTER_DIR=" + new File("main/exec/measurer/cluster").getAbsolutePath(), configurations.getAllAsArguments().get(6));
-		assertEquals("export TIME_DIR=" + new File("main/exec/measurer/times").getAbsolutePath(), configurations.getAllAsArguments().get(7));
+		assertEquals("export SRC_DIR=" + new File("output/materializer").getAbsolutePath(), configurations.getAllAsArguments().get(4));
+		assertEquals("export VECTOR_DIR=" + new File("output/measurer/vectors").getAbsolutePath(), configurations.getAllAsArguments().get(5));
+		assertEquals("export CLUSTER_DIR=" + new File("output/measurer/cluster").getAbsolutePath(), configurations.getAllAsArguments().get(6));
+		assertEquals("export TIME_DIR=" + new File("output/measurer/times").getAbsolutePath(), configurations.getAllAsArguments().get(7));
 		assertEquals("export DECKARD_DIR=tool", configurations.getAllAsArguments().get(8));
 		assertEquals("export VGEN_EXEC=tool/src/main/jvecgen", configurations.getAllAsArguments().get(9));
 		assertEquals("export GROUPING_EXEC=tool/src/vgen/vgrouping/runvectorsort", configurations.getAllAsArguments().get(10));
@@ -96,10 +96,10 @@ class DeckardConfigurationsTest {
 		assertEquals("export STRIDE=0", configurations.getAllAsArguments().get(1));
 		assertEquals("export SIMILARITY=1.0", configurations.getAllAsArguments().get(2));
 		assertEquals("export FILE_PATTERN=*.java", configurations.getAllAsArguments().get(3));
-		assertEquals("export SRC_DIR=" + "../../exec/materializer", configurations.getAllAsArguments().get(4));
-		assertEquals("export VECTOR_DIR=" + "../../exec/measurer/vectors", configurations.getAllAsArguments().get(5));
-		assertEquals("export CLUSTER_DIR=" + "../../exec/measurer/cluster", configurations.getAllAsArguments().get(6));
-		assertEquals("export TIME_DIR=" + "../../exec/measurer/times", configurations.getAllAsArguments().get(7));
+		assertEquals("export SRC_DIR=" + "../../../output/materializer", configurations.getAllAsArguments().get(4));
+		assertEquals("export VECTOR_DIR=" + "../../../output/measurer/vectors", configurations.getAllAsArguments().get(5));
+		assertEquals("export CLUSTER_DIR=" + "../../../output/measurer/cluster", configurations.getAllAsArguments().get(6));
+		assertEquals("export TIME_DIR=" + "../../../output/measurer/times", configurations.getAllAsArguments().get(7));
 		assertEquals("export DECKARD_DIR=tool", configurations.getAllAsArguments().get(8));
 		assertEquals("export VGEN_EXEC=tool/src/main/jvecgen", configurations.getAllAsArguments().get(9));
 		assertEquals("export GROUPING_EXEC=tool/src/vgen/vgrouping/runvectorsort", configurations.getAllAsArguments().get(10));
@@ -145,6 +145,6 @@ class DeckardConfigurationsTest {
 	@Test
 	void getConfigurations() {
 		DeckardConfigurations configurations = new DeckardConfigurations(true);
-		assertEquals(new File("main/exec/measurer/cluster").getAbsolutePath(), configurations.clusterDir());
+		assertEquals(new File("output/measurer/cluster").getAbsolutePath(), configurations.clusterDir());
 	}
 }

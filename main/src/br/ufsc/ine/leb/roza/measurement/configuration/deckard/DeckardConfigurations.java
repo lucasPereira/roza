@@ -15,8 +15,8 @@ public class DeckardConfigurations extends AbstractConfigurations implements Con
 	private final DeckardDoubleConfiguration similarity;
 	private final Boolean isDockerMode;
 
-	private static final String SRC_DIR_PATH = "exec/materializer";
-	private static final String RESULTS_DIR_PATH = "exec/measurer";
+	private static final String SRC_DIR_PATH = "output/materializer";
+	private static final String RESULTS_DIR_PATH = "output/measurer";
 	private static final String VECTOR_DIR_PATH =  RESULTS_DIR_PATH + "/vectors";
 	private static final String CLUSTER_DIR_PATH = RESULTS_DIR_PATH + "/cluster";
 	private static final String TIME_DIR_PATH= RESULTS_DIR_PATH + "/times";
@@ -76,9 +76,9 @@ public class DeckardConfigurations extends AbstractConfigurations implements Con
 
 	private String getPath(String path, Boolean useRelativePath) {
 		if (useRelativePath) {
-			return new File("../../" + path).getPath();
+			return new File("../../../" + path).getPath();
 		} else {
-			return new File("main/" + path).getAbsolutePath();
+			return new File(path).getAbsolutePath();
 		}
 	}
 

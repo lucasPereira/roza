@@ -21,9 +21,9 @@ class Junit4WithoutAssertionsTestCaseMaterializerTest {
 
 	@BeforeEach
 	void setup() {
-		new FolderUtils("main/exec/materializer").createEmptyFolder();
+		new FolderUtils("output/materializer").createEmptyFolder();
 		fileUtils = new FileUtils();
-		materializer = new Junit4WithoutAssertionsTestCaseMaterializer("main/exec/materializer");
+		materializer = new Junit4WithoutAssertionsTestCaseMaterializer("output/materializer");
 	}
 
 	@Test
@@ -41,12 +41,12 @@ class Junit4WithoutAssertionsTestCaseMaterializerTest {
 			"\t}\n" +
 			"}\n";
 
-		assertEquals("main/exec/materializer", report.getBaseFolder());
+		assertEquals("output/materializer", report.getBaseFolder());
 		assertEquals(1, materializations.size());
 		assertEquals(testCase, materializations.get(0).getTestCase());
 		assertEquals(7, materializations.get(0).getLength().intValue());
 		assertEquals("TestClass1ExampleTest.java", materializations.get(0).getFileName());
-		assertEquals("main/exec/materializer/TestClass1ExampleTest.java", materializations.get(0).getFilePath());
+		assertEquals("output/materializer/TestClass1ExampleTest.java", materializations.get(0).getFilePath());
 		assertEquals(generatedClass, fileUtils.readContetAsString(materializations.get(0).getFilePath()));
 	}
 
@@ -75,7 +75,7 @@ class Junit4WithoutAssertionsTestCaseMaterializerTest {
 			"\t}\n" +
 			"}\n";
 
-		assertEquals("main/exec/materializer", report.getBaseFolder());
+		assertEquals("output/materializer", report.getBaseFolder());
 		assertEquals(2, materializations.size());
 		assertEquals(7, materializations.get(0).getLength().intValue());
 		assertEquals(7, materializations.get(1).getLength().intValue());
@@ -83,8 +83,8 @@ class Junit4WithoutAssertionsTestCaseMaterializerTest {
 		assertEquals(testCase2, materializations.get(1).getTestCase());
 		assertEquals("TestClass1Example1Test.java", materializations.get(0).getFileName());
 		assertEquals("TestClass2Example2Test.java", materializations.get(1).getFileName());
-		assertEquals("main/exec/materializer/TestClass1Example1Test.java", materializations.get(0).getFilePath());
-		assertEquals("main/exec/materializer/TestClass2Example2Test.java", materializations.get(1).getFilePath());
+		assertEquals("output/materializer/TestClass1Example1Test.java", materializations.get(0).getFilePath());
+		assertEquals("output/materializer/TestClass2Example2Test.java", materializations.get(1).getFilePath());
 		assertEquals(generatedClass1, fileUtils.readContetAsString(materializations.get(0).getFilePath()));
 		assertEquals(generatedClass2, fileUtils.readContetAsString(materializations.get(1).getFilePath()));
 	}
@@ -114,7 +114,7 @@ class Junit4WithoutAssertionsTestCaseMaterializerTest {
 			"\t}\n" +
 			"}\n";
 
-		assertEquals("main/exec/materializer", report.getBaseFolder());
+		assertEquals("output/materializer", report.getBaseFolder());
 		assertEquals(2, materializations.size());
 		assertEquals(7, materializations.get(0).getLength().intValue());
 		assertEquals(7, materializations.get(1).getLength().intValue());
@@ -122,8 +122,8 @@ class Junit4WithoutAssertionsTestCaseMaterializerTest {
 		assertEquals(testCase2, materializations.get(1).getTestCase());
 		assertEquals("TestClass1ExampleTest.java", materializations.get(0).getFileName());
 		assertEquals("TestClass2ExampleTest.java", materializations.get(1).getFileName());
-		assertEquals("main/exec/materializer/TestClass1ExampleTest.java", materializations.get(0).getFilePath());
-		assertEquals("main/exec/materializer/TestClass2ExampleTest.java", materializations.get(1).getFilePath());
+		assertEquals("output/materializer/TestClass1ExampleTest.java", materializations.get(0).getFilePath());
+		assertEquals("output/materializer/TestClass2ExampleTest.java", materializations.get(1).getFilePath());
 		assertEquals(generatedClass1, fileUtils.readContetAsString(materializations.get(0).getFilePath()));
 		assertEquals(generatedClass2, fileUtils.readContetAsString(materializations.get(1).getFilePath()));
 	}

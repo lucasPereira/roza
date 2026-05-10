@@ -48,12 +48,12 @@ import java.util.Set;
 public class Experiment {
 
 	public static void main(String[] args) {
-		new FolderUtils("main/exec/materializer").createEmptyFolder();
+		new FolderUtils("output/materializer").createEmptyFolder();
 		TextFileLoader loader = new RecursiveTextFileLoader("expt/resources/c");
 		TextFileSelector selector = new JavaExtensionTextFileSelector();
 		TestClassParser parser = new Junit4TestClassParser();
 		TestCaseExtractor extractor = new Junit4TestCaseExtractor();
-		TestCaseMaterializer materializer = new Junit4WithAssertionsTestCaseMaterializer("main/exec/materializer");
+		TestCaseMaterializer materializer = new Junit4WithAssertionsTestCaseMaterializer("output/materializer");
 		SimilarityMeasurer measurer = new LccssSimilarityMeasurer();
 		List<TextFile> files = loader.load();
 		List<TextFile> selected = selector.select(files);

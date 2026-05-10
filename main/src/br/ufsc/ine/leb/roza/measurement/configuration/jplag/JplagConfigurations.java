@@ -21,10 +21,10 @@ public class JplagConfigurations extends AbstractConfigurations implements Confi
 		log = new JplagStringConfiguration("o", null, "Output file of the parser log");
 		sources = new JplagStringConfiguration("s", null, "Look at files in subfolders too");
 
-		String measurerFolder = "main/exec/measurer";
+		String measurerFolder = "output/measurer";
 		results.setValue(measurerFolder);
 		log.setValue(new File(measurerFolder, "log.txt").getPath());
-		sources.setValue("main/exec/materializer");
+		sources.setValue("output/materializer");
 	}
 
 	@Override

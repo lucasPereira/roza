@@ -26,9 +26,9 @@ public class JUnit4TestClassWriterTest {
 	@BeforeEach
 	void setup() {
 		fileUtils = new FileUtils();
-		folderUtils = new FolderUtils("main/exec/writer");
+		folderUtils = new FolderUtils("output/writer");
 		folderUtils.createEmptyFolder();
-		writer = new Junit4TestClassWriter("main/exec/writer");
+		writer = new Junit4TestClassWriter("output/writer");
 	}
 
 	@Test

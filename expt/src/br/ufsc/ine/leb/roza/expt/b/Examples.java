@@ -36,7 +36,7 @@ import br.ufsc.ine.leb.roza.utils.comparator.SimilarityAssessmentComparatorBySou
 public class Examples {
 
 	public static void main(String[] args) {
-		new FolderUtils("main/exec/materializer").createEmptyFolder();
+		new FolderUtils("output/materializer").createEmptyFolder();
 		FolderUtils folderUtils = new FolderUtils("expt/results/b");
 		folderUtils.createEmptyFolder();
 		CommaSeparatedValues csv = new CommaSeparatedValues();
@@ -59,7 +59,7 @@ public class Examples {
 		TextFileSelector selector = new JavaExtensionTextFileSelector();
 		TestClassParser parser = new Junit4TestClassParser();
 		TestCaseExtractor extractor = new Junit4TestCaseExtractor();
-		TestCaseMaterializer materializer = new Junit4WithoutAssertionsTestCaseMaterializer("main/exec/materializer");
+		TestCaseMaterializer materializer = new Junit4WithoutAssertionsTestCaseMaterializer("output/materializer");
 
 		List<TextFile> files = loader.load();
 		List<TextFile> selected = selector.select(files);
@@ -69,7 +69,7 @@ public class Examples {
 	}
 
 	private static void includeMetric(CommaSeparatedValues csv, MaterializationReport materialization, String metric, SimilarityMeasurer measurer) {
-		new FolderUtils("main/exec/measurer").createEmptyFolder();
+		new FolderUtils("output/measurer").createEmptyFolder();
 		FormatterUtils formatterUtils = new FormatterUtils();
 		Comparator<SimilarityAssessment> comparator = new SimilarityAssessmentComparatorBySourceAndTargetNames();
 		SimilarityReport report = measurer.measure(materialization).sort(comparator).removeReflexives();

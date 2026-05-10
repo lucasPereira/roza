@@ -43,7 +43,7 @@ import java.util.stream.Stream;
 
 public class Experiment {
 	public static void main(String[] args) {
-		FolderUtils materializerFolderUtils = new FolderUtils("main/exec/materializer");
+		FolderUtils materializerFolderUtils = new FolderUtils("output/materializer");
 		materializerFolderUtils.createEmptyFolder();
 
 		FolderUtils resultsFolderUtils = new FolderUtils("expt/results/e");

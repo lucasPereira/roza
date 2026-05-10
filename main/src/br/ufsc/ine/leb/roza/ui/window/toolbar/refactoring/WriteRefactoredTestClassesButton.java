@@ -28,7 +28,7 @@ public class WriteRefactoredTestClassesButton implements UiComponent {
 		toolbar.addComponent(button);
 		button.addActionListener(event -> {
 			JFileChooser chooser = new JFileChooser();
-			chooser.setCurrentDirectory(new File("main/exec/writer"));
+			chooser.setCurrentDirectory(new File("output/writer"));
 			chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 			chooser.setAcceptAllFileFilterUsed(false);
 			chooser.setMultiSelectionEnabled(false);

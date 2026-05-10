@@ -53,7 +53,7 @@ public class Experiment {
 	private static final String SOURCE_COMMIT = "19e2d568a4ee4910ff470eba40ec040673195d7d";
 	private static final String SUBJECT_TESTS = "expt/resources/h";
 	private static final String RESULTS = "expt/results/h";
-	private static final String MATERIALIZER_OUTPUT = "main/exec/materializer/h";
+	private static final String MATERIALIZER_OUTPUT = "output/materializer/h";
 	private static final String FILE_LIMIT_ENVIRONMENT_VARIABLE = "ROZA_EXPERIMENT_H_MAX_FILES";
 	private static final BigDecimal SIMILARITY_THRESHOLD = BigDecimal.valueOf(0.4);
 

@@ -21,4 +21,4 @@ java -jar simian-2.5.10.jar \
 	-ignoreModifiers+ \
 	-balanceParentheses+ \
 	-balanceSquareBrackets+ \
-	../../exec/materializer/*.java >> ../../exec/measurer/report.xml
+	../../../output/materializer/*.java >> ../../../output/measurer/report.xml

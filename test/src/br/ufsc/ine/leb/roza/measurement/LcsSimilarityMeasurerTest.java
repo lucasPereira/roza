@@ -24,9 +24,9 @@ class LcsSimilarityMeasurerTest {
 
 	@BeforeEach
 	void setup() {
-		new FolderUtils("main/exec/materializer").createEmptyFolder();
-		new FolderUtils("main/exec/measurer").createEmptyFolder();
-		materializer = new Junit4WithAssertionsTestCaseMaterializer("main/exec/materializer");
+		new FolderUtils("output/materializer").createEmptyFolder();
+		new FolderUtils("output/measurer").createEmptyFolder();
+		materializer = new Junit4WithAssertionsTestCaseMaterializer("output/materializer");
 		measurer = new LcsSimilarityMeasurer();
 	}
 

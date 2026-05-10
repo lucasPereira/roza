@@ -2,7 +2,7 @@
 bin/
 build/
 
-main/exec/materializer/
-main/exec/measurer/
-main/exec/writer/
+output/materializer/
+output/measurer/
+output/writer/
 main/tools/deckard/tool/

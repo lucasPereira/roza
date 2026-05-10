@@ -48,7 +48,7 @@ public class Manager {
 	public Manager() {}
 
 	public List<TestClass> loadClasses(List<File> files) {
-		new FolderUtils("main/exec/materializer").createEmptyFolder();
+		new FolderUtils("output/materializer").createEmptyFolder();
 		TextFileLoader loader = new ProgrammaticTextFileLoader(files);
 		TextFileSelector selector = new JavaExtensionTextFileSelector();
 		List<TextFile> textFiles = loader.load();
@@ -63,9 +63,9 @@ public class Manager {
 	}
 
 	public SimilarityReport measureTestCases() {
-		new FolderUtils("main/exec/materializer").createEmptyFolder();
-		new FolderUtils("main/exec/measurer").createEmptyFolder();
-		TestCaseMaterializer materializer = new Junit4WithoutAssertionsTestCaseMaterializer("main/exec/materializer");
+		new FolderUtils("output/materializer").createEmptyFolder();
+		new FolderUtils("output/measurer").createEmptyFolder();
+		TestCaseMaterializer materializer = new Junit4WithoutAssertionsTestCaseMaterializer("output/materializer");
 		MaterializationReport materializationReport = materializer.materialize(testCases);
 		similarityReport = measurer.measure(materializationReport);
 		return similarityReport;

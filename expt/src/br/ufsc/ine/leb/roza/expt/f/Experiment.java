@@ -75,7 +75,7 @@ public class Experiment {
 
 		for (int project = 1; project <= 47; project++) {
 			try {
-				new FolderUtils("main/exec/materializer").createEmptyFolder();
+				new FolderUtils("output/materializer").createEmptyFolder();
 
 				TextFileLoader loader = new RecursiveTextFileLoader("expt/resources/f/p" + project + "/original");
 				List<TextFile> files = loader.load();
@@ -89,7 +89,7 @@ public class Experiment {
 				TestCaseExtractor extractor = new Junit4TestCaseExtractor();
 				List<TestCase> tests = extractor.extract(classes);
 
-				TestCaseMaterializer materializer = new Junit4WithoutAssertionsTestCaseMaterializer("main/exec/materializer");
+				TestCaseMaterializer materializer = new Junit4WithoutAssertionsTestCaseMaterializer("output/materializer");
 				MaterializationReport materialization = materializer.materialize(tests);
 
 				SimilarityMeasurer measurer = new LccssSimilarityMeasurer();
