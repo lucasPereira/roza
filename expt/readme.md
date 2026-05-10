@@ -14,13 +14,13 @@ Experiment `b` is a compact example of how Róża computes similarity between te
 
 The output file `expt/results/b/examples.csv` contains the generated similarity matrix, making this experiment useful for inspecting the measurement process on a small and easy-to-read dataset.
 
-## `c`: clustering configurations on the SAAS project
+## `c`: configuration-sensitivity study on the SAAS project
 
-Experiment `c` evaluates how different clustering configurations affect refactoring results for the implicit setup strategy. It reads the source test classes from `expt/resources/c`, measures similarity with LCCSS, and combines linkage strategies, referee strategies, and stopping criteria in `expt/src/br/ufsc/ine/leb/roza/expt/c/Experiment.java`.
+Experiment `c` evaluates how different clustering configurations affect reuse-oriented refactoring results for the implicit setup strategy. It reads the source test classes from `expt/resources/c`, measures similarity with LCCSS, and combines linkage strategies, referee strategies, and stopping criteria in `expt/src/br/ufsc/ine/leb/roza/expt/c/Experiment.java`.
 
 The file `expt/results/c/original.csv` contains the baseline metrics for the original test classes, including the number of classes, tests, statements, unique duplicated statements, and total duplicated statements. The file `expt/results/c/refactored.csv` contains the corresponding metrics after refactoring for each clustering configuration, allowing the configurations to be compared by their effect on code reuse.
 
-## `d`: reuse measurement on 16 student programs
+## `d`: multi-project refactoring study on 16 student programs
 
 Experiment `d` measures reuse after automatically refactoring 16 undergraduate student programs. The original projects are stored in `expt/resources/d`, and `expt/src/br/ufsc/ine/leb/roza/expt/d/Experiment.java` executes the refactoring using LCCSS, average linkage, the any-cluster referee, and a similarity-based threshold criterion of 0.4.
 
@@ -32,9 +32,9 @@ Experiment `e` is a banking-system use case that demonstrates the complete refac
 
 The file `expt/results/e/similarity-matrix.csv` contains the pairwise similarity scores used by the clustering stage. The files `expt/results/e/RefactoredTestClass1.java` and `expt/results/e/RefactoredTestClass2.java` contain the refactored test classes produced by Róża.
 
-## `f`: reuse measurement on 47 student programs
+## `f`: multi-project refactoring study on 47 student programs
 
-Experiment `f` extends the reuse measurement from experiment `d` to 47 undergraduate student programs. The projects are stored in `expt/resources/f`, and `expt/src/br/ufsc/ine/leb/roza/expt/f/Experiment.java` executes the refactoring with LCCSS, complete linkage, a composed referee that first prioritizes the biggest cluster and then falls back to any cluster, and a similarity-based threshold criterion of 0.4.
+Experiment `f` evaluates whether applying the selected Roza configuration reduces duplicated statements across 47 undergraduate student programs. The projects are stored in `expt/resources/f`, and `expt/src/br/ufsc/ine/leb/roza/expt/f/Experiment.java` executes the refactoring with LCCSS, complete linkage, a composed referee that first prioritizes the biggest cluster and then falls back to any cluster, and a similarity-based threshold criterion of 0.4.
 
 The experiment writes the generated refactored classes into the corresponding `refactored` folders under `expt/resources/f`. The file `expt/results/f/results.csv` contains before-and-after metrics for each project, including classes, attributes, setup methods, test methods, statements, unique duplicated statements, and total duplicated statements.
 
