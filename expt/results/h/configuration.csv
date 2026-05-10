@@ -1,0 +1,13 @@
+Property;Value
+Subject;Apache Commons Lang
+Source repository;https://github.com/apache/commons-lang
+Source commit;19e2d568a4ee4910ff470eba40ec040673195d7d
+Source folder;src/test/java/org/apache/commons/lang3
+Roza resource folder;expt/resources/h
+File limit environment variable;ROZA_EXPERIMENT_H_MAX_FILES
+File limit value;all
+Similarity metric;LCCSS
+Global linkage;Complete linkage
+Global referee;ComposedReferee(BiggestClusterReferee, AnyClusterReferee)
+Global threshold;0.4
+Local-only baseline;Refactor each original test class independently without redistributing tests across classes

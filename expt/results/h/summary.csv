@@ -1,0 +1,4 @@
+Strategy;Subject;Java files;Skipped files;Classes;Attributes;Setup methods;Test methods;Statements;Unique duplicates;Total duplicates;Total duplicate reduction;Total duplicate reduction percent;Runtime millis
+Original;Apache Commons Lang;328;2;276;739;40;4683;13573;1619;4792;0;0.00;0
+Local-only refactoring;Apache Commons Lang;328;2;276;90;43;4683;13541;1616;4760;32;0.67;417
+Roza global clustering;Apache Commons Lang;328;2;3441;555;333;4683;12912;1244;4052;740;15.44;34854

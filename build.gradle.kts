@@ -100,6 +100,8 @@ registerExperimentTask("runExperimentF", "Runs experiment f, which measures reus
 
 registerExperimentTask("runExperimentG", "Runs experiment g, which benchmarks baseline and optimized clustering scalability on Apache Commons Lang.", "br.ufsc.ine.leb.roza.expt.g.Experiment")
 
+registerExperimentTask("runExperimentH", "Runs experiment h, which compares original, local-only, and global refactoring on Apache Commons Lang.", "br.ufsc.ine.leb.roza.expt.h.Experiment")
+
 spotless {
     java {
         target("main/src/**/*.java", "test/src/**/*.java", "expt/src/**/*.java")
