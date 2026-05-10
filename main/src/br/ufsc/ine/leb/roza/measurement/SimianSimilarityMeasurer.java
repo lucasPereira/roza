@@ -82,7 +82,7 @@ public class SimianSimilarityMeasurer extends AbstractSimilarityMeasurer impleme
 		List<String> arguments = new LinkedList<>();
 		arguments.add("java");
 		arguments.add("-jar");
-		arguments.add("main/tools/simian/simian-2.5.10.jar");
+		arguments.add("external-tools/simian/simian-2.5.10.jar");
 		arguments.addAll(configurations.getAllAsArguments());
 		arguments.add(new File(materializationReport.getBaseFolder(), "*.java").getPath());
 		processUtils.execute(fileReport, arguments);

@@ -87,7 +87,7 @@ public class JplagSimilarityMeasurer extends AbstractSimilarityMeasurer implemen
 		List<String> arguments = new LinkedList<>();
 		arguments.add("java");
 		arguments.add("-jar");
-		arguments.add("main/tools/jplag/jplag-2.11.9.jar");
+		arguments.add("external-tools/jplag/jplag-2.11.9.jar");
 		arguments.addAll(configurations.getAllAsArguments());
 		processUtils.execute(arguments);
 	}

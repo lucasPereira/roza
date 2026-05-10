@@ -76,7 +76,7 @@ public class DeckardConfigurations extends AbstractConfigurations implements Con
 
 	private String getPath(String path, Boolean useRelativePath) {
 		if (useRelativePath) {
-			return new File("../../../" + path).getPath();
+			return new File("../../" + path).getPath();
 		} else {
 			return new File(path).getAbsolutePath();
 		}

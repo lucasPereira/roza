@@ -94,16 +94,16 @@ public class DeckardSimilarityMeasurer extends AbstractSimilarityMeasurer implem
 	}
 
 	private void run() {
-		FolderUtils folderUtils = new FolderUtils("main/tools/deckard");
+		FolderUtils folderUtils = new FolderUtils("external-tools/deckard");
 		String argumentsText = configurations.getAllAsArguments().stream().collect(Collectors.joining(System.lineSeparator()));
 		String argumentsScript = String.format("#!/bin/sh\n%s", argumentsText);
 		folderUtils.writeContetAsString("config", argumentsScript);
 		ProcessUtils processUtils = new ProcessUtils(true, true, true, false);
 		try {
 			if (configurations.isDockerMode()) {
-				processUtils.execute(new File("main/tools/deckard"), "./execute-using-docker.sh");
+				processUtils.execute(new File("external-tools/deckard"), "./execute-using-docker.sh");
 			} else {
-				processUtils.execute(new File("main/tools/deckard"), "./execute.sh");
+				processUtils.execute(new File("external-tools/deckard"), "./execute.sh");
 			}
 		} finally {
 			folderUtils.removeFile("config");
