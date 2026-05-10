@@ -1,0 +1,28 @@
+package br.ufsc.ine.leb.roza.core.clustering;
+
+import java.math.BigDecimal;
+
+import br.ufsc.ine.leb.roza.core.exceptions.InvalidThresholdException;
+
+public class SimilarityBasedCriterion implements ThresholdCriterion {
+
+	private final BigDecimal threshold;
+
+	public SimilarityBasedCriterion(BigDecimal threshold) {
+		if (BigDecimal.ZERO.compareTo(threshold) > 0 || BigDecimal.ONE.compareTo(threshold) < 0) {
+			throw new InvalidThresholdException();
+		}
+		this.threshold = threshold;
+	}
+
+	@Override
+	public Boolean shouldStop(Integer nextLevel, Combination combinationToNext, BigDecimal evaluationToNext) {
+		return threshold.compareTo(evaluationToNext) >= 0;
+	}
+
+	@Override
+	public String toString() {
+		return String.format("%s", threshold);
+	}
+
+}

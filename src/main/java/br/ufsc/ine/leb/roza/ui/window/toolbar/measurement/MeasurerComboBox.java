@@ -4,14 +4,14 @@ import java.util.List;
 
 import javax.swing.JComboBox;
 
-import br.ufsc.ine.leb.roza.measurement.DeckardSimilarityMeasurer;
-import br.ufsc.ine.leb.roza.measurement.JplagSimilarityMeasurer;
-import br.ufsc.ine.leb.roza.measurement.LccssSimilarityMeasurer;
-import br.ufsc.ine.leb.roza.measurement.LcsSimilarityMeasurer;
-import br.ufsc.ine.leb.roza.measurement.SimianSimilarityMeasurer;
-import br.ufsc.ine.leb.roza.measurement.configuration.deckard.DeckardConfigurations;
-import br.ufsc.ine.leb.roza.measurement.configuration.jplag.JplagConfigurations;
-import br.ufsc.ine.leb.roza.measurement.configuration.simian.SimianConfigurations;
+import br.ufsc.ine.leb.roza.core.measurement.DeckardSimilarityMeasurer;
+import br.ufsc.ine.leb.roza.core.measurement.JplagSimilarityMeasurer;
+import br.ufsc.ine.leb.roza.core.measurement.LccssSimilarityMeasurer;
+import br.ufsc.ine.leb.roza.core.measurement.LcsSimilarityMeasurer;
+import br.ufsc.ine.leb.roza.core.measurement.SimianSimilarityMeasurer;
+import br.ufsc.ine.leb.roza.core.measurement.configuration.deckard.DeckardConfigurations;
+import br.ufsc.ine.leb.roza.core.measurement.configuration.jplag.JplagConfigurations;
+import br.ufsc.ine.leb.roza.core.measurement.configuration.simian.SimianConfigurations;
 import br.ufsc.ine.leb.roza.ui.Hub;
 import br.ufsc.ine.leb.roza.ui.Manager;
 import br.ufsc.ine.leb.roza.ui.UiComponent;

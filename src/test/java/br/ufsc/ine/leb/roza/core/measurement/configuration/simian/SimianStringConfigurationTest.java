@@ -1,0 +1,45 @@
+package br.ufsc.ine.leb.roza.core.measurement.configuration.simian;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.util.LinkedList;
+import java.util.List;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+class SimianStringConfigurationTest {
+
+	private SimianStringConfiguration configuration;
+	private List<String> arguments;
+
+	@BeforeEach
+	void setup() {
+		configuration = new SimianStringConfiguration("language", "java", "Assumes all files are in the specified language");
+		arguments = new LinkedList<>();
+	}
+
+	@Test
+	void nameAndDescription() {
+		assertEquals("language", configuration.getName());
+		assertEquals("Assumes all files are in the specified language", configuration.getDescription());
+	}
+
+	@Test
+	void create() {
+		configuration.addArgument(arguments);
+		assertEquals("java", configuration.getValue());
+		assertEquals(1, arguments.size());
+		assertEquals("-language=java", arguments.get(0));
+	}
+
+	@Test
+	void change() {
+		configuration.setValue("ruby");
+		configuration.addArgument(arguments);
+		assertEquals("ruby", configuration.getValue());
+		assertEquals(1, arguments.size());
+		assertEquals("-language=ruby", arguments.get(0));
+	}
+
+}

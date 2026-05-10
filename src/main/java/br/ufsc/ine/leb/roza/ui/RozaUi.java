@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Queue;
 
 import br.ufsc.ine.leb.roza.ui.window.Window;
-import br.ufsc.ine.leb.roza.utils.RozaLogger;
+import br.ufsc.ine.leb.roza.core.utils.RozaLogger;
 
 public class RozaUi {
 

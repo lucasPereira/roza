@@ -4,23 +4,23 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import br.ufsc.ine.leb.roza.Statement;
-import br.ufsc.ine.leb.roza.TestCase;
-import br.ufsc.ine.leb.roza.TestClass;
-import br.ufsc.ine.leb.roza.TextFile;
-import br.ufsc.ine.leb.roza.extraction.JunitTestCaseExtractor;
-import br.ufsc.ine.leb.roza.extraction.TestCaseExtractor;
-import br.ufsc.ine.leb.roza.loading.RecursiveTextFileLoader;
-import br.ufsc.ine.leb.roza.loading.TextFileLoader;
-import br.ufsc.ine.leb.roza.measurement.matrix.Matrix;
-import br.ufsc.ine.leb.roza.measurement.matrix.MatrixElementToKeyConverter;
-import br.ufsc.ine.leb.roza.measurement.matrix.MatrixIntegerValueFactory;
-import br.ufsc.ine.leb.roza.measurement.matrix.MatrixPair;
-import br.ufsc.ine.leb.roza.measurement.matrix.MatrixTestCaseToStringConverter;
-import br.ufsc.ine.leb.roza.measurement.matrix.MatrixValueFactory;
-import br.ufsc.ine.leb.roza.parsing.Junit5TestClassParser;
-import br.ufsc.ine.leb.roza.parsing.TestClassParser;
-import br.ufsc.ine.leb.roza.utils.RozaLogger;
+import br.ufsc.ine.leb.roza.core.Statement;
+import br.ufsc.ine.leb.roza.core.TestCase;
+import br.ufsc.ine.leb.roza.core.TestClass;
+import br.ufsc.ine.leb.roza.core.TextFile;
+import br.ufsc.ine.leb.roza.core.extraction.JunitTestCaseExtractor;
+import br.ufsc.ine.leb.roza.core.extraction.TestCaseExtractor;
+import br.ufsc.ine.leb.roza.core.loading.RecursiveTextFileLoader;
+import br.ufsc.ine.leb.roza.core.loading.TextFileLoader;
+import br.ufsc.ine.leb.roza.core.measurement.matrix.Matrix;
+import br.ufsc.ine.leb.roza.core.measurement.matrix.MatrixElementToKeyConverter;
+import br.ufsc.ine.leb.roza.core.measurement.matrix.MatrixIntegerValueFactory;
+import br.ufsc.ine.leb.roza.core.measurement.matrix.MatrixPair;
+import br.ufsc.ine.leb.roza.core.measurement.matrix.MatrixTestCaseToStringConverter;
+import br.ufsc.ine.leb.roza.core.measurement.matrix.MatrixValueFactory;
+import br.ufsc.ine.leb.roza.core.parsing.Junit5TestClassParser;
+import br.ufsc.ine.leb.roza.core.parsing.TestClassParser;
+import br.ufsc.ine.leb.roza.core.utils.RozaLogger;
 
 public class GroundTruth {
 

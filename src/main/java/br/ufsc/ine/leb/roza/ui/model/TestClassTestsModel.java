@@ -4,8 +4,8 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import br.ufsc.ine.leb.roza.TestClass;
-import br.ufsc.ine.leb.roza.TestMethod;
+import br.ufsc.ine.leb.roza.core.TestClass;
+import br.ufsc.ine.leb.roza.core.TestMethod;
 
 public class TestClassTestsModel extends TestClassAbstractModel<TestMethod> {
 

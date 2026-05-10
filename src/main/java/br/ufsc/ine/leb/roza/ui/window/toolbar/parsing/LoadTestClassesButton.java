@@ -8,7 +8,7 @@ import javax.swing.JFileChooser;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import br.ufsc.ine.leb.roza.TestClass;
+import br.ufsc.ine.leb.roza.core.TestClass;
 import br.ufsc.ine.leb.roza.ui.Hub;
 import br.ufsc.ine.leb.roza.ui.Manager;
 import br.ufsc.ine.leb.roza.ui.UiComponent;

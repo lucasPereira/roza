@@ -11,16 +11,16 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-import br.ufsc.ine.leb.roza.Cluster;
-import br.ufsc.ine.leb.roza.TestCase;
-import br.ufsc.ine.leb.roza.clustering.Level;
+import br.ufsc.ine.leb.roza.core.Cluster;
+import br.ufsc.ine.leb.roza.core.TestCase;
+import br.ufsc.ine.leb.roza.core.clustering.Level;
 import br.ufsc.ine.leb.roza.ui.Hub;
 import br.ufsc.ine.leb.roza.ui.Manager;
 import br.ufsc.ine.leb.roza.ui.UiComponent;
 import br.ufsc.ine.leb.roza.ui.shared.WrapLayout;
-import br.ufsc.ine.leb.roza.utils.Ring;
-import br.ufsc.ine.leb.roza.utils.comparator.ClusterComparatorBySizeAndTestName;
-import br.ufsc.ine.leb.roza.utils.comparator.TestCaseComparatorByName;
+import br.ufsc.ine.leb.roza.core.utils.Ring;
+import br.ufsc.ine.leb.roza.core.utils.comparator.ClusterComparatorBySizeAndTestName;
+import br.ufsc.ine.leb.roza.core.utils.comparator.TestCaseComparatorByName;
 
 public class ClustersPanel implements UiComponent {
 

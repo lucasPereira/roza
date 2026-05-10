@@ -5,9 +5,9 @@ import java.util.stream.Collectors;
 
 import javax.swing.JButton;
 
-import br.ufsc.ine.leb.roza.TestCase;
-import br.ufsc.ine.leb.roza.clustering.Level;
-import br.ufsc.ine.leb.roza.exceptions.ClusteringLevelGenerationException;
+import br.ufsc.ine.leb.roza.core.TestCase;
+import br.ufsc.ine.leb.roza.core.clustering.Level;
+import br.ufsc.ine.leb.roza.core.exceptions.ClusteringLevelGenerationException;
 import br.ufsc.ine.leb.roza.ui.Hub;
 import br.ufsc.ine.leb.roza.ui.Manager;
 import br.ufsc.ine.leb.roza.ui.UiComponent;

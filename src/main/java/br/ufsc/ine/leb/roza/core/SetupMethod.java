@@ -1,0 +1,23 @@
+package br.ufsc.ine.leb.roza.core;
+
+import java.util.List;
+
+public class SetupMethod {
+
+	private final String name;
+	private final List<Statement> statements;
+
+	public SetupMethod(String name, List<Statement> statements) {
+		this.name = name;
+		this.statements = statements;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public List<Statement> getStatements() {
+		return statements;
+	}
+
+}

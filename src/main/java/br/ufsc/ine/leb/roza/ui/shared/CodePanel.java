@@ -8,8 +8,8 @@ import javax.swing.text.Document;
 import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.StyleSheet;
 
-import br.ufsc.ine.leb.roza.Statement;
-import br.ufsc.ine.leb.roza.TestCase;
+import br.ufsc.ine.leb.roza.core.Statement;
+import br.ufsc.ine.leb.roza.core.TestCase;
 
 public class CodePanel extends JScrollPane {
 

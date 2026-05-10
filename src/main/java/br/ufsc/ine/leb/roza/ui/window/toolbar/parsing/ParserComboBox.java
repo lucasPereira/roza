@@ -4,8 +4,8 @@ import java.util.List;
 
 import javax.swing.JComboBox;
 
-import br.ufsc.ine.leb.roza.parsing.Junit4TestClassParser;
-import br.ufsc.ine.leb.roza.parsing.Junit5TestClassParser;
+import br.ufsc.ine.leb.roza.core.parsing.Junit4TestClassParser;
+import br.ufsc.ine.leb.roza.core.parsing.Junit5TestClassParser;
 import br.ufsc.ine.leb.roza.ui.Hub;
 import br.ufsc.ine.leb.roza.ui.Manager;
 import br.ufsc.ine.leb.roza.ui.UiComponent;

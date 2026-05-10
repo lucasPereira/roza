@@ -13,15 +13,15 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingConstants;
 
-import br.ufsc.ine.leb.roza.SimilarityAssessment;
-import br.ufsc.ine.leb.roza.SimilarityReport;
-import br.ufsc.ine.leb.roza.TestCase;
+import br.ufsc.ine.leb.roza.core.SimilarityAssessment;
+import br.ufsc.ine.leb.roza.core.SimilarityReport;
+import br.ufsc.ine.leb.roza.core.TestCase;
 import br.ufsc.ine.leb.roza.ui.Hub;
 import br.ufsc.ine.leb.roza.ui.Manager;
 import br.ufsc.ine.leb.roza.ui.UiComponent;
 import br.ufsc.ine.leb.roza.ui.model.TestCaseRenderer;
-import br.ufsc.ine.leb.roza.utils.FormatterUtils;
-import br.ufsc.ine.leb.roza.utils.ReportUtils;
+import br.ufsc.ine.leb.roza.core.utils.FormatterUtils;
+import br.ufsc.ine.leb.roza.core.utils.ReportUtils;
 
 public class SelectTestCasesMeasurementPanel implements UiComponent {
 

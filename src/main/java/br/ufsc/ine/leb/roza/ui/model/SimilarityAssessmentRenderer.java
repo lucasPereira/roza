@@ -7,8 +7,8 @@ import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 
-import br.ufsc.ine.leb.roza.SimilarityAssessment;
-import br.ufsc.ine.leb.roza.utils.FormatterUtils;
+import br.ufsc.ine.leb.roza.core.SimilarityAssessment;
+import br.ufsc.ine.leb.roza.core.utils.FormatterUtils;
 
 public class SimilarityAssessmentRenderer implements TableCellRenderer {
 

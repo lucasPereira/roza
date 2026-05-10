@@ -7,11 +7,11 @@ import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.SwingUtilities;
 
-import br.ufsc.ine.leb.roza.TestClass;
+import br.ufsc.ine.leb.roza.core.TestClass;
 import br.ufsc.ine.leb.roza.ui.Hub;
 import br.ufsc.ine.leb.roza.ui.Manager;
 import br.ufsc.ine.leb.roza.ui.UiComponent;
-import br.ufsc.ine.leb.roza.utils.FolderUtils;
+import br.ufsc.ine.leb.roza.core.utils.FolderUtils;
 
 public class WriteRefactoredTestClassesButton implements UiComponent {
 
