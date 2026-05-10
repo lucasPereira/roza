@@ -41,8 +41,8 @@ sourceSets {
         resources {
             setSrcDirs(listOf("src/expt/resources"))
         }
-        compileClasspath += sourceSets.main.get().output
-        runtimeClasspath += sourceSets.main.get().output
+        compileClasspath += sourceSets.main.get().output + sourceSets.main.get().compileClasspath
+        runtimeClasspath += sourceSets.main.get().output + sourceSets.main.get().runtimeClasspath
     }
 }
 

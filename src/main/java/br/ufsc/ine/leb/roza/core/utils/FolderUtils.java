@@ -94,13 +94,9 @@ public class FolderUtils {
 	public File writeContetAsString(String path, String content) {
 		try {
 			File file = new File(baseFolder, path);
-			boolean success = file.createNewFile();
-			if (!success) {
-				throw new FailedFileSystemOperationException();
+			try (FileWriter writer = new FileWriter(file)) {
+				writer.write(content);
 			}
-			FileWriter writer = new FileWriter(file);
-			writer.write(content);
-			writer.close();
 			return file;
 		} catch (IOException exception) {
 			throw new RuntimeException(exception);
