@@ -212,6 +212,17 @@ Acceptance criteria:
 - AC-147: LCCSS score is `(2 * commonPrefixSize) / (sourceProjectionSize + targetProjectionSize)`.
 - AC-148: LCCSS score is `0.0` when both projected statement lists are empty for distinct test cases.
 - AC-149: LCCSS measurement must use `CodeStatement.isAssertion()` to find the first assertion; it must not infer assertions from statement text during measurement.
+- AC-218: LCS measurement uses the same pre-assertion projection as LCCSS, stopping at the first `CodeStatement.isAssertion()` statement.
+- AC-219: LCS compares the projected statement lists by counting the longest common subsequence while preserving statement order.
+- AC-220: LCS score is `(2 * commonSubsequenceSize) / (sourceProjectionSize + targetProjectionSize)`.
+- AC-221: LCS score is `0.0` when both projected statement lists are empty for distinct test cases.
+- AC-222: Deckard measurement exposes `MIN_TOKENS`, `STRIDE`, and `SIMILARITY` configuration values with defaults `1`, `0`, and `1.0`.
+- AC-223: Deckard configuration rejects non-positive `MIN_TOKENS`, negative `STRIDE`, and `SIMILARITY` values outside `0.0` to `1.0`.
+- AC-224: Deckard measurement uses the same pre-assertion projection as LCCSS and LCS, stopping at the first `CodeStatement.isAssertion()` statement.
+- AC-225: Deckard measurement materializes each projected test case as an isolated Java source file and invokes the existing Deckard external-tool script.
+- AC-226: Deckard clone-report parsing pairs entries in the same cluster only when `NODE_KIND`, `TBID`, and `TEID` match, avoiding the legacy Cartesian interpretation of every cluster entry.
+- AC-227: Deckard score is asymmetric: merged covered source projected lines divided by the source projected line count.
+- AC-228: Deckard score calculation ignores wrapper lines introduced only for Deckard materialization.
 - AC-152: The first `TestCaseSimilarityMatrix` constructor receives only the ordered list of `TestCase` instances.
 - AC-153: The first `TestCaseSimilarityMatrix` stores similarities as a dense directed matrix and must not assume similarity metrics are symmetric.
 - AC-154: The first `TestCaseSimilarityMatrix` initializes every similarity with `0.0` except the diagonal, which starts with `1.0`.
@@ -331,8 +342,8 @@ Acceptance criteria:
 - AC-201: The modern UI parsing violation viewer shows the code snippet for the displayed violation without an extra card-style white background.
 - AC-202: The modern UI `Decomposition` center shows a summary with the number of classes with class-level violations, tests with method-level violations, tests excluded by violations, and accepted tests.
 - AC-203: After decomposition, the modern UI `Measurement` center shows all decomposed tests and the code for the selected test.
-- AC-205: The modern UI `Measurement` configuration exposes a metric dropdown with `LCCSS` selected by default.
-- AC-206: Triggering `Measure` in the modern UI uses `LccssTestCaseSimilarityMeasurer` and advances to `Clustering` when measurement succeeds.
+- AC-205: The modern UI `Measurement` configuration exposes a metric dropdown with `LCCSS` selected by default and `LCS` as an alternative.
+- AC-206: Triggering `Measure` in the modern UI uses the selected similarity measurer and advances to `Clustering` when measurement succeeds.
 - AC-207: The modern UI `Clustering` center shows source and target test selectors.
 - AC-208: The modern UI `Clustering` center shows a ranked source-target similarity pair list.
 - AC-209: The modern UI `Clustering` ranked list has an order toggle button above it.
@@ -342,6 +353,9 @@ Acceptance criteria:
 - AC-213: The modern UI `Clustering` ranked list items show only the similarity score.
 - AC-214: Selecting an item from the modern UI `Clustering` ranked list preserves the current list scroll position.
 - AC-217: The modern UI `Clustering` ranked score list uses a narrow width so the source and target code blocks receive most of the horizontal space.
+- AC-229: The modern UI `Measurement` metric dropdown exposes `Deckard` as an option.
+- AC-230: When `Deckard` is selected in the modern UI, the `Measurement` configuration shows `MIN_TOKENS`, `STRIDE`, and `SIMILARITY` inputs with Deckard defaults.
+- AC-231: Triggering `Measure` with `Deckard` selected uses the configured Deckard measurer and then reuses the existing `Clustering` ranked-pair view.
 
 ### NFR-004: Minimal Code Comments
 
@@ -445,6 +459,10 @@ public final class TestCaseSimilarityMatrix {
 	public int size();
 	public TestCase testCaseAt(int index);
 	public double similarity(int sourceIndex, int targetIndex);
+}
+
+public final class LcsTestCaseSimilarityMeasurer implements TestCaseSimilarityMeasurer {
+	public TestCaseSimilarityMatrix measure(DecomposedTestCases testCases);
 }
 ```
 
@@ -615,3 +633,5 @@ The first measurement implementation fills a dense directed matrix by source and
 - 2026-05-11: Set the modern UI default loading source folder to Roza's own test sources.
 - 2026-05-11: Narrowed the modern UI `Clustering` ranked score list.
 - 2026-05-11: Shortened the modern UI `Clustering` ranked-order button text.
+- 2026-05-11: Added modern LCS measurement and exposed it in the modern UI metric dropdown.
+- 2026-05-11: Validated Deckard execution through the existing Docker script and added modern Deckard configuration, report parsing, scoring, and UI selection requirements.

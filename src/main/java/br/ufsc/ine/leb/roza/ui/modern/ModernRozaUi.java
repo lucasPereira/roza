@@ -19,7 +19,10 @@ import br.ufsc.ine.leb.roza.core.modern.decomposition.TestCaseDecomposer;
 import br.ufsc.ine.leb.roza.core.modern.loading.CodeFile;
 import br.ufsc.ine.leb.roza.core.modern.loading.FileSystemCodeFileLoader;
 import br.ufsc.ine.leb.roza.core.modern.loading.LoadedCodeFiles;
+import br.ufsc.ine.leb.roza.core.modern.measurement.DeckardMeasurementConfiguration;
+import br.ufsc.ine.leb.roza.core.modern.measurement.DeckardTestCaseSimilarityMeasurer;
 import br.ufsc.ine.leb.roza.core.modern.measurement.LccssTestCaseSimilarityMeasurer;
+import br.ufsc.ine.leb.roza.core.modern.measurement.LcsTestCaseSimilarityMeasurer;
 import br.ufsc.ine.leb.roza.core.modern.measurement.TestCaseSimilarityMatrix;
 import br.ufsc.ine.leb.roza.core.modern.measurement.TestCaseSimilarityMeasurer;
 import br.ufsc.ine.leb.roza.core.modern.parsing.CodeStatement;
@@ -42,6 +45,7 @@ import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.OverrunStyle;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -55,6 +59,10 @@ public final class ModernRozaUi extends Application {
 	private static final Insets MARGIN_AFTER_CONFIGURATION_GROUP = new Insets(0, 0, 12, 0);
 	private static final Insets MARGIN_SECTION_TITLE_AFTER_GROUP = new Insets(4, 0, 0, 0);
 	private static final Insets MARGIN_ACTION_BUTTON_TOP = new Insets(12, 0, 0, 0);
+	/** Matches vertical gap above the stage action button (sidebar spacing + button top margin). */
+	private static final int CONFIGURATION_SIDEBAR_SPACING = 14;
+	private static final int CONFIGURATION_GROUP_VERTICAL_GAP =
+			CONFIGURATION_SIDEBAR_SPACING + (int) MARGIN_ACTION_BUTTON_TOP.getTop();
 
 	private final PipelineState pipelineState;
 	private final HBox pipelineBar;
@@ -66,6 +74,9 @@ public final class ModernRozaUi extends Application {
 	private final ComboBox<String> parserImplementationCombo;
 	private final ComboBox<String> decomposerImplementationCombo;
 	private final ComboBox<String> metricCombo;
+	private final TextField deckardMinTokensInput;
+	private final TextField deckardStrideInput;
+	private final TextField deckardSimilarityInput;
 	private final ComboBox<TestCase> sourceTestCombo;
 	private final ComboBox<TestCase> targetTestCombo;
 	private Path sourceFolder;
@@ -88,7 +99,7 @@ public final class ModernRozaUi extends Application {
 	public ModernRozaUi() {
 		pipelineState = new PipelineState();
 		pipelineBar = new HBox(8);
-		configurationSidebar = new VBox(14);
+		configurationSidebar = new VBox(CONFIGURATION_SIDEBAR_SPACING);
 		contentArea = new VBox(14);
 		recursiveLoading = new CheckBox("Enabled");
 		javaExtension = new CheckBox(".java");
@@ -109,8 +120,15 @@ public final class ModernRozaUi extends Application {
 
 		metricCombo = new ComboBox<>();
 		metricCombo.getItems().add("LCCSS");
+		metricCombo.getItems().add("LCS");
+		metricCombo.getItems().add("Deckard");
 		metricCombo.getSelectionModel().selectFirst();
 		metricCombo.setStyle(singleLineComboBoxStyle());
+		metricCombo.valueProperty().addListener((observable, previous, selected) -> renderConfigurationSidebar());
+
+		deckardMinTokensInput = deckardConfigurationInput(String.valueOf(DeckardMeasurementConfiguration.DEFAULT_MIN_TOKENS));
+		deckardStrideInput = deckardConfigurationInput(String.valueOf(DeckardMeasurementConfiguration.DEFAULT_STRIDE));
+		deckardSimilarityInput = deckardConfigurationInput(String.valueOf(DeckardMeasurementConfiguration.DEFAULT_SIMILARITY));
 
 		sourceTestCombo = testCaseComboBox();
 		targetTestCombo = testCaseComboBox();
@@ -291,15 +309,23 @@ public final class ModernRozaUi extends Application {
 	}
 
 	private VBox measurementConfiguration() {
-		VBox configuration = new VBox(CONFIGURATION_INNER_SPACING);
-		configuration.setPadding(new Insets(0, 0, 4, 0));
-
+		VBox metricBlock = new VBox(CONFIGURATION_INNER_SPACING);
 		Label metricTitle = body("Similarity metric");
 		metricTitle.setStyle(metricTitle.getStyle() + "-fx-font-weight: bold; -fx-text-fill: #333333;");
-
 		metricCombo.setMaxWidth(Double.MAX_VALUE);
+		metricBlock.getChildren().addAll(metricTitle, metricCombo);
 
-		configuration.getChildren().addAll(metricTitle, metricCombo);
+		VBox configuration = new VBox(CONFIGURATION_GROUP_VERTICAL_GAP);
+		configuration.setPadding(new Insets(0, 0, 4, 0));
+		configuration.getChildren().add(metricBlock);
+		if ("Deckard".equals(metricCombo.getSelectionModel().getSelectedItem())) {
+			VBox deckardFields = new VBox(CONFIGURATION_GROUP_VERTICAL_GAP);
+			deckardFields.getChildren().addAll(
+					configurationInput("Minimum tokens", deckardMinTokensInput),
+					configurationInput("Stride", deckardStrideInput),
+					configurationInput("Similarity", deckardSimilarityInput));
+			configuration.getChildren().add(deckardFields);
+		}
 		return configuration;
 	}
 
@@ -335,6 +361,21 @@ public final class ModernRozaUi extends Application {
 			}
 		});
 		return comboBox;
+	}
+
+	private TextField deckardConfigurationInput(String defaultValue) {
+		TextField input = new TextField(defaultValue);
+		input.setStyle(singleLineComboBoxStyle());
+		input.setMaxWidth(Double.MAX_VALUE);
+		return input;
+	}
+
+	private VBox configurationInput(String label, TextField input) {
+		VBox row = new VBox(4);
+		Label title = body(label);
+		title.setStyle(title.getStyle() + "-fx-font-weight: bold; -fx-text-fill: #333333;");
+		row.getChildren().addAll(title, input);
+		return row;
 	}
 
 	private void chooseSourceFolder() {
@@ -538,7 +579,7 @@ public final class ModernRozaUi extends Application {
 
 	private void runMeasurement() {
 		try {
-			TestCaseSimilarityMeasurer measurer = new LccssTestCaseSimilarityMeasurer();
+			TestCaseSimilarityMeasurer measurer = selectedSimilarityMeasurer();
 			similarityMatrix = measurer.measure(decomposedTestCases);
 			measurementError = null;
 			refreshSimilaritySelectionControls();
@@ -548,6 +589,27 @@ public final class ModernRozaUi extends Application {
 			similarityMatrix = null;
 		}
 		render();
+	}
+
+	private TestCaseSimilarityMeasurer selectedSimilarityMeasurer() {
+		if ("Deckard".equals(metricCombo.getSelectionModel().getSelectedItem())) {
+			return new DeckardTestCaseSimilarityMeasurer(deckardConfiguration());
+		}
+		if ("LCS".equals(metricCombo.getSelectionModel().getSelectedItem())) {
+			return new LcsTestCaseSimilarityMeasurer();
+		}
+		return new LccssTestCaseSimilarityMeasurer();
+	}
+
+	private DeckardMeasurementConfiguration deckardConfiguration() {
+		try {
+			return new DeckardMeasurementConfiguration(
+					Integer.parseInt(deckardMinTokensInput.getText().trim()),
+					Integer.parseInt(deckardStrideInput.getText().trim()),
+					Double.parseDouble(deckardSimilarityInput.getText().trim()));
+		} catch (NumberFormatException exception) {
+			throw new IllegalArgumentException("Deckard configuration values must be numeric.", exception);
+		}
 	}
 
 	private List<String> acceptedExtensions() {
