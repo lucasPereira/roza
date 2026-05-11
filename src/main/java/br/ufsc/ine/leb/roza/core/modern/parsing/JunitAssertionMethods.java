@@ -14,6 +14,7 @@ final class JunitAssertionMethods {
 			"assertIterableEquals",
 			"assertLinesMatch",
 			"assertNotEquals",
+			"assertNotInstanceOf",
 			"assertNotNull",
 			"assertNotSame",
 			"assertNull",

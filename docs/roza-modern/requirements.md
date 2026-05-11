@@ -118,8 +118,21 @@ Acceptance criteria:
 - AC-150: The first concrete parser implementation is named `JunitTestClassParser` because it supports a conservative JUnit subset on Java source code, not every Java test framework.
 - AC-121: Unsupported parsing features are handled by `UnsupportedFeaturePolicy`.
 - AC-122: Unsupported feature validation runs in a separate validator before extracting modern Roza domain models.
-- AC-123: `UnsupportedFeaturePolicy.SAFE` fails immediately with a clear error when unsupported features are found.
-- AC-124: `UnsupportedFeaturePolicy.UNSAFE` records diagnostics and skips unsupported input instead of silently accepting it.
+- AC-123: The parser identifies unsupported-subset violations before downstream stages refactor tests.
+- AC-124: Unsupported-subset violations are reported as structured parsing output instead of being silently accepted.
+- AC-180: `ParsedTestClasses` exposes unsupported-subset violations through `violations()`.
+- AC-181: Each unsupported-subset violation records whether it applies to a test class or a test method.
+- AC-182: Each unsupported-subset violation records a human-readable description suitable for experiment reports.
+- AC-199: Each unsupported-subset violation can expose a code snippet for the construct that caused it.
+- AC-183: Supported classes in the first refactoring-safe subset are plain JUnit classes: one top-level concrete non-generic class, no inheritance, and no explicit constructor.
+- AC-184: Supported fields in the first refactoring-safe subset are non-static instance fields without direct field initialization.
+- AC-185: Multiple variables in one field declaration remain supported because parsing separates them into individual `Field` instances.
+- AC-186: Supported methods in the first refactoring-safe subset are `@Test` methods and at most one simple `@Before` or `@BeforeEach` fixture.
+- AC-187: Any annotation outside `@Test`, `@Before`, and `@BeforeEach` is unsupported in the first refactoring-safe subset.
+- AC-188: Helper methods are unsupported in the first refactoring-safe subset.
+- AC-189: Tear down and lifecycle methods other than the supported before fixture are unsupported in the first refactoring-safe subset.
+- AC-190: Tests without a detectable assertion are supported; metrics that stop at assertions use the whole test body when no detectable assertion exists.
+- AC-191: A detectable assertion is an assertion recognized in the current statement, including assertion calls with lambda or method-reference arguments.
 
 ### REQ-009: Java-First TestClass Domain Model
 
@@ -142,11 +155,11 @@ Acceptance criteria:
 - AC-131: Parsed code blocks expose top-level `CodeStatement` instances.
 - AC-132: `CodeStatement` exposes original text, normalized text, and whether the statement is an assertion.
 - AC-133: The first parser treats control-flow blocks such as `for`, `while`, and `if` as top-level statements rather than flattening their internals.
-- AC-134: Static members, nested classes, unsupported lifecycle features, parameterized tests, inheritance, static imports, and other listed unsupported features are rejected or skipped according to `UnsupportedFeaturePolicy`.
+- AC-134: Static members, nested classes, unsupported lifecycle features, parameterized tests, inheritance, wildcard imports, and other listed unsupported features are rejected or skipped according to `UnsupportedFeaturePolicy`.
 - AC-135: Modern Roza starts conservative: unsupported features should be removed from the unsupported list only when real support is implemented.
 - AC-136: JUnit 4 `@After` and JUnit 5 `@AfterEach` are unsupported in the first parser slice and are handled according to `UnsupportedFeaturePolicy`.
 - AC-137: Parsed field types preserve complex Java type text needed by decomposition, including generics, nested generics, wildcard generics, qualified types, generic arrays, arrays, and multidimensional arrays.
-- AC-151: `JunitTestClassParser` marks assertions using an explicit supported assertion method list covering JUnit 4, current JUnit Jupiter assertions, and Hamcrest `assertThat`, not by checking whether a method name starts with `assert`.
+- AC-151: `JunitTestClassParser` marks assertions using an explicit supported assertion method list covering JUnit 4, current JUnit Jupiter assertions, and Hamcrest `assertThat`, for unqualified calls and for calls on typical receivers (`Assert`, `Assertions`, `MatcherAssert`, and the usual fully qualified type names), not by checking whether a method name starts with `assert`.
 
 ### REQ-010: Decomposition Stage
 
@@ -171,6 +184,9 @@ Acceptance criteria:
 - AC-141: `TestCase` does not need to preserve the source `@Before` annotation or fixture identity; it only needs to include the statements derived from supported `@Before` fixtures in the decomposed body.
 - AC-144: The default decomposition implementation preserves assertions in the decomposed `TestCase` body.
 - AC-145: The default decomposition implementation orders the decomposed body as field declarations, supported `@Before` statements, then original test body statements.
+- AC-192: The default decomposition implementation does not decompose tests that belong to classes with class-level violations.
+- AC-193: The default decomposition implementation does not decompose test methods with method-level violations.
+- AC-194: Downstream measurement and refactoring consume only decomposed tests, so tests discarded because of parsing violations are excluded from those stages by construction.
 
 ### REQ-011: Measurement Stage
 
@@ -304,6 +320,13 @@ Acceptance criteria:
 - AC-177: The modern UI loading configuration has accepted extension checkboxes for `.java` and `.txt`.
 - AC-178: Triggering `Load` in the modern UI uses the filesystem code file loader and advances to `Parsing` when loading succeeds.
 - AC-179: The modern UI `Parsing` center shows the loaded file list after `Load`; selecting a loaded file shows that file's content.
+- AC-195: The modern UI `Parsing` center shows parsing violations at the top when violations exist.
+- AC-196: The modern UI `Parsing` violation viewer shows one violation at a time with previous and next controls.
+- AC-197: The modern UI selects the loaded file for the class referenced by the displayed parsing violation, including the first displayed violation.
+- AC-198: The modern UI parsing configuration does not expose unsupported feature policy selection.
+- AC-200: The modern UI parsing violation viewer shows the violation target using `ClassName.methodName` format when a method is present.
+- AC-201: The modern UI parsing violation viewer shows the code snippet for the displayed violation without an extra card-style white background.
+- AC-202: The modern UI `Decomposition` center shows a summary with the number of classes with class-level violations, tests with method-level violations, tests excluded by violations, and accepted tests.
 
 ### NFR-004: Minimal Code Comments
 
@@ -357,6 +380,20 @@ public interface TestClassParser {
 
 public final class ParsedTestClasses {
 	public List<TestClass> testClasses();
+	public List<TestCodeViolation> violations();
+}
+
+public enum ViolationScope {
+	TEST_CLASS,
+	TEST_METHOD
+}
+
+public final class TestCodeViolation {
+	public ViolationScope scope();
+	public String testClassName();
+	public Optional<String> testMethodName();
+	public String description();
+	public String codeSnippet();
 }
 ```
 
@@ -543,3 +580,10 @@ The first measurement implementation fills a dense directed matrix by source and
 - 2026-05-11: Refined blocked pipeline stage buttons to use a lighter gray treatment.
 - 2026-05-11: Confirmed the first functional modern UI loading flow: source folder selector, recursive checkbox, `.java`/`.txt` extension checkboxes, loaded file list in `Parsing`, and file-content inspection.
 - 2026-05-11: Strengthened legacy isolation so imports between `core.modern` and `core.legacy` must not cross in either direction.
+- 2026-05-11: Defined the first refactoring-safe supported subset and structured parsing violations for experiment exclusions.
+- 2026-05-11: Added the modern UI parsing violation viewer behavior: show one violation at a time and select the violated class file.
+- 2026-05-11: Removed unsupported feature policy selection from the modern UI parsing configuration.
+- 2026-05-11: Added code snippets to parsing violations and displayed them in the modern UI parsing violation viewer.
+- 2026-05-11: Confirmed that method references inside detectable assertion calls are not unsupported-subset violations.
+- 2026-05-11: Added a modern UI `Decomposition` summary for violation and accepted-test counts.
+- 2026-05-11: Removed parsing violation records from the modern UI `Decomposition` summary.

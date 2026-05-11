@@ -11,13 +11,13 @@ enum PipelineStage {
 	PARSING(
 			"Parsing",
 			"Parse",
-			List.of("Parser implementation", "Unsupported feature policy"),
+			List.of("Parser implementation"),
 			"Loaded files from the loading stage will be shown here."),
 	DECOMPOSITION(
 			"Decomposition",
 			"Decompose",
 			List.of("Decomposer implementation"),
-			"Parsed test classes from the parsing stage will be shown here."),
+			""),
 	MEASUREMENT(
 			"Measurement",
 			"Measure",

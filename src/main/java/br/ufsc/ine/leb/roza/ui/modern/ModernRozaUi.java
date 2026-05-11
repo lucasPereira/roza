@@ -3,11 +3,27 @@ package br.ufsc.ine.leb.roza.ui.modern;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
+import br.ufsc.ine.leb.roza.core.modern.decomposition.DefaultTestCaseDecomposer;
+import br.ufsc.ine.leb.roza.core.modern.decomposition.DecomposedTestCases;
+import br.ufsc.ine.leb.roza.core.modern.decomposition.TestCase;
+import br.ufsc.ine.leb.roza.core.modern.decomposition.TestCaseDecomposer;
 import br.ufsc.ine.leb.roza.core.modern.loading.CodeFile;
 import br.ufsc.ine.leb.roza.core.modern.loading.FileSystemCodeFileLoader;
 import br.ufsc.ine.leb.roza.core.modern.loading.LoadedCodeFiles;
+import br.ufsc.ine.leb.roza.core.modern.parsing.CodeStatement;
+import br.ufsc.ine.leb.roza.core.modern.parsing.JunitTestClassParser;
+import br.ufsc.ine.leb.roza.core.modern.parsing.ParsedTestClasses;
+import br.ufsc.ine.leb.roza.core.modern.parsing.ParsingException;
+import br.ufsc.ine.leb.roza.core.modern.parsing.TestClassParser;
+import br.ufsc.ine.leb.roza.core.modern.parsing.TestCodeViolation;
+import br.ufsc.ine.leb.roza.core.modern.parsing.UnsupportedFeatureException;
+import br.ufsc.ine.leb.roza.core.modern.parsing.ViolationScope;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -18,9 +34,8 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
-import javafx.scene.control.RadioButton;
+import javafx.scene.control.OverrunStyle;
 import javafx.scene.control.TextArea;
-import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -31,9 +46,9 @@ public final class ModernRozaUi extends Application {
 
 	private static final String FONT_FAMILY = "-fx-font-family: 'Arial';";
 	private static final int CONFIGURATION_INNER_SPACING = 10;
-	private static final Insets MARGIN_AFTER_CONFIGURATION_GROUP = new Insets(0, 0, 32, 0);
-	private static final Insets MARGIN_SECTION_TITLE_AFTER_GROUP = new Insets(8, 0, 0, 0);
-	private static final Insets MARGIN_ACTION_BUTTON_TOP = new Insets(28, 0, 0, 0);
+	private static final Insets MARGIN_AFTER_CONFIGURATION_GROUP = new Insets(0, 0, 12, 0);
+	private static final Insets MARGIN_SECTION_TITLE_AFTER_GROUP = new Insets(4, 0, 0, 0);
+	private static final Insets MARGIN_ACTION_BUTTON_TOP = new Insets(12, 0, 0, 0);
 
 	private final PipelineState pipelineState;
 	private final HBox pipelineBar;
@@ -43,13 +58,17 @@ public final class ModernRozaUi extends Application {
 	private final CheckBox javaExtension;
 	private final CheckBox txtExtension;
 	private final ComboBox<String> parserImplementationCombo;
-	private final RadioButton unsupportedFeaturePolicySafe;
-	private final RadioButton unsupportedFeaturePolicyUnsafe;
-	private final ToggleGroup unsupportedFeaturePolicyGroup;
+	private final ComboBox<String> decomposerImplementationCombo;
 	private Path sourceFolder;
 	private LoadedCodeFiles loadedCodeFiles;
 	private CodeFile selectedCodeFile;
 	private String loadingError;
+	private ParsedTestClasses parsedTestClasses;
+	private String parsingError;
+	private int selectedViolationIndex;
+	private DecomposedTestCases decomposedTestCases;
+	private String decompositionError;
+	private TestCase selectedDecomposedTestCase;
 
 	public ModernRozaUi() {
 		pipelineState = new PipelineState();
@@ -68,12 +87,12 @@ public final class ModernRozaUi extends Application {
 		parserImplementationCombo.getSelectionModel().selectFirst();
 		parserImplementationCombo.setStyle(singleLineComboBoxStyle());
 
-		unsupportedFeaturePolicyGroup = new ToggleGroup();
-		unsupportedFeaturePolicySafe = new RadioButton("Safe");
-		unsupportedFeaturePolicyUnsafe = new RadioButton("Unsafe");
-		unsupportedFeaturePolicySafe.setToggleGroup(unsupportedFeaturePolicyGroup);
-		unsupportedFeaturePolicyUnsafe.setToggleGroup(unsupportedFeaturePolicyGroup);
-		unsupportedFeaturePolicySafe.setSelected(true);
+		decomposerImplementationCombo = new ComboBox<>();
+		decomposerImplementationCombo.getItems().add("Default");
+		decomposerImplementationCombo.getSelectionModel().selectFirst();
+		decomposerImplementationCombo.setStyle(singleLineComboBoxStyle());
+
+		selectedViolationIndex = -1;
 	}
 
 	public static void main(String[] args) {
@@ -92,6 +111,7 @@ public final class ModernRozaUi extends Application {
 
 		stage.setTitle("Modern Roza UI");
 		stage.setScene(new Scene(root, 1100, 700));
+		stage.setMaximized(true);
 		stage.show();
 	}
 
@@ -149,6 +169,9 @@ public final class ModernRozaUi extends Application {
 		if (selectedStage == PipelineStage.PARSING) {
 			return parsingConfiguration();
 		}
+		if (selectedStage == PipelineStage.DECOMPOSITION) {
+			return decompositionConfiguration();
+		}
 		VBox configuration = new VBox(CONFIGURATION_INNER_SPACING);
 		for (String item : selectedStage.configurationItems()) {
 			configuration.getChildren().add(configurationRow(item));
@@ -165,7 +188,7 @@ public final class ModernRozaUi extends Application {
 		sourceFolderButton.setOnAction(event -> chooseSourceFolder());
 
 		Label selectedFolder = body(sourceFolderText());
-		VBox.setMargin(selectedFolder, new Insets(4, 0, 32, 0));
+		VBox.setMargin(selectedFolder, new Insets(4, 0, 12, 0));
 
 		Label recursiveSectionTitle = body("Recursive loading");
 		recursiveSectionTitle.setStyle(recursiveSectionTitle.getStyle() + "-fx-font-weight: bold; -fx-text-fill: #333333;");
@@ -188,16 +211,21 @@ public final class ModernRozaUi extends Application {
 		parserTitle.setStyle(parserTitle.getStyle() + "-fx-font-weight: bold; -fx-text-fill: #333333;");
 
 		parserImplementationCombo.setMaxWidth(Double.MAX_VALUE);
-		VBox.setMargin(parserImplementationCombo, MARGIN_AFTER_CONFIGURATION_GROUP);
 
-		Label policyTitle = body("Unsupported feature policy");
-		VBox.setMargin(policyTitle, MARGIN_SECTION_TITLE_AFTER_GROUP);
-		policyTitle.setStyle(policyTitle.getStyle() + "-fx-font-weight: bold; -fx-text-fill: #333333;");
+		configuration.getChildren().addAll(parserTitle, parserImplementationCombo);
+		return configuration;
+	}
 
-		VBox policyRadios = new VBox(8);
-		policyRadios.getChildren().addAll(unsupportedFeaturePolicySafe, unsupportedFeaturePolicyUnsafe);
+	private VBox decompositionConfiguration() {
+		VBox configuration = new VBox(CONFIGURATION_INNER_SPACING);
+		configuration.setPadding(new Insets(0, 0, 4, 0));
 
-		configuration.getChildren().addAll(parserTitle, parserImplementationCombo, policyTitle, policyRadios);
+		Label decomposerTitle = body("Decomposer implementation");
+		decomposerTitle.setStyle(decomposerTitle.getStyle() + "-fx-font-weight: bold; -fx-text-fill: #333333;");
+
+		decomposerImplementationCombo.setMaxWidth(Double.MAX_VALUE);
+
+		configuration.getChildren().addAll(decomposerTitle, decomposerImplementationCombo);
 		return configuration;
 	}
 
@@ -229,12 +257,19 @@ public final class ModernRozaUi extends Application {
 		if (selectedStage == PipelineStage.PARSING) {
 			return loadedCodeFiles != null;
 		}
+		if (selectedStage == PipelineStage.DECOMPOSITION) {
+			return parsedTestClasses != null;
+		}
 		return true;
 	}
 
 	private void runStage(PipelineStage selectedStage) {
 		if (selectedStage == PipelineStage.LOADING) {
 			loadCodeFiles();
+		} else if (selectedStage == PipelineStage.PARSING) {
+			runParsing();
+		} else if (selectedStage == PipelineStage.DECOMPOSITION) {
+			runDecomposition();
 		} else {
 			pipelineState.runSelectedStage();
 			render();
@@ -246,11 +281,127 @@ public final class ModernRozaUi extends Application {
 			loadedCodeFiles = new FileSystemCodeFileLoader(sourceFolder, recursiveLoading.isSelected(), acceptedExtensions()).load();
 			selectedCodeFile = null;
 			loadingError = null;
+			clearParsingAndDecompositionResults();
 			pipelineState.runSelectedStage();
 		} catch (RuntimeException exception) {
 			loadedCodeFiles = null;
 			selectedCodeFile = null;
 			loadingError = exception.getMessage();
+			clearParsingAndDecompositionResults();
+		}
+		render();
+	}
+
+	private void clearParsingAndDecompositionResults() {
+		parsedTestClasses = null;
+		parsingError = null;
+		selectedViolationIndex = -1;
+		decomposedTestCases = null;
+		decompositionError = null;
+		selectedDecomposedTestCase = null;
+	}
+
+	private static String failedParseCodeFileSource(Throwable exception) {
+		for (Throwable t = exception; t != null; t = t.getCause()) {
+			if (t instanceof ParsingException) {
+				return ((ParsingException) t).codeFileSource();
+			}
+			if (t instanceof UnsupportedFeatureException) {
+				return ((UnsupportedFeatureException) t).codeFileSource();
+			}
+		}
+		return "";
+	}
+
+	private void selectCodeFileForParseFailure(RuntimeException exception) {
+		if (loadedCodeFiles == null) {
+			return;
+		}
+		String source = failedParseCodeFileSource(exception);
+		if (source == null || source.isBlank()) {
+			return;
+		}
+		for (CodeFile file : loadedCodeFiles.codeFiles()) {
+			if (source.equals(file.source())) {
+				selectedCodeFile = file;
+				return;
+			}
+		}
+	}
+
+	private void selectFirstViolation() {
+		if (parsedTestClasses == null || parsedTestClasses.violations().isEmpty()) {
+			selectedViolationIndex = -1;
+			return;
+		}
+		selectedViolationIndex = 0;
+		selectCodeFileForViolation(selectedViolation());
+	}
+
+	private TestCodeViolation selectedViolation() {
+		return parsedTestClasses.violations().get(selectedViolationIndex);
+	}
+
+	private void selectPreviousViolation() {
+		if (selectedViolationIndex > 0) {
+			selectedViolationIndex--;
+			selectCodeFileForViolation(selectedViolation());
+			renderContentArea();
+		}
+	}
+
+	private void selectNextViolation() {
+		if (parsedTestClasses != null && selectedViolationIndex < parsedTestClasses.violations().size() - 1) {
+			selectedViolationIndex++;
+			selectCodeFileForViolation(selectedViolation());
+			renderContentArea();
+		}
+	}
+
+	private void selectCodeFileForViolation(TestCodeViolation violation) {
+		if (loadedCodeFiles == null) {
+			return;
+		}
+		Pattern classDeclaration = Pattern.compile("\\bclass\\s+" + Pattern.quote(violation.testClassName()) + "\\b");
+		for (CodeFile file : loadedCodeFiles.codeFiles()) {
+			if (classDeclaration.matcher(file.content()).find()) {
+				selectedCodeFile = file;
+				return;
+			}
+		}
+	}
+
+	private void runParsing() {
+		try {
+			TestClassParser parser = new JunitTestClassParser();
+			parsedTestClasses = parser.parse(loadedCodeFiles);
+			selectFirstViolation();
+			parsingError = null;
+			decomposedTestCases = null;
+			decompositionError = null;
+			selectedDecomposedTestCase = null;
+			pipelineState.runSelectedStage();
+		} catch (RuntimeException exception) {
+			parsingError = exception.getMessage() != null ? exception.getMessage() : exception.toString();
+			selectCodeFileForParseFailure(exception);
+			parsedTestClasses = null;
+			selectedViolationIndex = -1;
+			decomposedTestCases = null;
+			decompositionError = null;
+			selectedDecomposedTestCase = null;
+		}
+		render();
+	}
+
+	private void runDecomposition() {
+		try {
+			TestCaseDecomposer decomposer = new DefaultTestCaseDecomposer();
+			decomposedTestCases = decomposer.decompose(parsedTestClasses);
+			decompositionError = null;
+			pipelineState.runSelectedStage();
+		} catch (RuntimeException exception) {
+			decompositionError = exception.getMessage() != null ? exception.getMessage() : exception.toString();
+			decomposedTestCases = null;
 		}
 		render();
 	}
@@ -277,10 +428,142 @@ public final class ModernRozaUi extends Application {
 			error.setStyle(error.getStyle() + "-fx-text-fill: #991b1b;");
 			contentArea.getChildren().add(error);
 		} else if (selectedStage == PipelineStage.PARSING && loadedCodeFiles != null) {
-			contentArea.getChildren().add(loadedFilesView());
+			VBox parsingColumn = new VBox(12);
+			if (parsingError != null) {
+				Label error = body("Parsing failed: " + parsingError);
+				error.setStyle(error.getStyle() + "-fx-text-fill: #991b1b;");
+				parsingColumn.getChildren().add(error);
+			}
+			if (hasParsingViolations()) {
+				parsingColumn.getChildren().add(violationNavigator());
+			}
+			parsingColumn.getChildren().add(loadedFilesView());
+			contentArea.getChildren().add(parsingColumn);
+			VBox.setVgrow(parsingColumn, Priority.ALWAYS);
+		} else if (selectedStage == PipelineStage.DECOMPOSITION) {
+			VBox decompositionColumn = new VBox(12);
+			if (parsedTestClasses != null) {
+				decompositionColumn.getChildren().add(decompositionSummary());
+			}
+			if (decompositionError != null) {
+				Label error = body("Decomposition failed: " + decompositionError);
+				error.setStyle(error.getStyle() + "-fx-text-fill: #991b1b;");
+				decompositionColumn.getChildren().add(error);
+			} else if (decomposedTestCases != null) {
+				HBox decompositionRow = decomposedTestsView();
+				decompositionColumn.getChildren().add(decompositionRow);
+				VBox.setVgrow(decompositionRow, Priority.ALWAYS);
+			}
+			contentArea.getChildren().add(decompositionColumn);
+			VBox.setVgrow(decompositionColumn, Priority.ALWAYS);
 		} else {
 			contentArea.getChildren().add(body(selectedStage.previousStageDataDescription()));
 		}
+	}
+
+	private VBox decompositionSummary() {
+		VBox summary = new VBox(6);
+		Label classViolations = body("Classes with class-level violations: " + classViolationCount());
+		Label testViolations = body("Tests with method-level violations: " + methodLevelViolationTestCount());
+		Label excludedTests = body("Tests excluded by violations: " + excludedTestCount());
+		Label acceptedTests = body("Accepted tests: " + acceptedTestCount());
+		summary.getChildren().addAll(classViolations, testViolations, excludedTests, acceptedTests);
+		return summary;
+	}
+
+	private long classViolationCount() {
+		return parsedTestClasses.violations().stream()
+				.filter(violation -> violation.scope() == ViolationScope.TEST_CLASS)
+				.map(TestCodeViolation::testClassName)
+				.distinct()
+				.count();
+	}
+
+	private long methodLevelViolationTestCount() {
+		return parsedTestClasses.violations().stream()
+				.filter(violation -> violation.scope() == ViolationScope.TEST_METHOD)
+				.map(this::violationTestKey)
+				.distinct()
+				.count();
+	}
+
+	private long excludedTestCount() {
+		Set<String> excludedTests = new HashSet<>();
+		parsedTestClasses.violations().stream()
+				.filter(violation -> violation.scope() == ViolationScope.TEST_METHOD)
+				.map(this::violationTestKey)
+				.forEach(excludedTests::add);
+		Set<String> excludedClasses = parsedTestClasses.violations().stream()
+				.filter(violation -> violation.scope() == ViolationScope.TEST_CLASS)
+				.map(TestCodeViolation::testClassName)
+				.collect(Collectors.toSet());
+		parsedTestClasses.testClasses().stream()
+				.filter(testClass -> excludedClasses.contains(testClass.name()))
+				.flatMap(testClass -> testClass.testMethods().stream().map(testMethod -> testClass.name() + "." + testMethod.name()))
+				.forEach(excludedTests::add);
+		return excludedTests.size();
+	}
+
+	private long acceptedTestCount() {
+		if (decomposedTestCases != null) {
+			return decomposedTestCases.testCases().size();
+		}
+		Set<String> excludedClasses = parsedTestClasses.violations().stream()
+				.filter(violation -> violation.scope() == ViolationScope.TEST_CLASS)
+				.map(TestCodeViolation::testClassName)
+				.collect(Collectors.toSet());
+		Set<String> excludedTests = parsedTestClasses.violations().stream()
+				.filter(violation -> violation.scope() == ViolationScope.TEST_METHOD)
+				.map(this::violationTestKey)
+				.collect(Collectors.toSet());
+		return parsedTestClasses.testClasses().stream()
+				.filter(testClass -> !excludedClasses.contains(testClass.name()))
+				.flatMap(testClass -> testClass.testMethods()
+						.stream()
+						.filter(testMethod -> !excludedTests.contains(testClass.name() + "." + testMethod.name())))
+				.count();
+	}
+
+	private String violationTestKey(TestCodeViolation violation) {
+		return violation.testClassName() + "." + violation.testMethodName().orElse("");
+	}
+
+	private boolean hasParsingViolations() {
+		return parsedTestClasses != null && !parsedTestClasses.violations().isEmpty() && selectedViolationIndex >= 0;
+	}
+
+	private VBox violationNavigator() {
+		TestCodeViolation violation = selectedViolation();
+
+		VBox box = new VBox(8);
+
+		Label position = body("Violation " + (selectedViolationIndex + 1) + " of " + parsedTestClasses.violations().size());
+		position.setStyle(position.getStyle() + "-fx-font-weight: bold; -fx-text-fill: #333333;");
+
+		Label description = body(violation.testClassName() + violation.testMethodName().map(method -> "." + method).orElse("")
+				+ ": " + violation.description());
+
+		Label snippet = body(violation.codeSnippet());
+		snippet.setStyle(FONT_FAMILY + "-fx-font-family: 'Monospaced'; -fx-font-size: 13px; -fx-text-fill: #333333;");
+
+		Button previous = new Button("Previous");
+		previous.setDisable(selectedViolationIndex == 0);
+		previous.setStyle(secondaryButtonStyle());
+		previous.setOnAction(event -> selectPreviousViolation());
+
+		Button next = new Button("Next");
+		next.setDisable(selectedViolationIndex == parsedTestClasses.violations().size() - 1);
+		next.setStyle(secondaryButtonStyle());
+		next.setOnAction(event -> selectNextViolation());
+
+		HBox controls = new HBox(8);
+		controls.getChildren().addAll(previous, next);
+		box.getChildren().addAll(position, description);
+		if (!violation.codeSnippet().isBlank()) {
+			box.getChildren().add(snippet);
+		}
+		box.getChildren().add(controls);
+		return box;
 	}
 
 	private HBox loadedFilesView() {
@@ -314,6 +597,42 @@ public final class ModernRozaUi extends Application {
 		return loadedFiles;
 	}
 
+	private HBox decomposedTestsView() {
+		ListView<TestCase> testList = new ListView<>();
+		testList.getItems().addAll(decomposedTestCases.testCases());
+		testList.setCellFactory(list -> new ListCell<>() {
+			@Override
+			protected void updateItem(TestCase item, boolean empty) {
+				super.updateItem(item, empty);
+				setText(empty || item == null ? null : item.name());
+			}
+		});
+		testList.setPrefWidth(320);
+		if (selectedDecomposedTestCase != null) {
+			testList.getSelectionModel().select(selectedDecomposedTestCase);
+		}
+		testList.getSelectionModel().selectedItemProperty().addListener((observable, previous, selected) -> {
+			selectedDecomposedTestCase = selected;
+			renderContentArea();
+		});
+
+		String bodyText = selectedDecomposedTestCase == null ? "Select a test to inspect its decomposed body." : formatDecomposedTestBody(selectedDecomposedTestCase);
+		TextArea bodyArea = new TextArea(bodyText);
+		bodyArea.setEditable(false);
+		bodyArea.setWrapText(false);
+		bodyArea.setStyle(FONT_FAMILY + "-fx-font-family: 'Monospaced'; -fx-font-size: 13px;");
+		HBox.setHgrow(bodyArea, Priority.ALWAYS);
+
+		HBox row = new HBox(16);
+		row.getChildren().addAll(testList, bodyArea);
+		VBox.setVgrow(row, Priority.ALWAYS);
+		return row;
+	}
+
+	private static String formatDecomposedTestBody(TestCase testCase) {
+		return testCase.body().statements().stream().map(CodeStatement::originalText).collect(Collectors.joining("\n"));
+	}
+
 	private String actionButtonText(PipelineStage selectedStage) {
 		return selectedStage.actionLabel();
 	}
@@ -328,6 +647,8 @@ public final class ModernRozaUi extends Application {
 	private Label body(String text) {
 		Label label = new Label(text);
 		label.setWrapText(true);
+		label.setMaxWidth(Double.MAX_VALUE);
+		label.setTextOverrun(OverrunStyle.CLIP);
 		label.setStyle(FONT_FAMILY + "-fx-font-size: 14px; -fx-text-fill: #4b5563;");
 		return label;
 	}

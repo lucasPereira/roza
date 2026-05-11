@@ -24,16 +24,15 @@ import br.ufsc.ine.leb.roza.core.modern.loading.LoadedCodeFiles;
 
 public final class JunitTestClassParser implements TestClassParser {
 
-	private final UnsupportedFeaturePolicy unsupportedFeaturePolicy;
 	private final JavaUnsupportedFeatureValidator validator;
-	private final List<UnsupportedFeatureDiagnostic> diagnostics;
+	private final List<TestCodeViolation> diagnostics;
 
 	public JunitTestClassParser() {
 		this(UnsupportedFeaturePolicy.SAFE);
 	}
 
 	public JunitTestClassParser(UnsupportedFeaturePolicy unsupportedFeaturePolicy) {
-		this.unsupportedFeaturePolicy = Objects.requireNonNull(unsupportedFeaturePolicy);
+		Objects.requireNonNull(unsupportedFeaturePolicy);
 		validator = new JavaUnsupportedFeatureValidator();
 		diagnostics = new ArrayList<>();
 	}
@@ -42,37 +41,33 @@ public final class JunitTestClassParser implements TestClassParser {
 	public ParsedTestClasses parse(LoadedCodeFiles codeFiles) {
 		diagnostics.clear();
 		List<TestClass> testClasses = new ArrayList<>();
+		List<TestCodeViolation> violations = new ArrayList<>();
 		for (CodeFile codeFile : codeFiles.codeFiles()) {
-			CompilationUnit unit = JavaParser.parse(codeFile.content());
-			if (containsNoTests(unit)) {
-				continue;
+			try {
+				CompilationUnit unit = JavaParser.parse(codeFile.content());
+				if (containsNoTests(unit)) {
+					continue;
+				}
+				List<TestCodeViolation> codeFileViolations = validator.validate(unit);
+				diagnostics.addAll(codeFileViolations);
+				violations.addAll(codeFileViolations);
+				extractTestClass(unit).ifPresent(testClasses::add);
+			} catch (UnsupportedFeatureException exception) {
+				throw exception;
+			} catch (RuntimeException exception) {
+				String detail = exception.getMessage() != null ? exception.getMessage() : exception.toString();
+				throw new ParsingException(codeFile.source(), detail, exception);
 			}
-			if (hasUnsupportedFeatures(unit)) {
-				continue;
-			}
-			extractTestClass(unit).ifPresent(testClasses::add);
 		}
-		return new ParsedTestClasses(testClasses);
+		return new ParsedTestClasses(testClasses, violations);
 	}
 
-	public List<UnsupportedFeatureDiagnostic> diagnostics() {
+	public List<TestCodeViolation> diagnostics() {
 		return List.copyOf(diagnostics);
 	}
 
 	private boolean containsNoTests(CompilationUnit unit) {
 		return unit.findAll(MethodDeclaration.class).stream().noneMatch(this::isTestLikeMethod);
-	}
-
-	private boolean hasUnsupportedFeatures(CompilationUnit unit) {
-		List<UnsupportedFeatureDiagnostic> unsupportedFeatures = validator.validate(unit);
-		if (unsupportedFeatures.isEmpty()) {
-			return false;
-		}
-		if (unsupportedFeaturePolicy == UnsupportedFeaturePolicy.SAFE) {
-			throw new UnsupportedFeatureException(unsupportedFeatures.get(0));
-		}
-		diagnostics.addAll(unsupportedFeatures);
-		return true;
 	}
 
 	private Optional<TestClass> extractTestClass(CompilationUnit unit) {
@@ -128,7 +123,9 @@ public final class JunitTestClassParser implements TestClassParser {
 	}
 
 	private CodeBlock body(MethodDeclaration parsedMethod) {
-		return new CodeBlock(parsedMethod.getBody().orElseThrow().getStatements().stream().map(this::statement).collect(Collectors.toList()));
+		return parsedMethod.getBody()
+				.map(body -> new CodeBlock(body.getStatements().stream().map(this::statement).collect(Collectors.toList())))
+				.orElseGet(() -> new CodeBlock(List.of()));
 	}
 
 	private CodeStatement statement(Statement statement) {
@@ -148,14 +145,7 @@ public final class JunitTestClassParser implements TestClassParser {
 	}
 
 	private boolean isAssertion(Statement statement) {
-		return statement.findAll(MethodCallExpr.class)
-				.stream()
-				.map(MethodCallExpr::getNameAsString)
-				.anyMatch(this::isAssertionMethod);
-	}
-
-	private boolean isAssertionMethod(String name) {
-		return JunitAssertionMethods.contains(name);
+		return statement.findAll(MethodCallExpr.class).stream().anyMatch(AssertionMethodCalls::isAssertionMethod);
 	}
 
 	private PrettyPrinterConfiguration prettyPrinterConfiguration() {

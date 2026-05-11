@@ -17,8 +17,10 @@ import br.ufsc.ine.leb.roza.core.modern.parsing.FixtureKind;
 import br.ufsc.ine.leb.roza.core.modern.parsing.FixtureMethod;
 import br.ufsc.ine.leb.roza.core.modern.parsing.HelperMethod;
 import br.ufsc.ine.leb.roza.core.modern.parsing.ParsedTestClasses;
+import br.ufsc.ine.leb.roza.core.modern.parsing.TestCodeViolation;
 import br.ufsc.ine.leb.roza.core.modern.parsing.TestClass;
 import br.ufsc.ine.leb.roza.core.modern.parsing.TestMethod;
+import br.ufsc.ine.leb.roza.core.modern.parsing.ViolationScope;
 
 class DefaultTestCaseDecomposerTest {
 
@@ -99,6 +101,29 @@ class DefaultTestCaseDecomposerTest {
 		assertEquals(false, statements.get(0).isAssertion());
 		assertEquals(false, statements.get(1).isAssertion());
 		assertEquals(true, statements.get(2).isAssertion());
+	}
+
+	@Test
+	void shouldSkipTestsFromClassWithViolation() {
+		ParsedTestClasses parsedTestClasses = new ParsedTestClasses(
+				List.of(testClass(List.of(), List.of(), List.of(testMethod("first", "assertTrue(true);"), testMethod("second", "assertFalse(false);")))),
+				List.of(new TestCodeViolation(ViolationScope.TEST_CLASS, "Example", "Unsupported helper method: helper")));
+
+		DecomposedTestCases decomposed = decomposer.decompose(parsedTestClasses);
+
+		assertEquals(0, decomposed.testCases().size());
+	}
+
+	@Test
+	void shouldSkipOnlyTestWithMethodViolation() {
+		ParsedTestClasses parsedTestClasses = new ParsedTestClasses(
+				List.of(testClass(List.of(), List.of(), List.of(testMethod("first", "assertTrue(true);"), testMethod("second", "assertFalse(false);")))),
+				List.of(new TestCodeViolation(ViolationScope.TEST_METHOD, "Example", "second", "Unsupported test method with parameters: second")));
+
+		DecomposedTestCases decomposed = decomposer.decompose(parsedTestClasses);
+
+		assertEquals(1, decomposed.testCases().size());
+		assertEquals("first", decomposed.testCases().get(0).name());
 	}
 
 	private ParsedTestClasses parsedTestClasses(TestClass testClass) {

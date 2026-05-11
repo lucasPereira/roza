@@ -1,17 +1,13 @@
 package br.ufsc.ine.leb.roza.core.modern.parsing;
 
-public final class UnsupportedFeatureException extends RuntimeException {
+public final class ParsingException extends RuntimeException {
 
 	private static final long serialVersionUID = 1L;
 
 	private final String codeFileSource;
 
-	public UnsupportedFeatureException(UnsupportedFeatureDiagnostic diagnostic) {
-		this("", diagnostic);
-	}
-
-	public UnsupportedFeatureException(String codeFileSource, UnsupportedFeatureDiagnostic diagnostic) {
-		super(withSource(codeFileSource, diagnostic.message()));
+	public ParsingException(String codeFileSource, String message, Throwable cause) {
+		super(withSource(codeFileSource, message), cause);
 		this.codeFileSource = codeFileSource != null ? codeFileSource : "";
 	}
 
