@@ -112,19 +112,36 @@ Acceptance criteria:
 - AC-041: `TestClassParser.parse` returns `ParsedTestClasses`.
 - AC-042: `ParsedTestClasses` contains a list of `TestClass` instances.
 - AC-079: `ParsedTestClasses` exposes the parsed test classes through `testClasses()`.
+- AC-119: The first parsing implementation is Java-first rather than language-universal.
+- AC-120: Concrete Java parsers may use JavaParser internally, but JavaParser types must not appear in the public modern Roza parsing contract.
+- AC-121: Unsupported parsing features are handled by `UnsupportedFeaturePolicy`.
+- AC-122: Unsupported feature validation runs in a separate validator before extracting modern Roza domain models.
+- AC-123: `UnsupportedFeaturePolicy.SAFE` fails immediately with a clear error when unsupported features are found.
+- AC-124: `UnsupportedFeaturePolicy.UNSAFE` records diagnostics and skips unsupported input instead of silently accepting it.
 
-### REQ-009: Generalized TestClass AST Root
+### REQ-009: Java-First TestClass Domain Model
 
-`TestClass` must be the root AST abstraction for each identified test class and must be general enough to support all modern Roza pipeline stages independently of the source language, test framework, or concrete parser implementation.
+`TestClass` must be the root domain abstraction for each identified Java test class. It must be Java-first and must not expose parser-library types such as JavaParser `CompilationUnit`.
 
 Acceptance criteria:
 
-- AC-043: `TestClass` is the parent AST abstraction for all sub-ASTs of an identified test class.
-- AC-044: Consumers of `TestClass` can work with it without knowing whether it came from Java, Python, JUnit 4, JUnit 5, or another language/framework/source.
+- AC-043: `TestClass` is the parent domain abstraction for the supported parts of an identified Java test class.
+- AC-044: Consumers of `TestClass` can work with it without depending on JavaParser types.
 - AC-045: Only concrete `TestClassParser` implementations know how to build `TestClass` instances from loaded raw code files.
-- AC-046: `TestClass` must not expose assumptions tied to a single language or test framework.
-- AC-047: The `TestClass` abstraction must be powerful enough to support later pipeline stages through generalized AST operations or structures.
-- AC-078: `TestClass` has no minimum content API until confirmed requirements make one necessary.
+- AC-046: The first `TestClass` model may expose Java test-code domain concepts instead of trying to support non-Java languages prematurely.
+- AC-047: The `TestClass` abstraction must be powerful enough to support later Java decomposition, measurement, refactoring, and writing stages.
+- AC-078: `TestClass` exposes only the minimum content required by confirmed requirements.
+- AC-125: `TestClass` exposes its name.
+- AC-126: `TestClass` exposes parsed fields because decomposition needs to transform class attributes into local variables.
+- AC-127: `TestClass` exposes supported fixture methods.
+- AC-128: `TestClass` exposes supported helper methods.
+- AC-129: `TestClass` exposes supported test methods.
+- AC-130: Parsed fields preserve type, name, supported modifiers, and optional initialization.
+- AC-131: Parsed code blocks expose top-level `CodeStatement` instances.
+- AC-132: `CodeStatement` exposes original text and normalized text.
+- AC-133: The first parser treats control-flow blocks such as `for`, `while`, and `if` as top-level statements rather than flattening their internals.
+- AC-134: Static members, nested classes, unsupported lifecycle features, parameterized tests, inheritance, static imports, and other listed unsupported features are rejected or skipped according to `UnsupportedFeaturePolicy`.
+- AC-135: Modern Roza starts conservative: unsupported features should be removed from the unsupported list only when real support is implemented.
 
 ### REQ-010: Decomposition Stage
 
@@ -335,3 +352,5 @@ The similarity matrix must be indexed by abstract test identities, but the exact
 - 2026-05-10: Moved the loading contract to the `core.modern.loading` package.
 - 2026-05-10: Added acceptance criteria for the first filesystem `CodeFileLoader` implementation, covering folder inclusion, recursion, and extension filtering.
 - 2026-05-11: Confirmed `LoadedCodeFiles` and `CodeFile` as concrete loading data classes rather than extension interfaces.
+- 2026-05-11: Refined parsing and `TestClass` from a language-universal AST goal to a Java-first domain model that hides JavaParser behind concrete parser implementations.
+- 2026-05-11: Added `UnsupportedFeaturePolicy` and fail-fast/diagnostic handling for unsupported parser features.

@@ -18,7 +18,14 @@ This document stores evolving knowledge discovered while designing and implement
 - Parsing stage: the second modern Roza pipeline stage; it reads loaded raw code files and creates ASTs for identified test classes.
 - `TestClassParser`: the parsing stage interface.
 - `ParsedTestClasses`: the result returned by `TestClassParser.parse`; it exposes `TestClass` instances through `testClasses()`.
-- `TestClass`: the generalized root AST abstraction for an identified test class and the parent of all its sub-ASTs. It has no minimum content API yet.
+- `UnsupportedFeaturePolicy`: the parser policy for unsupported Java test-code features. `SAFE` fails with a clear error; `UNSAFE` records diagnostics and skips unsupported input.
+- `JavaUnsupportedFeatureValidator`: the separate validation step that runs before Java parser implementations extract modern Roza domain models.
+- `TestClass`: the Java-first root domain abstraction for an identified Java test class. It hides JavaParser types from the public modern Roza contract.
+- `Field`: a parsed Java field that decomposition can later transform into a local variable.
+- `FixtureMethod`: a supported instance fixture method such as JUnit 4 `@Before` or `@After`.
+- `HelperMethod`: a supported non-test helper method in the Java test class.
+- `CodeBlock`: a block of parsed top-level code statements.
+- `CodeStatement`: a statement-level code unit with original and normalized text for later decomposition and similarity measurement.
 - Decomposition stage: the third modern Roza pipeline stage; it separates each test from its original class and carries the code required by that test.
 - `TestMethodDecomposer`: the decomposition stage interface.
 - `DecomposedTestMethods`: the result returned by `TestMethodDecomposer.decompose`; it exposes decomposed `TestMethod` instances through `testMethods()`.
@@ -52,11 +59,11 @@ The framework should be designed for broad extension across programming language
 
 The first confirmed pipeline stage is `loading`. It has one shared interface named `CodeFileLoader` with a single method named `load`. The method returns `LoadedCodeFiles`, a concrete data class that exposes concrete `CodeFile` instances through `codeFiles()`. Each `CodeFile` exposes raw textual content through `content()`. The name avoids implying that every loaded file contains tests. Concrete loading implementations are configured through constructor parameters, allowing different strategies such as recursive filesystem loading, extension-based filesystem loading, and Git-based loading.
 
-The second confirmed pipeline stage is `parsing`. Its interface is named `TestClassParser`. It receives the in-memory raw code files produced by `loading`, determines which loaded files contain test classes, identifies those test classes, and creates one AST per identified test class. Its `parse` method returns `ParsedTestClasses`, which exposes `TestClass` instances through `testClasses()`. This keeps loading focused on loading files and leaves structural interpretation to parsing.
+The second confirmed pipeline stage is `parsing`. Its interface is named `TestClassParser`. It receives the in-memory raw code files produced by `loading`, determines which loaded files contain test classes, identifies those test classes, and creates one Java-first domain model per identified test class. Its `parse` method returns `ParsedTestClasses`, which exposes `TestClass` instances through `testClasses()`. This keeps loading focused on loading files and leaves structural interpretation to parsing.
 
-`TestClass` is currently the most delicate abstraction in modern Roza. It must be powerful enough to represent the root AST for a test class while staying independent of concrete origins such as `.java`, `.py`, JUnit 4, JUnit 5, or future languages/frameworks. Concrete `TestClassParser` implementations know how to build `TestClass`; downstream consumers should work against `TestClass` without knowing the origin. Its minimum content API is intentionally undefined for now.
+The initial `TestClass` model is Java-first, not language-universal. The architecture should still preserve pipeline extension points, but it should not sacrifice the quality of the Java model to prematurely support Python, Rust, or other languages. JavaParser may be used inside concrete Java parser implementations, but JavaParser types should not become the public modern Roza model.
 
-The detailed design of `TestClass` is the current inflection point for modern Roza. It should be deliberately deferred until the whole pipeline is understood at a high level, then revisited with the pipeline's downstream needs in mind.
+The first supported parser scenario should be deliberately conservative. Unsupported Java/JUnit features are validated by a separate validator before model extraction. `UnsupportedFeaturePolicy.SAFE` fails fast with a clear error; `UnsupportedFeaturePolicy.UNSAFE` records diagnostics and skips unsupported input rather than silently accepting it. The project should start with many unsupported features and remove them from the unsupported list only when real support is implemented.
 
 The third confirmed pipeline stage is `decomposition`. Its interface is named `TestMethodDecomposer`, and its method is named `decompose`. It receives parsed test classes and separates each test from its class of origin. `TestMethodDecomposer.decompose` returns `DecomposedTestMethods`, which exposes decomposed `TestMethod` instances through `testMethods()`. Each decomposed test is represented by `TestMethod`. For now, `TestMethod` has no minimum content API and does not expose `id()` or `testClass()`. In the implicit setup example, a class with one implicit setup and two tests produces two decomposed test models, each conceptually containing the implicit setup code plus the body of one test, without yet exposing that structure through the public API.
 
@@ -72,6 +79,7 @@ The final confirmed pipeline stage is `writing`. Its interface is named `TestCla
 
 - The minimum loading API is implemented in `src/main/java/br/ufsc/ine/leb/roza/core/modern/loading` as `CodeFileLoader`, `LoadedCodeFiles`, and `CodeFile`.
 - `FileSystemCodeFileLoader` is implemented in `src/main/java/br/ufsc/ine/leb/roza/core/modern/loading` and covered by tests in `src/test/java/br/ufsc/ine/leb/roza/core/modern/loading`.
+- The first parsing implementation is being designed as Java-first and belongs in `src/main/java/br/ufsc/ine/leb/roza/core/modern/parsing`.
 - Code comments should be avoided unless they explain something non-obvious.
 
 ## Decisions
@@ -115,6 +123,10 @@ The final confirmed pipeline stage is `writing`. Its interface is named `TestCla
 - DEC-037: The loading contract belongs in the `br.ufsc.ine.leb.roza.core.modern.loading` package.
 - DEC-038: The first concrete loading implementation is `FileSystemCodeFileLoader`, configured through its constructor with a folder, a recursive flag, and an extension list.
 - DEC-039: `LoadedCodeFiles` and `CodeFile` are concrete loading data classes rather than extension interfaces; `CodeFileLoader` remains the extension interface for loading strategies.
+- DEC-040: The first modern parsing model is Java-first rather than a language-universal AST abstraction.
+- DEC-041: JavaParser is allowed inside concrete Java parser implementations, but JavaParser types must not appear in the public modern Roza parsing contract.
+- DEC-042: Unsupported parser features are handled by `UnsupportedFeaturePolicy`, with `SAFE` as the conservative fail-fast mode and `UNSAFE` as the diagnostic-and-skip mode.
+- DEC-043: Unsupported feature detection must run in a separate validator before extracting `TestClass`, `Field`, `TestMethod`, or other parsing models.
 
 ## Hypotheses
 
@@ -127,7 +139,7 @@ The final confirmed pipeline stage is `writing`. Its interface is named `TestCla
 - Confirm whether the high-level pipeline stages are complete: `loading`, `parsing`, `decomposition`, `measurement`, `clustering`, `refactoring`, and `writing`.
 - Define the input and output contract for the whole pipeline.
 - Decide which additional attributes `CodeFile` needs beyond `content()` when a confirmed requirement makes them necessary.
-- Decide which minimum content API `TestClass` needs when a confirmed requirement makes it necessary.
+- Refine the Java-first `TestClass` model as decomposition, measurement, refactoring, and writing expose real needs.
 - Decide how parsing should represent ASTs and identified test classes in the core model.
 - Explore whether an existing non-legacy AST abstraction can support `TestClass`.
 - Decide whether later core contracts should model files, ASTs, tests, changes, or all of them.
@@ -179,3 +191,5 @@ The final confirmed pipeline stage is `writing`. Its interface is named `TestCla
 - 2026-05-10: Moved the minimum loading API to the `core.modern.loading` package.
 - 2026-05-10: Implemented and tested the first concrete filesystem loader for folder inclusion, recursion, and extension filtering.
 - 2026-05-11: Changed `LoadedCodeFiles` and `CodeFile` from interfaces to concrete data classes.
+- 2026-05-11: Pivoted parsing from a language-universal AST goal to a Java-first domain model that keeps JavaParser behind concrete implementations.
+- 2026-05-11: Recorded `UnsupportedFeaturePolicy` and the separate unsupported-feature validator as the conservative parsing strategy.
