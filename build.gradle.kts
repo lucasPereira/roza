@@ -2,6 +2,7 @@ plugins {
     java
     application
     id("com.diffplug.spotless") version "6.23.3"
+    id("org.openjfx.javafxplugin") version "0.1.0"
 }
 
 group = "br.ufsc.ine.leb"
@@ -17,7 +18,12 @@ java {
 }
 
 application {
-    mainClass.set("br.ufsc.ine.leb.roza.ui.legacy.RozaUi")
+    mainClass.set("br.ufsc.ine.leb.roza.ui.legacy.LegacyRozaUi")
+}
+
+javafx {
+    version = "17.0.10"
+    modules = listOf("javafx.controls")
 }
 
 sourceSets {
@@ -73,7 +79,20 @@ tasks.register<JavaExec>("runLegacyRozaUi") {
     group = "application"
     description = "Runs the legacy Roza UI."
     classpath = sourceSets.main.get().runtimeClasspath
-    mainClass.set("br.ufsc.ine.leb.roza.ui.legacy.RozaUi")
+    mainClass.set("br.ufsc.ine.leb.roza.ui.legacy.LegacyRozaUi")
+}
+
+tasks.register<JavaExec>("runModernRozaUi") {
+    group = "application"
+    description = "Runs the modern Roza UI."
+    classpath = sourceSets.main.get().runtimeClasspath
+    mainClass.set("br.ufsc.ine.leb.roza.ui.modern.ModernRozaUi")
+    jvmArgs(
+        "--module-path",
+        configurations.runtimeClasspath.get().filter { file -> file.name.startsWith("javafx-") }.asPath,
+        "--add-modules",
+        "javafx.controls",
+    )
 }
 
 fun registerExperimentTask(

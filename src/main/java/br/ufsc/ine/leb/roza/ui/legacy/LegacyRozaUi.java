@@ -7,7 +7,7 @@ import java.util.Queue;
 import br.ufsc.ine.leb.roza.ui.legacy.window.Window;
 import br.ufsc.ine.leb.roza.core.legacy.utils.RozaLogger;
 
-public class RozaUi {
+public class LegacyRozaUi {
 
 	public static void main(String[] args) {
 		Hub hub = new Hub();

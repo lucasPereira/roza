@@ -284,6 +284,20 @@ Acceptance criteria:
 - AC-157: Existing legacy UI code lives under `br.ufsc.ine.leb.roza.ui.legacy`.
 - AC-158: The modern UI package starts under `br.ufsc.ine.leb.roza.ui.modern`.
 - AC-159: The existing Gradle UI entry point continues to run the legacy UI until a modern UI entry point is implemented.
+- AC-160: The modern UI uses JavaFX 17.x for the first slice, without upgrading the project Java version unless a concrete JavaFX/JDK limitation requires it.
+- AC-161: The modern UI skeleton has a top pipeline bar that represents the modern Roza pipeline stages.
+- AC-162: The modern UI skeleton allows navigation only to the current stage and stages already completed.
+- AC-163: The modern UI skeleton uses distinct visual states for completed stages, the current pending stage, and blocked future stages.
+- AC-164: The modern UI skeleton shows the selected stage configuration and action button in a left sidebar.
+- AC-165: The modern UI skeleton shows placeholder data from the previous stage in the center content area.
+- AC-166: The existing Swing UI entry point is named `LegacyRozaUi`, and the JavaFX modern UI entry point is named `ModernRozaUi`.
+- AC-167: The modern UI skeleton should stay visually minimal, avoiding redundant section titles and unnecessary nested cards.
+- AC-168: The final writing stage can be marked as completed in the modern UI skeleton after its action is triggered.
+- AC-169: The modern UI skeleton visually marks the selected pipeline stage independently from whether the stage is completed or current.
+- AC-170: The modern UI skeleton uses a mostly black, white, and gray visual scheme; pipeline stage status colors are exceptions.
+- AC-171: The modern UI toolbar and stage action buttons use `#333333` as their black background.
+- AC-172: The modern UI keeps stage action buttons active for completed stages; triggering a completed stage resets only later completed stages.
+- AC-173: Blocked pipeline stage buttons use a lighter gray treatment than available stages, without relying on disabled opacity that harms text contrast.
 
 ### NFR-004: Minimal Code Comments
 
@@ -510,4 +524,10 @@ The first measurement implementation fills a dense directed matrix by source and
 - 2026-05-11: Renamed the first modern parser implementation from `JavaTestClassParser` to `JunitTestClassParser` to reflect that the implementation targets JUnit, not all Java test frameworks.
 - 2026-05-11: Replaced assertion-name prefix matching with an explicit supported assertion method list for JUnit 4, current JUnit Jupiter, and Hamcrest `assertThat`, shared by parsing and unsupported-feature validation.
 - 2026-05-11: Implemented the first measurement slice with `TestCaseSimilarityMeasurer`, dense directed `TestCaseSimilarityMatrix`, and `LccssTestCaseSimilarityMeasurer`.
+- 2026-05-11: Chose JavaFX 17.x for the first modern UI skeleton and confirmed explicit entrypoint names: `LegacyRozaUi` and `ModernRozaUi`.
+- 2026-05-11: Refined the modern UI skeleton toward a minimal layout without redundant headings, bordered pipeline buttons, or an inner center content card.
+- 2026-05-11: Refined the modern UI skeleton so writing can be completed visually and configuration controls do not sit inside a white card.
+- 2026-05-11: Refined the modern UI skeleton so previous stages can be visually selected without losing their completed status.
+- 2026-05-11: Refined the modern UI skeleton with a black toolbar, mostly neutral colors, and active actions for completed stages that reset later stages.
+- 2026-05-11: Refined blocked pipeline stage buttons to use a lighter gray treatment.
 - 2026-05-11: Strengthened legacy isolation so imports between `core.modern` and `core.legacy` must not cross in either direction.

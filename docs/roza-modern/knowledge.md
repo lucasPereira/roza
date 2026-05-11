@@ -46,8 +46,8 @@ This document stores evolving knowledge discovered while designing and implement
 - `RefactoredTestClasses`: the result returned by `TestClassRefactorer.refactor`; it exposes refactored `TestClass` instances through `testClasses()`.
 - Writing stage: the final modern Roza pipeline stage; it writes refactored test classes to an output destination such as the filesystem or cloud.
 - `TestClassWriter`: the writing stage interface.
-- Legacy UI: the existing Swing UI now lives under `br.ufsc.ine.leb.roza.ui.legacy`.
-- Modern UI: the future manual-testing UI for modern Roza starts under `br.ufsc.ine.leb.roza.ui.modern`.
+- Legacy UI: the existing Swing UI now lives under `br.ufsc.ine.leb.roza.ui.legacy` and starts from `LegacyRozaUi`.
+- Modern UI: the JavaFX manual-testing UI for modern Roza starts under `br.ufsc.ine.leb.roza.ui.modern` and starts from `ModernRozaUi`.
 
 ## Current Architectural Understanding
 
@@ -84,6 +84,8 @@ The fifth confirmed pipeline stage is `clustering`. Its interface is named `Test
 The sixth confirmed pipeline stage is `refactoring`. Its interface is named `TestClassRefactorer`, and its method is named `refactor`. It receives `TestCaseClusters` and returns `RefactoredTestClasses`, which exposes refactored `TestClass` instances through `testClasses()`. It receives the groups produced by `clustering` and decides what to do with them. The first concrete purpose is to refactor test classes by regrouping tests into better classes so implicit setup can be used, but the pipeline may be able to support other refactoring purposes, such as delegated setup, through different refactoring implementations.
 
 The final confirmed pipeline stage is `writing`. Its interface is named `TestClassWriter`, and its method is named `write`. It receives `RefactoredTestClasses` and writes them to an output destination without returning a serialized model. The destination may be the filesystem or a cloud target, depending on the writer implementation. Concrete writer implementations receive required output destination parameters through constructors.
+
+The first modern UI slice uses JavaFX 17.x while the project remains on Java 11. It is a code-only skeleton without FXML. Its layout mirrors the pipeline: a top stage bar, a left sidebar with selected-stage configuration and action button, and a center area with placeholder data produced by the previous stage. The layout should stay minimal, using mostly black, white, and gray; pipeline status colors are exceptions. The top stage bar and selected-stage action button use `#333333`, and blocked pipeline stage buttons use a lighter gray treatment without JavaFX disabled opacity so their text remains readable. Stage selection is visual state independent from pipeline status, so a previous completed stage can still be shown as selected. Stage actions advance only local UI state for manual navigation, including visually completing the final writing stage; triggering a completed stage resets only later completed stages. These actions do not execute loading, parsing, decomposition, measurement, clustering, refactoring, or writing yet.
 
 ## Implementation Notes
 
@@ -153,6 +155,12 @@ The final confirmed pipeline stage is `writing`. Its interface is named `TestCla
 - DEC-056: The first measurement implementation is `LccssTestCaseSimilarityMeasurer`.
 - DEC-057: Isolation between `core.modern` and `core.legacy` is bidirectional; imports must not cross between them in either direction.
 - DEC-058: UI code is split into `ui.legacy` and `ui.modern`; the existing UI remains the legacy UI, and the modern UI will be developed separately.
+- DEC-059: The modern UI uses JavaFX 17.x for the first slice and defers any Java version upgrade until a concrete limitation requires it.
+- DEC-060: UI entrypoint names are explicit: `LegacyRozaUi` for the existing Swing UI and `ModernRozaUi` for the new JavaFX UI.
+- DEC-061: The modern UI skeleton should favor a minimal visual layout over descriptive headings and nested cards.
+- DEC-062: The modern UI skeleton can advance past the last pipeline stage so `Writing` can be visually marked as completed.
+- DEC-063: Modern UI pipeline selection is tracked separately from completed/current/blocked pipeline status.
+- DEC-064: Modern UI stage actions remain active for completed stages and reset only subsequent completed stages when triggered.
 
 ## Hypotheses
 
@@ -233,3 +241,9 @@ The final confirmed pipeline stage is `writing`. Its interface is named `TestCla
 - 2026-05-11: Implemented the first measurement contracts, dense directed similarity matrix, and LCCSS measurer.
 - 2026-05-11: Recorded bidirectional import isolation between `core.modern` and `core.legacy`.
 - 2026-05-11: Split UI packages into `ui.legacy` and `ui.modern` to prepare for a new modern Roza UI.
+- 2026-05-11: Recorded JavaFX 17.x as the first modern UI technology and defined the initial pipeline navigation skeleton.
+- 2026-05-11: Recorded the minimal layout direction for the modern UI skeleton.
+- 2026-05-11: Recorded that the modern UI skeleton can visually complete the final writing stage.
+- 2026-05-11: Recorded that modern UI pipeline stage selection is independent from stage completion status.
+- 2026-05-11: Recorded the black toolbar, neutral color direction, and completed-stage reset behavior for the modern UI skeleton.
+- 2026-05-11: Recorded that blocked pipeline stage buttons should use a lighter gray treatment.
