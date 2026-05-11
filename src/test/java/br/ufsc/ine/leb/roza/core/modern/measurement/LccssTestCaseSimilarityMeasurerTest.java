@@ -33,6 +33,27 @@ class LccssTestCaseSimilarityMeasurerTest {
 	}
 
 	@Test
+	void shouldMeasureFixtureDeclarationPrefixBeforeDifferentTestBodies() {
+		DecomposedTestCases testCases = testCases(
+				testCase(
+						"cluster",
+						statement("TestCase alpha = new TestCase(\"alpha\", List.of(), List.of());"),
+						statement("TestCase beta = new TestCase(\"beta\", List.of(), List.of());"),
+						statement("TestCase gamma = new TestCase(\"gamma\", List.of(), List.of());"),
+						statement("Cluster alphaCluster = new Cluster(alpha);")),
+				testCase(
+						"threeTestsStopingInLevelTwoBecauseItHasntClustersToMerge",
+						statement("TestCase alpha = new TestCase(\"alpha\", List.of(), List.of());"),
+						statement("TestCase beta = new TestCase(\"beta\", List.of(), List.of());"),
+						statement("TestCase gamma = new TestCase(\"gamma\", List.of(), List.of());"),
+						statement("SimilarityReport report = new SimilarityReportBuilder(true).add(alpha, beta, dotFive).add(gamma).complete().build();")));
+
+		TestCaseSimilarityMatrix matrix = measurer.measure(testCases);
+
+		assertEquals(0.75, matrix.similarity(0, 1), 0.000001);
+	}
+
+	@Test
 	void shouldStopProjectionAtFirstAssertion() {
 		DecomposedTestCases testCases = testCases(
 				testCase("source", statement("setup();"), assertion("assertTrue(true);"), statement("after();")),

@@ -22,12 +22,16 @@ public final class TestCaseSimilarityMatrix {
 		similarities[index(sourceIndex, targetIndex)] = similarity;
 	}
 
-	double similarity(int sourceIndex, int targetIndex) {
+	public double similarity(int sourceIndex, int targetIndex) {
 		return similarities[index(sourceIndex, targetIndex)];
 	}
 
-	int size() {
+	public int size() {
 		return testCases.size();
+	}
+
+	public TestCase testCaseAt(int index) {
+		return testCases.get(index);
 	}
 
 	private int index(int sourceIndex, int targetIndex) {

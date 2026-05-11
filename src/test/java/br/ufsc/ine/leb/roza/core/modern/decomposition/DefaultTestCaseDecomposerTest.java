@@ -69,7 +69,28 @@ class DefaultTestCaseDecomposerTest {
 
 		DecomposedTestCases decomposed = decomposer.decompose(parsedTestClasses);
 
-		assertEquals(List.of("Sut sut;", "sut = new Sut();", "sut.save(1);", "assertEquals(1, sut.count());"), statements(decomposed.testCases().get(0)));
+		assertEquals(List.of("Sut sut = new Sut();", "sut.save(1);", "assertEquals(1, sut.count());"), statements(decomposed.testCases().get(0)));
+	}
+
+	@Test
+	void shouldTurnFixtureFieldAssignmentsIntoInitializedDeclarations() {
+		ParsedTestClasses parsedTestClasses = parsedTestClasses(testClass(
+				List.of(field("TestCase", "alpha"), field("TestCase", "beta"), field("TestCase", "gamma")),
+				List.of(before(
+						"alpha = new TestCase(\"alpha\", List.of(), List.of());",
+						"beta = new TestCase(\"beta\", List.of(), List.of());",
+						"gamma = new TestCase(\"gamma\", List.of(), List.of());")),
+				List.of(testMethod("test", "assertTrue(true);"))));
+
+		DecomposedTestCases decomposed = decomposer.decompose(parsedTestClasses);
+
+		assertEquals(
+				List.of(
+						"TestCase alpha = new TestCase(\"alpha\", List.of(), List.of());",
+						"TestCase beta = new TestCase(\"beta\", List.of(), List.of());",
+						"TestCase gamma = new TestCase(\"gamma\", List.of(), List.of());",
+						"assertTrue(true);"),
+				statements(decomposed.testCases().get(0)));
 	}
 
 	@Test
@@ -83,9 +104,9 @@ class DefaultTestCaseDecomposerTest {
 
 		assertEquals(2, decomposed.testCases().size());
 		assertEquals("first", decomposed.testCases().get(0).name());
-		assertEquals(List.of("Sut sut;", "sut = new Sut();", "assertTrue(true);"), statements(decomposed.testCases().get(0)));
+		assertEquals(List.of("Sut sut = new Sut();", "assertTrue(true);"), statements(decomposed.testCases().get(0)));
 		assertEquals("second", decomposed.testCases().get(1).name());
-		assertEquals(List.of("Sut sut;", "sut = new Sut();", "assertTrue(false);"), statements(decomposed.testCases().get(1)));
+		assertEquals(List.of("Sut sut = new Sut();", "assertTrue(false);"), statements(decomposed.testCases().get(1)));
 	}
 
 	@Test
@@ -99,8 +120,7 @@ class DefaultTestCaseDecomposerTest {
 
 		List<CodeStatement> statements = decomposed.testCases().get(0).body().statements();
 		assertEquals(false, statements.get(0).isAssertion());
-		assertEquals(false, statements.get(1).isAssertion());
-		assertEquals(true, statements.get(2).isAssertion());
+		assertEquals(true, statements.get(1).isAssertion());
 	}
 
 	@Test

@@ -183,7 +183,8 @@ Acceptance criteria:
 - AC-140: `TestCase` preserves the original parsed test method name so refactoring can use it later, even when names are duplicated.
 - AC-141: `TestCase` does not need to preserve the source `@Before` annotation or fixture identity; it only needs to include the statements derived from supported `@Before` fixtures in the decomposed body.
 - AC-144: The default decomposition implementation preserves assertions in the decomposed `TestCase` body.
-- AC-145: The default decomposition implementation orders the decomposed body as field declarations, supported `@Before` statements, then original test body statements.
+- AC-145: The default decomposition implementation orders the decomposed body as field declarations that are not initialized in supported `@Before` fixtures, supported `@Before` statements, then original test body statements.
+- AC-215: When a supported `@Before` fixture assigns to a parsed field, the default decomposition implementation turns that assignment into a local variable declaration with initialization at the assignment position.
 - AC-192: The default decomposition implementation does not decompose tests that belong to classes with class-level violations.
 - AC-193: The default decomposition implementation does not decompose test methods with method-level violations.
 - AC-194: Downstream measurement and refactoring consume only decomposed tests, so tests discarded because of parsing violations are excluded from those stages by construction.
@@ -214,7 +215,8 @@ Acceptance criteria:
 - AC-152: The first `TestCaseSimilarityMatrix` constructor receives only the ordered list of `TestCase` instances.
 - AC-153: The first `TestCaseSimilarityMatrix` stores similarities as a dense directed matrix and must not assume similarity metrics are symmetric.
 - AC-154: The first `TestCaseSimilarityMatrix` initializes every similarity with `0.0` except the diagonal, which starts with `1.0`.
-- AC-155: The first `TestCaseSimilarityMatrix` exposes only the write operation currently needed by measurers, `setSimilarity(int sourceIndex, int targetIndex, double similarity)`, with package-level visibility.
+- AC-155: The first `TestCaseSimilarityMatrix` exposes the write operation needed by measurers, `setSimilarity(int sourceIndex, int targetIndex, double similarity)`, with package-level visibility.
+- AC-204: `TestCaseSimilarityMatrix` exposes public read operations for matrix size, test case by index, and similarity by source/target indexes.
 
 ### REQ-012: Clustering Stage
 
@@ -320,6 +322,7 @@ Acceptance criteria:
 - AC-177: The modern UI loading configuration has accepted extension checkboxes for `.java` and `.txt`.
 - AC-178: Triggering `Load` in the modern UI uses the filesystem code file loader and advances to `Parsing` when loading succeeds.
 - AC-179: The modern UI `Parsing` center shows the loaded file list after `Load`; selecting a loaded file shows that file's content.
+- AC-216: The modern UI loading source folder defaults to Roza's own test source folder, `roza/src/test/java`.
 - AC-195: The modern UI `Parsing` center shows parsing violations at the top when violations exist.
 - AC-196: The modern UI `Parsing` violation viewer shows one violation at a time with previous and next controls.
 - AC-197: The modern UI selects the loaded file for the class referenced by the displayed parsing violation, including the first displayed violation.
@@ -327,6 +330,18 @@ Acceptance criteria:
 - AC-200: The modern UI parsing violation viewer shows the violation target using `ClassName.methodName` format when a method is present.
 - AC-201: The modern UI parsing violation viewer shows the code snippet for the displayed violation without an extra card-style white background.
 - AC-202: The modern UI `Decomposition` center shows a summary with the number of classes with class-level violations, tests with method-level violations, tests excluded by violations, and accepted tests.
+- AC-203: After decomposition, the modern UI `Measurement` center shows all decomposed tests and the code for the selected test.
+- AC-205: The modern UI `Measurement` configuration exposes a metric dropdown with `LCCSS` selected by default.
+- AC-206: Triggering `Measure` in the modern UI uses `LccssTestCaseSimilarityMeasurer` and advances to `Clustering` when measurement succeeds.
+- AC-207: The modern UI `Clustering` center shows source and target test selectors.
+- AC-208: The modern UI `Clustering` center shows a ranked source-target similarity pair list.
+- AC-209: The modern UI `Clustering` ranked list has an order toggle button above it.
+- AC-210: Selecting an item from the modern UI `Clustering` ranked list synchronizes the selected source and target tests.
+- AC-211: The modern UI `Clustering` center shows source and target decomposed-code blocks next to the ranked list.
+- AC-212: The modern UI `Clustering` ranked list omits self-pairs.
+- AC-213: The modern UI `Clustering` ranked list items show only the similarity score.
+- AC-214: Selecting an item from the modern UI `Clustering` ranked list preserves the current list scroll position.
+- AC-217: The modern UI `Clustering` ranked score list uses a narrow width so the source and target code blocks receive most of the horizontal space.
 
 ### NFR-004: Minimal Code Comments
 
@@ -427,6 +442,9 @@ public interface TestCaseSimilarityMeasurer {
 
 public final class TestCaseSimilarityMatrix {
 	public TestCaseSimilarityMatrix(List<TestCase> testCases);
+	public int size();
+	public TestCase testCaseAt(int index);
+	public double similarity(int sourceIndex, int targetIndex);
 }
 ```
 
@@ -587,3 +605,13 @@ The first measurement implementation fills a dense directed matrix by source and
 - 2026-05-11: Confirmed that method references inside detectable assertion calls are not unsupported-subset violations.
 - 2026-05-11: Added a modern UI `Decomposition` summary for violation and accepted-test counts.
 - 2026-05-11: Removed parsing violation records from the modern UI `Decomposition` summary.
+- 2026-05-11: Added the decomposed-test list and selected-test code view to the modern UI `Measurement` center.
+- 2026-05-11: Added the LCCSS metric selector, measurement action, and clustering matrix inspection to the modern UI.
+- 2026-05-11: Replaced the full modern UI `Clustering` matrix rendering with a ranked similarity list and side-by-side source/target code blocks.
+- 2026-05-11: Refined the modern UI `Clustering` ranked list to omit self-pairs, show scores only, and preserve scroll on selection.
+- 2026-05-11: Fixed ranked-list selection so it synchronizes both source and target controls without resetting scroll.
+- 2026-05-11: Changed the modern UI `Clustering` ranked list from selected-source targets to global source-target pairs.
+- 2026-05-11: Corrected default decomposition so supported `@Before` assignments to fields become initialized local declarations.
+- 2026-05-11: Set the modern UI default loading source folder to Roza's own test sources.
+- 2026-05-11: Narrowed the modern UI `Clustering` ranked score list.
+- 2026-05-11: Shortened the modern UI `Clustering` ranked-order button text.

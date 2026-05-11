@@ -1,10 +1,13 @@
 package br.ufsc.ine.leb.roza.ui.modern;
 
 import java.io.File;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -16,6 +19,9 @@ import br.ufsc.ine.leb.roza.core.modern.decomposition.TestCaseDecomposer;
 import br.ufsc.ine.leb.roza.core.modern.loading.CodeFile;
 import br.ufsc.ine.leb.roza.core.modern.loading.FileSystemCodeFileLoader;
 import br.ufsc.ine.leb.roza.core.modern.loading.LoadedCodeFiles;
+import br.ufsc.ine.leb.roza.core.modern.measurement.LccssTestCaseSimilarityMeasurer;
+import br.ufsc.ine.leb.roza.core.modern.measurement.TestCaseSimilarityMatrix;
+import br.ufsc.ine.leb.roza.core.modern.measurement.TestCaseSimilarityMeasurer;
 import br.ufsc.ine.leb.roza.core.modern.parsing.CodeStatement;
 import br.ufsc.ine.leb.roza.core.modern.parsing.JunitTestClassParser;
 import br.ufsc.ine.leb.roza.core.modern.parsing.ParsedTestClasses;
@@ -59,6 +65,9 @@ public final class ModernRozaUi extends Application {
 	private final CheckBox txtExtension;
 	private final ComboBox<String> parserImplementationCombo;
 	private final ComboBox<String> decomposerImplementationCombo;
+	private final ComboBox<String> metricCombo;
+	private final ComboBox<TestCase> sourceTestCombo;
+	private final ComboBox<TestCase> targetTestCombo;
 	private Path sourceFolder;
 	private LoadedCodeFiles loadedCodeFiles;
 	private CodeFile selectedCodeFile;
@@ -69,6 +78,12 @@ public final class ModernRozaUi extends Application {
 	private DecomposedTestCases decomposedTestCases;
 	private String decompositionError;
 	private TestCase selectedDecomposedTestCase;
+	private TestCaseSimilarityMatrix similarityMatrix;
+	private String measurementError;
+	private boolean rankedSimilarityDescending;
+	private boolean suppressSimilaritySelectionRender;
+	private TextArea clusteringSourceCodeArea;
+	private TextArea clusteringTargetCodeArea;
 
 	public ModernRozaUi() {
 		pipelineState = new PipelineState();
@@ -92,7 +107,43 @@ public final class ModernRozaUi extends Application {
 		decomposerImplementationCombo.getSelectionModel().selectFirst();
 		decomposerImplementationCombo.setStyle(singleLineComboBoxStyle());
 
+		metricCombo = new ComboBox<>();
+		metricCombo.getItems().add("LCCSS");
+		metricCombo.getSelectionModel().selectFirst();
+		metricCombo.setStyle(singleLineComboBoxStyle());
+
+		sourceTestCombo = testCaseComboBox();
+		targetTestCombo = testCaseComboBox();
+		sourceTestCombo.valueProperty().addListener((observable, previous, selected) -> {
+			if (suppressSimilaritySelectionRender) {
+				updateSelectedSimilarityCodeBlocks(selectedSimilaritySourceIndex(), selectedSimilarityTargetIndex());
+			} else {
+				renderContentArea();
+			}
+		});
+		targetTestCombo.valueProperty().addListener((observable, previous, selected) -> {
+			if (suppressSimilaritySelectionRender) {
+				updateSelectedSimilarityCodeBlocks(selectedSimilaritySourceIndex(), selectedSimilarityTargetIndex());
+			} else {
+				renderContentArea();
+			}
+		});
+
+		sourceFolder = defaultSourceFolder();
 		selectedViolationIndex = -1;
+		rankedSimilarityDescending = true;
+	}
+
+	private Path defaultSourceFolder() {
+		Path fromRozaProject = Path.of("src", "test", "java").toAbsolutePath().normalize();
+		if (Files.isDirectory(fromRozaProject)) {
+			return fromRozaProject;
+		}
+		Path fromWorkspaceRoot = Path.of("roza", "src", "test", "java").toAbsolutePath().normalize();
+		if (Files.isDirectory(fromWorkspaceRoot)) {
+			return fromWorkspaceRoot;
+		}
+		return fromRozaProject;
 	}
 
 	public static void main(String[] args) {
@@ -150,16 +201,20 @@ public final class ModernRozaUi extends Application {
 
 		VBox configuration = configurationFor(selectedStage);
 
-		Button actionButton = new Button(actionButtonText(selectedStage));
-		actionButton.setMaxWidth(Double.MAX_VALUE);
-		actionButton.setDisable(!stageActionEnabled(selectedStage));
-		actionButton.setStyle(primaryButtonStyle());
-		actionButton.setOnAction(event -> {
-			runStage(selectedStage);
-		});
+		if (selectedStage == PipelineStage.CLUSTERING) {
+			configurationSidebar.getChildren().add(configuration);
+		} else {
+			Button actionButton = new Button(actionButtonText(selectedStage));
+			actionButton.setMaxWidth(Double.MAX_VALUE);
+			actionButton.setDisable(!stageActionEnabled(selectedStage));
+			actionButton.setStyle(primaryButtonStyle());
+			actionButton.setOnAction(event -> {
+				runStage(selectedStage);
+			});
 
-		configurationSidebar.getChildren().addAll(configuration, actionButton);
-		VBox.setMargin(actionButton, MARGIN_ACTION_BUTTON_TOP);
+			configurationSidebar.getChildren().addAll(configuration, actionButton);
+			VBox.setMargin(actionButton, MARGIN_ACTION_BUTTON_TOP);
+		}
 	}
 
 	private VBox configurationFor(PipelineStage selectedStage) {
@@ -171,6 +226,12 @@ public final class ModernRozaUi extends Application {
 		}
 		if (selectedStage == PipelineStage.DECOMPOSITION) {
 			return decompositionConfiguration();
+		}
+		if (selectedStage == PipelineStage.MEASUREMENT) {
+			return measurementConfiguration();
+		}
+		if (selectedStage == PipelineStage.CLUSTERING) {
+			return clusteringConfiguration();
 		}
 		VBox configuration = new VBox(CONFIGURATION_INNER_SPACING);
 		for (String item : selectedStage.configurationItems()) {
@@ -229,6 +290,53 @@ public final class ModernRozaUi extends Application {
 		return configuration;
 	}
 
+	private VBox measurementConfiguration() {
+		VBox configuration = new VBox(CONFIGURATION_INNER_SPACING);
+		configuration.setPadding(new Insets(0, 0, 4, 0));
+
+		Label metricTitle = body("Similarity metric");
+		metricTitle.setStyle(metricTitle.getStyle() + "-fx-font-weight: bold; -fx-text-fill: #333333;");
+
+		metricCombo.setMaxWidth(Double.MAX_VALUE);
+
+		configuration.getChildren().addAll(metricTitle, metricCombo);
+		return configuration;
+	}
+
+	private VBox clusteringConfiguration() {
+		VBox configuration = new VBox(CONFIGURATION_INNER_SPACING);
+		configuration.setPadding(new Insets(0, 0, 4, 0));
+
+		Button clusterButton = new Button(PipelineStage.CLUSTERING.actionLabel());
+		clusterButton.setMaxWidth(Double.MAX_VALUE);
+		clusterButton.setStyle(primaryButtonStyle());
+		clusterButton.setDisable(!stageActionEnabled(PipelineStage.CLUSTERING));
+		clusterButton.setOnAction(event -> runStage(PipelineStage.CLUSTERING));
+
+		configuration.getChildren().add(clusterButton);
+		return configuration;
+	}
+
+	private ComboBox<TestCase> testCaseComboBox() {
+		ComboBox<TestCase> comboBox = new ComboBox<>();
+		comboBox.setStyle(singleLineComboBoxStyle());
+		comboBox.setCellFactory(list -> new ListCell<>() {
+			@Override
+			protected void updateItem(TestCase item, boolean empty) {
+				super.updateItem(item, empty);
+				setText(empty || item == null ? null : item.name());
+			}
+		});
+		comboBox.setButtonCell(new ListCell<>() {
+			@Override
+			protected void updateItem(TestCase item, boolean empty) {
+				super.updateItem(item, empty);
+				setText(empty || item == null ? null : item.name());
+			}
+		});
+		return comboBox;
+	}
+
 	private void chooseSourceFolder() {
 		DirectoryChooser directoryChooser = new DirectoryChooser();
 		directoryChooser.setTitle("Source folder");
@@ -260,6 +368,12 @@ public final class ModernRozaUi extends Application {
 		if (selectedStage == PipelineStage.DECOMPOSITION) {
 			return parsedTestClasses != null;
 		}
+		if (selectedStage == PipelineStage.MEASUREMENT) {
+			return decomposedTestCases != null;
+		}
+		if (selectedStage == PipelineStage.CLUSTERING) {
+			return similarityMatrix != null;
+		}
 		return true;
 	}
 
@@ -270,6 +384,8 @@ public final class ModernRozaUi extends Application {
 			runParsing();
 		} else if (selectedStage == PipelineStage.DECOMPOSITION) {
 			runDecomposition();
+		} else if (selectedStage == PipelineStage.MEASUREMENT) {
+			runMeasurement();
 		} else {
 			pipelineState.runSelectedStage();
 			render();
@@ -299,6 +415,16 @@ public final class ModernRozaUi extends Application {
 		decomposedTestCases = null;
 		decompositionError = null;
 		selectedDecomposedTestCase = null;
+		clearMeasurementResults();
+	}
+
+	private void clearMeasurementResults() {
+		similarityMatrix = null;
+		measurementError = null;
+		sourceTestCombo.getItems().clear();
+		targetTestCombo.getItems().clear();
+		sourceTestCombo.getSelectionModel().clearSelection();
+		targetTestCombo.getSelectionModel().clearSelection();
 	}
 
 	private static String failedParseCodeFileSource(Throwable exception) {
@@ -380,6 +506,7 @@ public final class ModernRozaUi extends Application {
 			decomposedTestCases = null;
 			decompositionError = null;
 			selectedDecomposedTestCase = null;
+			clearMeasurementResults();
 			pipelineState.runSelectedStage();
 		} catch (RuntimeException exception) {
 			parsingError = exception.getMessage() != null ? exception.getMessage() : exception.toString();
@@ -389,6 +516,7 @@ public final class ModernRozaUi extends Application {
 			decomposedTestCases = null;
 			decompositionError = null;
 			selectedDecomposedTestCase = null;
+			clearMeasurementResults();
 		}
 		render();
 	}
@@ -398,10 +526,26 @@ public final class ModernRozaUi extends Application {
 			TestCaseDecomposer decomposer = new DefaultTestCaseDecomposer();
 			decomposedTestCases = decomposer.decompose(parsedTestClasses);
 			decompositionError = null;
+			clearMeasurementResults();
 			pipelineState.runSelectedStage();
 		} catch (RuntimeException exception) {
 			decompositionError = exception.getMessage() != null ? exception.getMessage() : exception.toString();
 			decomposedTestCases = null;
+			clearMeasurementResults();
+		}
+		render();
+	}
+
+	private void runMeasurement() {
+		try {
+			TestCaseSimilarityMeasurer measurer = new LccssTestCaseSimilarityMeasurer();
+			similarityMatrix = measurer.measure(decomposedTestCases);
+			measurementError = null;
+			refreshSimilaritySelectionControls();
+			pipelineState.runSelectedStage();
+		} catch (RuntimeException exception) {
+			measurementError = exception.getMessage() != null ? exception.getMessage() : exception.toString();
+			similarityMatrix = null;
 		}
 		render();
 	}
@@ -456,6 +600,22 @@ public final class ModernRozaUi extends Application {
 			}
 			contentArea.getChildren().add(decompositionColumn);
 			VBox.setVgrow(decompositionColumn, Priority.ALWAYS);
+		} else if (selectedStage == PipelineStage.MEASUREMENT && decomposedTestCases != null) {
+			VBox measurementColumn = new VBox(12);
+			if (measurementError != null) {
+				Label error = body("Measurement failed: " + measurementError);
+				error.setStyle(error.getStyle() + "-fx-text-fill: #991b1b;");
+				measurementColumn.getChildren().add(error);
+			}
+			HBox measurementInput = decomposedTestsView();
+			measurementColumn.getChildren().add(measurementInput);
+			contentArea.getChildren().add(measurementColumn);
+			VBox.setVgrow(measurementInput, Priority.ALWAYS);
+			VBox.setVgrow(measurementColumn, Priority.ALWAYS);
+		} else if (selectedStage == PipelineStage.CLUSTERING && similarityMatrix != null) {
+			VBox clusteringColumn = similarityMatrixView();
+			contentArea.getChildren().add(clusteringColumn);
+			VBox.setVgrow(clusteringColumn, Priority.ALWAYS);
 		} else {
 			contentArea.getChildren().add(body(selectedStage.previousStageDataDescription()));
 		}
@@ -526,6 +686,52 @@ public final class ModernRozaUi extends Application {
 
 	private String violationTestKey(TestCodeViolation violation) {
 		return violation.testClassName() + "." + violation.testMethodName().orElse("");
+	}
+
+	private void refreshSimilaritySelectionControls() {
+		if (similarityMatrix == null) {
+			sourceTestCombo.getItems().clear();
+			targetTestCombo.getItems().clear();
+			return;
+		}
+		List<TestCase> testCases = new ArrayList<>();
+		for (int index = 0; index < similarityMatrix.size(); index++) {
+			testCases.add(similarityMatrix.testCaseAt(index));
+		}
+		if (!sourceTestCombo.getItems().equals(testCases)) {
+			sourceTestCombo.getItems().setAll(testCases);
+			targetTestCombo.getItems().setAll(testCases);
+		}
+		if (similarityMatrix.size() > 0) {
+			List<SimilarityRankingItem> ranking = rankingItems();
+			boolean bothEmpty = sourceTestCombo.getSelectionModel().isEmpty() && targetTestCombo.getSelectionModel().isEmpty();
+			if (bothEmpty) {
+				if (!ranking.isEmpty()) {
+					SimilarityRankingItem first = ranking.get(0);
+					sourceTestCombo.getSelectionModel().select(first.sourceIndex());
+					targetTestCombo.getSelectionModel().select(first.targetIndex());
+				} else {
+					sourceTestCombo.getSelectionModel().select(0);
+					targetTestCombo.getSelectionModel().select(0);
+				}
+			} else {
+				if (sourceTestCombo.getSelectionModel().isEmpty()) {
+					sourceTestCombo.getSelectionModel().select(0);
+				}
+				if (targetTestCombo.getSelectionModel().isEmpty()) {
+					targetTestCombo.getSelectionModel().select(0);
+				}
+			}
+			if (similarityMatrix.size() >= 2 && !ranking.isEmpty()) {
+				int si = sourceTestCombo.getSelectionModel().getSelectedIndex();
+				int ti = targetTestCombo.getSelectionModel().getSelectedIndex();
+				if (si >= 0 && ti >= 0 && si == ti) {
+					SimilarityRankingItem first = ranking.get(0);
+					sourceTestCombo.getSelectionModel().clearAndSelect(first.sourceIndex());
+					targetTestCombo.getSelectionModel().clearAndSelect(first.targetIndex());
+				}
+			}
+		}
 	}
 
 	private boolean hasParsingViolations() {
@@ -629,8 +835,182 @@ public final class ModernRozaUi extends Application {
 		return row;
 	}
 
+	private VBox similarityMatrixView() {
+		refreshSimilaritySelectionControls();
+		VBox matrixView = new VBox(12);
+		if (similarityMatrix.size() == 0) {
+			matrixView.getChildren().add(similaritySelectionControls());
+			return matrixView;
+		}
+		HBox rankingAndCode = new HBox(16);
+		VBox ranking = rankedSimilarityList();
+
+		VBox sourceColumn = new VBox(6);
+		Label sourceTitle = body("Source test");
+		sourceTitle.setStyle(sourceTitle.getStyle() + "-fx-font-weight: bold; -fx-text-fill: #333333;");
+		sourceTestCombo.setPrefWidth(320);
+		sourceTestCombo.setMaxWidth(Double.MAX_VALUE);
+		TextArea sourceCode = clusteringCodeTextArea(sourceTestCombo.getSelectionModel().getSelectedItem(), true);
+		sourceColumn.getChildren().addAll(sourceTitle, sourceTestCombo, sourceCode);
+		VBox.setVgrow(sourceCode, Priority.ALWAYS);
+
+		VBox targetColumn = new VBox(6);
+		Label targetTitle = body("Target test");
+		targetTitle.setStyle(targetTitle.getStyle() + "-fx-font-weight: bold; -fx-text-fill: #333333;");
+		targetTestCombo.setPrefWidth(320);
+		targetTestCombo.setMaxWidth(Double.MAX_VALUE);
+		TextArea targetCode = clusteringCodeTextArea(targetTestCombo.getSelectionModel().getSelectedItem(), false);
+		targetColumn.getChildren().addAll(targetTitle, targetTestCombo, targetCode);
+		VBox.setVgrow(targetCode, Priority.ALWAYS);
+
+		rankingAndCode.getChildren().addAll(ranking, sourceColumn, targetColumn);
+		HBox.setHgrow(sourceColumn, Priority.ALWAYS);
+		HBox.setHgrow(targetColumn, Priority.ALWAYS);
+		matrixView.getChildren().add(rankingAndCode);
+		VBox.setVgrow(rankingAndCode, Priority.ALWAYS);
+		return matrixView;
+	}
+
+	private HBox similaritySelectionControls() {
+		HBox controls = new HBox(16);
+
+		VBox source = new VBox(6);
+		Label sourceTitle = body("Source test");
+		sourceTitle.setStyle(sourceTitle.getStyle() + "-fx-font-weight: bold; -fx-text-fill: #333333;");
+		sourceTestCombo.setPrefWidth(320);
+		sourceTestCombo.setMaxWidth(Double.MAX_VALUE);
+		source.getChildren().addAll(sourceTitle, sourceTestCombo);
+		HBox.setHgrow(source, Priority.ALWAYS);
+
+		VBox target = new VBox(6);
+		Label targetTitle = body("Target test");
+		targetTitle.setStyle(targetTitle.getStyle() + "-fx-font-weight: bold; -fx-text-fill: #333333;");
+		targetTestCombo.setPrefWidth(320);
+		targetTestCombo.setMaxWidth(Double.MAX_VALUE);
+		target.getChildren().addAll(targetTitle, targetTestCombo);
+		HBox.setHgrow(target, Priority.ALWAYS);
+
+		controls.getChildren().addAll(source, target);
+		return controls;
+	}
+
+	private int selectedSimilaritySourceIndex() {
+		int index = sourceTestCombo.getSelectionModel().getSelectedIndex();
+		return index >= 0 ? index : 0;
+	}
+
+	private int selectedSimilarityTargetIndex() {
+		int index = targetTestCombo.getSelectionModel().getSelectedIndex();
+		return index >= 0 ? index : 0;
+	}
+
+	private VBox rankedSimilarityList() {
+		VBox ranking = new VBox(8);
+		ranking.setPrefWidth(90);
+		Button order = new Button(rankedSimilarityDescending ? "Highest" : "Lowest");
+		order.setStyle(secondaryButtonStyle());
+		order.setMaxWidth(Double.MAX_VALUE);
+		order.setOnAction(event -> {
+			rankedSimilarityDescending = !rankedSimilarityDescending;
+			renderContentArea();
+		});
+
+		ListView<SimilarityRankingItem> list = new ListView<>();
+		list.getItems().setAll(rankingItems());
+		list.setCellFactory(items -> new ListCell<>() {
+			@Override
+			protected void updateItem(SimilarityRankingItem item, boolean empty) {
+				super.updateItem(item, empty);
+				setText(empty || item == null ? null : item.label());
+			}
+		});
+		int selectedTargetIndex = selectedSimilarityTargetIndex();
+		int selectedSourceIndex = selectedSimilaritySourceIndex();
+		list.getItems()
+				.stream()
+				.filter(item -> item.sourceIndex() == selectedSourceIndex && item.targetIndex() == selectedTargetIndex)
+				.findFirst()
+				.ifPresent(item -> list.getSelectionModel().select(item));
+		list.getSelectionModel().selectedItemProperty().addListener((observable, previous, selected) -> {
+			if (selected == null) {
+				return;
+			}
+			int sourceIndex = selected.sourceIndex();
+			int targetIndex = selected.targetIndex();
+			suppressSimilaritySelectionRender = true;
+			try {
+				sourceTestCombo.getSelectionModel().clearAndSelect(sourceIndex);
+				targetTestCombo.getSelectionModel().clearAndSelect(targetIndex);
+			} finally {
+				suppressSimilaritySelectionRender = false;
+			}
+			updateSelectedSimilarityCodeBlocks(sourceIndex, targetIndex);
+		});
+		ranking.getChildren().addAll(order, list);
+		VBox.setVgrow(list, Priority.ALWAYS);
+		return ranking;
+	}
+
+	private List<SimilarityRankingItem> rankingItems() {
+		List<SimilarityRankingItem> items = new ArrayList<>();
+		for (int source = 0; source < similarityMatrix.size(); source++) {
+			for (int target = 0; target < similarityMatrix.size(); target++) {
+				if (source != target) {
+					items.add(new SimilarityRankingItem(
+							source,
+							target,
+							similarityMatrix.testCaseAt(source),
+							similarityMatrix.testCaseAt(target),
+							similarityMatrix.similarity(source, target)));
+				}
+			}
+		}
+		Comparator<SimilarityRankingItem> comparator = Comparator.comparingDouble(SimilarityRankingItem::similarity)
+				.thenComparing(item -> item.sourceTestCase().name())
+				.thenComparing(item -> item.targetTestCase().name());
+		if (rankedSimilarityDescending) {
+			comparator = comparator.reversed();
+		}
+		items.sort(comparator);
+		return items;
+	}
+
+	private TextArea clusteringCodeTextArea(TestCase testCase, boolean sourcePanel) {
+		TextArea code = new TextArea(testCase == null ? "" : formatDecomposedTestBody(testCase));
+		code.setEditable(false);
+		code.setWrapText(false);
+		code.setStyle(FONT_FAMILY + "-fx-font-family: 'Monospaced'; -fx-font-size: 13px;");
+		if (sourcePanel) {
+			clusteringSourceCodeArea = code;
+		} else {
+			clusteringTargetCodeArea = code;
+		}
+		return code;
+	}
+
+	private void updateSelectedSimilarityCodeBlocks(int sourceIndex, int targetIndex) {
+		if (similarityMatrix == null || similarityMatrix.size() == 0) {
+			return;
+		}
+		if (sourceIndex < 0 || targetIndex < 0 || sourceIndex >= similarityMatrix.size() || targetIndex >= similarityMatrix.size()) {
+			return;
+		}
+		TestCase source = similarityMatrix.testCaseAt(sourceIndex);
+		TestCase target = similarityMatrix.testCaseAt(targetIndex);
+		if (clusteringSourceCodeArea != null) {
+			clusteringSourceCodeArea.setText(formatDecomposedTestBody(source));
+		}
+		if (clusteringTargetCodeArea != null) {
+			clusteringTargetCodeArea.setText(formatDecomposedTestBody(target));
+		}
+	}
+
 	private static String formatDecomposedTestBody(TestCase testCase) {
 		return testCase.body().statements().stream().map(CodeStatement::originalText).collect(Collectors.joining("\n"));
+	}
+
+	private static String formatSimilarity(double similarity) {
+		return String.format(Locale.ROOT, "%.4f", similarity);
 	}
 
 	private String actionButtonText(PipelineStage selectedStage) {
@@ -683,6 +1063,47 @@ public final class ModernRozaUi extends Application {
 	}
 
 	private String secondaryButtonStyle() {
-		return FONT_FAMILY + "-fx-background-color: #ffffff; -fx-text-fill: #333333; -fx-background-radius: 6; -fx-padding: 10; -fx-font-weight: bold;";
+		return FONT_FAMILY + "-fx-background-color: #333333; -fx-text-fill: #ffffff; -fx-background-radius: 6; -fx-padding: 10; -fx-font-weight: bold;";
+	}
+
+	private static final class SimilarityRankingItem {
+
+		private final int sourceIndex;
+		private final int targetIndex;
+		private final TestCase sourceTestCase;
+		private final TestCase targetTestCase;
+		private final double similarity;
+
+		private SimilarityRankingItem(int sourceIndex, int targetIndex, TestCase sourceTestCase, TestCase targetTestCase, double similarity) {
+			this.sourceIndex = sourceIndex;
+			this.targetIndex = targetIndex;
+			this.sourceTestCase = sourceTestCase;
+			this.targetTestCase = targetTestCase;
+			this.similarity = similarity;
+		}
+
+		private int sourceIndex() {
+			return sourceIndex;
+		}
+
+		private int targetIndex() {
+			return targetIndex;
+		}
+
+		private TestCase sourceTestCase() {
+			return sourceTestCase;
+		}
+
+		private TestCase targetTestCase() {
+			return targetTestCase;
+		}
+
+		private double similarity() {
+			return similarity;
+		}
+
+		private String label() {
+			return formatSimilarity(similarity);
+		}
 	}
 }

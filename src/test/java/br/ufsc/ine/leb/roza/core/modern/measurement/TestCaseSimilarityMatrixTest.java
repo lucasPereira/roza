@@ -32,6 +32,16 @@ class TestCaseSimilarityMatrixTest {
 		assertEquals(0.0, matrix.similarity(1, 0));
 	}
 
+	@Test
+	void shouldExposeTestCaseByIndex() {
+		TestCase first = testCase("first");
+		TestCase second = testCase("second");
+		TestCaseSimilarityMatrix matrix = new TestCaseSimilarityMatrix(List.of(first, second));
+
+		assertEquals(first, matrix.testCaseAt(0));
+		assertEquals(second, matrix.testCaseAt(1));
+	}
+
 	private TestCase testCase(String name) {
 		return new TestCase(name, new CodeBlock(List.of()));
 	}
