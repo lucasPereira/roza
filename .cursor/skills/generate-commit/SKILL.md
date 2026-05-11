@@ -22,7 +22,7 @@ Attach this **`SKILL.md`** (or ask the agent to follow it). Do **not** rely on o
 slug: commit message
 ```
 
-- **slug**: short `kebab-case` (topic or conventional style, e.g. `feat`, `fix`, `docs`, `chore`, optionally scoped).
+- **slug**: short `kebab-case` (topic or conventional style, e.g. `feat`, `fix`, `docs`, `chore`, optionally scoped such as `docs-modern` for modern-Roza docs). **Do not** add a redundant **`roza`** segment to the slug (e.g. avoid `chore-roza`); commits already live in the Roza repo.
 - **commit message**: imperative summary of **everything** that was not yet committed in **this** repo.
 
 2. **Stage** everything not yet committed (`git add -A`), then show the user **only**: full **`git status`** output (after the add) **and** the **composed `slug: commit message` line**. Then **ask for explicit approval** before running **`git commit`**. If the user does not approve, **do not** commit; offer `git reset` to unstage if they want to undo staging. Do **not** show **`git diff --cached`** unless the user explicitly asks for a patch preview.
@@ -55,18 +55,18 @@ The message must reflect the **full** tree vs `HEAD` before staging: staged, uns
 ## Slug and message
 
 - Prefer **English** unless the user asks for Portuguese.
-- One line; no vague slugs (`update`, `fix-stuff`). If changes are unrelated, reflect the main change and briefly note the rest, or warn that bundling unrelated work is risky and offer to split only if the user asks.
+- One line; no vague slugs (`update`, `fix-stuff`). **Never** use a `-roza` suffix (or `something-roza`) in the slug — it is redundant. If changes are unrelated, reflect the main change and briefly note the rest, or warn that bundling unrelated work is risky and offer to split only if the user asks.
 
 ## Examples
 
 ```text
-chore-roza: move legacy loader fixtures under test/resources/legacy/loader
+chore: move legacy loader test fixtures under test/resources/legacy/loader
 ```
 
 ```text
-gradle-roza: rename runRozaUi application task to runLegacyRozaUi
+gradle: rename runRozaUi application task to runLegacyRozaUi
 ```
 
 ```text
-docs-modern-roza: document bidirectional modern/legacy import isolation
+docs-modern: document bidirectional modern/legacy import isolation
 ```
