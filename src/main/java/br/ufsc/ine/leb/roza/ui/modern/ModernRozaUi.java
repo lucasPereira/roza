@@ -14,10 +14,13 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -27,6 +30,10 @@ import javafx.stage.DirectoryChooser;
 public final class ModernRozaUi extends Application {
 
 	private static final String FONT_FAMILY = "-fx-font-family: 'Arial';";
+	private static final int CONFIGURATION_INNER_SPACING = 10;
+	private static final Insets MARGIN_AFTER_CONFIGURATION_GROUP = new Insets(0, 0, 32, 0);
+	private static final Insets MARGIN_SECTION_TITLE_AFTER_GROUP = new Insets(8, 0, 0, 0);
+	private static final Insets MARGIN_ACTION_BUTTON_TOP = new Insets(28, 0, 0, 0);
 
 	private final PipelineState pipelineState;
 	private final HBox pipelineBar;
@@ -35,6 +42,10 @@ public final class ModernRozaUi extends Application {
 	private final CheckBox recursiveLoading;
 	private final CheckBox javaExtension;
 	private final CheckBox txtExtension;
+	private final ComboBox<String> parserImplementationCombo;
+	private final RadioButton unsupportedFeaturePolicySafe;
+	private final RadioButton unsupportedFeaturePolicyUnsafe;
+	private final ToggleGroup unsupportedFeaturePolicyGroup;
 	private Path sourceFolder;
 	private LoadedCodeFiles loadedCodeFiles;
 	private CodeFile selectedCodeFile;
@@ -51,6 +62,18 @@ public final class ModernRozaUi extends Application {
 		recursiveLoading.setSelected(true);
 		javaExtension.setSelected(true);
 		txtExtension.setSelected(false);
+
+		parserImplementationCombo = new ComboBox<>();
+		parserImplementationCombo.getItems().add("JUnit");
+		parserImplementationCombo.getSelectionModel().selectFirst();
+		parserImplementationCombo.setStyle(singleLineComboBoxStyle());
+
+		unsupportedFeaturePolicyGroup = new ToggleGroup();
+		unsupportedFeaturePolicySafe = new RadioButton("Safe");
+		unsupportedFeaturePolicyUnsafe = new RadioButton("Unsafe");
+		unsupportedFeaturePolicySafe.setToggleGroup(unsupportedFeaturePolicyGroup);
+		unsupportedFeaturePolicyUnsafe.setToggleGroup(unsupportedFeaturePolicyGroup);
+		unsupportedFeaturePolicySafe.setSelected(true);
 	}
 
 	public static void main(String[] args) {
@@ -116,15 +139,17 @@ public final class ModernRozaUi extends Application {
 		});
 
 		configurationSidebar.getChildren().addAll(configuration, actionButton);
-		VBox.setMargin(actionButton,
-				selectedStage == PipelineStage.LOADING ? new Insets(28, 0, 0, 0) : Insets.EMPTY);
+		VBox.setMargin(actionButton, MARGIN_ACTION_BUTTON_TOP);
 	}
 
 	private VBox configurationFor(PipelineStage selectedStage) {
 		if (selectedStage == PipelineStage.LOADING) {
 			return loadingConfiguration();
 		}
-		VBox configuration = new VBox(10);
+		if (selectedStage == PipelineStage.PARSING) {
+			return parsingConfiguration();
+		}
+		VBox configuration = new VBox(CONFIGURATION_INNER_SPACING);
 		for (String item : selectedStage.configurationItems()) {
 			configuration.getChildren().add(configurationRow(item));
 		}
@@ -132,7 +157,7 @@ public final class ModernRozaUi extends Application {
 	}
 
 	private VBox loadingConfiguration() {
-		VBox configuration = new VBox(10);
+		VBox configuration = new VBox(CONFIGURATION_INNER_SPACING);
 		configuration.setPadding(new Insets(0, 0, 4, 0));
 		Button sourceFolderButton = new Button("Source folder");
 		sourceFolderButton.setMaxWidth(Double.MAX_VALUE);
@@ -140,18 +165,39 @@ public final class ModernRozaUi extends Application {
 		sourceFolderButton.setOnAction(event -> chooseSourceFolder());
 
 		Label selectedFolder = body(sourceFolderText());
-		selectedFolder.setStyle(selectedFolder.getStyle() + "-fx-padding: 4 0 32 0;");
+		VBox.setMargin(selectedFolder, new Insets(4, 0, 32, 0));
 
 		Label recursiveSectionTitle = body("Recursive loading");
 		recursiveSectionTitle.setStyle(recursiveSectionTitle.getStyle() + "-fx-font-weight: bold; -fx-text-fill: #333333;");
-		recursiveLoading.setPadding(new Insets(0, 0, 32, 0));
+		VBox.setMargin(recursiveLoading, MARGIN_AFTER_CONFIGURATION_GROUP);
 
 		Label acceptedExtensions = body("Accepted extensions");
-		VBox.setMargin(acceptedExtensions, new Insets(8, 0, 0, 0));
+		VBox.setMargin(acceptedExtensions, MARGIN_SECTION_TITLE_AFTER_GROUP);
 		acceptedExtensions.setStyle(acceptedExtensions.getStyle() + "-fx-font-weight: bold; -fx-text-fill: #333333;");
 
 		configuration.getChildren().addAll(sourceFolderButton, selectedFolder, recursiveSectionTitle, recursiveLoading, acceptedExtensions,
 				javaExtension, txtExtension);
+		return configuration;
+	}
+
+	private VBox parsingConfiguration() {
+		VBox configuration = new VBox(CONFIGURATION_INNER_SPACING);
+		configuration.setPadding(new Insets(0, 0, 4, 0));
+
+		Label parserTitle = body("Parser implementation");
+		parserTitle.setStyle(parserTitle.getStyle() + "-fx-font-weight: bold; -fx-text-fill: #333333;");
+
+		parserImplementationCombo.setMaxWidth(Double.MAX_VALUE);
+		VBox.setMargin(parserImplementationCombo, MARGIN_AFTER_CONFIGURATION_GROUP);
+
+		Label policyTitle = body("Unsupported feature policy");
+		VBox.setMargin(policyTitle, MARGIN_SECTION_TITLE_AFTER_GROUP);
+		policyTitle.setStyle(policyTitle.getStyle() + "-fx-font-weight: bold; -fx-text-fill: #333333;");
+
+		VBox policyRadios = new VBox(8);
+		policyRadios.getChildren().addAll(unsupportedFeaturePolicySafe, unsupportedFeaturePolicyUnsafe);
+
+		configuration.getChildren().addAll(parserTitle, parserImplementationCombo, policyTitle, policyRadios);
 		return configuration;
 	}
 
@@ -177,7 +223,13 @@ public final class ModernRozaUi extends Application {
 		if (!pipelineState.selectedStageCanRun()) {
 			return false;
 		}
-		return selectedStage != PipelineStage.LOADING || sourceFolder != null;
+		if (selectedStage == PipelineStage.LOADING) {
+			return sourceFolder != null;
+		}
+		if (selectedStage == PipelineStage.PARSING) {
+			return loadedCodeFiles != null;
+		}
+		return true;
 	}
 
 	private void runStage(PipelineStage selectedStage) {
@@ -303,6 +355,10 @@ public final class ModernRozaUi extends Application {
 
 	private String primaryButtonStyle() {
 		return FONT_FAMILY + "-fx-background-color: #333333; -fx-text-fill: white; -fx-background-radius: 6; -fx-padding: 10; -fx-font-weight: bold;";
+	}
+
+	private String singleLineComboBoxStyle() {
+		return FONT_FAMILY + "-fx-min-height: 30px; -fx-pref-height: 30px; -fx-max-height: 30px; -fx-padding: 2 8 2 8;";
 	}
 
 	private String secondaryButtonStyle() {

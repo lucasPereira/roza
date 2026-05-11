@@ -94,6 +94,7 @@ The first modern UI slice uses JavaFX 17.x while the project remains on Java 11.
 - The first parsing implementation is being designed as Java-first and belongs in `src/main/java/br/ufsc/ine/leb/roza/core/modern/parsing`.
 - The first decomposition implementation is `DefaultTestCaseDecomposer` in `src/main/java/br/ufsc/ine/leb/roza/core/modern/decomposition`.
 - Code comments should be avoided unless they explain something non-obvious.
+- **Modern UI sidebar spacing (`ModernRozaUi`)**: Keep vertical rhythm consistent. The configuration column uses an inner `VBox` with **10px** spacing between adjacent children. After each **configuration group** (the block that ends before the next bold section title), apply **`VBox.setMargin` with bottom 32px** on the last control of that group so the gap to the next section is reliable. On each **bold section title** that follows another group, add **`VBox.setMargin` with top 8px**. The stage **action** button uses **`VBox.setMargin` with top 28px** after the configuration `VBox` for **every** pipeline stage so the space above the button matches. **Do not** rely on `ComboBox.setPadding` to separate the dropdown from the next section — layout often ignores the external gap users expect; use **`VBox.setMargin` on the `ComboBox`** (bottom 32px) instead. **`ComboBox` height**: force a single-line control with explicit **`-fx-min-height` / `-fx-pref-height` / `-fx-max-height`** (30px in the first implementation) and modest horizontal padding.
 
 ## Decisions
 
@@ -163,6 +164,7 @@ The first modern UI slice uses JavaFX 17.x while the project remains on Java 11.
 - DEC-064: Modern UI stage actions remain active for completed stages and reset only subsequent completed stages when triggered.
 - DEC-065: `CodeFile.source()` is now required to support manual UI inspection of loaded files without adding parser responsibilities to loading.
 - DEC-066: The first functional modern UI pipeline behavior is loading from the filesystem and presenting the loaded files as the previous-stage output in `Parsing`.
+- DEC-067: The modern JavaFX configuration sidebar uses margin-based vertical gaps between configuration groups (32px below the last control of a group, 8px above the following section title), a consistent 28px top margin on the stage action button for all stages, and explicit single-line `ComboBox` height; gaps between groups must not depend on `ComboBox` padding alone.
 
 ## Hypotheses
 
@@ -250,3 +252,4 @@ The first modern UI slice uses JavaFX 17.x while the project remains on Java 11.
 - 2026-05-11: Recorded the black toolbar, neutral color direction, and completed-stage reset behavior for the modern UI skeleton.
 - 2026-05-11: Recorded that blocked pipeline stage buttons should use a lighter gray treatment.
 - 2026-05-11: Recorded the first functional loading behavior in the modern UI and the resulting `CodeFile.source()` requirement.
+- 2026-05-11: Documented modern UI sidebar spacing conventions (margin-based group gaps, action-button top margin, single-line ComboBox) and recorded DEC-067.
