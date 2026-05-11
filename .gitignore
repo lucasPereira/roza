@@ -1,6 +1,7 @@
 .gradle/
 bin/
 build/
+.idea/
 
 output/materializer/
 output/measurer/

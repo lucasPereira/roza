@@ -114,6 +114,7 @@ Acceptance criteria:
 - AC-079: `ParsedTestClasses` exposes the parsed test classes through `testClasses()`.
 - AC-119: The first parsing implementation is Java-first rather than language-universal.
 - AC-120: Concrete Java parsers may use JavaParser internally, but JavaParser types must not appear in the public modern Roza parsing contract.
+- AC-150: The first concrete parser implementation is named `JunitTestClassParser` because it supports a conservative JUnit subset on Java source code, not every Java test framework.
 - AC-121: Unsupported parsing features are handled by `UnsupportedFeaturePolicy`.
 - AC-122: Unsupported feature validation runs in a separate validator before extracting modern Roza domain models.
 - AC-123: `UnsupportedFeaturePolicy.SAFE` fails immediately with a clear error when unsupported features are found.
@@ -138,12 +139,13 @@ Acceptance criteria:
 - AC-129: `TestClass` exposes supported test methods.
 - AC-130: Parsed fields preserve type, name, supported modifiers, and optional initialization.
 - AC-131: Parsed code blocks expose top-level `CodeStatement` instances.
-- AC-132: `CodeStatement` exposes original text and normalized text.
+- AC-132: `CodeStatement` exposes original text, normalized text, and whether the statement is an assertion.
 - AC-133: The first parser treats control-flow blocks such as `for`, `while`, and `if` as top-level statements rather than flattening their internals.
 - AC-134: Static members, nested classes, unsupported lifecycle features, parameterized tests, inheritance, static imports, and other listed unsupported features are rejected or skipped according to `UnsupportedFeaturePolicy`.
 - AC-135: Modern Roza starts conservative: unsupported features should be removed from the unsupported list only when real support is implemented.
 - AC-136: JUnit 4 `@After` and JUnit 5 `@AfterEach` are unsupported in the first parser slice and are handled according to `UnsupportedFeaturePolicy`.
 - AC-137: Parsed field types preserve complex Java type text needed by decomposition, including generics, nested generics, wildcard generics, qualified types, generic arrays, arrays, and multidimensional arrays.
+- AC-151: `JunitTestClassParser` marks assertions using an explicit supported assertion method list covering JUnit 4, current JUnit Jupiter assertions, and Hamcrest `assertThat`, not by checking whether a method name starts with `assert`.
 
 ### REQ-010: Decomposition Stage
 
@@ -181,13 +183,21 @@ Acceptance criteria:
 - AC-057: Identifying duplicated tests or duplicated test code is the most common objective for a similarity metric.
 - AC-058: The measurement stage produces a similarity matrix.
 - AC-059: The similarity matrix indicates the similarity degree for each pair of tests according to the applied metric.
-- AC-074: The similarity matrix is indexed by abstract test identities.
+- AC-074: The first similarity matrix is indexed internally by source and target test case positions from the decomposed test case list.
 - AC-087: The measurement stage is represented by one interface named `TestCaseSimilarityMeasurer`.
 - AC-088: The measurement interface has a method named `measure`.
 - AC-089: `TestCaseSimilarityMeasurer.measure` receives `DecomposedTestCases`.
 - AC-090: `TestCaseSimilarityMeasurer.measure` returns `TestCaseSimilarityMatrix`.
 - AC-142: Measurement can use a projection of each `TestCase` rather than measuring every statement in the decomposed body.
 - AC-143: LCCSS measurement must stop its measured projection at the first assertion statement; it must not continue measuring statements that appear after the first assertion.
+- AC-146: LCCSS compares the projected statement lists by counting the common contiguous prefix from the start of both lists.
+- AC-147: LCCSS score is `(2 * commonPrefixSize) / (sourceProjectionSize + targetProjectionSize)`.
+- AC-148: LCCSS score is `0.0` when both projected statement lists are empty for distinct test cases.
+- AC-149: LCCSS measurement must use `CodeStatement.isAssertion()` to find the first assertion; it must not infer assertions from statement text during measurement.
+- AC-152: The first `TestCaseSimilarityMatrix` constructor receives only the ordered list of `TestCase` instances.
+- AC-153: The first `TestCaseSimilarityMatrix` stores similarities as a dense directed matrix and must not assume similarity metrics are symmetric.
+- AC-154: The first `TestCaseSimilarityMatrix` initializes every similarity with `0.0` except the diagonal, which starts with `1.0`.
+- AC-155: The first `TestCaseSimilarityMatrix` exposes only the write operation currently needed by measurers, `setSimilarity(int sourceIndex, int targetIndex, double similarity)`, with package-level visibility.
 
 ### REQ-012: Clustering Stage
 
@@ -333,7 +343,7 @@ public final class TestCase {
 }
 ```
 
-### Confirmed, Not Yet Implemented: Measurement
+### Implemented: Measurement
 
 ```java
 package br.ufsc.ine.leb.roza.core.modern.measurement;
@@ -343,7 +353,7 @@ public interface TestCaseSimilarityMeasurer {
 }
 
 public final class TestCaseSimilarityMatrix {
-	// Minimum API not confirmed yet.
+	public TestCaseSimilarityMatrix(List<TestCase> testCases);
 }
 ```
 
@@ -417,7 +427,7 @@ The decomposition interface is named `TestCaseDecomposer`, and its method is nam
 
 ### Q-008: What are the measurement interface and output model names?
 
-The measurement interface is named `TestCaseSimilarityMeasurer`, and its method is named `measure`. `TestCaseSimilarityMeasurer.measure` receives `DecomposedTestCases` and returns `TestCaseSimilarityMatrix`. The minimum API of `TestCaseSimilarityMatrix`, the exact abstract test identity model, and any separate similarity metric or score abstractions are not defined yet.
+The measurement interface is named `TestCaseSimilarityMeasurer`, and its method is named `measure`. `TestCaseSimilarityMeasurer.measure` receives `DecomposedTestCases` and returns `TestCaseSimilarityMatrix`. The first matrix API is intentionally minimal for LCCSS: construction from the ordered `TestCase` list and package-level writing by source and target indexes. Public read methods and any separate similarity metric or score abstractions are deferred until clustering needs them.
 
 ### Q-009: What are the clustering interface and output model names?
 
@@ -435,9 +445,9 @@ The final output stage is named `writing`. Its interface is named `TestClassWrit
 
 The initial concrete purpose is to refactor test classes by regrouping tests into better classes so implicit setup can be used. The desired broader goal is an abstract and flexible pipeline for different refactoring purposes, but the feasibility and exact boundaries of that generality remain open.
 
-### Q-013: What is the exact model for abstract test identities?
+### Q-013: What public read API should clustering require from the similarity matrix?
 
-The similarity matrix must be indexed by abstract test identities, but the exact identity model and where those identities are created are not defined yet. `TestCase` does not expose an `id()` method for now.
+The first measurement implementation fills a dense directed matrix by source and target test case positions. The clusterer read API is intentionally deferred until clustering is implemented, so the matrix does not expose public read methods yet.
 
 ## Change Log
 
@@ -459,7 +469,7 @@ The similarity matrix must be indexed by abstract test identities, but the exact
 - 2026-05-10: Added `refactoring` as the sixth pipeline stage, receiving groups and deciding how to refactor them.
 - 2026-05-10: Added `writing` as the final pipeline stage, outputting refactored test classes to a destination such as the filesystem or cloud.
 - 2026-05-10: Recorded the initial concrete purpose as regrouping tests into better classes for implicit setup, while keeping broader refactoring generality open.
-- 2026-05-10: Confirmed that the similarity matrix is indexed by abstract test identities and that clustering consumes this indexed matrix instead of ASTs.
+- 2026-05-10: Confirmed that clustering consumes a similarity matrix instead of ASTs.
 - 2026-05-10: Confirmed the minimum loading contract: `LoadedCodeFiles.codeFiles()` and `CodeFile.content()`.
 - 2026-05-10: Confirmed that `TestClass` has no minimum content API yet.
 - 2026-05-10: Confirmed that `ParsedTestClasses` exposes parsed test classes through `testClasses()`.
@@ -484,3 +494,8 @@ The similarity matrix must be indexed by abstract test identities, but the exact
 - 2026-05-11: Confirmed that decomposed `TestCase` bodies include statements from `@Before` fixtures but do not need to preserve the `@Before` annotation itself.
 - 2026-05-11: Confirmed that LCCSS measurement must stop at the first assertion statement rather than merely filtering assertions.
 - 2026-05-11: Implemented the first `DefaultTestCaseDecomposer`, with `TestCase.name()` and `TestCase.body()`, preserving assertions in the full decomposed body.
+- 2026-05-11: Added assertion metadata to `CodeStatement`; LCCSS must use this metadata to stop at the first assertion instead of inferring assertions from text.
+- 2026-05-11: Recorded the LCCSS scoring formula as common contiguous prefix based: `(2 * commonPrefixSize) / (sourceProjectionSize + targetProjectionSize)`.
+- 2026-05-11: Renamed the first modern parser implementation from `JavaTestClassParser` to `JunitTestClassParser` to reflect that the implementation targets JUnit, not all Java test frameworks.
+- 2026-05-11: Replaced assertion-name prefix matching with an explicit supported assertion method list for JUnit 4, current JUnit Jupiter, and Hamcrest `assertThat`, shared by parsing and unsupported-feature validation.
+- 2026-05-11: Implemented the first measurement slice with `TestCaseSimilarityMeasurer`, dense directed `TestCaseSimilarityMatrix`, and `LccssTestCaseSimilarityMeasurer`.

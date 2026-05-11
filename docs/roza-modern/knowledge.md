@@ -17,6 +17,8 @@ This document stores evolving knowledge discovered while designing and implement
 - `CodeFile`: a concrete raw loaded code file class. Its minimum confirmed API exposes raw textual content through `content()`. Other attributes remain undefined until confirmed requirements make them necessary.
 - Parsing stage: the second modern Roza pipeline stage; it reads loaded raw code files and creates ASTs for identified test classes.
 - `TestClassParser`: the parsing stage interface.
+- `JunitTestClassParser`: the first concrete modern parser implementation. It parses Java source code for a conservative JUnit subset, while JavaParser remains an internal implementation detail.
+- `JunitAssertionMethods`: the internal supported assertion method list for JUnit 4, current JUnit Jupiter, and Hamcrest `assertThat`, shared by the parser and unsupported-feature validator.
 - `ParsedTestClasses`: the result returned by `TestClassParser.parse`; it exposes `TestClass` instances through `testClasses()`.
 - `UnsupportedFeaturePolicy`: the parser policy for unsupported Java test-code features. `SAFE` fails with a clear error; `UNSAFE` records diagnostics and skips unsupported input.
 - `JavaUnsupportedFeatureValidator`: the separate validation step that runs before Java parser implementations extract modern Roza domain models.
@@ -25,7 +27,7 @@ This document stores evolving knowledge discovered while designing and implement
 - `FixtureMethod`: a supported instance fixture method such as JUnit 4 `@Before`; JUnit 4 `@After` and JUnit 5 `@AfterEach` are unsupported in the first parser slice.
 - `HelperMethod`: a supported non-test helper method in the Java test class.
 - `CodeBlock`: a block of parsed top-level code statements.
-- `CodeStatement`: a statement-level code unit with original and normalized text for later decomposition and similarity measurement.
+- `CodeStatement`: a statement-level code unit with original text, normalized text, and assertion metadata for later decomposition and similarity measurement.
 - Decomposition stage: the third modern Roza pipeline stage; it separates each test from its original class and carries the code required by that test.
 - `TestCaseDecomposer`: the decomposition stage interface.
 - `DecomposedTestCases`: the result returned by `TestCaseDecomposer.decompose`; it exposes decomposed `TestCase` instances through `testCases()`.
@@ -33,9 +35,8 @@ This document stores evolving knowledge discovered while designing and implement
 - `TestCase`: the model for a decomposed test. It is called a test case because after decomposition it is no longer exactly a method inside a test class. It preserves the original parsed test method name through `name()`, including duplicate names. Its `body()` includes statements derived from supported `@Before` fixtures and preserves assertions, but it does not need to preserve the `@Before` annotation itself. It does not expose `id()` or `testClass()` yet.
 - Measurement stage: the fourth modern Roza pipeline stage; it applies a similarity metric to each pair of decomposed tests and produces a similarity matrix.
 - `TestCaseSimilarityMeasurer`: the measurement stage interface.
-- `TestCaseSimilarityMatrix`: the result returned by `TestCaseSimilarityMeasurer.measure`; it is indexed by abstract test case identities and has no minimum content API beyond that yet.
-- Indexed similarity matrix: the measurement output that records pairwise similarity degrees and is indexed by abstract test identities.
-- Abstract test identity: an identity used to refer to a decomposed test across measurement, clustering, and refactoring without exposing the test AST to clustering.
+- `TestCaseSimilarityMatrix`: the result returned by `TestCaseSimilarityMeasurer.measure`; the first implementation is a dense directed matrix indexed internally by source and target test case positions.
+- `LccssTestCaseSimilarityMeasurer`: the first concrete measurement implementation. It projects each decomposed `TestCase` body up to the first assertion and applies the LCCSS common-prefix formula.
 - Clustering stage: the fifth modern Roza pipeline stage; it groups similar tests using only the similarity matrix.
 - `TestCaseClusterer`: the clustering stage interface.
 - `TestCaseClusters`: the result returned by `TestCaseClusterer.cluster`; it exposes `TestCaseCluster` instances through `clusters()`.
@@ -64,13 +65,17 @@ The second confirmed pipeline stage is `parsing`. Its interface is named `TestCl
 
 The initial `TestClass` model is Java-first, not language-universal. The architecture should still preserve pipeline extension points, but it should not sacrifice the quality of the Java model to prematurely support Python, Rust, or other languages. JavaParser may be used inside concrete Java parser implementations, but JavaParser types should not become the public modern Roza model.
 
+The first concrete parser implementation is named `JunitTestClassParser` because its supported and unsupported features are defined around JUnit, not every Java testing framework. Other Java test frameworks can later have separate concrete parsers, such as TestNG or Spock parsers, while still implementing `TestClassParser`.
+
+Assertion metadata is derived from an explicit supported assertion method list for JUnit 4, current JUnit Jupiter, and Hamcrest `assertThat`, not a method-name prefix. This avoids treating helper calls such as `assertBusinessRule()` as assertions.
+
 The first supported parser scenario should be deliberately conservative. Unsupported Java/JUnit features are validated by a separate validator before model extraction. `UnsupportedFeaturePolicy.SAFE` fails fast with a clear error; `UnsupportedFeaturePolicy.UNSAFE` records diagnostics and skips unsupported input rather than silently accepting it. The project should start with many unsupported features and remove them from the unsupported list only when real support is implemented.
 
 The third confirmed pipeline stage is `decomposition`. Its interface is named `TestCaseDecomposer`, and its method is named `decompose`. It receives parsed test classes and separates each test from its class of origin. `TestCaseDecomposer.decompose` returns `DecomposedTestCases`, which exposes decomposed `TestCase` instances through `testCases()`. Each decomposed test is represented by `TestCase`. The name distinguishes decomposed tests from parsed `TestMethod` models, which still represent methods inside a `TestClass`. `TestCase` preserves the original parsed test method name for later refactoring use, even when names are duplicated. It does not need to preserve the source `@Before` annotation or fixture identity; it only needs the statements derived from supported `@Before` fixtures in its decomposed body. Assertions remain in the full `TestCase` body; measurement-specific projections decide whether to stop before assertions. For now, `TestCase` does not expose `id()` or `testClass()`. In the implicit setup example, a class with one implicit setup and two tests produces two decomposed test case models, each containing field declarations, the implicit setup statements, and the body of one test.
 
-The fourth confirmed pipeline stage is `measurement`. Its interface is named `TestCaseSimilarityMeasurer`, and its method is named `measure`. It receives `DecomposedTestCases` and returns `TestCaseSimilarityMatrix`. It applies a similarity metric to each pair of decomposed test cases. Similarity metrics can have different objectives, with duplicated test/code identification as the most common one. The returned matrix records the similarity degree for each pair according to the applied metric and is indexed by abstract test case identities. Measurement may use a projection of the `TestCase` body instead of every statement. The LCCSS measurement must stop its measured projection at the first assertion statement, not merely filter assertion statements. `TestCaseSimilarityMatrix` has no minimum content API beyond that yet.
+The fourth confirmed pipeline stage is `measurement`. Its interface is named `TestCaseSimilarityMeasurer`, and its method is named `measure`. It receives `DecomposedTestCases` and returns `TestCaseSimilarityMatrix`. It applies a similarity metric to each pair of decomposed test cases. Similarity metrics can have different objectives, with duplicated test/code identification as the most common one. The returned matrix records the similarity degree for each directed pair according to the applied metric. The first matrix implementation receives the ordered `TestCase` list, stores scores in a dense `double[]`, initializes all values as `0.0`, initializes the diagonal as `1.0`, and exposes only package-level `setSimilarity(int sourceIndex, int targetIndex, double similarity)` for measurers. Measurement may use a projection of the `TestCase` body instead of every statement. The LCCSS measurement must stop its measured projection at the first assertion statement, using `CodeStatement.isAssertion()` rather than inferring assertions from statement text. It then counts the common contiguous prefix from the start of both projected statement lists. Its score is `(2 * commonPrefixSize) / (sourceProjectionSize + targetProjectionSize)`, with `0.0` when both projections are empty for distinct test cases.
 
-The fifth confirmed pipeline stage is `clustering`. Its interface is named `TestCaseClusterer`, and its method is named `cluster`. It receives `TestCaseSimilarityMatrix` and returns `TestCaseClusters`, which exposes `TestCaseCluster` instances through `clusters()`. It groups tests according to the indexed similarity matrix produced by `measurement`. This stage intentionally does not know anything about the tests themselves; it sees only the similarity matrix and the abstract identities used to index it. Architecturally, this starts rebuilding structure after the earlier decomposition split test classes into separated test-level ASTs. `TestCaseCluster` has no minimum content API yet.
+The fifth confirmed pipeline stage is `clustering`. Its interface is named `TestCaseClusterer`, and its method is named `cluster`. It receives `TestCaseSimilarityMatrix` and returns `TestCaseClusters`, which exposes `TestCaseCluster` instances through `clusters()`. It groups tests according to the similarity matrix produced by `measurement`. The clusterer read API for the matrix is intentionally deferred until clustering is implemented. Architecturally, this starts rebuilding structure after the earlier decomposition split test classes into separated test-level ASTs. `TestCaseCluster` has no minimum content API yet.
 
 The sixth confirmed pipeline stage is `refactoring`. Its interface is named `TestClassRefactorer`, and its method is named `refactor`. It receives `TestCaseClusters` and returns `RefactoredTestClasses`, which exposes refactored `TestClass` instances through `testClasses()`. It receives the groups produced by `clustering` and decides what to do with them. The first concrete purpose is to refactor test classes by regrouping tests into better classes so implicit setup can be used, but the pipeline may be able to support other refactoring purposes, such as delegated setup, through different refactoring implementations.
 
@@ -108,7 +113,7 @@ The final confirmed pipeline stage is `writing`. Its interface is named `TestCla
 - DEC-020: The sixth confirmed pipeline stage is `refactoring`; it receives clustered groups and decides what to do with them.
 - DEC-021: The final confirmed pipeline stage is `writing`; it writes refactored test classes to a destination.
 - DEC-022: The first concrete purpose of modern Roza is regrouping tests into better classes to enable implicit setup, while broader refactoring generality remains a desired but still uncertain design goal.
-- DEC-023: The similarity matrix is indexed by abstract test identities, and clustering consumes that indexed matrix instead of test ASTs.
+- DEC-023: Clustering consumes the similarity matrix instead of test ASTs; the first matrix implementation is indexed internally by test case positions.
 - DEC-024: The minimum loading API is `CodeFileLoader.load()`, `LoadedCodeFiles.codeFiles()`, and `CodeFile.content()`.
 - DEC-025: `TestClass` has no minimum content API yet; its detailed shape remains deferred.
 - DEC-026: The minimum parsing API includes `TestClassParser.parse(LoadedCodeFiles)` and `ParsedTestClasses.testClasses()`, while `TestClass` remains without a minimum content API.
@@ -135,12 +140,19 @@ The final confirmed pipeline stage is `writing`. Its interface is named `TestCla
 - DEC-047: `TestCase` bodies include statements from supported `@Before` fixtures, but `TestCase` does not need to preserve the `@Before` annotation itself.
 - DEC-048: LCCSS measurement should stop at the first assertion statement because code after assertions should not be measured as reusable setup/fixture code.
 - DEC-049: `DefaultTestCaseDecomposer` keeps assertions in the full decomposed `TestCase` body; assertion handling belongs to measurement projections.
+- DEC-050: LCCSS uses common contiguous prefix scoring: `(2 * commonPrefixSize) / (sourceProjectionSize + targetProjectionSize)`, not `commonPrefixSize / min(sourceProjectionSize, targetProjectionSize)`.
+- DEC-051: Assertion detection belongs before measurement and is stored as `CodeStatement.isAssertion()` metadata; LCCSS must consume that metadata.
+- DEC-052: The first modern parser implementation is named `JunitTestClassParser`, not `JavaTestClassParser`, because it is Java-based but JUnit-specific.
+- DEC-053: Assertion detection uses an explicit supported method list for JUnit 4, current JUnit Jupiter, and Hamcrest `assertThat`, shared by parser and validator, not `startsWith("assert")`.
+- DEC-054: The first `TestCaseSimilarityMatrix` is dense and directed; it must not assume metrics are symmetric.
+- DEC-055: The first matrix write API is package-level `setSimilarity(int sourceIndex, int targetIndex, double similarity)` because LCCSS only needs to fill scores by index.
+- DEC-056: The first measurement implementation is `LccssTestCaseSimilarityMeasurer`.
 
 ## Hypotheses
 
 - HYP-001: The pipeline can likely remain abstract and flexible if the generic core stops at stage contracts and each concrete purpose is isolated in implementations, especially in measurement, clustering, and refactoring. The first vertical slice should stay anchored in implicit-setup regrouping to prevent premature abstractions.
 - HYP-002: A useful boundary may be to keep `loading`, `parsing`, `decomposition`, `measurement`, and `clustering` relatively purpose-neutral, while allowing `refactoring` implementations to encode concrete refactoring intentions such as implicit setup or delegated setup.
-- HYP-003: Refactoring may use the abstract identities returned by clustering to recover grouped decomposed tests, but the exact lookup/ownership model remains undecided. Those identities are not part of the `TestCase` API for now.
+- HYP-003: Refactoring may need access from clusters back to decomposed `TestCase` instances, but the exact lookup/ownership model remains undecided.
 
 ## Interview Backlog
 
@@ -158,8 +170,8 @@ The final confirmed pipeline stage is `writing`. Its interface is named `TestCla
 - Define the minimum `TestCaseSimilarityMatrix` API and decide whether separate similarity metric or score abstractions are necessary.
 - Decide the first concrete output destination for `TestClassWriter`.
 - Investigate how far the pipeline can generalize beyond the implicit-setup regrouping purpose without weakening the concrete first use case.
-- Define the exact abstract test identity model and where those identities are created.
-- Define how abstract test identities relate to `TestCase` without adding premature attributes to `TestCase`.
+- Define the public read API that clustering needs from `TestCaseSimilarityMatrix`.
+- Define how clusters should refer back to grouped `TestCase` instances without adding premature attributes to `TestCase`.
 
 ## Change Log
 
@@ -184,8 +196,8 @@ The final confirmed pipeline stage is `writing`. Its interface is named `TestCla
 - 2026-05-10: Recorded `refactoring` as the sixth confirmed pipeline stage.
 - 2026-05-10: Recorded `writing` as the final confirmed pipeline stage.
 - 2026-05-10: Recorded the tension between the concrete implicit-setup regrouping purpose and the desired broader refactoring generality.
-- 2026-05-10: Added hypotheses about keeping the early/middle stages purpose-neutral and using abstract test identities between measurement, clustering, and refactoring.
-- 2026-05-10: Confirmed that the similarity matrix is indexed by abstract test identities and that clustering consumes this indexed matrix instead of ASTs.
+- 2026-05-10: Added hypotheses about keeping the early/middle stages purpose-neutral between measurement, clustering, and refactoring.
+- 2026-05-10: Confirmed that clustering consumes a similarity matrix instead of ASTs.
 - 2026-05-10: Confirmed the minimum loading API as `CodeFileLoader.load()`, `LoadedCodeFiles.codeFiles()`, and `CodeFile.content()`.
 - 2026-05-10: Confirmed that `TestClass` has no minimum content API yet.
 - 2026-05-10: Confirmed that `ParsedTestClasses` exposes parsed test classes through `testClasses()`.
@@ -207,4 +219,9 @@ The final confirmed pipeline stage is `writing`. Its interface is named `TestCla
 - 2026-05-11: Confirmed that `TestCase` does not need to preserve the `@Before` annotation, only the statements derived from supported `@Before` fixtures.
 - 2026-05-11: Confirmed that LCCSS measurement should stop at the first assertion statement rather than merely filtering assertions.
 - 2026-05-11: Implemented the first `DefaultTestCaseDecomposer` and recorded that decomposition preserves assertions while measurement projections decide what to measure.
+- 2026-05-11: Recorded the LCCSS formula from legacy behavior without reusing legacy classes.
 - 2026-05-11: Recorded that JUnit 5 `@AfterEach` is unsupported in the first parser slice, like JUnit 4 `@After`.
+- 2026-05-11: Added assertion metadata to `CodeStatement` and recorded that measurement must use it instead of detecting assertions from text.
+- 2026-05-11: Renamed the modern concrete parser implementation to `JunitTestClassParser`.
+- 2026-05-11: Replaced assertion prefix matching with an explicit supported assertion method list for JUnit 4, current JUnit Jupiter, and Hamcrest `assertThat`.
+- 2026-05-11: Implemented the first measurement contracts, dense directed similarity matrix, and LCCSS measurer.

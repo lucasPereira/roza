@@ -86,6 +86,21 @@ class DefaultTestCaseDecomposerTest {
 		assertEquals(List.of("Sut sut;", "sut = new Sut();", "assertTrue(false);"), statements(decomposed.testCases().get(1)));
 	}
 
+	@Test
+	void shouldPreserveAssertionMetadataFromOriginalTestBody() {
+		ParsedTestClasses parsedTestClasses = parsedTestClasses(testClass(
+				List.of(field("Sut", "sut")),
+				List.of(before("sut = new Sut();")),
+				List.of(new TestMethod("test", List.of(annotation("Test")), new CodeBlock(List.of(statement("assertTrue(true);", true)))))));
+
+		DecomposedTestCases decomposed = decomposer.decompose(parsedTestClasses);
+
+		List<CodeStatement> statements = decomposed.testCases().get(0).body().statements();
+		assertEquals(false, statements.get(0).isAssertion());
+		assertEquals(false, statements.get(1).isAssertion());
+		assertEquals(true, statements.get(2).isAssertion());
+	}
+
 	private ParsedTestClasses parsedTestClasses(TestClass testClass) {
 		return new ParsedTestClasses(List.of(testClass));
 	}
@@ -120,6 +135,10 @@ class DefaultTestCaseDecomposerTest {
 
 	private CodeStatement statement(String statement) {
 		return new CodeStatement(statement, statement);
+	}
+
+	private CodeStatement statement(String statement, boolean assertion) {
+		return new CodeStatement(statement, statement, assertion);
 	}
 
 	private List<String> statements(TestCase testCase) {

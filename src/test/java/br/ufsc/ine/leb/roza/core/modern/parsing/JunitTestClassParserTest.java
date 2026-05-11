@@ -1,6 +1,7 @@
 package br.ufsc.ine.leb.roza.core.modern.parsing;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -16,13 +17,13 @@ import org.junit.jupiter.params.provider.MethodSource;
 import br.ufsc.ine.leb.roza.core.modern.loading.CodeFile;
 import br.ufsc.ine.leb.roza.core.modern.loading.LoadedCodeFiles;
 
-class JavaTestClassParserTest {
+class JunitTestClassParserTest {
 
-	private JavaTestClassParser parser;
+	private JunitTestClassParser parser;
 
 	@BeforeEach
 	void setup() {
-		parser = new JavaTestClassParser();
+		parser = new JunitTestClassParser();
 	}
 
 	@Test
@@ -44,6 +45,7 @@ class JavaTestClassParserTest {
 		assertEquals("shouldWork", testMethod.name());
 		assertEquals("Test", testMethod.annotations().get(0).name());
 		assertEquals("assertEquals(1, 1);", testMethod.body().statements().get(0).normalizedText());
+		assertTrue(testMethod.body().statements().get(0).isAssertion());
 	}
 
 	@Test
@@ -140,7 +142,28 @@ class JavaTestClassParserTest {
 		List<CodeStatement> statements = parsed.testClasses().get(0).testMethods().get(0).body().statements();
 		assertEquals(2, statements.size());
 		assertEquals("while (true) { int value = 1; }", statements.get(0).normalizedText());
+		assertFalse(statements.get(0).isAssertion());
 		assertEquals("assertTrue(true);", statements.get(1).normalizedText());
+		assertTrue(statements.get(1).isAssertion());
+	}
+
+	@Test
+	void shouldNotMarkHelperWhoseNameStartsWithAssertAsAssertion() {
+		ParsedTestClasses parsed = parse("class Example { void assertBusinessRule() { int value = 1; } @Test public void test() { assertBusinessRule(); assertTrue(true); } }");
+
+		List<CodeStatement> statements = parsed.testClasses().get(0).testMethods().get(0).body().statements();
+		assertEquals("assertBusinessRule();", statements.get(0).normalizedText());
+		assertFalse(statements.get(0).isAssertion());
+		assertEquals("assertTrue(true);", statements.get(1).normalizedText());
+		assertTrue(statements.get(1).isAssertion());
+	}
+
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("assertionMethods")
+	void shouldMarkSupportedJunitAndHamcrestAssertionMethods(String assertionMethod) {
+		ParsedTestClasses parsed = parse("class Example { @Test public void test() { " + assertionMethod + "(); } }");
+
+		assertTrue(parsed.testClasses().get(0).testMethods().get(0).body().statements().get(0).isAssertion());
 	}
 
 	@ParameterizedTest(name = "{0}")
@@ -153,7 +176,7 @@ class JavaTestClassParserTest {
 
 	@Test
 	void shouldSkipUnsupportedClassInUnsafeMode() {
-		JavaTestClassParser unsafeParser = new JavaTestClassParser(UnsupportedFeaturePolicy.UNSAFE);
+		JunitTestClassParser unsafeParser = new JunitTestClassParser(UnsupportedFeaturePolicy.UNSAFE);
 
 		ParsedTestClasses parsed = unsafeParser.parse(files("class Example { static int value; @Test public void test() { assertTrue(true); } }"));
 
@@ -168,6 +191,30 @@ class JavaTestClassParserTest {
 
 	private LoadedCodeFiles files(String content) {
 		return new LoadedCodeFiles(List.of(new CodeFile(content)));
+	}
+
+	private static Stream<String> assertionMethods() {
+		return Stream.of(
+				"assertAll",
+				"assertArrayEquals",
+				"assertDoesNotThrow",
+				"assertEquals",
+				"assertFalse",
+				"assertInstanceOf",
+				"assertIterableEquals",
+				"assertLinesMatch",
+				"assertNotEquals",
+				"assertNotNull",
+				"assertNotSame",
+				"assertNull",
+				"assertSame",
+				"assertThat",
+				"assertThrows",
+				"assertThrowsExactly",
+				"assertTimeout",
+				"assertTimeoutPreemptively",
+				"assertTrue",
+				"fail");
 	}
 
 	private static Stream<Arguments> unsupportedFeatures() {

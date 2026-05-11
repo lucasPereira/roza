@@ -321,18 +321,7 @@ final class JavaUnsupportedFeatureValidator {
 	}
 
 	private boolean isAllowedUnscopedCall(String name) {
-		return Set.of(
-				"assertArrayEquals",
-				"assertEquals",
-				"assertFalse",
-				"assertNotEquals",
-				"assertNotNull",
-				"assertNotSame",
-				"assertNull",
-				"assertSame",
-				"assertThat",
-				"assertTrue",
-				"fail").contains(name);
+		return JunitAssertionMethods.contains(name);
 	}
 
 	private boolean hasAnnotation(MethodDeclaration method, String annotationName) {

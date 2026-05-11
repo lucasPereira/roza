@@ -6,10 +6,16 @@ public final class CodeStatement {
 
 	private final String originalText;
 	private final String normalizedText;
+	private final boolean assertion;
 
 	public CodeStatement(String originalText, String normalizedText) {
+		this(originalText, normalizedText, false);
+	}
+
+	public CodeStatement(String originalText, String normalizedText, boolean assertion) {
 		this.originalText = Objects.requireNonNull(originalText);
 		this.normalizedText = Objects.requireNonNull(normalizedText);
+		this.assertion = assertion;
 	}
 
 	public String originalText() {
@@ -18,5 +24,9 @@ public final class CodeStatement {
 
 	public String normalizedText() {
 		return normalizedText;
+	}
+
+	public boolean isAssertion() {
+		return assertion;
 	}
 }
