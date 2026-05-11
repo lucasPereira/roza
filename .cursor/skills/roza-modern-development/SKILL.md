@@ -62,6 +62,7 @@ When implementing `core.modern`:
 - Support interchangeable implementations for each stage.
 - Prefer extension points over language-, framework-, or refactoring-specific assumptions.
 - Do not use or reuse classes from legacy Roza. Modern Roza implementation must be written from scratch.
+- Never allow imports between `core.modern` and `core.legacy` in either direction.
 - Validate that new code does not couple unrelated stages directly.
 
 ## Interview Workflow

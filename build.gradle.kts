@@ -17,7 +17,7 @@ java {
 }
 
 application {
-    mainClass.set("br.ufsc.ine.leb.roza.ui.RozaUi")
+    mainClass.set("br.ufsc.ine.leb.roza.ui.legacy.RozaUi")
 }
 
 sourceSets {
@@ -69,11 +69,11 @@ tasks.test {
     useJUnitPlatform()
 }
 
-tasks.register<JavaExec>("runRozaUi") {
+tasks.register<JavaExec>("runLegacyRozaUi") {
     group = "application"
-    description = "Runs the Roza UI."
+    description = "Runs the legacy Roza UI."
     classpath = sourceSets.main.get().runtimeClasspath
-    mainClass.set("br.ufsc.ine.leb.roza.ui.RozaUi")
+    mainClass.set("br.ufsc.ine.leb.roza.ui.legacy.RozaUi")
 }
 
 fun registerExperimentTask(

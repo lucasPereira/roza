@@ -1,11 +1,11 @@
 # Roza
 
-## Running Roza UI
+## Running legacy Roza UI
 
 From the project root, run:
 
 ```sh
-./gradlew runRozaUi
+./gradlew runLegacyRozaUi
 ```
 
 ## Running Experiments

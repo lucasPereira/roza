@@ -7,7 +7,7 @@ import java.util.NoSuchElementException;
 
 import org.junit.runners.Suite.SuiteClasses;
 
-import br.ufsc.ine.leb.roza.ui.window.content.sidebar.clustering.ClusteringTab;
+import br.ufsc.ine.leb.roza.ui.legacy.window.content.sidebar.clustering.ClusteringTab;
 
 @SuiteClasses({ ClusteringTab.class })
 public class Ring<T> {

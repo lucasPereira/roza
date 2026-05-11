@@ -46,6 +46,8 @@ This document stores evolving knowledge discovered while designing and implement
 - `RefactoredTestClasses`: the result returned by `TestClassRefactorer.refactor`; it exposes refactored `TestClass` instances through `testClasses()`.
 - Writing stage: the final modern Roza pipeline stage; it writes refactored test classes to an output destination such as the filesystem or cloud.
 - `TestClassWriter`: the writing stage interface.
+- Legacy UI: the existing Swing UI now lives under `br.ufsc.ine.leb.roza.ui.legacy`.
+- Modern UI: the future manual-testing UI for modern Roza starts under `br.ufsc.ine.leb.roza.ui.modern`.
 
 ## Current Architectural Understanding
 
@@ -58,6 +60,8 @@ The pipeline must allow combinations such as:
 - future implementations added without changing unrelated stages.
 
 The framework should be designed for broad extension across programming languages, test frameworks, refactoring types, and analysis techniques. The initial pipeline will impose some limits, but core abstractions should avoid unnecessary assumptions.
+
+Modern and legacy Roza are isolated architecture areas. The isolation is bidirectional: `core.modern` must not import `core.legacy`, and `core.legacy` must not import `core.modern`.
 
 The first confirmed pipeline stage is `loading`. It has one shared interface named `CodeFileLoader` with a single method named `load`. The method returns `LoadedCodeFiles`, a concrete data class that exposes concrete `CodeFile` instances through `codeFiles()`. Each `CodeFile` exposes raw textual content through `content()`. The name avoids implying that every loaded file contains tests. Concrete loading implementations are configured through constructor parameters, allowing different strategies such as recursive filesystem loading, extension-based filesystem loading, and Git-based loading.
 
@@ -147,6 +151,8 @@ The final confirmed pipeline stage is `writing`. Its interface is named `TestCla
 - DEC-054: The first `TestCaseSimilarityMatrix` is dense and directed; it must not assume metrics are symmetric.
 - DEC-055: The first matrix write API is package-level `setSimilarity(int sourceIndex, int targetIndex, double similarity)` because LCCSS only needs to fill scores by index.
 - DEC-056: The first measurement implementation is `LccssTestCaseSimilarityMeasurer`.
+- DEC-057: Isolation between `core.modern` and `core.legacy` is bidirectional; imports must not cross between them in either direction.
+- DEC-058: UI code is split into `ui.legacy` and `ui.modern`; the existing UI remains the legacy UI, and the modern UI will be developed separately.
 
 ## Hypotheses
 
@@ -225,3 +231,5 @@ The final confirmed pipeline stage is `writing`. Its interface is named `TestCla
 - 2026-05-11: Renamed the modern concrete parser implementation to `JunitTestClassParser`.
 - 2026-05-11: Replaced assertion prefix matching with an explicit supported assertion method list for JUnit 4, current JUnit Jupiter, and Hamcrest `assertThat`.
 - 2026-05-11: Implemented the first measurement contracts, dense directed similarity matrix, and LCCSS measurer.
+- 2026-05-11: Recorded bidirectional import isolation between `core.modern` and `core.legacy`.
+- 2026-05-11: Split UI packages into `ui.legacy` and `ui.modern` to prepare for a new modern Roza UI.

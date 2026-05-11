@@ -1,0 +1,47 @@
+package br.ufsc.ine.leb.roza.ui.legacy.window.content.sidebar.classes;
+
+import java.awt.Component;
+import java.util.List;
+
+import javax.swing.JSplitPane;
+
+import br.ufsc.ine.leb.roza.ui.legacy.Hub;
+import br.ufsc.ine.leb.roza.ui.legacy.Manager;
+import br.ufsc.ine.leb.roza.ui.legacy.UiComponent;
+import br.ufsc.ine.leb.roza.ui.legacy.window.content.sidebar.Sidebar;
+
+public class TestClassesTab implements UiComponent {
+
+	private final Sidebar sidebar;
+	private JSplitPane panel;
+
+	public TestClassesTab(Sidebar sidebar) {
+		this.sidebar = sidebar;
+	}
+
+	@Override
+	public void init(Hub hub, Manager manager) {
+		panel = new JSplitPane();
+		panel.setOrientation(JSplitPane.VERTICAL_SPLIT);
+		panel.setResizeWeight(0.5);
+		sidebar.addComponent("Test Classes", panel);
+	}
+
+	@Override
+	public void addChildren(List<UiComponent> children) {
+		children.add(new TestClassList(this));
+		children.add(new TestClassInformation(this));
+	}
+
+	@Override
+	public void start() {}
+
+	public void addTopComponent(Component component) {
+		panel.setTopComponent(component);
+	}
+
+	public void addBottomComponent(Component component) {
+		panel.setBottomComponent(component);
+	}
+
+}

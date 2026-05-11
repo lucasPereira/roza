@@ -265,7 +265,7 @@ Pipeline stages should remain loosely coupled through explicit input/output cont
 
 ### NFR-003: Legacy Isolation
 
-The existing Roza implementation lives under `core.legacy`. Modern Roza architecture work should go under `core.modern` unless the user explicitly asks to change legacy code.
+The existing Roza implementation lives under `core.legacy`. Modern Roza architecture work should go under `core.modern` unless the user explicitly asks to change legacy code. Imports between `core.modern` and `core.legacy` must not cross in either direction.
 
 Acceptance criteria:
 
@@ -273,6 +273,17 @@ Acceptance criteria:
 - AC-036: Modern Roza implementation must not reuse classes from legacy Roza.
 - AC-037: Modern Roza implementation must be written from scratch.
 - AC-038: Code in `core.modern` must not import from `core.legacy`.
+- AC-156: Code in `core.legacy` must not import from `core.modern`.
+
+### NFR-006: UI Isolation
+
+The existing UI must be separated from the new modern Roza UI so manual testing can evolve independently for legacy and modern implementations.
+
+Acceptance criteria:
+
+- AC-157: Existing legacy UI code lives under `br.ufsc.ine.leb.roza.ui.legacy`.
+- AC-158: The modern UI package starts under `br.ufsc.ine.leb.roza.ui.modern`.
+- AC-159: The existing Gradle UI entry point continues to run the legacy UI until a modern UI entry point is implemented.
 
 ### NFR-004: Minimal Code Comments
 
@@ -499,3 +510,4 @@ The first measurement implementation fills a dense directed matrix by source and
 - 2026-05-11: Renamed the first modern parser implementation from `JavaTestClassParser` to `JunitTestClassParser` to reflect that the implementation targets JUnit, not all Java test frameworks.
 - 2026-05-11: Replaced assertion-name prefix matching with an explicit supported assertion method list for JUnit 4, current JUnit Jupiter, and Hamcrest `assertThat`, shared by parsing and unsupported-feature validation.
 - 2026-05-11: Implemented the first measurement slice with `TestCaseSimilarityMeasurer`, dense directed `TestCaseSimilarityMatrix`, and `LccssTestCaseSimilarityMeasurer`.
+- 2026-05-11: Strengthened legacy isolation so imports between `core.modern` and `core.legacy` must not cross in either direction.

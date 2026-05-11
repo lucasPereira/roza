@@ -17,7 +17,7 @@ class ProgrammaticTextFileLoaderTest {
 
 	@BeforeEach
 	void setup() {
-		List<File> files = new FolderUtils("src/test/resources/loader").listFilesRecursively();
+		List<File> files = new FolderUtils("src/test/resources/legacy/loader").listFilesRecursively();
 		loader = new ProgrammaticTextFileLoader(files);
 	}
 
