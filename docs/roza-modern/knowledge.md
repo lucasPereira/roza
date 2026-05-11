@@ -63,7 +63,7 @@ The framework should be designed for broad extension across programming language
 
 Modern and legacy Roza are isolated architecture areas. The isolation is bidirectional: `core.modern` must not import `core.legacy`, and `core.legacy` must not import `core.modern`.
 
-The first confirmed pipeline stage is `loading`. It has one shared interface named `CodeFileLoader` with a single method named `load`. The method returns `LoadedCodeFiles`, a concrete data class that exposes concrete `CodeFile` instances through `codeFiles()`. Each `CodeFile` exposes raw textual content through `content()`. The name avoids implying that every loaded file contains tests. Concrete loading implementations are configured through constructor parameters, allowing different strategies such as recursive filesystem loading, extension-based filesystem loading, and Git-based loading.
+The first confirmed pipeline stage is `loading`. It has one shared interface named `CodeFileLoader` with a single method named `load`. The method returns `LoadedCodeFiles`, a concrete data class that exposes concrete `CodeFile` instances through `codeFiles()`. Each `CodeFile` exposes a textual source identity through `source()` and raw textual content through `content()`. The name avoids implying that every loaded file contains tests. Concrete loading implementations are configured through constructor parameters, allowing different strategies such as recursive filesystem loading, extension-based filesystem loading, and Git-based loading.
 
 The second confirmed pipeline stage is `parsing`. Its interface is named `TestClassParser`. It receives the in-memory raw code files produced by `loading`, determines which loaded files contain test classes, identifies those test classes, and creates one Java-first domain model per identified test class. Its `parse` method returns `ParsedTestClasses`, which exposes `TestClass` instances through `testClasses()`. This keeps loading focused on loading files and leaves structural interpretation to parsing.
 
@@ -85,7 +85,7 @@ The sixth confirmed pipeline stage is `refactoring`. Its interface is named `Tes
 
 The final confirmed pipeline stage is `writing`. Its interface is named `TestClassWriter`, and its method is named `write`. It receives `RefactoredTestClasses` and writes them to an output destination without returning a serialized model. The destination may be the filesystem or a cloud target, depending on the writer implementation. Concrete writer implementations receive required output destination parameters through constructors.
 
-The first modern UI slice uses JavaFX 17.x while the project remains on Java 11. It is a code-only skeleton without FXML. Its layout mirrors the pipeline: a top stage bar, a left sidebar with selected-stage configuration and action button, and a center area with placeholder data produced by the previous stage. The layout should stay minimal, using mostly black, white, and gray; pipeline status colors are exceptions. The top stage bar and selected-stage action button use `#333333`, and blocked pipeline stage buttons use a lighter gray treatment without JavaFX disabled opacity so their text remains readable. Stage selection is visual state independent from pipeline status, so a previous completed stage can still be shown as selected. Stage actions advance only local UI state for manual navigation, including visually completing the final writing stage; triggering a completed stage resets only later completed stages. These actions do not execute loading, parsing, decomposition, measurement, clustering, refactoring, or writing yet.
+The first modern UI slice uses JavaFX 17.x while the project remains on Java 11. It is a code-only skeleton without FXML. Its layout mirrors the pipeline: a top stage bar, a left sidebar with selected-stage configuration and action button, and a center area with placeholder data produced by the previous stage. The layout should stay minimal, using mostly black, white, and gray; pipeline status colors are exceptions. The top stage bar and selected-stage action button use `#333333`, and blocked pipeline stage buttons use a lighter gray treatment without JavaFX disabled opacity so their text remains readable. Stage selection is visual state independent from pipeline status, so a previous completed stage can still be shown as selected. The loading stage is the first functional UI flow: it opens a folder selector, lets the user choose recursive loading and accepted `.java`/`.txt` extensions, calls `FileSystemCodeFileLoader`, and shows the loaded files in the `Parsing` center. Selecting a loaded file shows its content. Other stage actions advance only local UI state for manual navigation, including visually completing the final writing stage; triggering a completed stage resets only later completed stages. These actions do not execute parsing, decomposition, measurement, clustering, refactoring, or writing yet.
 
 ## Implementation Notes
 
@@ -161,6 +161,8 @@ The first modern UI slice uses JavaFX 17.x while the project remains on Java 11.
 - DEC-062: The modern UI skeleton can advance past the last pipeline stage so `Writing` can be visually marked as completed.
 - DEC-063: Modern UI pipeline selection is tracked separately from completed/current/blocked pipeline status.
 - DEC-064: Modern UI stage actions remain active for completed stages and reset only subsequent completed stages when triggered.
+- DEC-065: `CodeFile.source()` is now required to support manual UI inspection of loaded files without adding parser responsibilities to loading.
+- DEC-066: The first functional modern UI pipeline behavior is loading from the filesystem and presenting the loaded files as the previous-stage output in `Parsing`.
 
 ## Hypotheses
 
@@ -247,3 +249,4 @@ The first modern UI slice uses JavaFX 17.x while the project remains on Java 11.
 - 2026-05-11: Recorded that modern UI pipeline stage selection is independent from stage completion status.
 - 2026-05-11: Recorded the black toolbar, neutral color direction, and completed-stage reset behavior for the modern UI skeleton.
 - 2026-05-11: Recorded that blocked pipeline stage buttons should use a lighter gray treatment.
+- 2026-05-11: Recorded the first functional loading behavior in the modern UI and the resulting `CodeFile.source()` requirement.

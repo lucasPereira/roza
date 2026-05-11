@@ -76,6 +76,20 @@ class FileSystemCodeFileLoaderTest {
 		assertEquals(Set.of("java", "txt"), contents);
 	}
 
+	@Test
+	void shouldExposeTheLoadedFileSourceRelativeToTheProvidedFolder() throws IOException {
+		createFile(folder.resolve("child").resolve("test.java"), "java");
+
+		Set<String> sources = new FileSystemCodeFileLoader(folder, true, List.of())
+				.load()
+				.codeFiles()
+				.stream()
+				.map(CodeFile::source)
+				.collect(Collectors.toSet());
+
+		assertEquals(Set.of(Path.of("child", "test.java").toString()), sources);
+	}
+
 	private Set<String> load(boolean recursive, List<String> extensions) {
 		return new FileSystemCodeFileLoader(folder, recursive, extensions)
 				.load()

@@ -27,6 +27,7 @@ public final class FileSystemCodeFileLoader implements CodeFileLoader {
 		try (Stream<Path> files = files()) {
 			return new LoadedCodeFiles(files.filter(Files::isRegularFile)
 					.filter(this::hasAcceptedExtension)
+					.sorted()
 					.map(this::read)
 					.collect(Collectors.toList()));
 		} catch (IOException exception) {
@@ -56,7 +57,7 @@ public final class FileSystemCodeFileLoader implements CodeFileLoader {
 
 	private CodeFile read(Path file) {
 		try {
-			return new CodeFile(Files.readString(file));
+			return new CodeFile(folder.relativize(file).toString(), Files.readString(file));
 		} catch (IOException exception) {
 			throw new UncheckedIOException(exception);
 		}

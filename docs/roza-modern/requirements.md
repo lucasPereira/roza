@@ -87,6 +87,7 @@ Acceptance criteria:
 - AC-034: `CodeFile` must not define attributes beyond those required by confirmed requirements.
 - AC-076: `LoadedCodeFiles` exposes the loaded code files through `codeFiles()`.
 - AC-077: `CodeFile` exposes the raw textual content of the loaded code file through `content()`.
+- AC-174: `CodeFile` exposes a textual source identity for the loaded code file through `source()`, so manual UI flows can identify loaded files.
 - AC-111: The loading contract belongs in the `br.ufsc.ine.leb.roza.core.modern.loading` package.
 - AC-118: `LoadedCodeFiles` and `CodeFile` are concrete loading data classes, not extension interfaces.
 - AC-112: A filesystem `CodeFileLoader` implementation includes files from the folder provided to it.
@@ -298,6 +299,11 @@ Acceptance criteria:
 - AC-171: The modern UI toolbar and stage action buttons use `#333333` as their black background.
 - AC-172: The modern UI keeps stage action buttons active for completed stages; triggering a completed stage resets only later completed stages.
 - AC-173: Blocked pipeline stage buttons use a lighter gray treatment than available stages, without relying on disabled opacity that harms text contrast.
+- AC-175: The modern UI loading configuration has a `Source folder` button that opens a folder selector.
+- AC-176: The modern UI loading configuration has a recursive loading checkbox.
+- AC-177: The modern UI loading configuration has accepted extension checkboxes for `.java` and `.txt`.
+- AC-178: Triggering `Load` in the modern UI uses the filesystem code file loader and advances to `Parsing` when loading succeeds.
+- AC-179: The modern UI `Parsing` center shows the loaded file list after `Load`; selecting a loaded file shows that file's content.
 
 ### NFR-004: Minimal Code Comments
 
@@ -332,6 +338,11 @@ public interface CodeFileLoader {
 
 public final class LoadedCodeFiles {
 	public List<CodeFile> codeFiles();
+}
+
+public final class CodeFile {
+	public String source();
+	public String content();
 }
 ```
 
@@ -432,7 +443,7 @@ The user stated that stages do not communicate directly and that each stage gene
 
 ### Q-003: What is the minimum raw code loading input model?
 
-`CodeFileLoader.load` returns `LoadedCodeFiles`, which contains `CodeFile` instances and exposes them through `codeFiles()`. `CodeFile` exposes raw textual content through `content()`. Other attributes remain undecided until they are required.
+`CodeFileLoader.load` returns `LoadedCodeFiles`, which contains `CodeFile` instances and exposes them through `codeFiles()`. `CodeFile` exposes a textual source identity through `source()` and raw textual content through `content()`. Other attributes remain undecided until they are required.
 
 ### Q-004: What is the first target implementation slice?
 
@@ -530,4 +541,5 @@ The first measurement implementation fills a dense directed matrix by source and
 - 2026-05-11: Refined the modern UI skeleton so previous stages can be visually selected without losing their completed status.
 - 2026-05-11: Refined the modern UI skeleton with a black toolbar, mostly neutral colors, and active actions for completed stages that reset later stages.
 - 2026-05-11: Refined blocked pipeline stage buttons to use a lighter gray treatment.
+- 2026-05-11: Confirmed the first functional modern UI loading flow: source folder selector, recursive checkbox, `.java`/`.txt` extension checkboxes, loaded file list in `Parsing`, and file-content inspection.
 - 2026-05-11: Strengthened legacy isolation so imports between `core.modern` and `core.legacy` must not cross in either direction.
