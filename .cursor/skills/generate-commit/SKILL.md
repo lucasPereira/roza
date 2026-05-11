@@ -3,8 +3,9 @@ name: generate-commit
 description: >-
   Roza (Java/Gradle): in the roza submodule repo root, build one line
   `slug: commit message` from the full uncommitted tree, stage with `git add -A`,
-  show **`git status`** after staging and the **composed commit message**, wait
-  for explicit user approval, then run `git commit`. Use when the user attaches
+  show **`git status`** after staging and the **composed commit message** (one
+  line, ≤72 chars total), wait for explicit user approval, then run `git commit`.
+  Use when the user attaches
   this skill or asks to generate commit / mensagem de commit for Roza.
 ---
 
@@ -42,7 +43,7 @@ The message must reflect the **full** tree vs `HEAD` before staging: staged, uns
 1. `cd` to the **roza** submodule root (or use `git -C <roza-root>`).
 2. Run `git status` and `git diff HEAD` (and short/porcelain status if useful) to understand **all** pending changes.
 3. If there is **nothing** to commit (clean tree), report that and **stop** — do not run `git add` or `git commit`.
-4. Compose **one** line `slug: commit message` covering the full picture. Show that line to the user before staging.
+4. Compose **one** line `slug: commit message` covering the full picture. The **entire line** (including `slug: `) must be **at most 72 characters** — the usual first-line limit Git and UIs assume before wrapping; shorten wording or drop minor clauses if needed. Show that line to the user before staging.
 5. Stage everything not yet committed: **`git add -A`** at the **roza** repo root (adds new files, stages modifications, stages removals; honors ignored files).
 6. After staging, show the user (before asking approval):
    - **`git status`**: paste the **full** output (branch, ahead/behind if any, and the whole “Changes to be committed” section).
@@ -55,18 +56,18 @@ The message must reflect the **full** tree vs `HEAD` before staging: staged, uns
 ## Slug and message
 
 - Prefer **English** unless the user asks for Portuguese.
-- One line; no vague slugs (`update`, `fix-stuff`). **Never** use a `-roza` suffix (or `something-roza`) in the slug — it is redundant. If changes are unrelated, reflect the main change and briefly note the rest, or warn that bundling unrelated work is risky and offer to split only if the user asks.
+- One line; **hard cap 72 characters** total. No vague slugs (`update`, `fix-stuff`). **Never** use a `-roza` suffix (or `something-roza`) in the slug — it is redundant. If changes are unrelated, reflect the main change and briefly note the rest, or warn that bundling unrelated work is risky and offer to split only if the user asks.
 
 ## Examples
 
 ```text
-chore: move legacy loader test fixtures under test/resources/legacy/loader
+chore: move legacy loader fixtures to test/resources/legacy/loader
 ```
 
 ```text
-gradle: rename runRozaUi application task to runLegacyRozaUi
+gradle: rename runRozaUi task to runLegacyRozaUi
 ```
 
 ```text
-docs-modern: document bidirectional modern/legacy import isolation
+docs-modern: document modern/legacy import isolation
 ```
