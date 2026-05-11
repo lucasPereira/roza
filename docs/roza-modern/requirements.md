@@ -142,6 +142,8 @@ Acceptance criteria:
 - AC-133: The first parser treats control-flow blocks such as `for`, `while`, and `if` as top-level statements rather than flattening their internals.
 - AC-134: Static members, nested classes, unsupported lifecycle features, parameterized tests, inheritance, static imports, and other listed unsupported features are rejected or skipped according to `UnsupportedFeaturePolicy`.
 - AC-135: Modern Roza starts conservative: unsupported features should be removed from the unsupported list only when real support is implemented.
+- AC-136: JUnit 4 `@After` and JUnit 5 `@AfterEach` are unsupported in the first parser slice and are handled according to `UnsupportedFeaturePolicy`.
+- AC-137: Parsed field types preserve complex Java type text needed by decomposition, including generics, nested generics, wildcard generics, qualified types, generic arrays, arrays, and multidimensional arrays.
 
 ### REQ-010: Decomposition Stage
 
@@ -155,13 +157,17 @@ Acceptance criteria:
 - AC-051: Each produced test AST contains the original test body plus the code required by that test.
 - AC-052: If a source test class has an implicit setup and two tests, decomposition produces one AST per test, and each produced AST includes the implicit setup code plus that test's original body.
 - AC-053: The decomposition stage separates tests from their class of origin.
-- AC-080: The decomposition stage is represented by one interface named `TestMethodDecomposer`.
+- AC-080: The decomposition stage is represented by one interface named `TestCaseDecomposer`.
 - AC-081: The decomposition interface has a method named `decompose`.
-- AC-082: Each decomposed test is represented by `TestMethod`.
-- AC-083: `TestMethod` has no minimum content API until confirmed requirements make one necessary.
-- AC-084: `TestMethod` must not expose `id()` or `testClass()` unless future confirmed requirements make them necessary.
-- AC-085: `TestMethodDecomposer.decompose` returns `DecomposedTestMethods`.
-- AC-086: `DecomposedTestMethods` exposes decomposed test methods through `testMethods()`.
+- AC-082: Each decomposed test is represented by `TestCase`, because after decomposition it is no longer exactly a method inside a test class.
+- AC-083: `TestCase` exposes the minimum content needed by the current pipeline slice through `name()` and `body()`.
+- AC-084: `TestCase` must not expose `id()` or `testClass()` unless future confirmed requirements make them necessary.
+- AC-085: `TestCaseDecomposer.decompose` returns `DecomposedTestCases`.
+- AC-086: `DecomposedTestCases` exposes decomposed test cases through `testCases()`.
+- AC-140: `TestCase` preserves the original parsed test method name so refactoring can use it later, even when names are duplicated.
+- AC-141: `TestCase` does not need to preserve the source `@Before` annotation or fixture identity; it only needs to include the statements derived from supported `@Before` fixtures in the decomposed body.
+- AC-144: The default decomposition implementation preserves assertions in the decomposed `TestCase` body.
+- AC-145: The default decomposition implementation orders the decomposed body as field declarations, supported `@Before` statements, then original test body statements.
 
 ### REQ-011: Measurement Stage
 
@@ -176,10 +182,12 @@ Acceptance criteria:
 - AC-058: The measurement stage produces a similarity matrix.
 - AC-059: The similarity matrix indicates the similarity degree for each pair of tests according to the applied metric.
 - AC-074: The similarity matrix is indexed by abstract test identities.
-- AC-087: The measurement stage is represented by one interface named `TestMethodSimilarityMeasurer`.
+- AC-087: The measurement stage is represented by one interface named `TestCaseSimilarityMeasurer`.
 - AC-088: The measurement interface has a method named `measure`.
-- AC-089: `TestMethodSimilarityMeasurer.measure` receives `DecomposedTestMethods`.
-- AC-090: `TestMethodSimilarityMeasurer.measure` returns `TestMethodSimilarityMatrix`.
+- AC-089: `TestCaseSimilarityMeasurer.measure` receives `DecomposedTestCases`.
+- AC-090: `TestCaseSimilarityMeasurer.measure` returns `TestCaseSimilarityMatrix`.
+- AC-142: Measurement can use a projection of each `TestCase` rather than measuring every statement in the decomposed body.
+- AC-143: LCCSS measurement must stop its measured projection at the first assertion statement; it must not continue measuring statements that appear after the first assertion.
 
 ### REQ-012: Clustering Stage
 
@@ -193,13 +201,13 @@ Acceptance criteria:
 - AC-063: The clustering stage knows only the information represented in the similarity matrix.
 - AC-064: The clustering stage reverses the earlier decomposition direction by constructing groups from tests that were previously separated from their original classes.
 - AC-075: The clustering stage consumes the indexed similarity matrix rather than test ASTs.
-- AC-091: The clustering stage is represented by one interface named `TestMethodClusterer`.
+- AC-091: The clustering stage is represented by one interface named `TestCaseClusterer`.
 - AC-092: The clustering interface has a method named `cluster`.
-- AC-093: `TestMethodClusterer.cluster` receives `TestMethodSimilarityMatrix`.
-- AC-094: `TestMethodClusterer.cluster` returns `TestMethodClusters`.
-- AC-095: `TestMethodClusters` exposes test method clusters through `clusters()`.
-- AC-096: Each test method cluster is represented by `TestMethodCluster`.
-- AC-097: `TestMethodCluster` has no minimum content API until confirmed requirements make one necessary.
+- AC-093: `TestCaseClusterer.cluster` receives `TestCaseSimilarityMatrix`.
+- AC-094: `TestCaseClusterer.cluster` returns `TestCaseClusters`.
+- AC-095: `TestCaseClusters` exposes test case clusters through `clusters()`.
+- AC-096: Each test case cluster is represented by `TestCaseCluster`.
+- AC-097: `TestCaseCluster` has no minimum content API until confirmed requirements make one necessary.
 
 ### REQ-013: Refactoring Stage
 
@@ -213,7 +221,7 @@ Acceptance criteria:
 - AC-068: The pipeline design should leave room for other refactoring strategies, such as delegated setup, when supported by future refactoring implementations.
 - AC-098: The refactoring stage is represented by one interface named `TestClassRefactorer`.
 - AC-099: The refactoring interface has a method named `refactor`.
-- AC-100: `TestClassRefactorer.refactor` receives `TestMethodClusters`.
+- AC-100: `TestClassRefactorer.refactor` receives `TestCaseClusters`.
 - AC-101: `TestClassRefactorer.refactor` returns `RefactoredTestClasses`.
 - AC-102: `RefactoredTestClasses` exposes refactored test classes through `testClasses()`.
 - AC-103: `RefactoredTestClasses.testClasses()` returns `TestClass` instances.
@@ -265,6 +273,118 @@ Acceptance criteria:
 - AC-109: Do not add comments that merely restate type names, method names, or obvious behavior.
 - AC-110: Add a code comment only when it explains non-obvious intent, constraints, or reasoning.
 
+### NFR-005: Requirements API Snapshot
+
+This requirements document must keep an up-to-date snapshot of the current modern Roza public API contracts.
+
+Acceptance criteria:
+
+- AC-138: When a modern Roza pipeline interface or stage boundary container is added, removed, or changed, the Current API Contracts section must be updated in the same task.
+- AC-139: The API snapshot must distinguish implemented contracts from contracts that are only confirmed but not yet implemented.
+
+## Current API Contracts
+
+This section is the current requirements-level pipeline contract snapshot. It includes each pipeline interface and its immediate stage boundary containers. It must be updated whenever a modern Roza pipeline interface or stage boundary container changes.
+
+### Implemented: Loading
+
+```java
+package br.ufsc.ine.leb.roza.core.modern.loading;
+
+public interface CodeFileLoader {
+	LoadedCodeFiles load();
+}
+
+public final class LoadedCodeFiles {
+	public List<CodeFile> codeFiles();
+}
+```
+
+### Implemented: Parsing
+
+```java
+package br.ufsc.ine.leb.roza.core.modern.parsing;
+
+public interface TestClassParser {
+	ParsedTestClasses parse(LoadedCodeFiles codeFiles);
+}
+
+public final class ParsedTestClasses {
+	public List<TestClass> testClasses();
+}
+```
+
+### Implemented: Decomposition
+
+```java
+package br.ufsc.ine.leb.roza.core.modern.decomposition;
+
+public interface TestCaseDecomposer {
+	DecomposedTestCases decompose(ParsedTestClasses parsedTestClasses);
+}
+
+public final class DecomposedTestCases {
+	public List<TestCase> testCases();
+}
+
+public final class TestCase {
+	public String name();
+	public CodeBlock body();
+}
+```
+
+### Confirmed, Not Yet Implemented: Measurement
+
+```java
+package br.ufsc.ine.leb.roza.core.modern.measurement;
+
+public interface TestCaseSimilarityMeasurer {
+	TestCaseSimilarityMatrix measure(DecomposedTestCases testCases);
+}
+
+public final class TestCaseSimilarityMatrix {
+	// Minimum API not confirmed yet.
+}
+```
+
+### Confirmed, Not Yet Implemented: Clustering
+
+```java
+package br.ufsc.ine.leb.roza.core.modern.clustering;
+
+public interface TestCaseClusterer {
+	TestCaseClusters cluster(TestCaseSimilarityMatrix similarityMatrix);
+}
+
+public final class TestCaseClusters {
+	public List<TestCaseCluster> clusters();
+}
+```
+
+### Confirmed, Not Yet Implemented: Refactoring
+
+```java
+package br.ufsc.ine.leb.roza.core.modern.refactoring;
+
+public interface TestClassRefactorer {
+	RefactoredTestClasses refactor(TestCaseClusters clusters);
+}
+
+public final class RefactoredTestClasses {
+	public List<TestClass> testClasses();
+}
+```
+
+### Confirmed, Not Yet Implemented: Writing
+
+```java
+package br.ufsc.ine.leb.roza.core.modern.writing;
+
+public interface TestClassWriter {
+	void write(RefactoredTestClasses testClasses);
+}
+```
+
 ## Open Questions
 
 ### Q-001: What are the initial pipeline stages?
@@ -293,19 +413,19 @@ Explore whether modern Roza should use or adapt an existing AST abstraction for 
 
 ### Q-007: What are the decomposition interface and output model names?
 
-The decomposition interface is named `TestMethodDecomposer`, and its method is named `decompose`. `TestMethodDecomposer.decompose` returns `DecomposedTestMethods`, which exposes decomposed test methods through `testMethods()`. Each decomposed test is represented by `TestMethod`, which has no minimum content API yet.
+The decomposition interface is named `TestCaseDecomposer`, and its method is named `decompose`. `TestCaseDecomposer.decompose` returns `DecomposedTestCases`, which exposes decomposed test cases through `testCases()`. Each decomposed test is represented by `TestCase`, because after decomposition it is no longer exactly a method inside a test class. `TestCase` has no minimum content API yet.
 
 ### Q-008: What are the measurement interface and output model names?
 
-The measurement interface is named `TestMethodSimilarityMeasurer`, and its method is named `measure`. `TestMethodSimilarityMeasurer.measure` receives `DecomposedTestMethods` and returns `TestMethodSimilarityMatrix`. The minimum API of `TestMethodSimilarityMatrix`, the exact abstract test identity model, and any separate similarity metric or score abstractions are not defined yet.
+The measurement interface is named `TestCaseSimilarityMeasurer`, and its method is named `measure`. `TestCaseSimilarityMeasurer.measure` receives `DecomposedTestCases` and returns `TestCaseSimilarityMatrix`. The minimum API of `TestCaseSimilarityMatrix`, the exact abstract test identity model, and any separate similarity metric or score abstractions are not defined yet.
 
 ### Q-009: What are the clustering interface and output model names?
 
-The clustering interface is named `TestMethodClusterer`, and its method is named `cluster`. `TestMethodClusterer.cluster` receives `TestMethodSimilarityMatrix` and returns `TestMethodClusters`, which exposes test method clusters through `clusters()`. Each cluster is represented by `TestMethodCluster`, which has no minimum content API yet.
+The clustering interface is named `TestCaseClusterer`, and its method is named `cluster`. `TestCaseClusterer.cluster` receives `TestCaseSimilarityMatrix` and returns `TestCaseClusters`, which exposes test case clusters through `clusters()`. Each cluster is represented by `TestCaseCluster`, which has no minimum content API yet.
 
 ### Q-010: What are the refactoring interface and output model names?
 
-The refactoring interface is named `TestClassRefactorer`, and its method is named `refactor`. `TestClassRefactorer.refactor` receives `TestMethodClusters` and returns `RefactoredTestClasses`, which exposes refactored `TestClass` instances through `testClasses()`.
+The refactoring interface is named `TestClassRefactorer`, and its method is named `refactor`. `TestClassRefactorer.refactor` receives `TestCaseClusters` and returns `RefactoredTestClasses`, which exposes refactored `TestClass` instances through `testClasses()`.
 
 ### Q-011: What output destinations should writing support first?
 
@@ -317,7 +437,7 @@ The initial concrete purpose is to refactor test classes by regrouping tests int
 
 ### Q-013: What is the exact model for abstract test identities?
 
-The similarity matrix must be indexed by abstract test identities, but the exact identity model and where those identities are created are not defined yet. `TestMethod` does not expose an `id()` method for now.
+The similarity matrix must be indexed by abstract test identities, but the exact identity model and where those identities are created are not defined yet. `TestCase` does not expose an `id()` method for now.
 
 ## Change Log
 
@@ -354,3 +474,13 @@ The similarity matrix must be indexed by abstract test identities, but the exact
 - 2026-05-11: Confirmed `LoadedCodeFiles` and `CodeFile` as concrete loading data classes rather than extension interfaces.
 - 2026-05-11: Refined parsing and `TestClass` from a language-universal AST goal to a Java-first domain model that hides JavaParser behind concrete parser implementations.
 - 2026-05-11: Added `UnsupportedFeaturePolicy` and fail-fast/diagnostic handling for unsupported parser features.
+- 2026-05-11: Marked JUnit 4 `@After` and JUnit 5 `@AfterEach` as unsupported in the first parser slice.
+- 2026-05-11: Confirmed that parsed fields must preserve complex Java type text such as generics and multidimensional arrays.
+- 2026-05-11: Added the Current API Contracts snapshot and the requirement to keep it updated whenever public modern Roza contracts change.
+- 2026-05-11: Narrowed the Current API Contracts snapshot to pipeline interfaces only.
+- 2026-05-11: Refined the Current API Contracts snapshot to include pipeline interfaces and immediate stage boundary containers.
+- 2026-05-11: Renamed decomposed test terminology from test method to test case: `TestCaseDecomposer`, `DecomposedTestCases`, `TestCase`, `TestCaseSimilarityMeasurer`, `TestCaseSimilarityMatrix`, `TestCaseClusterer`, `TestCaseClusters`, and `TestCaseCluster`.
+- 2026-05-11: Confirmed that `TestCase` preserves the original parsed test method name for later refactoring use.
+- 2026-05-11: Confirmed that decomposed `TestCase` bodies include statements from `@Before` fixtures but do not need to preserve the `@Before` annotation itself.
+- 2026-05-11: Confirmed that LCCSS measurement must stop at the first assertion statement rather than merely filtering assertions.
+- 2026-05-11: Implemented the first `DefaultTestCaseDecomposer`, with `TestCase.name()` and `TestCase.body()`, preserving assertions in the full decomposed body.

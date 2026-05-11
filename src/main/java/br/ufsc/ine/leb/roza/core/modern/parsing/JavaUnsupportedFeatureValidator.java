@@ -34,9 +34,11 @@ import com.github.javaparser.ast.stmt.TryStmt;
 
 final class JavaUnsupportedFeatureValidator {
 
-	private static final Set<String> SUPPORTED_METHOD_ANNOTATIONS = Set.of("Test", "Before", "After", "BeforeEach", "AfterEach");
+	private static final Set<String> SUPPORTED_METHOD_ANNOTATIONS = Set.of("Test", "Before", "BeforeEach");
 	private static final Set<String> UNSUPPORTED_ANNOTATIONS = Set.of(
 			"Nested",
+			"After",
+			"AfterEach",
 			"BeforeClass",
 			"AfterClass",
 			"BeforeAll",
@@ -342,7 +344,7 @@ final class JavaUnsupportedFeatureValidator {
 	}
 
 	private boolean isFixtureMethod(MethodDeclaration method) {
-		return method.getAnnotations().stream().map(this::simpleName).anyMatch(name -> Set.of("Before", "After", "BeforeEach", "AfterEach").contains(name));
+		return method.getAnnotations().stream().map(this::simpleName).anyMatch(name -> Set.of("Before", "BeforeEach").contains(name));
 	}
 
 	private String simpleName(AnnotationExpr annotation) {

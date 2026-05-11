@@ -65,6 +65,30 @@ class JavaTestClassParserTest {
 	}
 
 	@Test
+	void shouldParseFieldsWithComplexTypes() {
+		ParsedTestClasses parsed = parse("class Example { List<String> names; Map<String, List<Integer>> values; List<? extends Number> numbers; String[][] matrix; int[][][] cube; java.util.List<String> qualified; List<String>[] groupedNames; Map.Entry<String, Integer> entry; @Test public void test() { assertTrue(true); } }");
+
+		List<Field> fields = parsed.testClasses().get(0).fields();
+		assertEquals(8, fields.size());
+		assertEquals("List<String>", fields.get(0).type());
+		assertEquals("names", fields.get(0).name());
+		assertEquals("Map<String,List<Integer>>", fields.get(1).type());
+		assertEquals("values", fields.get(1).name());
+		assertEquals("List<? extends Number>", fields.get(2).type());
+		assertEquals("numbers", fields.get(2).name());
+		assertEquals("String[][]", fields.get(3).type());
+		assertEquals("matrix", fields.get(3).name());
+		assertEquals("int[][][]", fields.get(4).type());
+		assertEquals("cube", fields.get(4).name());
+		assertEquals("java.util.List<String>", fields.get(5).type());
+		assertEquals("qualified", fields.get(5).name());
+		assertEquals("List<String>[]", fields.get(6).type());
+		assertEquals("groupedNames", fields.get(6).name());
+		assertEquals("Map.Entry<String,Integer>", fields.get(7).type());
+		assertEquals("entry", fields.get(7).name());
+	}
+
+	@Test
 	void shouldParseMultipleVariablesInOneFieldDeclaration() {
 		ParsedTestClasses parsed = parse("class Example { int first = 1, second = 2; @Test public void test() { assertTrue(true); } }");
 
@@ -78,16 +102,13 @@ class JavaTestClassParserTest {
 
 	@Test
 	void shouldParseFixtures() {
-		ParsedTestClasses parsed = parse("class Example { @Before public void setup() { int value = 1; } @After public void teardown() { int value = 2; } @Test public void test() { assertTrue(true); } }");
+		ParsedTestClasses parsed = parse("class Example { @Before public void setup() { int value = 1; } @Test public void test() { assertTrue(true); } }");
 
 		List<FixtureMethod> fixtures = parsed.testClasses().get(0).fixtures();
-		assertEquals(2, fixtures.size());
+		assertEquals(1, fixtures.size());
 		assertEquals(FixtureKind.BEFORE, fixtures.get(0).kind());
 		assertEquals("setup", fixtures.get(0).name());
 		assertEquals("int value = 1;", fixtures.get(0).body().statements().get(0).normalizedText());
-		assertEquals(FixtureKind.AFTER, fixtures.get(1).kind());
-		assertEquals("teardown", fixtures.get(1).name());
-		assertEquals("int value = 2;", fixtures.get(1).body().statements().get(0).normalizedText());
 	}
 
 	@Test
@@ -183,8 +204,10 @@ class JavaTestClassParserTest {
 				unsupported("helper calls super", "class Example { void helper() { super.toString(); } @Test public void test() { assertTrue(true); } }", "super"),
 				unsupported("helper depends on inherited member", "class Example { void helper() { inherited(); } @Test public void test() { assertTrue(true); } }", "helper"),
 				unsupported("JUnit 4 BeforeClass", "class Example { @BeforeClass public void setup() { } @Test public void test() { assertTrue(true); } }", "BeforeClass"),
+				unsupported("JUnit 4 After", "class Example { @After public void teardown() { } @Test public void test() { assertTrue(true); } }", "After"),
 				unsupported("JUnit 4 AfterClass", "class Example { @AfterClass public void teardown() { } @Test public void test() { assertTrue(true); } }", "AfterClass"),
 				unsupported("JUnit 5 BeforeAll", "class Example { @BeforeAll public void setup() { } @Test public void test() { assertTrue(true); } }", "BeforeAll"),
+				unsupported("JUnit 5 AfterEach", "class Example { @AfterEach public void teardown() { } @Test public void test() { assertTrue(true); } }", "AfterEach"),
 				unsupported("JUnit 5 AfterAll", "class Example { @AfterAll public void teardown() { } @Test public void test() { assertTrue(true); } }", "AfterAll"),
 				unsupported("JUnit 4 Ignore", "class Example { @Ignore @Test public void test() { assertTrue(true); } }", "Ignore"),
 				unsupported("JUnit 5 Disabled", "class Example { @Disabled @Test public void test() { assertTrue(true); } }", "Disabled"),
@@ -225,7 +248,7 @@ class JavaTestClassParserTest {
 				unsupported("static test method", "class Example { @Test static void test() { assertTrue(true); } }", "static test"),
 				unsupported("repeated annotation", "class Example { @Test @Test public void test() { assertTrue(true); } }", "repeated annotation"),
 				unsupported("multiple Before fixtures", "class Example { @Before public void first() { } @Before public void second() { } @Test public void test() { assertTrue(true); } }", "multiple @Before"),
-				unsupported("multiple After fixtures", "class Example { @After public void first() { } @After public void second() { } @Test public void test() { assertTrue(true); } }", "multiple @After"),
+				unsupported("multiple After fixtures", "class Example { @After public void first() { } @After public void second() { } @Test public void test() { assertTrue(true); } }", "After"),
 				unsupported("local class", "class Example { @Test public void test() { class Local { } assertTrue(true); } }", "local class"),
 				unsupported("enum declaration", "class Example { enum State { READY } @Test public void test() { assertTrue(true); } }", "enum declaration"),
 				unsupported("anonymous class", "class Example { @Test public void test() { Runnable value = new Runnable() { public void run() { } }; } }", "anonymous class"),

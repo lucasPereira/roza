@@ -21,24 +21,25 @@ This document stores evolving knowledge discovered while designing and implement
 - `UnsupportedFeaturePolicy`: the parser policy for unsupported Java test-code features. `SAFE` fails with a clear error; `UNSAFE` records diagnostics and skips unsupported input.
 - `JavaUnsupportedFeatureValidator`: the separate validation step that runs before Java parser implementations extract modern Roza domain models.
 - `TestClass`: the Java-first root domain abstraction for an identified Java test class. It hides JavaParser types from the public modern Roza contract.
-- `Field`: a parsed Java field that decomposition can later transform into a local variable.
-- `FixtureMethod`: a supported instance fixture method such as JUnit 4 `@Before` or `@After`.
+- `Field`: a parsed Java field that decomposition can later transform into a local variable. Its type text must preserve complex Java forms such as generics, nested generics, wildcard generics, qualified types, generic arrays, arrays, and multidimensional arrays.
+- `FixtureMethod`: a supported instance fixture method such as JUnit 4 `@Before`; JUnit 4 `@After` and JUnit 5 `@AfterEach` are unsupported in the first parser slice.
 - `HelperMethod`: a supported non-test helper method in the Java test class.
 - `CodeBlock`: a block of parsed top-level code statements.
 - `CodeStatement`: a statement-level code unit with original and normalized text for later decomposition and similarity measurement.
 - Decomposition stage: the third modern Roza pipeline stage; it separates each test from its original class and carries the code required by that test.
-- `TestMethodDecomposer`: the decomposition stage interface.
-- `DecomposedTestMethods`: the result returned by `TestMethodDecomposer.decompose`; it exposes decomposed `TestMethod` instances through `testMethods()`.
-- `TestMethod`: the model for a decomposed test. It has no minimum content API yet and does not expose `id()` or `testClass()`.
+- `TestCaseDecomposer`: the decomposition stage interface.
+- `DecomposedTestCases`: the result returned by `TestCaseDecomposer.decompose`; it exposes decomposed `TestCase` instances through `testCases()`.
+- `DefaultTestCaseDecomposer`: the first concrete decomposition implementation. It creates one `TestCase` per parsed test method and orders the decomposed body as field declarations, supported `@Before` statements, then original test body statements.
+- `TestCase`: the model for a decomposed test. It is called a test case because after decomposition it is no longer exactly a method inside a test class. It preserves the original parsed test method name through `name()`, including duplicate names. Its `body()` includes statements derived from supported `@Before` fixtures and preserves assertions, but it does not need to preserve the `@Before` annotation itself. It does not expose `id()` or `testClass()` yet.
 - Measurement stage: the fourth modern Roza pipeline stage; it applies a similarity metric to each pair of decomposed tests and produces a similarity matrix.
-- `TestMethodSimilarityMeasurer`: the measurement stage interface.
-- `TestMethodSimilarityMatrix`: the result returned by `TestMethodSimilarityMeasurer.measure`; it is indexed by abstract test method identities and has no minimum content API beyond that yet.
+- `TestCaseSimilarityMeasurer`: the measurement stage interface.
+- `TestCaseSimilarityMatrix`: the result returned by `TestCaseSimilarityMeasurer.measure`; it is indexed by abstract test case identities and has no minimum content API beyond that yet.
 - Indexed similarity matrix: the measurement output that records pairwise similarity degrees and is indexed by abstract test identities.
 - Abstract test identity: an identity used to refer to a decomposed test across measurement, clustering, and refactoring without exposing the test AST to clustering.
 - Clustering stage: the fifth modern Roza pipeline stage; it groups similar tests using only the similarity matrix.
-- `TestMethodClusterer`: the clustering stage interface.
-- `TestMethodClusters`: the result returned by `TestMethodClusterer.cluster`; it exposes `TestMethodCluster` instances through `clusters()`.
-- `TestMethodCluster`: the model for a cluster of test methods. It has no minimum content API yet.
+- `TestCaseClusterer`: the clustering stage interface.
+- `TestCaseClusters`: the result returned by `TestCaseClusterer.cluster`; it exposes `TestCaseCluster` instances through `clusters()`.
+- `TestCaseCluster`: the model for a cluster of test cases. It has no minimum content API yet.
 - Refactoring stage: the sixth modern Roza pipeline stage; it receives test groups and decides what refactoring to apply to them.
 - `TestClassRefactorer`: the refactoring stage interface.
 - `RefactoredTestClasses`: the result returned by `TestClassRefactorer.refactor`; it exposes refactored `TestClass` instances through `testClasses()`.
@@ -65,13 +66,13 @@ The initial `TestClass` model is Java-first, not language-universal. The archite
 
 The first supported parser scenario should be deliberately conservative. Unsupported Java/JUnit features are validated by a separate validator before model extraction. `UnsupportedFeaturePolicy.SAFE` fails fast with a clear error; `UnsupportedFeaturePolicy.UNSAFE` records diagnostics and skips unsupported input rather than silently accepting it. The project should start with many unsupported features and remove them from the unsupported list only when real support is implemented.
 
-The third confirmed pipeline stage is `decomposition`. Its interface is named `TestMethodDecomposer`, and its method is named `decompose`. It receives parsed test classes and separates each test from its class of origin. `TestMethodDecomposer.decompose` returns `DecomposedTestMethods`, which exposes decomposed `TestMethod` instances through `testMethods()`. Each decomposed test is represented by `TestMethod`. For now, `TestMethod` has no minimum content API and does not expose `id()` or `testClass()`. In the implicit setup example, a class with one implicit setup and two tests produces two decomposed test models, each conceptually containing the implicit setup code plus the body of one test, without yet exposing that structure through the public API.
+The third confirmed pipeline stage is `decomposition`. Its interface is named `TestCaseDecomposer`, and its method is named `decompose`. It receives parsed test classes and separates each test from its class of origin. `TestCaseDecomposer.decompose` returns `DecomposedTestCases`, which exposes decomposed `TestCase` instances through `testCases()`. Each decomposed test is represented by `TestCase`. The name distinguishes decomposed tests from parsed `TestMethod` models, which still represent methods inside a `TestClass`. `TestCase` preserves the original parsed test method name for later refactoring use, even when names are duplicated. It does not need to preserve the source `@Before` annotation or fixture identity; it only needs the statements derived from supported `@Before` fixtures in its decomposed body. Assertions remain in the full `TestCase` body; measurement-specific projections decide whether to stop before assertions. For now, `TestCase` does not expose `id()` or `testClass()`. In the implicit setup example, a class with one implicit setup and two tests produces two decomposed test case models, each containing field declarations, the implicit setup statements, and the body of one test.
 
-The fourth confirmed pipeline stage is `measurement`. Its interface is named `TestMethodSimilarityMeasurer`, and its method is named `measure`. It receives `DecomposedTestMethods` and returns `TestMethodSimilarityMatrix`. It applies a similarity metric to each pair of decomposed test methods. Similarity metrics can have different objectives, with duplicated test/code identification as the most common one. The returned matrix records the similarity degree for each pair according to the applied metric and is indexed by abstract test method identities. `TestMethodSimilarityMatrix` has no minimum content API beyond that yet.
+The fourth confirmed pipeline stage is `measurement`. Its interface is named `TestCaseSimilarityMeasurer`, and its method is named `measure`. It receives `DecomposedTestCases` and returns `TestCaseSimilarityMatrix`. It applies a similarity metric to each pair of decomposed test cases. Similarity metrics can have different objectives, with duplicated test/code identification as the most common one. The returned matrix records the similarity degree for each pair according to the applied metric and is indexed by abstract test case identities. Measurement may use a projection of the `TestCase` body instead of every statement. The LCCSS measurement must stop its measured projection at the first assertion statement, not merely filter assertion statements. `TestCaseSimilarityMatrix` has no minimum content API beyond that yet.
 
-The fifth confirmed pipeline stage is `clustering`. Its interface is named `TestMethodClusterer`, and its method is named `cluster`. It receives `TestMethodSimilarityMatrix` and returns `TestMethodClusters`, which exposes `TestMethodCluster` instances through `clusters()`. It groups tests according to the indexed similarity matrix produced by `measurement`. This stage intentionally does not know anything about the tests themselves; it sees only the similarity matrix and the abstract identities used to index it. Architecturally, this starts rebuilding structure after the earlier decomposition split test classes into separated test-level ASTs. `TestMethodCluster` has no minimum content API yet.
+The fifth confirmed pipeline stage is `clustering`. Its interface is named `TestCaseClusterer`, and its method is named `cluster`. It receives `TestCaseSimilarityMatrix` and returns `TestCaseClusters`, which exposes `TestCaseCluster` instances through `clusters()`. It groups tests according to the indexed similarity matrix produced by `measurement`. This stage intentionally does not know anything about the tests themselves; it sees only the similarity matrix and the abstract identities used to index it. Architecturally, this starts rebuilding structure after the earlier decomposition split test classes into separated test-level ASTs. `TestCaseCluster` has no minimum content API yet.
 
-The sixth confirmed pipeline stage is `refactoring`. Its interface is named `TestClassRefactorer`, and its method is named `refactor`. It receives `TestMethodClusters` and returns `RefactoredTestClasses`, which exposes refactored `TestClass` instances through `testClasses()`. It receives the groups produced by `clustering` and decides what to do with them. The first concrete purpose is to refactor test classes by regrouping tests into better classes so implicit setup can be used, but the pipeline may be able to support other refactoring purposes, such as delegated setup, through different refactoring implementations.
+The sixth confirmed pipeline stage is `refactoring`. Its interface is named `TestClassRefactorer`, and its method is named `refactor`. It receives `TestCaseClusters` and returns `RefactoredTestClasses`, which exposes refactored `TestClass` instances through `testClasses()`. It receives the groups produced by `clustering` and decides what to do with them. The first concrete purpose is to refactor test classes by regrouping tests into better classes so implicit setup can be used, but the pipeline may be able to support other refactoring purposes, such as delegated setup, through different refactoring implementations.
 
 The final confirmed pipeline stage is `writing`. Its interface is named `TestClassWriter`, and its method is named `write`. It receives `RefactoredTestClasses` and writes them to an output destination without returning a serialized model. The destination may be the filesystem or a cloud target, depending on the writer implementation. Concrete writer implementations receive required output destination parameters through constructors.
 
@@ -80,6 +81,7 @@ The final confirmed pipeline stage is `writing`. Its interface is named `TestCla
 - The minimum loading API is implemented in `src/main/java/br/ufsc/ine/leb/roza/core/modern/loading` as `CodeFileLoader`, `LoadedCodeFiles`, and `CodeFile`.
 - `FileSystemCodeFileLoader` is implemented in `src/main/java/br/ufsc/ine/leb/roza/core/modern/loading` and covered by tests in `src/test/java/br/ufsc/ine/leb/roza/core/modern/loading`.
 - The first parsing implementation is being designed as Java-first and belongs in `src/main/java/br/ufsc/ine/leb/roza/core/modern/parsing`.
+- The first decomposition implementation is `DefaultTestCaseDecomposer` in `src/main/java/br/ufsc/ine/leb/roza/core/modern/decomposition`.
 - Code comments should be avoided unless they explain something non-obvious.
 
 ## Decisions
@@ -110,13 +112,13 @@ The final confirmed pipeline stage is `writing`. Its interface is named `TestCla
 - DEC-024: The minimum loading API is `CodeFileLoader.load()`, `LoadedCodeFiles.codeFiles()`, and `CodeFile.content()`.
 - DEC-025: `TestClass` has no minimum content API yet; its detailed shape remains deferred.
 - DEC-026: The minimum parsing API includes `TestClassParser.parse(LoadedCodeFiles)` and `ParsedTestClasses.testClasses()`, while `TestClass` remains without a minimum content API.
-- DEC-027: The decomposition interface is named `TestMethodDecomposer`, and its method is named `decompose`.
-- DEC-028: A decomposed test is represented by `TestMethod`, which has no minimum content API yet and does not expose `id()` or `testClass()`.
-- DEC-029: `TestMethodDecomposer.decompose` returns `DecomposedTestMethods`, which exposes decomposed test methods through `testMethods()`.
-- DEC-030: The measurement interface is named `TestMethodSimilarityMeasurer`, and its `measure` method receives `DecomposedTestMethods` and returns `TestMethodSimilarityMatrix`.
-- DEC-031: The clustering interface is named `TestMethodClusterer`, and its `cluster` method receives `TestMethodSimilarityMatrix` and returns `TestMethodClusters`.
-- DEC-032: `TestMethodClusters` exposes `TestMethodCluster` instances through `clusters()`, while `TestMethodCluster` has no minimum content API yet.
-- DEC-033: The refactoring interface is named `TestClassRefactorer`, and its `refactor` method receives `TestMethodClusters` and returns `RefactoredTestClasses`.
+- DEC-027: The decomposition interface is named `TestCaseDecomposer`, and its method is named `decompose`.
+- DEC-028: A decomposed test is represented by `TestCase`, which has no minimum content API yet and does not expose `id()` or `testClass()`.
+- DEC-029: `TestCaseDecomposer.decompose` returns `DecomposedTestCases`, which exposes decomposed test cases through `testCases()`.
+- DEC-030: The measurement interface is named `TestCaseSimilarityMeasurer`, and its `measure` method receives `DecomposedTestCases` and returns `TestCaseSimilarityMatrix`.
+- DEC-031: The clustering interface is named `TestCaseClusterer`, and its `cluster` method receives `TestCaseSimilarityMatrix` and returns `TestCaseClusters`.
+- DEC-032: `TestCaseClusters` exposes `TestCaseCluster` instances through `clusters()`, while `TestCaseCluster` has no minimum content API yet.
+- DEC-033: The refactoring interface is named `TestClassRefactorer`, and its `refactor` method receives `TestCaseClusters` and returns `RefactoredTestClasses`.
 - DEC-034: `RefactoredTestClasses` exposes refactored `TestClass` instances through `testClasses()`.
 - DEC-035: The writing interface is named `TestClassWriter`; its `write` method receives `RefactoredTestClasses` and does not return a serialized model.
 - DEC-036: Modern Roza code should not include comments unless they explain non-obvious information.
@@ -127,12 +129,18 @@ The final confirmed pipeline stage is `writing`. Its interface is named `TestCla
 - DEC-041: JavaParser is allowed inside concrete Java parser implementations, but JavaParser types must not appear in the public modern Roza parsing contract.
 - DEC-042: Unsupported parser features are handled by `UnsupportedFeaturePolicy`, with `SAFE` as the conservative fail-fast mode and `UNSAFE` as the diagnostic-and-skip mode.
 - DEC-043: Unsupported feature detection must run in a separate validator before extracting `TestClass`, `Field`, `TestMethod`, or other parsing models.
+- DEC-044: `docs/roza-modern/requirements.md` must maintain a Current API Contracts section for pipeline interfaces and immediate stage boundary containers, updated whenever those contracts change.
+- DEC-045: Parsed tests inside a class are `TestMethod`; decomposed tests are `TestCase` because they no longer belong to a source `TestClass` as methods.
+- DEC-046: `TestCase` preserves the original parsed test method name so refactoring can use it later, including as a prefix when duplicate names exist.
+- DEC-047: `TestCase` bodies include statements from supported `@Before` fixtures, but `TestCase` does not need to preserve the `@Before` annotation itself.
+- DEC-048: LCCSS measurement should stop at the first assertion statement because code after assertions should not be measured as reusable setup/fixture code.
+- DEC-049: `DefaultTestCaseDecomposer` keeps assertions in the full decomposed `TestCase` body; assertion handling belongs to measurement projections.
 
 ## Hypotheses
 
 - HYP-001: The pipeline can likely remain abstract and flexible if the generic core stops at stage contracts and each concrete purpose is isolated in implementations, especially in measurement, clustering, and refactoring. The first vertical slice should stay anchored in implicit-setup regrouping to prevent premature abstractions.
 - HYP-002: A useful boundary may be to keep `loading`, `parsing`, `decomposition`, `measurement`, and `clustering` relatively purpose-neutral, while allowing `refactoring` implementations to encode concrete refactoring intentions such as implicit setup or delegated setup.
-- HYP-003: Refactoring may use the abstract identities returned by clustering to recover grouped decomposed tests, but the exact lookup/ownership model remains undecided. Those identities are not part of the `TestMethod` API for now.
+- HYP-003: Refactoring may use the abstract identities returned by clustering to recover grouped decomposed tests, but the exact lookup/ownership model remains undecided. Those identities are not part of the `TestCase` API for now.
 
 ## Interview Backlog
 
@@ -147,11 +155,11 @@ The final confirmed pipeline stage is `writing`. Its interface is named `TestCla
 - Define how failures, partial results, and unsupported inputs are represented.
 - Define what the first runnable vertical slice should prove.
 - Return to detailed `TestClass` design after the high-level pipeline is mapped.
-- Define the minimum `TestMethodSimilarityMatrix` API and decide whether separate similarity metric or score abstractions are necessary.
+- Define the minimum `TestCaseSimilarityMatrix` API and decide whether separate similarity metric or score abstractions are necessary.
 - Decide the first concrete output destination for `TestClassWriter`.
 - Investigate how far the pipeline can generalize beyond the implicit-setup regrouping purpose without weakening the concrete first use case.
 - Define the exact abstract test identity model and where those identities are created.
-- Define how abstract test identities relate to `TestMethod` without adding premature attributes to `TestMethod`.
+- Define how abstract test identities relate to `TestCase` without adding premature attributes to `TestCase`.
 
 ## Change Log
 
@@ -193,3 +201,10 @@ The final confirmed pipeline stage is `writing`. Its interface is named `TestCla
 - 2026-05-11: Changed `LoadedCodeFiles` and `CodeFile` from interfaces to concrete data classes.
 - 2026-05-11: Pivoted parsing from a language-universal AST goal to a Java-first domain model that keeps JavaParser behind concrete implementations.
 - 2026-05-11: Recorded `UnsupportedFeaturePolicy` and the separate unsupported-feature validator as the conservative parsing strategy.
+- 2026-05-11: Recorded that the requirements file is the durable home for the current pipeline interface and stage boundary container snapshot.
+- 2026-05-11: Renamed decomposed-test terminology from `TestMethod` to `TestCase` and propagated the change through decomposition, measurement, clustering, and refactoring contracts.
+- 2026-05-11: Confirmed that `TestCase` preserves the original parsed test method name for later refactoring use.
+- 2026-05-11: Confirmed that `TestCase` does not need to preserve the `@Before` annotation, only the statements derived from supported `@Before` fixtures.
+- 2026-05-11: Confirmed that LCCSS measurement should stop at the first assertion statement rather than merely filtering assertions.
+- 2026-05-11: Implemented the first `DefaultTestCaseDecomposer` and recorded that decomposition preserves assertions while measurement projections decide what to measure.
+- 2026-05-11: Recorded that JUnit 5 `@AfterEach` is unsupported in the first parser slice, like JUnit 4 `@After`.

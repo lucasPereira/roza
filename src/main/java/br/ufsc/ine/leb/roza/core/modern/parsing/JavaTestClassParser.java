@@ -174,7 +174,7 @@ public final class JavaTestClassParser implements TestClassParser {
 	}
 
 	private boolean isFixtureMethod(MethodDeclaration method) {
-		return hasAnnotation(method, "Before") || hasAnnotation(method, "After") || hasAnnotation(method, "BeforeEach") || hasAnnotation(method, "AfterEach");
+		return hasAnnotation(method, "Before") || hasAnnotation(method, "BeforeEach");
 	}
 
 	private boolean hasAnnotation(MethodDeclaration method, String name) {
