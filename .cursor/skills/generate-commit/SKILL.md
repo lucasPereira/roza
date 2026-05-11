@@ -2,18 +2,17 @@
 name: generate-commit
 description: >-
   Roza (Java/Gradle): in the roza submodule repo root, build one line
-  `slug: commit message` from the full uncommitted tree, stage everything not yet
-  committed (`git add -A`), and run `git commit` with that message. Triggers:
-  generate commit, /generate-commit, mensagem de commit, or when this skill is
-  attached for Roza commits.
+  `slug: commit message` from the full uncommitted tree, stage with `git add -A`,
+  show **`git status`** after staging and the **composed commit message**, wait
+  for explicit user approval, then run `git commit`. Use when the user attaches
+  this skill or asks to generate commit / mensagem de commit for Roza.
 ---
 
 # Generate commit for Roza (`slug: commit message`)
 
 ## How to invoke
 
-- **Slash command:** **`/generate-commit`** via `.cursor/commands/generate-commit.md` (workspace root or `roza/` depending on what you opened in Cursor).
-- **Skill:** attach this `SKILL.md` for the same workflow.
+Attach this **`SKILL.md`** (or ask the agent to follow it). Do **not** rely on or add Cursor slash commands for this workflow unless the user explicitly requests them.
 
 ## Goal
 
@@ -26,7 +25,7 @@ slug: commit message
 - **slug**: short `kebab-case` (topic or conventional style, e.g. `feat`, `fix`, `docs`, `chore`, optionally scoped).
 - **commit message**: imperative summary of **everything** that was not yet committed in **this** repo.
 
-2. **Stage** all changes that are not committed yet (staged, unstaged, and untracked) and **create the commit** with that line as the message.
+2. **Stage** everything not yet committed (`git add -A`), then show the user **only**: full **`git status`** output (after the add) **and** the **composed `slug: commit message` line**. Then **ask for explicit approval** before running **`git commit`**. If the user does not approve, **do not** commit; offer `git reset` to unstage if they want to undo staging. Do **not** show **`git diff --cached`** unless the user explicitly asks for a patch preview.
 
 ## Repo root (mandatory)
 
@@ -42,11 +41,16 @@ The message must reflect the **full** tree vs `HEAD` before staging: staged, uns
 
 1. `cd` to the **roza** submodule root (or use `git -C <roza-root>`).
 2. Run `git status` and `git diff HEAD` (and short/porcelain status if useful) to understand **all** pending changes.
-3. If there is **nothing** to commit (clean tree), report that and **stop** — do not run `git commit`.
-4. Compose **one** line `slug: commit message` covering the full picture. Show that line to the user, then proceed (or proceed and echo it in the final summary).
+3. If there is **nothing** to commit (clean tree), report that and **stop** — do not run `git add` or `git commit`.
+4. Compose **one** line `slug: commit message` covering the full picture. Show that line to the user before staging.
 5. Stage everything not yet committed: **`git add -A`** at the **roza** repo root (adds new files, stages modifications, stages removals; honors ignored files).
-6. Commit: **`git commit -m "slug: commit message"`** using the exact composed line (quote safely for the shell).
-7. If `git commit` fails (e.g. empty commit after add, hook failure, GPG signing issues), report the error output; do not claim success.
+6. After staging, show the user (before asking approval):
+   - **`git status`**: paste the **full** output (branch, ahead/behind if any, and the whole “Changes to be committed” section).
+   - The **commit message** you composed: the single line `slug: commit message` (and optionally the exact `git commit -m "…"` command using that line).
+7. **Stop and ask for explicit approval** (e.g. yes / ok / pode / aprovo) to run the commit. Do **not** run `git commit` until the user confirms.
+8. After approval: **`git commit -m "slug: commit message"`** using the exact composed line (quote safely for the shell).
+9. If the user declines approval, do **not** commit. Optionally offer **`git reset`** (mixed or keep their preference) to unstage if they want to revert the index.
+10. If `git commit` fails (e.g. hook failure, GPG signing issues), report the error output; do not claim success.
 
 ## Slug and message
 
