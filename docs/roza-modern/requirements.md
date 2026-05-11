@@ -87,6 +87,14 @@ Acceptance criteria:
 - AC-034: `CodeFile` must not define attributes beyond those required by confirmed requirements.
 - AC-076: `LoadedCodeFiles` exposes the loaded code files through `codeFiles()`.
 - AC-077: `CodeFile` exposes the raw textual content of the loaded code file through `content()`.
+- AC-111: The loading contract belongs in the `br.ufsc.ine.leb.roza.core.modern.loading` package.
+- AC-118: `LoadedCodeFiles` and `CodeFile` are concrete loading data classes, not extension interfaces.
+- AC-112: A filesystem `CodeFileLoader` implementation includes files from the folder provided to it.
+- AC-113: A non-recursive filesystem `CodeFileLoader` implementation does not include files from child folders of the provided folder.
+- AC-114: A recursive filesystem `CodeFileLoader` implementation includes files from child folders of the provided folder.
+- AC-115: A filesystem `CodeFileLoader` implementation with a non-empty extension list does not include files whose extension is not in the list.
+- AC-116: A filesystem `CodeFileLoader` implementation with a non-empty extension list includes only files whose extension belongs to the list.
+- AC-117: A filesystem `CodeFileLoader` implementation with an empty extension list includes files regardless of extension.
 
 ### REQ-008: Parsing Stage
 
@@ -231,6 +239,15 @@ Acceptance criteria:
 - AC-037: Modern Roza implementation must be written from scratch.
 - AC-038: Code in `core.modern` must not import from `core.legacy`.
 
+### NFR-004: Minimal Code Comments
+
+Modern Roza code must not include comments unless they explain something that is not obvious from the code itself.
+
+Acceptance criteria:
+
+- AC-109: Do not add comments that merely restate type names, method names, or obvious behavior.
+- AC-110: Add a code comment only when it explains non-obvious intent, constraints, or reasoning.
+
 ## Open Questions
 
 ### Q-001: What are the initial pipeline stages?
@@ -314,3 +331,7 @@ The similarity matrix must be indexed by abstract test identities, but the exact
 - 2026-05-10: Confirmed the clustering interface as `TestMethodClusterer`, its method as `cluster`, and its contract from `TestMethodSimilarityMatrix` to `TestMethodClusters`.
 - 2026-05-10: Confirmed the refactoring interface as `TestClassRefactorer`, its method as `refactor`, and its contract from `TestMethodClusters` to `RefactoredTestClasses`.
 - 2026-05-10: Confirmed the final stage as `writing`, represented by `TestClassWriter.write(RefactoredTestClasses)` without returning a serialized model.
+- 2026-05-10: Added the constraint that modern Roza code should not include comments unless they explain non-obvious information.
+- 2026-05-10: Moved the loading contract to the `core.modern.loading` package.
+- 2026-05-10: Added acceptance criteria for the first filesystem `CodeFileLoader` implementation, covering folder inclusion, recursion, and extension filtering.
+- 2026-05-11: Confirmed `LoadedCodeFiles` and `CodeFile` as concrete loading data classes rather than extension interfaces.

@@ -12,8 +12,9 @@ This document stores evolving knowledge discovered while designing and implement
 - Stage contract: the input/output model that allows one stage implementation to be combined with others without direct coupling.
 - Loading stage: the first modern Roza pipeline stage; it loads raw code files into memory.
 - `CodeFileLoader`: the loading stage interface, implemented by concrete raw code-file loaders.
-- `LoadedCodeFiles`: the result returned by `CodeFileLoader.load`; it exposes loaded `CodeFile` instances through `codeFiles()`.
-- `CodeFile`: a raw loaded code file. Its minimum confirmed API exposes raw textual content through `content()`. Other attributes remain undefined until confirmed requirements make them necessary.
+- `FileSystemCodeFileLoader`: the first concrete `CodeFileLoader` implementation; it loads regular files from a provided folder, optionally recursing into child folders and filtering by file extension.
+- `LoadedCodeFiles`: the concrete result class returned by `CodeFileLoader.load`; it exposes loaded `CodeFile` instances through `codeFiles()`.
+- `CodeFile`: a concrete raw loaded code file class. Its minimum confirmed API exposes raw textual content through `content()`. Other attributes remain undefined until confirmed requirements make them necessary.
 - Parsing stage: the second modern Roza pipeline stage; it reads loaded raw code files and creates ASTs for identified test classes.
 - `TestClassParser`: the parsing stage interface.
 - `ParsedTestClasses`: the result returned by `TestClassParser.parse`; it exposes `TestClass` instances through `testClasses()`.
@@ -49,7 +50,7 @@ The pipeline must allow combinations such as:
 
 The framework should be designed for broad extension across programming languages, test frameworks, refactoring types, and analysis techniques. The initial pipeline will impose some limits, but core abstractions should avoid unnecessary assumptions.
 
-The first confirmed pipeline stage is `loading`. It has one shared interface named `CodeFileLoader` with a single method named `load`. The method returns `LoadedCodeFiles`, which exposes `CodeFile` instances through `codeFiles()`. Each `CodeFile` exposes raw textual content through `content()`. The name avoids implying that every loaded file contains tests. Concrete loading implementations are configured through constructor parameters, allowing different strategies such as recursive filesystem loading, extension-based filesystem loading, and Git-based loading.
+The first confirmed pipeline stage is `loading`. It has one shared interface named `CodeFileLoader` with a single method named `load`. The method returns `LoadedCodeFiles`, a concrete data class that exposes concrete `CodeFile` instances through `codeFiles()`. Each `CodeFile` exposes raw textual content through `content()`. The name avoids implying that every loaded file contains tests. Concrete loading implementations are configured through constructor parameters, allowing different strategies such as recursive filesystem loading, extension-based filesystem loading, and Git-based loading.
 
 The second confirmed pipeline stage is `parsing`. Its interface is named `TestClassParser`. It receives the in-memory raw code files produced by `loading`, determines which loaded files contain test classes, identifies those test classes, and creates one AST per identified test class. Its `parse` method returns `ParsedTestClasses`, which exposes `TestClass` instances through `testClasses()`. This keeps loading focused on loading files and leaves structural interpretation to parsing.
 
@@ -66,6 +67,12 @@ The fifth confirmed pipeline stage is `clustering`. Its interface is named `Test
 The sixth confirmed pipeline stage is `refactoring`. Its interface is named `TestClassRefactorer`, and its method is named `refactor`. It receives `TestMethodClusters` and returns `RefactoredTestClasses`, which exposes refactored `TestClass` instances through `testClasses()`. It receives the groups produced by `clustering` and decides what to do with them. The first concrete purpose is to refactor test classes by regrouping tests into better classes so implicit setup can be used, but the pipeline may be able to support other refactoring purposes, such as delegated setup, through different refactoring implementations.
 
 The final confirmed pipeline stage is `writing`. Its interface is named `TestClassWriter`, and its method is named `write`. It receives `RefactoredTestClasses` and writes them to an output destination without returning a serialized model. The destination may be the filesystem or a cloud target, depending on the writer implementation. Concrete writer implementations receive required output destination parameters through constructors.
+
+## Implementation Notes
+
+- The minimum loading API is implemented in `src/main/java/br/ufsc/ine/leb/roza/core/modern/loading` as `CodeFileLoader`, `LoadedCodeFiles`, and `CodeFile`.
+- `FileSystemCodeFileLoader` is implemented in `src/main/java/br/ufsc/ine/leb/roza/core/modern/loading` and covered by tests in `src/test/java/br/ufsc/ine/leb/roza/core/modern/loading`.
+- Code comments should be avoided unless they explain something non-obvious.
 
 ## Decisions
 
@@ -104,6 +111,10 @@ The final confirmed pipeline stage is `writing`. Its interface is named `TestCla
 - DEC-033: The refactoring interface is named `TestClassRefactorer`, and its `refactor` method receives `TestMethodClusters` and returns `RefactoredTestClasses`.
 - DEC-034: `RefactoredTestClasses` exposes refactored `TestClass` instances through `testClasses()`.
 - DEC-035: The writing interface is named `TestClassWriter`; its `write` method receives `RefactoredTestClasses` and does not return a serialized model.
+- DEC-036: Modern Roza code should not include comments unless they explain non-obvious information.
+- DEC-037: The loading contract belongs in the `br.ufsc.ine.leb.roza.core.modern.loading` package.
+- DEC-038: The first concrete loading implementation is `FileSystemCodeFileLoader`, configured through its constructor with a folder, a recursive flag, and an extension list.
+- DEC-039: `LoadedCodeFiles` and `CodeFile` are concrete loading data classes rather than extension interfaces; `CodeFileLoader` remains the extension interface for loading strategies.
 
 ## Hypotheses
 
@@ -163,3 +174,8 @@ The final confirmed pipeline stage is `writing`. Its interface is named `TestCla
 - 2026-05-10: Confirmed the clustering interface as `TestMethodClusterer`, its method as `cluster`, and its contract from `TestMethodSimilarityMatrix` to `TestMethodClusters`.
 - 2026-05-10: Confirmed the refactoring interface as `TestClassRefactorer`, its method as `refactor`, and its contract from `TestMethodClusters` to `RefactoredTestClasses`.
 - 2026-05-10: Confirmed the final stage as `writing`, represented by `TestClassWriter.write(RefactoredTestClasses)` without returning a serialized model.
+- 2026-05-10: Implemented the minimum loading API in `core.modern`.
+- 2026-05-10: Recorded the code comment policy and removed obvious comments from the minimum loading API.
+- 2026-05-10: Moved the minimum loading API to the `core.modern.loading` package.
+- 2026-05-10: Implemented and tested the first concrete filesystem loader for folder inclusion, recursion, and extension filtering.
+- 2026-05-11: Changed `LoadedCodeFiles` and `CodeFile` from interfaces to concrete data classes.
