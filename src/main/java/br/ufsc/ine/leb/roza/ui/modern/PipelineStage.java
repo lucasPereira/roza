@@ -37,7 +37,12 @@ enum PipelineStage {
 			"Writing",
 			"Write",
 			List.of(),
-			"Refactored test classes from the refactoring stage will be shown here.");
+			"Refactored test classes from the refactoring stage will be shown here."),
+	ANALYTICS(
+			"Analitycs",
+			"",
+			List.of(),
+			"Pipeline analytics will be shown here after writing completes.");
 
 	private final String displayName;
 	private final String actionLabel;

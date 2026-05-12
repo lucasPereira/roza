@@ -16,6 +16,12 @@ import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import br.ufsc.ine.leb.roza.core.modern.analytics.DefaultTestCodeAnalytics;
+import br.ufsc.ine.leb.roza.core.modern.analytics.OriginalTestCodeMetrics;
+import br.ufsc.ine.leb.roza.core.modern.analytics.TestClassMetrics;
+import br.ufsc.ine.leb.roza.core.modern.analytics.TestCodeAnalytics;
+import br.ufsc.ine.leb.roza.core.modern.analytics.TestCodeAnalyticsReport;
+import br.ufsc.ine.leb.roza.core.modern.analytics.TestCodeMetricComparison;
 import br.ufsc.ine.leb.roza.core.modern.clustering.AgglomerativeHierarchicalTestCaseClusterer;
 import br.ufsc.ine.leb.roza.core.modern.clustering.ClusteringLevel;
 import br.ufsc.ine.leb.roza.core.modern.clustering.CompositeMergeTieBreaker;
@@ -85,6 +91,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
@@ -297,11 +304,14 @@ public final class ModernRozaUi extends Application {
 		pipelineBar.setStyle(FONT_FAMILY + "-fx-background-color: #333333;");
 
 		for (PipelineStage stage : pipelineState.stages()) {
+			if (stage == PipelineStage.ANALYTICS && !pipelineState.canSelect(stage)) {
+				continue;
+			}
 			Button stageButton = new Button(stage.displayName());
 			boolean selectable = pipelineState.canSelect(stage);
 			stageButton.setMouseTransparent(!selectable);
 			stageButton.setFocusTraversable(selectable);
-			stageButton.setStyle(stageButtonStyle(pipelineState.status(stage), pipelineState.isSelected(stage)));
+			stageButton.setStyle(stageButtonStyle(stage, pipelineState.status(stage), pipelineState.isSelected(stage)));
 			stageButton.setOnAction(event -> {
 				pipelineState.select(stage);
 				render();
@@ -319,7 +329,13 @@ public final class ModernRozaUi extends Application {
 
 		VBox configuration = configurationFor(selectedStage);
 
-		if (selectedStage == PipelineStage.CLUSTERING || selectedStage == PipelineStage.REFACTORING) {
+		if (selectedStage == PipelineStage.ANALYTICS) {
+			if (configuration.getChildren().isEmpty()) {
+				configurationSidebar.getChildren().add(body("Pipeline statistics after writing completes."));
+			} else {
+				configurationSidebar.getChildren().add(configuration);
+			}
+		} else if (selectedStage == PipelineStage.CLUSTERING || selectedStage == PipelineStage.REFACTORING) {
 			configurationSidebar.getChildren().add(configuration);
 		} else {
 			Button actionButton = new Button(actionButtonText(selectedStage));
@@ -1171,6 +1187,10 @@ public final class ModernRozaUi extends Application {
 			contentArea.getChildren().add(writingColumn);
 			VBox.setVgrow(writingView, Priority.ALWAYS);
 			VBox.setVgrow(writingColumn, Priority.ALWAYS);
+		} else if (selectedStage == PipelineStage.ANALYTICS && parsedTestClasses != null && refactoredTestClasses != null) {
+			VBox analyticsColumn = analyticsView();
+			contentArea.getChildren().add(analyticsColumn);
+			VBox.setVgrow(analyticsColumn, Priority.ALWAYS);
 		} else {
 			contentArea.getChildren().add(body(selectedStage.previousStageDataDescription()));
 		}
@@ -1184,6 +1204,83 @@ public final class ModernRozaUi extends Application {
 		Label acceptedTests = body("Accepted tests: " + acceptedTestCount());
 		summary.getChildren().addAll(classViolations, testViolations, excludedTests, acceptedTests);
 		return summary;
+	}
+
+	private VBox analyticsView() {
+		VBox analytics = new VBox(18);
+		TestCodeAnalytics analyticsGenerator = new DefaultTestCodeAnalytics();
+		TestCodeAnalyticsReport report = analyticsGenerator.analyze(parsedTestClasses, decomposedTestCases, refactoredTestClasses);
+		HBox tables = new HBox(18);
+		VBox original = originalCodeStatisticsTable(report.original());
+		VBox comparison = originalVsRefactoredStatisticsTable(report.comparison());
+		tables.getChildren().addAll(original, comparison);
+		HBox.setHgrow(original, Priority.ALWAYS);
+		HBox.setHgrow(comparison, Priority.ALWAYS);
+		analytics.getChildren().add(tables);
+		return analytics;
+	}
+
+	private VBox originalCodeStatisticsTable(OriginalTestCodeMetrics metrics) {
+		VBox section = analyticsSection("Original test code");
+		section.getChildren().add(statisticsTable(
+				List.of("Metric", "Value"),
+				List.of(
+						List.of("Test classes", formatNumber(metrics.testClasses())),
+						List.of("Test classes without violations", formatNumber(metrics.testClassesWithoutViolations())),
+						List.of("Test classes with violations", formatNumber(metrics.testClassesWithViolations())),
+						List.of("Test methods", formatNumber(metrics.testMethods())),
+						List.of("Test methods without violations", formatNumber(metrics.testMethodsWithoutViolations())),
+						List.of("Test methods with violations", formatNumber(metrics.testMethodsWithViolations())))));
+		return section;
+	}
+
+	private VBox originalVsRefactoredStatisticsTable(TestCodeMetricComparison comparison) {
+		VBox section = analyticsSection("Original vs. refactored");
+		TestClassMetrics original = comparison.original();
+		TestClassMetrics refactored = comparison.refactored();
+		section.getChildren().add(statisticsTable(
+				List.of("Metric", "Original", "Refactored"),
+				List.of(
+						List.of("Test classes", formatNumber(original.testClasses()), formatNumber(refactored.testClasses())),
+						List.of("Test methods", formatNumber(original.testMethods()), formatNumber(refactored.testMethods())),
+						List.of("Setup methods", formatNumber(original.setupMethods()), formatNumber(refactored.setupMethods())),
+						List.of("Fields", formatNumber(original.fields()), formatNumber(refactored.fields())))));
+		return section;
+	}
+
+	private VBox analyticsSection(String titleText) {
+		VBox section = new VBox(8);
+		Label title = body(titleText);
+		title.setStyle(title.getStyle() + "-fx-font-weight: bold; -fx-text-fill: #333333;");
+		section.getChildren().add(title);
+		return section;
+	}
+
+	private GridPane statisticsTable(List<String> headers, List<List<String>> rows) {
+		GridPane table = new GridPane();
+		table.setMaxWidth(Double.MAX_VALUE);
+		for (int column = 0; column < headers.size(); column++) {
+			table.add(tableCell(headers.get(column), true), column, 0);
+		}
+		for (int row = 0; row < rows.size(); row++) {
+			List<String> values = rows.get(row);
+			for (int column = 0; column < values.size(); column++) {
+				table.add(tableCell(values.get(column), false), column, row + 1);
+			}
+		}
+		return table;
+	}
+
+	private Label tableCell(String text, boolean header) {
+		Label cell = body(text);
+		cell.setMinWidth(180);
+		cell.setMaxWidth(Double.MAX_VALUE);
+		String background = header ? "#ede9fe" : "#ffffff";
+		String color = header ? "#4c1d95" : "#374151";
+		String weight = header ? "-fx-font-weight: bold;" : "";
+		cell.setStyle(FONT_FAMILY + "-fx-font-size: 13px; -fx-text-fill: " + color + "; -fx-background-color: " + background
+				+ "; -fx-border-color: #d1d5db; -fx-border-width: 0 1 1 0; -fx-padding: 8;" + weight);
+		return cell;
 	}
 
 	private long classViolationCount() {
@@ -1778,6 +1875,10 @@ public final class ModernRozaUi extends Application {
 		return String.format(Locale.ROOT, "%.4f", similarity);
 	}
 
+	private static String formatNumber(int value) {
+		return Integer.toString(value);
+	}
+
 	private String actionButtonText(PipelineStage selectedStage) {
 		return selectedStage.actionLabel();
 	}
@@ -1798,7 +1899,10 @@ public final class ModernRozaUi extends Application {
 		return label;
 	}
 
-	private String stageButtonStyle(PipelineStageStatus status, boolean selected) {
+	private String stageButtonStyle(PipelineStage stage, PipelineStageStatus status, boolean selected) {
+		if (stage == PipelineStage.ANALYTICS) {
+			return topButtonStyle(selected ? "#6d28d9" : "#ddd6fe", selected ? "#ffffff" : "#4c1d95");
+		}
 		if (selected && status == PipelineStageStatus.COMPLETED) {
 			return topButtonStyle("#059669", "#ffffff");
 		}

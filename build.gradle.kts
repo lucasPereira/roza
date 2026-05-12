@@ -1,3 +1,9 @@
+import org.gradle.api.tasks.testing.TestDescriptor
+import org.gradle.api.tasks.testing.TestListener
+import org.gradle.api.tasks.testing.TestResult
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat
+import org.gradle.api.tasks.testing.logging.TestLogEvent
+
 plugins {
     java
     application
@@ -73,6 +79,28 @@ dependencies {
 
 tasks.test {
     useJUnitPlatform()
+    testLogging {
+        events(TestLogEvent.FAILED, TestLogEvent.SKIPPED)
+        exceptionFormat = TestExceptionFormat.SHORT
+    }
+    addTestListener(object : TestListener {
+        override fun beforeSuite(descriptor: TestDescriptor) {}
+
+        override fun afterSuite(descriptor: TestDescriptor, result: TestResult) {
+            if (descriptor.parent == null) {
+                println(
+                    "Test summary: ${result.testCount} total, " +
+                        "${result.successfulTestCount} passed, " +
+                        "${result.failedTestCount} failed, " +
+                        "${result.skippedTestCount} skipped",
+                )
+            }
+        }
+
+        override fun beforeTest(descriptor: TestDescriptor) {}
+
+        override fun afterTest(descriptor: TestDescriptor, result: TestResult) {}
+    })
 }
 
 tasks.register<JavaExec>("runLegacyRozaUi") {

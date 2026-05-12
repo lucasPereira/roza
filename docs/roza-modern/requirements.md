@@ -430,6 +430,14 @@ Acceptance criteria:
 - AC-269: The modern UI `Writing` configuration shows an output folder chooser button and a selected-path label, following the loading source folder pattern.
 - AC-270: The modern UI `Writing` output folder defaults to Róża's `output/writer` folder.
 - AC-271: Triggering `Write` in the modern UI writes the rendered refactored test classes to the selected output folder.
+- AC-302: The modern UI top toolbar shows an `Analitycs` button only after the `Writing` stage completes.
+- AC-303: If a completed pipeline is reset by rerunning an earlier stage, the modern UI hides the `Analitycs` button again.
+- AC-304: The modern UI `Analitycs` toolbar button uses light purple when not selected and dark purple when selected.
+- AC-305: The modern UI `Analitycs` center shows an original-code table with original test class and test method counts split by violation status.
+- AC-306: The modern UI `Analitycs` center shows an original-vs-refactored table whose original test-class and test-method counts match the corresponding "without violations" rows in the original-code table.
+- AC-307: The modern UI `Analitycs` comparison includes only test classes, test methods, setup methods, and fields.
+- AC-308: Modern analytics is exposed through a `TestCodeAnalytics` interface in the `core.modern.analytics` package.
+- AC-309: After writing, the modern UI obtains analytics by passing the parsed original test classes, decomposed accepted test cases, and refactored test classes to a `TestCodeAnalytics` implementation.
 
 ### NFR-004: Minimal Code Comments
 
