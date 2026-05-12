@@ -36,7 +36,7 @@ enum PipelineStage {
 	WRITING(
 			"Writing",
 			"Write",
-			List.of("Writer implementation", "Output folder"),
+			List.of(),
 			"Refactored test classes from the refactoring stage will be shown here.");
 
 	private final String displayName;

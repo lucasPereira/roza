@@ -128,6 +128,7 @@ Acceptance criteria:
 - AC-184: Supported fields in the first refactoring-safe subset are non-static instance fields without direct field initialization.
 - AC-185: Multiple variables in one field declaration remain supported because parsing separates them into individual `Field` instances.
 - AC-186: Supported methods in the first refactoring-safe subset are `@Test` methods and at most one simple `@Before` or `@BeforeEach` fixture.
+- AC-268: A class that contains both `@Before` and `@BeforeEach`, or multiple setup fixtures of either kind, is outside the first refactoring-safe subset and is reported as a class-level violation.
 - AC-187: Any annotation outside `@Test`, `@Before`, and `@BeforeEach` is unsupported in the first refactoring-safe subset.
 - AC-188: Helper methods are unsupported in the first refactoring-safe subset.
 - AC-189: Tear down and lifecycle methods other than the supported before fixture are unsupported in the first refactoring-safe subset.
@@ -160,6 +161,10 @@ Acceptance criteria:
 - AC-136: JUnit 4 `@After` and JUnit 5 `@AfterEach` are unsupported in the first parser slice and are handled according to `UnsupportedFeaturePolicy`.
 - AC-137: Parsed field types preserve complex Java type text needed by decomposition, including generics, nested generics, wildcard generics, qualified types, generic arrays, arrays, and multidimensional arrays.
 - AC-151: `JunitTestClassParser` marks assertions using an explicit supported assertion method list covering JUnit 4, current JUnit Jupiter assertions, and Hamcrest `assertThat`, for unqualified calls and for calls on typical receivers (`Assert`, `Assertions`, `MatcherAssert`, and the usual fully qualified type names), not by checking whether a method name starts with `assert`.
+- AC-269: `TestClass` exposes import declarations from the original source class.
+- AC-270: `TestClass` exposes the setup annotation that should be used if later refactoring needs to generate implicit setup.
+- AC-271: If a supported setup fixture exists, the `TestClass` setup annotation comes from that fixture.
+- AC-272: If no supported setup fixture exists, the parser infers the `TestClass` setup annotation from the class's supported `@Test` annotation usage: JUnit 5 uses `@BeforeEach`; otherwise JUnit 4 uses `@Before`.
 
 ### REQ-010: Decomposition Stage
 
@@ -176,12 +181,13 @@ Acceptance criteria:
 - AC-080: The decomposition stage is represented by one interface named `TestCaseDecomposer`.
 - AC-081: The decomposition interface has a method named `decompose`.
 - AC-082: Each decomposed test is represented by `TestCase`, because after decomposition it is no longer exactly a method inside a test class.
-- AC-083: `TestCase` exposes the minimum content needed by the current pipeline slice through `name()` and `body()`.
-- AC-084: `TestCase` must not expose `id()` or `testClass()` unless future confirmed requirements make them necessary.
+- AC-083: `TestCase` exposes the minimum content needed by the current pipeline slice through `name()`, `body()`, `annotations()`, and `sourceTestClass()`.
+- AC-084: `TestCase` must not expose `id()` unless future confirmed requirements make it necessary.
 - AC-085: `TestCaseDecomposer.decompose` returns `DecomposedTestCases`.
 - AC-086: `DecomposedTestCases` exposes decomposed test cases through `testCases()`.
 - AC-140: `TestCase` preserves the original parsed test method name so refactoring can use it later, even when names are duplicated.
-- AC-141: `TestCase` does not need to preserve the source `@Before` annotation or fixture identity; it only needs to include the statements derived from supported `@Before` fixtures in the decomposed body.
+- AC-141: `TestCase` preserves a reference to its source `TestClass` so refactoring can reuse original imports and setup-annotation decisions.
+- AC-273: `TestCase` preserves the original parsed test method annotations so generated test methods can keep their original JUnit style.
 - AC-144: The default decomposition implementation preserves assertions in the decomposed `TestCase` body.
 - AC-145: The default decomposition implementation orders the decomposed body as field declarations that are not initialized in supported `@Before` fixtures, supported `@Before` statements, then original test body statements.
 - AC-215: When a supported `@Before` fixture assigns to a parsed field, the default decomposition implementation turns that assignment into a local variable declaration with initialization at the assignment position.
@@ -270,8 +276,8 @@ Acceptance criteria:
 - AC-257: An empty `CompositeStopCriterion` never stops clustering by criterion; clustering then stops only when there are no more merges.
 - AC-258: The initial stop criteria are minimum similarity, maximum tests per cluster, maximum level, target cluster count, and minimum shared prefix.
 - AC-259: Merge-tie resolution uses the name `MergeTieBreaker` rather than `Referee`.
-- AC-260: `CompositeMergeTieBreaker` tries configured tie breakers in order and throws if none resolves an actual tie.
-- AC-261: An empty `CompositeMergeTieBreaker` is allowed but throws when an actual tie must be resolved.
+- AC-260: `CompositeMergeTieBreaker` tries configured tie breakers in order and reports an unresolved tie when none resolves it.
+- AC-261: An empty `CompositeMergeTieBreaker` is allowed; the agglomerative clusterer throws when an actual tie remains unresolved.
 - AC-262: The initial merge tie breakers are largest merged cluster, smallest merged cluster, and stable test-case order.
 - AC-263: Agglomerative clustering exposes generated clustering levels for inspection.
 
@@ -291,6 +297,14 @@ Acceptance criteria:
 - AC-101: `TestClassRefactorer.refactor` returns `RefactoredTestClasses`.
 - AC-102: `RefactoredTestClasses` exposes refactored test classes through `testClasses()`.
 - AC-103: `RefactoredTestClasses.testClasses()` returns `TestClass` instances.
+- AC-274: The first concrete refactoring implementation is named `ImplicitSetupTestClassRefactorer`.
+- AC-275: `ImplicitSetupTestClassRefactorer` creates one generated `TestClass` per cluster.
+- AC-276: `ImplicitSetupTestClassRefactorer` moves the common initial non-assertion statement prefix of a cluster into a generated setup method.
+- AC-277: `ImplicitSetupTestClassRefactorer` converts local variable declarations moved into setup into fields plus setup assignments.
+- AC-278: `ImplicitSetupTestClassRefactorer` preserves each generated test method's original parsed test annotations.
+- AC-279: `ImplicitSetupTestClassRefactorer` leaves assertion calls unchanged and never moves assertion statements into setup.
+- AC-280: If clustered tests disagree on setup annotation, `ImplicitSetupTestClassRefactorer` prefers the JUnit 5 setup annotation already determined by parsing/decomposition.
+- AC-281: Refactoring output remains structured `TestClass` models; source-code rendering is a separate concern.
 
 ### REQ-014: Writing Stage
 
@@ -392,7 +406,15 @@ Acceptance criteria:
 - AC-265: The modern UI `Clustering` configuration allows enabling zero or more stop criteria.
 - AC-266: The modern UI `Clustering` configuration allows configuring ordered merge tie breaker fallbacks.
 - AC-267: Triggering `Cluster` runs the configured agglomerative clusterer and shows the resulting clusters while keeping the ranked similarity inspection available.
+- AC-282: Triggering `Refactor` in the modern UI runs `ImplicitSetupTestClassRefactorer` over the final clustering output, i.e., the last generated clustering level.
+- AC-283: The modern UI stores the generated `RefactoredTestClasses` as the output consumed by the `Writing` tab.
+- AC-284: The modern UI `Writing` center shows a list of generated test classes.
+- AC-285: Selecting a generated test class in the modern UI `Writing` center shows its rendered Java code on the right.
+- AC-286: The modern UI `Refactoring` configuration exposes a `Refactor Current level` action that runs `ImplicitSetupTestClassRefactorer` over the currently selected clustering level.
 - AC-268: In the modern UI sidebar, pipeline stages without visible configuration controls show their primary action button at the same top height as the loading stage's first control and the refactoring action button, without empty placeholder spacing above the action.
+- AC-269: The modern UI `Writing` configuration shows an output folder chooser button and a selected-path label, following the loading source folder pattern.
+- AC-270: The modern UI `Writing` output folder defaults to Roza's `output/writer` folder.
+- AC-271: Triggering `Write` in the modern UI writes the rendered refactored test classes to the selected output folder.
 
 ### NFR-004: Minimal Code Comments
 
@@ -449,6 +471,21 @@ public final class ParsedTestClasses {
 	public List<TestCodeViolation> violations();
 }
 
+public final class TestClass {
+	public String name();
+	public List<String> imports();
+	public Optional<SetupAnnotation> setupAnnotation();
+	public List<Field> fields();
+	public List<FixtureMethod> fixtures();
+	public List<HelperMethod> helperMethods();
+	public List<TestMethod> testMethods();
+}
+
+public final class SetupAnnotation {
+	public CodeAnnotation annotation();
+	public Optional<String> importDeclaration();
+}
+
 public enum ViolationScope {
 	TEST_CLASS,
 	TEST_METHOD
@@ -479,6 +516,8 @@ public final class DecomposedTestCases {
 public final class TestCase {
 	public String name();
 	public CodeBlock body();
+	public Optional<TestClass> sourceTestClass();
+	public List<CodeAnnotation> annotations();
 }
 ```
 
@@ -528,7 +567,7 @@ public final class AgglomerativeHierarchicalTestCaseClusterer implements TestCas
 }
 ```
 
-### Confirmed, Not Yet Implemented: Refactoring
+### Implemented: Refactoring
 
 ```java
 package br.ufsc.ine.leb.roza.core.modern.refactoring;
@@ -539,6 +578,10 @@ public interface TestClassRefactorer {
 
 public final class RefactoredTestClasses {
 	public List<TestClass> testClasses();
+}
+
+public final class ImplicitSetupTestClassRefactorer implements TestClassRefactorer {
+	public RefactoredTestClasses refactor(TestCaseClusters clusters);
 }
 ```
 
@@ -580,7 +623,7 @@ Explore whether modern Roza should use or adapt an existing AST abstraction for 
 
 ### Q-007: What are the decomposition interface and output model names?
 
-The decomposition interface is named `TestCaseDecomposer`, and its method is named `decompose`. `TestCaseDecomposer.decompose` returns `DecomposedTestCases`, which exposes decomposed test cases through `testCases()`. Each decomposed test is represented by `TestCase`, because after decomposition it is no longer exactly a method inside a test class. `TestCase` has no minimum content API yet.
+The decomposition interface is named `TestCaseDecomposer`, and its method is named `decompose`. `TestCaseDecomposer.decompose` returns `DecomposedTestCases`, which exposes decomposed test cases through `testCases()`. Each decomposed test is represented by `TestCase`, because after decomposition it is no longer exactly a method inside a test class. `TestCase` exposes its name, body, source test class, and original test annotations.
 
 ### Q-008: What are the measurement interface and output model names?
 
@@ -686,4 +729,6 @@ The current clustering implementation requires the matrix size, test case by ind
 - 2026-05-11: Validated JPlag execution through the existing jar and added modern JPlag sensitivity, HTML report parsing, directional scoring, and UI selection requirements.
 - 2026-05-11: Validated Simian execution through the existing jar and added modern Simian threshold, XML report parsing, asymmetric line-coverage scoring, and UI selection requirements.
 - 2026-05-12: Implemented the first modern clustering slice with agglomerative hierarchical clustering, linkage strategies, composable stop criteria, ordered merge tie breakers, level inspection, and JavaFX clustering configuration/output.
+- 2026-05-12: Implemented the first modern refactoring slice with `ImplicitSetupTestClassRefactorer`, source-class context preservation, setup annotation inference in parsing/decomposition, generated test-class rendering, and Writing-tab class/code inspection.
 - 2026-05-12: Confirmed that modern UI sidebar stages without visible configuration controls should align their primary action button with the first visible loading control and the refactoring action.
+- 2026-05-12: Confirmed the modern UI writing sidebar output folder chooser, default `output/writer` folder, and selected-folder write behavior.

@@ -1,6 +1,7 @@
 package br.ufsc.ine.leb.roza.ui.modern;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -51,10 +52,15 @@ import br.ufsc.ine.leb.roza.core.modern.parsing.CodeStatement;
 import br.ufsc.ine.leb.roza.core.modern.parsing.JunitTestClassParser;
 import br.ufsc.ine.leb.roza.core.modern.parsing.ParsedTestClasses;
 import br.ufsc.ine.leb.roza.core.modern.parsing.ParsingException;
+import br.ufsc.ine.leb.roza.core.modern.parsing.TestClass;
 import br.ufsc.ine.leb.roza.core.modern.parsing.TestClassParser;
 import br.ufsc.ine.leb.roza.core.modern.parsing.TestCodeViolation;
 import br.ufsc.ine.leb.roza.core.modern.parsing.UnsupportedFeatureException;
 import br.ufsc.ine.leb.roza.core.modern.parsing.ViolationScope;
+import br.ufsc.ine.leb.roza.core.modern.refactoring.ImplicitSetupTestClassRefactorer;
+import br.ufsc.ine.leb.roza.core.modern.refactoring.JunitTestClassRenderer;
+import br.ufsc.ine.leb.roza.core.modern.refactoring.RefactoredTestClasses;
+import br.ufsc.ine.leb.roza.core.modern.refactoring.TestClassRefactorer;
 import javafx.beans.binding.Bindings;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -147,6 +153,11 @@ public final class ModernRozaUi extends Application {
 	private List<ClusteringLevel> clusteringLevels;
 	private String clusteringError;
 	private int selectedRefactoringLevelIndex;
+	private RefactoredTestClasses refactoredTestClasses;
+	private TestClass selectedRefactoredTestClass;
+	private String refactoringError;
+	private Path outputFolder;
+	private String writingError;
 	private boolean rankedSimilarityDescending;
 	private boolean suppressSimilaritySelectionRender;
 	private boolean suppressSimilarityComboListener;
@@ -218,6 +229,7 @@ public final class ModernRozaUi extends Application {
 		selectedTieBreakerKinds = new ArrayList<>();
 
 		sourceFolder = defaultSourceFolder();
+		outputFolder = defaultOutputFolder();
 		selectedViolationIndex = -1;
 		rankedSimilarityDescending = true;
 	}
@@ -229,6 +241,18 @@ public final class ModernRozaUi extends Application {
 		}
 		Path fromWorkspaceRoot = Path.of("roza", "src", "test", "java").toAbsolutePath().normalize();
 		if (Files.isDirectory(fromWorkspaceRoot)) {
+			return fromWorkspaceRoot;
+		}
+		return fromRozaProject;
+	}
+
+	private Path defaultOutputFolder() {
+		Path fromRozaProject = Path.of("output", "writer").toAbsolutePath().normalize();
+		if (Files.isDirectory(Path.of("src", "main", "java"))) {
+			return fromRozaProject;
+		}
+		Path fromWorkspaceRoot = Path.of("roza", "output", "writer").toAbsolutePath().normalize();
+		if (Files.isDirectory(Path.of("roza", "src", "main", "java"))) {
 			return fromWorkspaceRoot;
 		}
 		return fromRozaProject;
@@ -289,7 +313,7 @@ public final class ModernRozaUi extends Application {
 
 		VBox configuration = configurationFor(selectedStage);
 
-		if (selectedStage == PipelineStage.CLUSTERING) {
+		if (selectedStage == PipelineStage.CLUSTERING || selectedStage == PipelineStage.REFACTORING) {
 			configurationSidebar.getChildren().add(configuration);
 		} else {
 			Button actionButton = new Button(actionButtonText(selectedStage));
@@ -328,6 +352,9 @@ public final class ModernRozaUi extends Application {
 		if (selectedStage == PipelineStage.REFACTORING) {
 			return refactoringConfiguration();
 		}
+		if (selectedStage == PipelineStage.WRITING) {
+			return writingConfiguration();
+		}
 		VBox configuration = new VBox(CONFIGURATION_INNER_SPACING);
 		configuration.setPadding(new Insets(0, 0, 4, 0));
 		for (String item : selectedStage.configurationItems()) {
@@ -363,6 +390,34 @@ public final class ModernRozaUi extends Application {
 	private VBox refactoringConfiguration() {
 		VBox configuration = new VBox(CONFIGURATION_INNER_SPACING);
 		configuration.setPadding(new Insets(0, 0, 4, 0));
+		Button refactorButton = new Button(PipelineStage.REFACTORING.actionLabel());
+		refactorButton.setMaxWidth(Double.MAX_VALUE);
+		refactorButton.setStyle(primaryButtonStyle());
+		refactorButton.setDisable(!stageActionEnabled(PipelineStage.REFACTORING));
+		refactorButton.setOnAction(event -> runRefactoring());
+
+		Button refactorCurrentLevelButton = new Button("Refactor Current level");
+		refactorCurrentLevelButton.setMaxWidth(Double.MAX_VALUE);
+		refactorCurrentLevelButton.setStyle(secondaryButtonStyle());
+		refactorCurrentLevelButton.setDisable(!stageActionEnabled(PipelineStage.REFACTORING));
+		refactorCurrentLevelButton.setOnAction(event -> runRefactoringCurrentLevel());
+
+		configuration.getChildren().addAll(refactorButton, refactorCurrentLevelButton);
+		return configuration;
+	}
+
+	private VBox writingConfiguration() {
+		VBox configuration = new VBox(CONFIGURATION_INNER_SPACING);
+		configuration.setPadding(new Insets(0, 0, 4, 0));
+		Button outputFolderButton = new Button("Output folder");
+		outputFolderButton.setMaxWidth(Double.MAX_VALUE);
+		outputFolderButton.setStyle(secondaryButtonStyle());
+		outputFolderButton.setOnAction(event -> chooseOutputFolder());
+
+		Label selectedFolder = body(outputFolderText());
+		VBox.setMargin(selectedFolder, new Insets(4, 0, 12, 0));
+
+		configuration.getChildren().addAll(outputFolderButton, selectedFolder);
 		return configuration;
 	}
 
@@ -579,11 +634,29 @@ public final class ModernRozaUi extends Application {
 		}
 	}
 
+	private void chooseOutputFolder() {
+		DirectoryChooser directoryChooser = new DirectoryChooser();
+		directoryChooser.setTitle("Output folder");
+		File selectedFolder = directoryChooser.showDialog(configurationSidebar.getScene().getWindow());
+		if (selectedFolder != null) {
+			outputFolder = selectedFolder.toPath();
+			writingError = null;
+			render();
+		}
+	}
+
 	private String sourceFolderText() {
 		if (sourceFolder == null) {
 			return "No source folder selected.";
 		}
 		return sourceFolder.toString();
+	}
+
+	private String outputFolderText() {
+		if (outputFolder == null) {
+			return "No output folder selected.";
+		}
+		return outputFolder.toString();
 	}
 
 	private boolean stageActionEnabled(PipelineStage selectedStage) {
@@ -605,6 +678,12 @@ public final class ModernRozaUi extends Application {
 		if (selectedStage == PipelineStage.CLUSTERING) {
 			return similarityMatrix != null;
 		}
+		if (selectedStage == PipelineStage.REFACTORING) {
+			return testCaseClusters != null;
+		}
+		if (selectedStage == PipelineStage.WRITING) {
+			return refactoredTestClasses != null && outputFolder != null;
+		}
 		return true;
 	}
 
@@ -619,6 +698,10 @@ public final class ModernRozaUi extends Application {
 			runMeasurement();
 		} else if (selectedStage == PipelineStage.CLUSTERING) {
 			runClustering();
+		} else if (selectedStage == PipelineStage.REFACTORING) {
+			runRefactoring();
+		} else if (selectedStage == PipelineStage.WRITING) {
+			runWriting();
 		} else {
 			pipelineState.runSelectedStage();
 			render();
@@ -667,6 +750,14 @@ public final class ModernRozaUi extends Application {
 		clusteringLevels = null;
 		clusteringError = null;
 		selectedRefactoringLevelIndex = 0;
+		clearRefactoringResults();
+	}
+
+	private void clearRefactoringResults() {
+		refactoredTestClasses = null;
+		selectedRefactoredTestClass = null;
+		refactoringError = null;
+		writingError = null;
 	}
 
 	private static String failedParseCodeFileSource(Throwable exception) {
@@ -800,11 +891,62 @@ public final class ModernRozaUi extends Application {
 			clusteringLevels = clusterer.generateLevels(similarityMatrix);
 			testCaseClusters = new TestCaseClusters(clusteringLevels.get(clusteringLevels.size() - 1).clusters());
 			clusteringError = null;
+			clearRefactoringResults();
 			pipelineState.runSelectedStage();
 		} catch (RuntimeException exception) {
 			testCaseClusters = null;
 			clusteringLevels = null;
 			clusteringError = exception.getMessage() != null ? exception.getMessage() : exception.toString();
+			clearRefactoringResults();
+		}
+		render();
+	}
+
+	private void runRefactoring() {
+		refactor(testCaseClusters);
+	}
+
+	private void runRefactoringCurrentLevel() {
+		if (clusteringLevels == null || clusteringLevels.isEmpty()) {
+			refactoringError = "No clustering level selected.";
+			render();
+			return;
+		}
+		int levelIndex = selectedRefactoringLevelIndex;
+		if (levelIndex < 0 || levelIndex >= clusteringLevels.size()) {
+			levelIndex = clusteringLevels.size() - 1;
+		}
+		refactor(new TestCaseClusters(clusteringLevels.get(levelIndex).clusters()));
+	}
+
+	private void refactor(TestCaseClusters clusters) {
+		try {
+			TestClassRefactorer refactorer = new ImplicitSetupTestClassRefactorer();
+			refactoredTestClasses = refactorer.refactor(clusters);
+			selectedRefactoredTestClass = refactoredTestClasses.testClasses().isEmpty() ? null : refactoredTestClasses.testClasses().get(0);
+			refactoringError = null;
+			writingError = null;
+			pipelineState.runSelectedStage();
+		} catch (RuntimeException exception) {
+			refactoredTestClasses = null;
+			selectedRefactoredTestClass = null;
+			refactoringError = exception.getMessage() != null ? exception.getMessage() : exception.toString();
+			writingError = null;
+		}
+		render();
+	}
+
+	private void runWriting() {
+		try {
+			Files.createDirectories(outputFolder);
+			JunitTestClassRenderer renderer = new JunitTestClassRenderer();
+			for (TestClass testClass : refactoredTestClasses.testClasses()) {
+				Files.writeString(outputFolder.resolve(testClass.name() + ".java"), renderer.render(testClass));
+			}
+			writingError = null;
+			pipelineState.runSelectedStage();
+		} catch (IOException | RuntimeException exception) {
+			writingError = exception.getMessage() != null ? exception.getMessage() : exception.toString();
 		}
 		render();
 	}
@@ -972,11 +1114,28 @@ public final class ModernRozaUi extends Application {
 				error.setStyle(error.getStyle() + "-fx-text-fill: #991b1b;");
 				refactoringColumn.getChildren().add(error);
 			}
+			if (refactoringError != null) {
+				Label error = body("Refactoring failed: " + refactoringError);
+				error.setStyle(error.getStyle() + "-fx-text-fill: #991b1b;");
+				refactoringColumn.getChildren().add(error);
+			}
 			HBox levelsView = refactoringMergeLevelsView();
 			refactoringColumn.getChildren().add(levelsView);
 			VBox.setVgrow(levelsView, Priority.ALWAYS);
 			contentArea.getChildren().add(refactoringColumn);
 			VBox.setVgrow(refactoringColumn, Priority.ALWAYS);
+		} else if (selectedStage == PipelineStage.WRITING && refactoredTestClasses != null) {
+			VBox writingColumn = new VBox(12);
+			if (writingError != null) {
+				Label error = body("Writing failed: " + writingError);
+				error.setStyle(error.getStyle() + "-fx-text-fill: #991b1b;");
+				writingColumn.getChildren().add(error);
+			}
+			HBox writingView = refactoredTestClassesView();
+			writingColumn.getChildren().add(writingView);
+			contentArea.getChildren().add(writingColumn);
+			VBox.setVgrow(writingView, Priority.ALWAYS);
+			VBox.setVgrow(writingColumn, Priority.ALWAYS);
 		} else {
 			contentArea.getChildren().add(body(selectedStage.previousStageDataDescription()));
 		}
@@ -1364,6 +1523,43 @@ public final class ModernRozaUi extends Application {
 			block.getChildren().add(line);
 		}
 		return block;
+	}
+
+	private HBox refactoredTestClassesView() {
+		ListView<TestClass> classList = new ListView<>();
+		classList.getItems().addAll(refactoredTestClasses.testClasses());
+		classList.setPrefWidth(320);
+		classList.setCellFactory(list -> new ListCell<>() {
+			@Override
+			protected void updateItem(TestClass item, boolean empty) {
+				super.updateItem(item, empty);
+				setText(empty || item == null ? null : item.name());
+			}
+		});
+		if (selectedRefactoredTestClass != null) {
+			classList.getSelectionModel().select(selectedRefactoredTestClass);
+		}
+
+		TextArea codeArea = new TextArea(renderSelectedRefactoredTestClassCode());
+		codeArea.setEditable(false);
+		codeArea.setWrapText(false);
+		codeArea.setStyle(FONT_FAMILY + "-fx-font-family: 'Monospaced'; -fx-font-size: 13px;");
+		HBox.setHgrow(codeArea, Priority.ALWAYS);
+		classList.getSelectionModel().selectedItemProperty().addListener((observable, previous, selected) -> {
+			selectedRefactoredTestClass = selected;
+			codeArea.setText(renderSelectedRefactoredTestClassCode());
+		});
+
+		HBox row = new HBox(16);
+		row.getChildren().addAll(classList, codeArea);
+		VBox.setVgrow(row, Priority.ALWAYS);
+		return row;
+	}
+
+	private String renderSelectedRefactoredTestClassCode() {
+		return selectedRefactoredTestClass == null
+				? "Select a refactored test class to inspect its code."
+				: new JunitTestClassRenderer().render(selectedRefactoredTestClass);
 	}
 
 	private HBox similaritySelectionControls() {

@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.ImportDeclaration;
 import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.FieldDeclaration;
@@ -76,15 +77,69 @@ public final class JunitTestClassParser implements TestClassParser {
 				.filter(type -> type.isClassOrInterfaceDeclaration())
 				.map(type -> type.asClassOrInterfaceDeclaration())
 				.findFirst()
-				.map(this::extractTestClass);
+				.map(parsedClass -> extractTestClass(unit, parsedClass));
 	}
 
-	private TestClass extractTestClass(ClassOrInterfaceDeclaration parsedClass) {
+	private TestClass extractTestClass(CompilationUnit unit, ClassOrInterfaceDeclaration parsedClass) {
+		List<String> imports = imports(unit);
 		List<Field> fields = parsedClass.getFields().stream().flatMap(field -> extractFields(field).stream()).collect(Collectors.toList());
 		List<FixtureMethod> fixtures = parsedClass.getMethods().stream().filter(this::isFixtureMethod).map(this::extractFixture).collect(Collectors.toList());
 		List<HelperMethod> helperMethods = parsedClass.getMethods().stream().filter(method -> !isTestMethod(method)).filter(method -> !isFixtureMethod(method)).map(this::extractHelper).collect(Collectors.toList());
 		List<TestMethod> testMethods = parsedClass.getMethods().stream().filter(this::isTestMethod).map(this::extractTestMethod).collect(Collectors.toList());
-		return new TestClass(parsedClass.getNameAsString(), fields, fixtures, helperMethods, testMethods);
+		return new TestClass(parsedClass.getNameAsString(), imports, setupAnnotation(imports, fixtures, testMethods), fields, fixtures, helperMethods, testMethods);
+	}
+
+	private List<String> imports(CompilationUnit unit) {
+		return unit.getImports().stream().map(this::formatImportDeclaration).collect(Collectors.toList());
+	}
+
+	private String formatImportDeclaration(ImportDeclaration declaration) {
+		StringBuilder text = new StringBuilder("import ");
+		if (declaration.isStatic()) {
+			text.append("static ");
+		}
+		text.append(declaration.getNameAsString());
+		if (declaration.isAsterisk()) {
+			text.append(".*");
+		}
+		text.append(";");
+		return text.toString();
+	}
+
+	private SetupAnnotation setupAnnotation(List<String> imports, List<FixtureMethod> fixtures, List<TestMethod> testMethods) {
+		Optional<FixtureMethod> fixture = fixtures.stream().filter(method -> method.kind() == FixtureKind.BEFORE).findFirst();
+		if (fixture.isPresent()) {
+			CodeAnnotation annotation = fixture.get().annotations().stream()
+					.filter(this::isSetupAnnotation)
+					.findFirst()
+					.orElseThrow();
+			return new SetupAnnotation(annotation, importForExistingAnnotation(imports, annotation));
+		}
+		if (usesJupiterTest(imports, testMethods)) {
+			return new SetupAnnotation(new CodeAnnotation("BeforeEach", "@BeforeEach"), Optional.of("import org.junit.jupiter.api.BeforeEach;"));
+		}
+		return new SetupAnnotation(new CodeAnnotation("Before", "@Before"), Optional.of("import org.junit.Before;"));
+	}
+
+	private boolean isSetupAnnotation(CodeAnnotation annotation) {
+		return "Before".equals(annotation.name()) || "BeforeEach".equals(annotation.name());
+	}
+
+	private Optional<String> importForExistingAnnotation(List<String> imports, CodeAnnotation annotation) {
+		if (annotation.text().contains(".")) {
+			return Optional.empty();
+		}
+		String suffix = "." + annotation.name() + ";";
+		return imports.stream().filter(imported -> imported.endsWith(suffix)).findFirst();
+	}
+
+	private boolean usesJupiterTest(List<String> imports, List<TestMethod> testMethods) {
+		if (imports.contains("import org.junit.jupiter.api.Test;")) {
+			return true;
+		}
+		return testMethods.stream()
+				.flatMap(method -> method.annotations().stream())
+				.anyMatch(annotation -> "Test".equals(annotation.name()) && annotation.text().contains("org.junit.jupiter.api.Test"));
 	}
 
 	private List<Field> extractFields(FieldDeclaration parsedField) {

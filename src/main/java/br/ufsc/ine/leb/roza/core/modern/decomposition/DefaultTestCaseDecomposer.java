@@ -79,7 +79,7 @@ public final class DefaultTestCaseDecomposer implements TestCaseDecomposer {
 			}
 		}
 		statements.addAll(testMethod.body().statements());
-		return new TestCase(testMethod.name(), new CodeBlock(statements));
+		return new TestCase(testMethod.name(), new CodeBlock(statements), testClass, testMethod.annotations());
 	}
 
 	private List<CodeStatement> beforeStatements(TestClass testClass) {

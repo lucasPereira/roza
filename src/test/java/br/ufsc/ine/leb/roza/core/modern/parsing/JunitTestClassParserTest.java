@@ -49,6 +49,43 @@ class JunitTestClassParserTest {
 	}
 
 	@Test
+	void shouldParseImports() {
+		ParsedTestClasses parsed = parse("import org.junit.Test; import static org.junit.Assert.assertTrue; class Example { @Test public void test() { assertTrue(true); } }");
+
+		assertEquals(List.of("import org.junit.Test;", "import static org.junit.Assert.assertTrue;"), parsed.testClasses().get(0).imports());
+	}
+
+	@Test
+	void shouldInferJunit4SetupAnnotationFromJunit4TestImportWhenFixtureIsMissing() {
+		ParsedTestClasses parsed = parse("import org.junit.Test; class Example { @Test public void test() { assertTrue(true); } }");
+
+		SetupAnnotation setup = parsed.testClasses().get(0).setupAnnotation().orElseThrow();
+		assertEquals("Before", setup.annotation().name());
+		assertEquals("@Before", setup.annotation().text());
+		assertEquals("import org.junit.Before;", setup.importDeclaration().orElseThrow());
+	}
+
+	@Test
+	void shouldInferJunit5SetupAnnotationFromJupiterTestImportWhenFixtureIsMissing() {
+		ParsedTestClasses parsed = parse("import org.junit.jupiter.api.Test; class Example { @Test public void test() { assertTrue(true); } }");
+
+		SetupAnnotation setup = parsed.testClasses().get(0).setupAnnotation().orElseThrow();
+		assertEquals("BeforeEach", setup.annotation().name());
+		assertEquals("@BeforeEach", setup.annotation().text());
+		assertEquals("import org.junit.jupiter.api.BeforeEach;", setup.importDeclaration().orElseThrow());
+	}
+
+	@Test
+	void shouldUseExistingFixtureAnnotationAsSetupAnnotation() {
+		ParsedTestClasses parsed = parse("import org.junit.jupiter.api.BeforeEach; import org.junit.jupiter.api.Test; class Example { @BeforeEach public void setup() { value = 1; } @Test public void test() { assertTrue(true); } }");
+
+		SetupAnnotation setup = parsed.testClasses().get(0).setupAnnotation().orElseThrow();
+		assertEquals("BeforeEach", setup.annotation().name());
+		assertEquals("@BeforeEach", setup.annotation().text());
+		assertEquals("import org.junit.jupiter.api.BeforeEach;", setup.importDeclaration().orElseThrow());
+	}
+
+	@Test
 	void shouldParseFields() {
 		ParsedTestClasses parsed = parse("class Example { private int first = 1; String second; int[] values = { 1, 2 }; @Test public void test() { assertTrue(true); } }");
 
@@ -329,6 +366,7 @@ class JunitTestClassParserTest {
 				unsupported("private test method", "class Example { @Test private void test() { assertTrue(true); } }", "private test"),
 				unsupported("static test method", "class Example { @Test static void test() { assertTrue(true); } }", "static test"),
 				unsupported("multiple Before fixtures", "class Example { @Before public void first() { } @Before public void second() { } @Test public void test() { assertTrue(true); } }", "multiple @Before"),
+				unsupported("mixed Before fixtures", "class Example { @Before public void first() { } @BeforeEach public void second() { } @Test public void test() { assertTrue(true); } }", "multiple @Before"),
 				unsupported("local class", "class Example { @Test public void test() { class Local { } assertTrue(true); } }", "local class"),
 				unsupported("enum declaration", "class Example { enum State { READY } @Test public void test() { assertTrue(true); } }", "enum declaration"),
 				unsupported("anonymous class", "class Example { @Test public void test() { Runnable value = new Runnable() { public void run() { } }; } }", "anonymous class"),

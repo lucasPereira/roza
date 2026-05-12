@@ -1,6 +1,7 @@
 package br.ufsc.ine.leb.roza.core.modern.decomposition;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 import java.util.List;
 import java.util.Optional;
@@ -121,6 +122,18 @@ class DefaultTestCaseDecomposerTest {
 		List<CodeStatement> statements = decomposed.testCases().get(0).body().statements();
 		assertEquals(false, statements.get(0).isAssertion());
 		assertEquals(true, statements.get(1).isAssertion());
+	}
+
+	@Test
+	void shouldPreserveSourceTestClassAndTestAnnotations() {
+		TestClass testClass = testClass(List.of(), List.of(), List.of(testMethod("test", "assertTrue(true);")));
+		ParsedTestClasses parsedTestClasses = parsedTestClasses(testClass);
+
+		DecomposedTestCases decomposed = decomposer.decompose(parsedTestClasses);
+		TestCase testCase = decomposed.testCases().get(0);
+
+		assertSame(testClass, testCase.sourceTestClass().orElseThrow());
+		assertEquals(List.of("Test"), testCase.annotations().stream().map(CodeAnnotation::name).collect(Collectors.toList()));
 	}
 
 	@Test
