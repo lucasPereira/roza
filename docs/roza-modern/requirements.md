@@ -322,6 +322,10 @@ Acceptance criteria:
 - AC-106: `TestClassWriter.write` receives `RefactoredTestClasses`.
 - AC-107: `TestClassWriter.write` does not return a serialized model.
 - AC-108: Concrete writer implementations receive their required output destination parameters through their constructors.
+- AC-287: The first concrete writing implementation is named `FileSystemTestClassWriter`.
+- AC-288: `FileSystemTestClassWriter` receives its output folder through its constructor.
+- AC-289: `FileSystemTestClassWriter` renders each refactored `TestClass` as Java source and writes one `.java` file per class.
+- AC-290: `FileSystemTestClassWriter` creates the output folder when it does not already exist.
 
 ## Architectural Constraints
 
@@ -585,13 +589,18 @@ public final class ImplicitSetupTestClassRefactorer implements TestClassRefactor
 }
 ```
 
-### Confirmed, Not Yet Implemented: Writing
+### Implemented: Writing
 
 ```java
 package br.ufsc.ine.leb.roza.core.modern.writing;
 
 public interface TestClassWriter {
 	void write(RefactoredTestClasses testClasses);
+}
+
+public final class FileSystemTestClassWriter implements TestClassWriter {
+	public FileSystemTestClassWriter(Path outputFolder);
+	public void write(RefactoredTestClasses testClasses);
 }
 ```
 
@@ -639,7 +648,7 @@ The refactoring interface is named `TestClassRefactorer`, and its method is name
 
 ### Q-011: What output destinations should writing support first?
 
-The final output stage is named `writing`. Its interface is named `TestClassWriter`, and its method is named `write`. `TestClassWriter.write` receives `RefactoredTestClasses` and does not return a serialized model. The first concrete output destination remains undefined.
+The first concrete output destination is the filesystem. `FileSystemTestClassWriter` writes one rendered `.java` file per refactored `TestClass` into the configured output folder.
 
 ### Q-012: How generic can the pipeline be beyond the initial implicit-setup refactoring purpose?
 

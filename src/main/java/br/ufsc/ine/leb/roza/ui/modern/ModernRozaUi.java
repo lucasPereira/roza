@@ -1,7 +1,6 @@
 package br.ufsc.ine.leb.roza.ui.modern;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -61,6 +60,8 @@ import br.ufsc.ine.leb.roza.core.modern.refactoring.ImplicitSetupTestClassRefact
 import br.ufsc.ine.leb.roza.core.modern.refactoring.JunitTestClassRenderer;
 import br.ufsc.ine.leb.roza.core.modern.refactoring.RefactoredTestClasses;
 import br.ufsc.ine.leb.roza.core.modern.refactoring.TestClassRefactorer;
+import br.ufsc.ine.leb.roza.core.modern.writing.FileSystemTestClassWriter;
+import br.ufsc.ine.leb.roza.core.modern.writing.TestClassWriter;
 import javafx.beans.binding.Bindings;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -938,14 +939,11 @@ public final class ModernRozaUi extends Application {
 
 	private void runWriting() {
 		try {
-			Files.createDirectories(outputFolder);
-			JunitTestClassRenderer renderer = new JunitTestClassRenderer();
-			for (TestClass testClass : refactoredTestClasses.testClasses()) {
-				Files.writeString(outputFolder.resolve(testClass.name() + ".java"), renderer.render(testClass));
-			}
+			TestClassWriter writer = new FileSystemTestClassWriter(outputFolder);
+			writer.write(refactoredTestClasses);
 			writingError = null;
 			pipelineState.runSelectedStage();
-		} catch (IOException | RuntimeException exception) {
+		} catch (RuntimeException exception) {
 			writingError = exception.getMessage() != null ? exception.getMessage() : exception.toString();
 		}
 		render();

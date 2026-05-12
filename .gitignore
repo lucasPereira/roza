@@ -7,3 +7,5 @@ output/materializer/
 output/measurer/
 output/writer/
 external-tools/deckard/tool/
+
+.DS_Store
