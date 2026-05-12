@@ -31,7 +31,7 @@ enum PipelineStage {
 	REFACTORING(
 			"Refactoring",
 			"Refactor",
-			List.of("Refactoring strategy"),
+			List.of(),
 			"Test case clusters from the clustering stage will be shown here."),
 	WRITING(
 			"Writing",

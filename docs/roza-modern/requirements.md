@@ -261,7 +261,19 @@ Acceptance criteria:
 - AC-094: `TestCaseClusterer.cluster` returns `TestCaseClusters`.
 - AC-095: `TestCaseClusters` exposes test case clusters through `clusters()`.
 - AC-096: Each test case cluster is represented by `TestCaseCluster`.
-- AC-097: `TestCaseCluster` has no minimum content API until confirmed requirements make one necessary.
+- AC-097: `TestCaseCluster` exposes grouped `TestCase` instances and their original similarity-matrix indexes.
+- AC-252: The first clustering implementation is agglomerative hierarchical clustering.
+- AC-253: Agglomerative hierarchical clustering receives linkage as a strategy/configuration, not as separate clusterer implementations.
+- AC-254: The supported linkage strategies are single linkage, complete linkage, and average linkage.
+- AC-255: Clustering stop rules use the name `StopCriterion` rather than `ThresholdCriterion`.
+- AC-256: `CompositeStopCriterion` combines configured stop criteria with OR semantics.
+- AC-257: An empty `CompositeStopCriterion` never stops clustering by criterion; clustering then stops only when there are no more merges.
+- AC-258: The initial stop criteria are minimum similarity, maximum tests per cluster, maximum level, target cluster count, and minimum shared prefix.
+- AC-259: Merge-tie resolution uses the name `MergeTieBreaker` rather than `Referee`.
+- AC-260: `CompositeMergeTieBreaker` tries configured tie breakers in order and throws if none resolves an actual tie.
+- AC-261: An empty `CompositeMergeTieBreaker` is allowed but throws when an actual tie must be resolved.
+- AC-262: The initial merge tie breakers are largest merged cluster, smallest merged cluster, and stable test-case order.
+- AC-263: Agglomerative clustering exposes generated clustering levels for inspection.
 
 ### REQ-013: Refactoring Stage
 
@@ -376,6 +388,10 @@ Acceptance criteria:
 - AC-249: The modern UI `Measurement` metric dropdown exposes `Simian` as an option.
 - AC-250: When `Simian` is selected in the modern UI, the `Measurement` configuration shows a `Threshold` input with Simian's default.
 - AC-251: Triggering `Measure` with `Simian` selected uses the configured Simian measurer and then reuses the existing `Clustering` ranked-pair view.
+- AC-264: The modern UI `Clustering` configuration exposes linkage selection.
+- AC-265: The modern UI `Clustering` configuration allows enabling zero or more stop criteria.
+- AC-266: The modern UI `Clustering` configuration allows configuring ordered merge tie breaker fallbacks.
+- AC-267: Triggering `Cluster` runs the configured agglomerative clusterer and shows the resulting clusters while keeping the ranked similarity inspection available.
 
 ### NFR-004: Minimal Code Comments
 
@@ -486,7 +502,7 @@ public final class LcsTestCaseSimilarityMeasurer implements TestCaseSimilarityMe
 }
 ```
 
-### Confirmed, Not Yet Implemented: Clustering
+### Implemented: Clustering
 
 ```java
 package br.ufsc.ine.leb.roza.core.modern.clustering;
@@ -497,6 +513,17 @@ public interface TestCaseClusterer {
 
 public final class TestCaseClusters {
 	public List<TestCaseCluster> clusters();
+}
+
+public final class TestCaseCluster {
+	public List<TestCase> testCases();
+	public List<Integer> testCaseIndexes();
+	public int size();
+}
+
+public final class AgglomerativeHierarchicalTestCaseClusterer implements TestCaseClusterer {
+	public TestCaseClusters cluster(TestCaseSimilarityMatrix matrix);
+	public List<ClusteringLevel> generateLevels(TestCaseSimilarityMatrix matrix);
 }
 ```
 
@@ -576,7 +603,7 @@ The initial concrete purpose is to refactor test classes by regrouping tests int
 
 ### Q-013: What public read API should clustering require from the similarity matrix?
 
-The first measurement implementation fills a dense directed matrix by source and target test case positions. The clusterer read API is intentionally deferred until clustering is implemented, so the matrix does not expose public read methods yet.
+The current clustering implementation requires the matrix size, test case by index, and directed source-target similarity values. These are exposed through `TestCaseSimilarityMatrix.size()`, `testCaseAt(int)`, and `similarity(int, int)`.
 
 ## Change Log
 
@@ -657,3 +684,4 @@ The first measurement implementation fills a dense directed matrix by source and
 - 2026-05-11: Validated Deckard execution through the existing Docker script and added modern Deckard configuration, report parsing, scoring, and UI selection requirements.
 - 2026-05-11: Validated JPlag execution through the existing jar and added modern JPlag sensitivity, HTML report parsing, directional scoring, and UI selection requirements.
 - 2026-05-11: Validated Simian execution through the existing jar and added modern Simian threshold, XML report parsing, asymmetric line-coverage scoring, and UI selection requirements.
+- 2026-05-12: Implemented the first modern clustering slice with agglomerative hierarchical clustering, linkage strategies, composable stop criteria, ordered merge tie breakers, level inspection, and JavaFX clustering configuration/output.

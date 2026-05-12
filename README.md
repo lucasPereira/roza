@@ -1,5 +1,13 @@
 # Roza
 
+## Running modern Roza UI
+
+From the project root, run:
+
+```sh
+./gradlew runModernRozaUi
+```
+
 ## Running legacy Roza UI
 
 From the project root, run:
