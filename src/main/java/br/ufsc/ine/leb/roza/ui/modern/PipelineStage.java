@@ -30,7 +30,7 @@ enum PipelineStage {
 			"The similarity matrix from the measurement stage will be shown here."),
 	REFACTORING(
 			"Refactoring",
-			"Refactor",
+			"Refactor last level clusters",
 			List.of(),
 			"Test case clusters from the clustering stage will be shown here."),
 	WRITING(

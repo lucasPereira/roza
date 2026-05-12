@@ -21,7 +21,7 @@ This document stores evolving knowledge discovered while designing and implement
 - `JunitAssertionMethods`: the internal supported assertion method list for JUnit 4, current JUnit Jupiter, and Hamcrest `assertThat`, shared by the parser and unsupported-feature validator.
 - `ParsedTestClasses`: the result returned by `TestClassParser.parse`; it exposes `TestClass` instances through `testClasses()`.
 - `UnsupportedFeaturePolicy`: the parser policy for unsupported Java test-code features. `SAFE` fails with a clear error; `UNSAFE` records diagnostics and skips unsupported input.
-- `JavaUnsupportedFeatureValidator`: the separate validation step that runs before Java parser implementations extract modern Róża domain models.
+- `JavaUnsupportedFeatureValidator`: the separate validation step that runs before Java parser implementations extract modern Róża domain models. The list of emitted violations and minimal examples is maintained in `docs/violations.md` (update that file whenever validator rules change).
 - `TestClass`: the Java-first root domain abstraction for an identified Java test class. It hides JavaParser types from the public modern Róża contract and preserves the source package name when one is declared.
 - `Field`: a parsed Java field that decomposition can later transform into a local variable. Its type text must preserve complex Java forms such as generics, nested generics, wildcard generics, qualified types, generic arrays, arrays, and multidimensional arrays.
 - `FixtureMethod`: a supported instance fixture method such as JUnit 4 `@Before`; JUnit 4 `@After` and JUnit 5 `@AfterEach` are unsupported in the first parser slice.
@@ -226,6 +226,7 @@ The first modern UI slice uses JavaFX 17.x while the project remains on Java 11.
 - DEC-118: `ImplicitSetupTestClassRefactorer` uses an implicit-setup package policy configuration. `DEFAULT_PACKAGE` prioritizes reuse by materializing one class per cluster in Java's default package; `PACKAGE_PARTITIONING` prioritizes package preservation by splitting each cluster by source package.
 - DEC-119: `TestMethod`, `FixtureMethod`, and decomposed `TestCase` preserve declared thrown exceptions so generated setup and test methods can remain compilable.
 - DEC-120: `ImplicitSetupTestClassRefactorer` rewrites moved local array declarations as explicit array creation assignments in generated setup methods.
+- DEC-121: The authoritative catalog of modern parsing violations (`TestCodeViolation` texts and examples) lives in `docs/violations.md`. Any change to `JavaUnsupportedFeatureValidator` must update that document in the same change so agents and humans stay aligned.
 ## Hypotheses
 
 - HYP-001: The pipeline can likely remain abstract and flexible if the generic core stops at stage contracts and each concrete purpose is isolated in implementations, especially in measurement, clustering, and refactoring. The first vertical slice should stay anchored in implicit-setup regrouping to prevent premature abstractions.
@@ -339,3 +340,4 @@ The first modern UI slice uses JavaFX 17.x while the project remains on Java 11.
 - 2026-05-12: Recorded and implemented `FileSystemTestClassWriter` as the first concrete writing implementation.
 - 2026-05-12: Recorded package preservation and generated-method name uniqueness after applying modern Róża to `java-string-similarity`.
 - 2026-05-12: Added implicit-setup package policy configuration for default-package and package-partitioned refactoring.
+- 2026-05-12: Added `docs/violations.md` as the maintained catalog of `JavaUnsupportedFeatureValidator` violations (with examples) and linked it from this knowledge base (DEC-121).

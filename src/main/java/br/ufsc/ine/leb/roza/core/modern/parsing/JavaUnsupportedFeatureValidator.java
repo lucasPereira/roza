@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.ImportDeclaration;
@@ -24,7 +25,11 @@ import com.github.javaparser.ast.expr.SuperExpr;
 import com.github.javaparser.ast.expr.ThisExpr;
 import com.github.javaparser.ast.stmt.BreakStmt;
 import com.github.javaparser.ast.stmt.ContinueStmt;
+import com.github.javaparser.ast.stmt.DoStmt;
+import com.github.javaparser.ast.stmt.ForEachStmt;
+import com.github.javaparser.ast.stmt.ForStmt;
 import com.github.javaparser.ast.stmt.LabeledStmt;
+import com.github.javaparser.ast.stmt.WhileStmt;
 import com.github.javaparser.ast.stmt.SwitchStmt;
 import com.github.javaparser.ast.stmt.SynchronizedStmt;
 import com.github.javaparser.ast.stmt.ThrowStmt;
@@ -108,14 +113,20 @@ final class JavaUnsupportedFeatureValidator {
 		return type.getParentNode().filter(parent -> parent instanceof ClassOrInterfaceDeclaration).isPresent();
 	}
 
+	private static String fieldVariableNames(FieldDeclaration field) {
+		return field.getVariables().stream().map(v -> v.getNameAsString()).collect(Collectors.joining(", "));
+	}
+
 	private void validateField(FieldDeclaration field, String testClassName, List<TestCodeViolation> violations) {
 		if (field.isStatic()) {
-			classViolation(violations, testClassName, "Unsupported static field: " + field, field);
+			String names = fieldVariableNames(field);
+			classViolation(violations, testClassName, "Unsupported static field: " + names, field);
 		}
 		field.getAnnotations().forEach(annotation -> classViolation(violations, testClassName, "Unsupported field annotation: " + annotation, annotation));
 		field.getVariables().forEach(variable -> {
 			if (variable.getInitializer().isPresent()) {
-				classViolation(violations, testClassName, "Unsupported field initialization: " + variable, field);
+				String name = variable.getNameAsString();
+				classViolation(violations, testClassName, "Unsupported field initialization: " + name, field);
 			}
 		});
 	}
@@ -222,6 +233,10 @@ final class JavaUnsupportedFeatureValidator {
 				.filter(creation -> Set.of("Socket", "URL").contains(creation.getType().asString()))
 				.forEach(creation -> violation(violations, testClassName, testMethodName, "Unsupported network object creation: " + creation.getType(), creation));
 		node.findAll(ClassOrInterfaceDeclaration.class).forEach(type -> violation(violations, testClassName, testMethodName, "Unsupported local class: " + type.getNameAsString(), type));
+		node.findAll(ForStmt.class).forEach(statement -> violation(violations, testClassName, testMethodName, "Unsupported for loop", statement));
+		node.findAll(ForEachStmt.class).forEach(statement -> violation(violations, testClassName, testMethodName, "Unsupported for-each loop", statement));
+		node.findAll(WhileStmt.class).forEach(statement -> violation(violations, testClassName, testMethodName, "Unsupported while loop", statement));
+		node.findAll(DoStmt.class).forEach(statement -> violation(violations, testClassName, testMethodName, "Unsupported do-while loop", statement));
 		node.findAll(TryStmt.class).forEach(statement -> violation(violations, testClassName, testMethodName, "Unsupported try statement", statement));
 		node.findAll(SwitchStmt.class).forEach(statement -> violation(violations, testClassName, testMethodName, "Unsupported switch statement", statement));
 		node.findAll(SynchronizedStmt.class).forEach(statement -> violation(violations, testClassName, testMethodName, "Unsupported synchronized block", statement));

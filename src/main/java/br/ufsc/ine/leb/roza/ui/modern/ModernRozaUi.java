@@ -407,7 +407,7 @@ public final class ModernRozaUi extends Application {
 		refactorButton.setDisable(!stageActionEnabled(PipelineStage.REFACTORING));
 		refactorButton.setOnAction(event -> runRefactoring());
 
-		Button refactorCurrentLevelButton = new Button("Refactor Current level");
+		Button refactorCurrentLevelButton = new Button("Refactor selected level clusters");
 		refactorCurrentLevelButton.setMaxWidth(Double.MAX_VALUE);
 		refactorCurrentLevelButton.setStyle(secondaryButtonStyle());
 		refactorCurrentLevelButton.setDisable(!stageActionEnabled(PipelineStage.REFACTORING));
