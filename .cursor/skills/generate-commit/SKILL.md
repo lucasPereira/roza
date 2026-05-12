@@ -38,6 +38,10 @@ Run all Git commands **from `roza/`** (e.g. `cd roza` or `git -C <path-to-roza>`
 
 The message must reflect the **full** tree vs `HEAD` before staging: staged, unstaged, and **untracked** paths (respecting `.gitignore` via normal Git rules).
 
+## Assistant attribution (mandatory)
+
+Do **not** add commit **bodies** or **trailers** that attribute authorship to Cursor, agents, or automated tooling—**no** `Co-authored-by: Cursor <cursoragent@cursor.com>`, **no** other `Co-authored-by:` lines for bots/agents, and **no** similar attribution trailers (for example `Generated-by:` for the assistant) unless the user **explicitly** asks for a specific trailer. This workflow uses **only** the approved single-line subject via one `git commit -m "…"` invocation—**no** second `-m`, here-doc, or `GIT_EDITOR` flow that appends co-authorship.
+
 ## Steps
 
 1. `cd` to the **roza** submodule root (or use `git -C <roza-root>`).
@@ -50,7 +54,7 @@ The message must reflect the **full** tree vs `HEAD` before staging: staged, uns
    - **`git status`**: paste the **full** output (branch, ahead/behind if any, and the whole “Changes to be committed” section).
    - The **commit message** you composed: the single line (and optionally the exact `git commit -m "…"` command using that line).
 8. **Stop and ask for explicit approval** (e.g. yes / ok / pode / aprovo) to run the commit. Do **not** run `git commit` until the user confirms.
-9. After approval: **`git commit -m "…"`** using the exact composed line (quote safely for the shell).
+9. After approval: **`git commit -m "…"`** once, using the exact composed subject line only (quote safely for the shell). Do **not** add a message body or trailers; see **Assistant attribution**.
 10. If the user declines approval, do **not** commit. Optionally offer **`git reset`** (mixed or keep their preference) to unstage if they want to revert the index.
 11. If `git commit` fails (e.g. hook failure, GPG signing issues), report the error output; do not claim success.
 
