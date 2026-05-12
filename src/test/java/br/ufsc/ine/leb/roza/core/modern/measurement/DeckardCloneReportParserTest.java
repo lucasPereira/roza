@@ -20,7 +20,7 @@ class DeckardCloneReportParserTest {
 				+ "000000003\tdist:0.0\tFILE ../../output/materializer/Target.java LINE:3:1 NODE_KIND:121 nVARs:1 NUM_NODE:5 TBID:10 TEID:13\n"
 				+ "000000004\tdist:0.0\tFILE ../../output/materializer/Target.java LINE:4:1 NODE_KIND:121 nVARs:1 NUM_NODE:5 TBID:14 TEID:17\n";
 
-		List<DeckardCloneFragment> fragments = parser.parse(report);
+		List<CloneFragment> fragments = parser.parse(report);
 
 		assertEquals(4, fragments.size());
 		assertFragment(fragments.get(0), "../../output/materializer/Source.java", "../../output/materializer/Target.java", 3, 3);
@@ -38,7 +38,7 @@ class DeckardCloneReportParserTest {
 				+ "000000000\tdist:0.0\tFILE Source.java LINE:6:1 NODE_KIND:121 nVARs:1 NUM_NODE:5 TBID:20 TEID:23\n"
 				+ "000000001\tdist:0.0\tFILE Target.java LINE:5:1 NODE_KIND:121 nVARs:1 NUM_NODE:5 TBID:20 TEID:23\n";
 
-		List<DeckardCloneFragment> fragments = parser.parse(report);
+		List<CloneFragment> fragments = parser.parse(report);
 
 		assertEquals(4, fragments.size());
 		assertFragment(fragments.get(0), "Source.java", "Target.java", 3, 4);
@@ -50,7 +50,7 @@ class DeckardCloneReportParserTest {
 		assertThrows(IllegalArgumentException.class, () -> parser.parse("not a deckard entry"));
 	}
 
-	private void assertFragment(DeckardCloneFragment fragment, String sourceFile, String targetFile, int startLine, int endLine) {
+	private void assertFragment(CloneFragment fragment, String sourceFile, String targetFile, int startLine, int endLine) {
 		assertEquals(sourceFile, fragment.sourceFile());
 		assertEquals(targetFile, fragment.targetFile());
 		assertEquals(startLine, fragment.startLine());

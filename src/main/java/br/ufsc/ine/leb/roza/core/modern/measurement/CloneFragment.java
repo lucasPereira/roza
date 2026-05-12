@@ -2,14 +2,14 @@ package br.ufsc.ine.leb.roza.core.modern.measurement;
 
 import java.util.Objects;
 
-public final class DeckardCloneFragment {
+public final class CloneFragment {
 
 	private final String sourceFile;
 	private final String targetFile;
 	private final int startLine;
 	private final int endLine;
 
-	public DeckardCloneFragment(String sourceFile, String targetFile, int startLine, int endLine) {
+	public CloneFragment(String sourceFile, String targetFile, int startLine, int endLine) {
 		if (startLine <= 0) {
 			throw new IllegalArgumentException("Start line must be greater than zero.");
 		}

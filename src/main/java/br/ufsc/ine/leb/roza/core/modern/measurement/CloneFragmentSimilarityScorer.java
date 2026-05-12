@@ -7,16 +7,16 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-final class DeckardSimilarityScorer {
+final class CloneFragmentSimilarityScorer {
 
-	TestCaseSimilarityMatrix score(List<DeckardMaterializedTestCase> testCases, List<DeckardCloneFragment> fragments) {
+	TestCaseSimilarityMatrix score(List<MaterializedTestCase> testCases, List<CloneFragment> fragments) {
 		Objects.requireNonNull(testCases);
 		Objects.requireNonNull(fragments);
 		TestCaseSimilarityMatrix matrix = new TestCaseSimilarityMatrix(testCases.stream()
-				.map(DeckardMaterializedTestCase::testCase)
+				.map(MaterializedTestCase::testCase)
 				.collect(Collectors.toList()));
-		Map<String, DeckardMaterializedTestCase> testCaseByFileName = testCases.stream()
-				.collect(Collectors.toMap(DeckardMaterializedTestCase::fileName, testCase -> testCase));
+		Map<String, MaterializedTestCase> testCaseByFileName = testCases.stream()
+				.collect(Collectors.toMap(MaterializedTestCase::fileName, testCase -> testCase));
 		for (int source = 0; source < testCases.size(); source++) {
 			for (int target = 0; target < testCases.size(); target++) {
 				if (source != target) {
@@ -28,10 +28,10 @@ final class DeckardSimilarityScorer {
 	}
 
 	private double score(
-			DeckardMaterializedTestCase source,
-			DeckardMaterializedTestCase target,
-			Map<String, DeckardMaterializedTestCase> testCaseByFileName,
-			List<DeckardCloneFragment> fragments) {
+			MaterializedTestCase source,
+			MaterializedTestCase target,
+			Map<String, MaterializedTestCase> testCaseByFileName,
+			List<CloneFragment> fragments) {
 		if (source.projectedLineCount() == 0) {
 			return 0.0;
 		}
@@ -45,7 +45,7 @@ final class DeckardSimilarityScorer {
 		return ((double) coveredLineCount(intervals)) / source.projectedLineCount();
 	}
 
-	private Interval intersection(DeckardMaterializedTestCase source, DeckardCloneFragment fragment) {
+	private Interval intersection(MaterializedTestCase source, CloneFragment fragment) {
 		int start = Math.max(source.firstProjectedLine(), fragment.startLine());
 		int end = Math.min(source.lastProjectedLine(), fragment.endLine());
 		if (start > end) {

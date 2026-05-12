@@ -13,45 +13,38 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import br.ufsc.ine.leb.roza.core.modern.decomposition.DecomposedTestCases;
-import br.ufsc.ine.leb.roza.core.modern.decomposition.TestCase;
-import br.ufsc.ine.leb.roza.core.modern.parsing.CodeStatement;
 
 public final class DeckardTestCaseSimilarityMeasurer implements TestCaseSimilarityMeasurer {
 
-	private static final int FIRST_PROJECTED_BODY_LINE = 3;
-
 	private final DeckardMeasurementConfiguration configuration;
 	private final DeckardCloneReportParser parser;
-	private final DeckardSimilarityScorer scorer;
-
-	public DeckardTestCaseSimilarityMeasurer() {
-		this(new DeckardMeasurementConfiguration());
-	}
+	private final CloneFragmentSimilarityScorer scorer;
 
 	public DeckardTestCaseSimilarityMeasurer(DeckardMeasurementConfiguration configuration) {
 		this.configuration = Objects.requireNonNull(configuration);
 		parser = new DeckardCloneReportParser();
-		scorer = new DeckardSimilarityScorer();
+		scorer = new CloneFragmentSimilarityScorer();
 	}
 
 	@Override
 	public TestCaseSimilarityMatrix measure(DecomposedTestCases decomposedTestCases) {
 		Objects.requireNonNull(decomposedTestCases);
-		Path rozaRoot = validateRozaRoot(Path.of("."));
+		RozaProjectPaths paths = RozaProjectPaths.forDeckard(Path.of("."));
 		String runId = "modern-deckard-" + UUID.randomUUID();
-		Path materializerDirectory = rozaRoot.resolve("output/materializer").resolve(runId);
-		Path measurerDirectory = rozaRoot.resolve("output/measurer").resolve(runId);
-		Path deckardDirectory = rozaRoot.resolve("external-tools/deckard");
+		Path materializerDirectory = paths.materializerRun(runId);
+		Path measurerDirectory = paths.measurerRun(runId);
+		Path deckardDirectory = paths.deckardToolDirectory();
 		Path config = deckardDirectory.resolve("config");
 		try {
 			createCleanDirectory(materializerDirectory);
 			createCleanDirectory(measurerDirectory.resolve("vectors"));
 			createCleanDirectory(measurerDirectory.resolve("cluster"));
 			createCleanDirectory(measurerDirectory.resolve("times"));
-			List<DeckardMaterializedTestCase> materializedTestCases = materialize(decomposedTestCases.testCases(), materializerDirectory);
+			List<MaterializedTestCase> materializedTestCases = TestCaseProjectionMaterializer.materialize(
+					decomposedTestCases.testCases(), materializerDirectory, "DeckardTestCase");
 			Files.writeString(config, configContent(deckardDirectory, materializerDirectory, measurerDirectory), StandardCharsets.UTF_8);
 			runDeckard(deckardDirectory);
-			List<DeckardCloneFragment> fragments = parseCloneReports(measurerDirectory.resolve("cluster"));
+			List<CloneFragment> fragments = parseCloneReports(measurerDirectory.resolve("cluster"));
 			return scorer.score(materializedTestCases, fragments);
 		} catch (IOException exception) {
 			throw new IllegalStateException("Deckard measurement failed.", exception);
@@ -62,42 +55,8 @@ public final class DeckardTestCaseSimilarityMeasurer implements TestCaseSimilari
 		}
 	}
 
-	private List<DeckardMaterializedTestCase> materialize(List<TestCase> testCases, Path materializerDirectory) throws IOException {
-		List<DeckardMaterializedTestCase> materializedTestCases = new ArrayList<>();
-		for (int index = 0; index < testCases.size(); index++) {
-			TestCase testCase = testCases.get(index);
-			String className = String.format("DeckardTestCase%05d", index);
-			String fileName = className + ".java";
-			List<String> projection = projection(testCase);
-			Files.writeString(materializerDirectory.resolve(fileName), javaSource(className, projection), StandardCharsets.UTF_8);
-			materializedTestCases.add(new DeckardMaterializedTestCase(testCase, fileName, FIRST_PROJECTED_BODY_LINE, projection.size()));
-		}
-		return materializedTestCases;
-	}
-
-	private List<String> projection(TestCase testCase) {
-		return testCase.body()
-				.statements()
-				.stream()
-				.takeWhile(statement -> !statement.isAssertion())
-				.map(CodeStatement::originalText)
-				.collect(Collectors.toList());
-	}
-
-	private String javaSource(String className, List<String> statements) {
-		StringBuilder builder = new StringBuilder();
-		builder.append("public class ").append(className).append(" {\n");
-		builder.append("\tpublic void test() {\n");
-		for (String statement : statements) {
-			builder.append("\t\t").append(statement).append("\n");
-		}
-		builder.append("\t}\n");
-		builder.append("}\n");
-		return builder.toString();
-	}
-
-	private List<DeckardCloneFragment> parseCloneReports(Path clusterDirectory) throws IOException {
-		List<DeckardCloneFragment> fragments = new ArrayList<>();
+	private List<CloneFragment> parseCloneReports(Path clusterDirectory) throws IOException {
+		List<CloneFragment> fragments = new ArrayList<>();
 		if (!Files.isDirectory(clusterDirectory)) {
 			return fragments;
 		}
@@ -153,14 +112,6 @@ public final class DeckardTestCaseSimilarityMeasurer implements TestCaseSimilari
 
 	private String configPath(Path deckardDirectory, Path path) {
 		return deckardDirectory.relativize(path).toString().replace('\\', '/');
-	}
-
-	private static Path validateRozaRoot(Path rozaRoot) {
-		Path normalized = Objects.requireNonNull(rozaRoot).toAbsolutePath().normalize();
-		if (!Files.isDirectory(normalized.resolve("external-tools/deckard"))) {
-			throw new IllegalArgumentException("Deckard measurement must run from the Roza project root.");
-		}
-		return normalized;
 	}
 
 	private void createCleanDirectory(Path directory) throws IOException {

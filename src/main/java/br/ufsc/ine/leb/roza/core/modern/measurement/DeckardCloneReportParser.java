@@ -11,15 +11,15 @@ public final class DeckardCloneReportParser {
 	private static final Pattern ENTRY = Pattern.compile(
 			"\\S+\\s+dist:[^\\s]+\\s+FILE\\s+(\\S+)\\s+LINE:(\\d+):(\\d+)\\s+NODE_KIND:(\\d+)\\s+.*\\bTBID:(\\d+)\\s+TEID:(\\d+)\\b");
 
-	public List<DeckardCloneFragment> parse(String reportContent) {
+	public List<CloneFragment> parse(String reportContent) {
 		Objects.requireNonNull(reportContent);
-		List<DeckardCloneFragment> fragments = new ArrayList<>();
+		List<CloneFragment> fragments = new ArrayList<>();
 		for (String cluster : reportContent.split("(?:\\R\\s*){2,}")) {
 			List<DeckardCloneEntry> entries = parseCluster(cluster);
 			for (DeckardCloneEntry source : entries) {
 				for (DeckardCloneEntry target : entries) {
 					if (!source.file().equals(target.file()) && source.sameTreePositionAs(target)) {
-						fragments.add(new DeckardCloneFragment(source.file(), target.file(), source.startLine(), source.endLine()));
+						fragments.add(new CloneFragment(source.file(), target.file(), source.startLine(), source.endLine()));
 					}
 				}
 			}

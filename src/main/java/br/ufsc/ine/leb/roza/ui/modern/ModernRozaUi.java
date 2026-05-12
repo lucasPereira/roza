@@ -21,8 +21,12 @@ import br.ufsc.ine.leb.roza.core.modern.loading.FileSystemCodeFileLoader;
 import br.ufsc.ine.leb.roza.core.modern.loading.LoadedCodeFiles;
 import br.ufsc.ine.leb.roza.core.modern.measurement.DeckardMeasurementConfiguration;
 import br.ufsc.ine.leb.roza.core.modern.measurement.DeckardTestCaseSimilarityMeasurer;
+import br.ufsc.ine.leb.roza.core.modern.measurement.JplagMeasurementConfiguration;
+import br.ufsc.ine.leb.roza.core.modern.measurement.JplagTestCaseSimilarityMeasurer;
 import br.ufsc.ine.leb.roza.core.modern.measurement.LccssTestCaseSimilarityMeasurer;
 import br.ufsc.ine.leb.roza.core.modern.measurement.LcsTestCaseSimilarityMeasurer;
+import br.ufsc.ine.leb.roza.core.modern.measurement.SimianMeasurementConfiguration;
+import br.ufsc.ine.leb.roza.core.modern.measurement.SimianTestCaseSimilarityMeasurer;
 import br.ufsc.ine.leb.roza.core.modern.measurement.TestCaseSimilarityMatrix;
 import br.ufsc.ine.leb.roza.core.modern.measurement.TestCaseSimilarityMeasurer;
 import br.ufsc.ine.leb.roza.core.modern.parsing.CodeStatement;
@@ -77,6 +81,8 @@ public final class ModernRozaUi extends Application {
 	private final TextField deckardMinTokensInput;
 	private final TextField deckardStrideInput;
 	private final TextField deckardSimilarityInput;
+	private final TextField jplagSensitivityInput;
+	private final TextField simianThresholdInput;
 	private final ComboBox<TestCase> sourceTestCombo;
 	private final ComboBox<TestCase> targetTestCombo;
 	private Path sourceFolder;
@@ -122,13 +128,17 @@ public final class ModernRozaUi extends Application {
 		metricCombo.getItems().add("LCCSS");
 		metricCombo.getItems().add("LCS");
 		metricCombo.getItems().add("Deckard");
+		metricCombo.getItems().add("JPlag");
+		metricCombo.getItems().add("Simian");
 		metricCombo.getSelectionModel().selectFirst();
 		metricCombo.setStyle(singleLineComboBoxStyle());
 		metricCombo.valueProperty().addListener((observable, previous, selected) -> renderConfigurationSidebar());
 
-		deckardMinTokensInput = deckardConfigurationInput(String.valueOf(DeckardMeasurementConfiguration.DEFAULT_MIN_TOKENS));
-		deckardStrideInput = deckardConfigurationInput(String.valueOf(DeckardMeasurementConfiguration.DEFAULT_STRIDE));
-		deckardSimilarityInput = deckardConfigurationInput(String.valueOf(DeckardMeasurementConfiguration.DEFAULT_SIMILARITY));
+		deckardMinTokensInput = metricConfigurationInput(String.valueOf(DeckardMeasurementConfiguration.DEFAULT_MIN_TOKENS));
+		deckardStrideInput = metricConfigurationInput(String.valueOf(DeckardMeasurementConfiguration.DEFAULT_STRIDE));
+		deckardSimilarityInput = metricConfigurationInput(String.valueOf(DeckardMeasurementConfiguration.DEFAULT_SIMILARITY));
+		jplagSensitivityInput = metricConfigurationInput(String.valueOf(JplagMeasurementConfiguration.DEFAULT_SENSITIVITY));
+		simianThresholdInput = metricConfigurationInput(String.valueOf(SimianMeasurementConfiguration.DEFAULT_THRESHOLD));
 
 		sourceTestCombo = testCaseComboBox();
 		targetTestCombo = testCaseComboBox();
@@ -326,6 +336,16 @@ public final class ModernRozaUi extends Application {
 					configurationInput("Similarity", deckardSimilarityInput));
 			configuration.getChildren().add(deckardFields);
 		}
+		if ("JPlag".equals(metricCombo.getSelectionModel().getSelectedItem())) {
+			VBox jplagFields = new VBox(CONFIGURATION_GROUP_VERTICAL_GAP);
+			jplagFields.getChildren().add(configurationInput("Sensitivity", jplagSensitivityInput));
+			configuration.getChildren().add(jplagFields);
+		}
+		if ("Simian".equals(metricCombo.getSelectionModel().getSelectedItem())) {
+			VBox simianFields = new VBox(CONFIGURATION_GROUP_VERTICAL_GAP);
+			simianFields.getChildren().add(configurationInput("Threshold", simianThresholdInput));
+			configuration.getChildren().add(simianFields);
+		}
 		return configuration;
 	}
 
@@ -363,7 +383,7 @@ public final class ModernRozaUi extends Application {
 		return comboBox;
 	}
 
-	private TextField deckardConfigurationInput(String defaultValue) {
+	private TextField metricConfigurationInput(String defaultValue) {
 		TextField input = new TextField(defaultValue);
 		input.setStyle(singleLineComboBoxStyle());
 		input.setMaxWidth(Double.MAX_VALUE);
@@ -595,6 +615,12 @@ public final class ModernRozaUi extends Application {
 		if ("Deckard".equals(metricCombo.getSelectionModel().getSelectedItem())) {
 			return new DeckardTestCaseSimilarityMeasurer(deckardConfiguration());
 		}
+		if ("JPlag".equals(metricCombo.getSelectionModel().getSelectedItem())) {
+			return new JplagTestCaseSimilarityMeasurer(jplagConfiguration());
+		}
+		if ("Simian".equals(metricCombo.getSelectionModel().getSelectedItem())) {
+			return new SimianTestCaseSimilarityMeasurer(simianConfiguration());
+		}
 		if ("LCS".equals(metricCombo.getSelectionModel().getSelectedItem())) {
 			return new LcsTestCaseSimilarityMeasurer();
 		}
@@ -609,6 +635,22 @@ public final class ModernRozaUi extends Application {
 					Double.parseDouble(deckardSimilarityInput.getText().trim()));
 		} catch (NumberFormatException exception) {
 			throw new IllegalArgumentException("Deckard configuration values must be numeric.", exception);
+		}
+	}
+
+	private JplagMeasurementConfiguration jplagConfiguration() {
+		try {
+			return new JplagMeasurementConfiguration(Integer.parseInt(jplagSensitivityInput.getText().trim()));
+		} catch (NumberFormatException exception) {
+			throw new IllegalArgumentException("JPlag sensitivity must be numeric.", exception);
+		}
+	}
+
+	private SimianMeasurementConfiguration simianConfiguration() {
+		try {
+			return new SimianMeasurementConfiguration(Integer.parseInt(simianThresholdInput.getText().trim()));
+		} catch (NumberFormatException exception) {
+			throw new IllegalArgumentException("Simian threshold must be numeric.", exception);
 		}
 	}
 

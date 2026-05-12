@@ -223,6 +223,20 @@ Acceptance criteria:
 - AC-226: Deckard clone-report parsing pairs entries in the same cluster only when `NODE_KIND`, `TBID`, and `TEID` match, avoiding the legacy Cartesian interpretation of every cluster entry.
 - AC-227: Deckard score is asymmetric: merged covered source projected lines divided by the source projected line count.
 - AC-228: Deckard score calculation ignores wrapper lines introduced only for Deckard materialization.
+- AC-232: JPlag measurement exposes a `sensitivity` configuration value with default `1`.
+- AC-233: JPlag configuration rejects non-positive `sensitivity` values.
+- AC-234: JPlag measurement uses the same pre-assertion projection as LCCSS, LCS, and Deckard, stopping at the first `CodeStatement.isAssertion()` statement.
+- AC-235: JPlag measurement materializes each projected test case as an isolated Java source file and invokes the existing JPlag external-tool jar.
+- AC-236: JPlag report parsing reads `match[0-9]+-top.html` reports from the JPlag results directory.
+- AC-237: JPlag report parsing extracts source and target materialized file names plus their directional percentages from the first report table header.
+- AC-238: JPlag scores are the parsed directional percentages converted to `double` values between `0.0` and `1.0`.
+- AC-242: Simian measurement exposes a `threshold` configuration value with default `6`.
+- AC-243: Simian configuration rejects `threshold` values smaller than `2`.
+- AC-244: Simian measurement uses the same pre-assertion projection as LCCSS, LCS, Deckard, and JPlag, stopping at the first `CodeStatement.isAssertion()` statement.
+- AC-245: Simian measurement materializes each projected test case as an isolated Java source file and invokes the existing Simian external-tool jar.
+- AC-246: Simian report parsing reads the XML report emitted by Simian, ignoring the textual preamble before the XML declaration.
+- AC-247: Simian report parsing converts `<block>` entries inside each clone `<set>` into directed clone fragments between materialized files.
+- AC-248: Simian score is asymmetric: merged covered source projected lines divided by the source projected line count.
 - AC-152: The first `TestCaseSimilarityMatrix` constructor receives only the ordered list of `TestCase` instances.
 - AC-153: The first `TestCaseSimilarityMatrix` stores similarities as a dense directed matrix and must not assume similarity metrics are symmetric.
 - AC-154: The first `TestCaseSimilarityMatrix` initializes every similarity with `0.0` except the diagonal, which starts with `1.0`.
@@ -356,6 +370,12 @@ Acceptance criteria:
 - AC-229: The modern UI `Measurement` metric dropdown exposes `Deckard` as an option.
 - AC-230: When `Deckard` is selected in the modern UI, the `Measurement` configuration shows `MIN_TOKENS`, `STRIDE`, and `SIMILARITY` inputs with Deckard defaults.
 - AC-231: Triggering `Measure` with `Deckard` selected uses the configured Deckard measurer and then reuses the existing `Clustering` ranked-pair view.
+- AC-239: The modern UI `Measurement` metric dropdown exposes `JPlag` as an option.
+- AC-240: When `JPlag` is selected in the modern UI, the `Measurement` configuration shows a `Sensitivity` input with JPlag's default.
+- AC-241: Triggering `Measure` with `JPlag` selected uses the configured JPlag measurer and then reuses the existing `Clustering` ranked-pair view.
+- AC-249: The modern UI `Measurement` metric dropdown exposes `Simian` as an option.
+- AC-250: When `Simian` is selected in the modern UI, the `Measurement` configuration shows a `Threshold` input with Simian's default.
+- AC-251: Triggering `Measure` with `Simian` selected uses the configured Simian measurer and then reuses the existing `Clustering` ranked-pair view.
 
 ### NFR-004: Minimal Code Comments
 
@@ -635,3 +655,5 @@ The first measurement implementation fills a dense directed matrix by source and
 - 2026-05-11: Shortened the modern UI `Clustering` ranked-order button text.
 - 2026-05-11: Added modern LCS measurement and exposed it in the modern UI metric dropdown.
 - 2026-05-11: Validated Deckard execution through the existing Docker script and added modern Deckard configuration, report parsing, scoring, and UI selection requirements.
+- 2026-05-11: Validated JPlag execution through the existing jar and added modern JPlag sensitivity, HTML report parsing, directional scoring, and UI selection requirements.
+- 2026-05-11: Validated Simian execution through the existing jar and added modern Simian threshold, XML report parsing, asymmetric line-coverage scoring, and UI selection requirements.
