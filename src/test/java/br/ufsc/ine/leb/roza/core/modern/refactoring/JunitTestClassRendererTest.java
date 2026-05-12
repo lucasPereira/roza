@@ -58,6 +58,36 @@ class JunitTestClassRendererTest {
 				rendered);
 	}
 
+	@Test
+	void shouldRenderThrownExceptions() {
+		TestClass testClass = new TestClass(
+				"TestClass1",
+				List.of(),
+				null,
+				List.of(),
+				List.of(new FixtureMethod(FixtureKind.BEFORE, "setup", List.of(annotation("Before")), List.of("UnknownHostException"), block("localHost = InetAddress.getLocalHost();"))),
+				List.of(),
+				List.of(new TestMethod("alpha", List.of(annotation("Test")), List.of("IOException", "InterruptedException"), block("assertTrue(true);"))));
+
+		String rendered = new JunitTestClassRenderer().render(testClass);
+
+		assertEquals(String.join(
+				"\n",
+				"public class TestClass1 {",
+				"\t@Before",
+				"\tpublic void setup() throws UnknownHostException {",
+				"\t\tlocalHost = InetAddress.getLocalHost();",
+				"\t}",
+				"",
+				"\t@Test",
+				"\tpublic void alpha() throws IOException, InterruptedException {",
+				"\t\tassertTrue(true);",
+				"\t}",
+				"",
+				"}"),
+				rendered);
+	}
+
 	private CodeAnnotation annotation(String name) {
 		return new CodeAnnotation(name, "@" + name);
 	}

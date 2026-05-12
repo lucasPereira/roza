@@ -66,6 +66,31 @@ class ImplicitSetupTestClassRefactorerTest {
 	}
 
 	@Test
+	void shouldMoveArrayDeclarationsToSetupWithExplicitArrayCreation() {
+		TestClass source = source("Example", junit4Imports(), setup("Before", "@Before", "import org.junit.Before;"));
+		TestCase first = testCase(0, "alpha", source, testAnnotation("Test", "@Test"), statement("String[] values = { \"a\", \"b\" };"), assertion("assertEquals(\"a\", values[0]);"));
+		TestCase second = testCase(1, "beta", source, testAnnotation("Test", "@Test"), statement("String[] values = { \"a\", \"b\" };"), assertion("assertEquals(\"b\", values[1]);"));
+
+		TestClass generated = refactor(first, second).testClasses().get(0);
+
+		assertEquals(List.of("private String[] values;"), fields(generated));
+		assertEquals(List.of("values = new String[] { \"a\", \"b\" };"), statements(generated.fixtures().get(0)));
+	}
+
+	@Test
+	void shouldPreserveThrownExceptionsInGeneratedSetupAndTests() {
+		TestClass source = source("Example", junit4Imports(), setup("Before", "@Before", "import org.junit.Before;"));
+		TestCase first = testCase(0, "alpha", source, testAnnotation("Test", "@Test"), List.of("UnknownHostException"), statement("InetAddress localHost = InetAddress.getLocalHost();"), assertion("assertEquals(\"127.0.0.1\", localHost.getHostAddress());"));
+		TestCase second = testCase(1, "beta", source, testAnnotation("Test", "@Test"), List.of("UnknownHostException"), statement("InetAddress localHost = InetAddress.getLocalHost();"), assertion("assertEquals(\"localhost\", localHost.getHostName());"));
+
+		TestClass generated = refactor(first, second).testClasses().get(0);
+
+		assertEquals(List.of("UnknownHostException"), generated.fixtures().get(0).thrownExceptions());
+		assertEquals(List.of("UnknownHostException"), generated.testMethods().get(0).thrownExceptions());
+		assertEquals(List.of("UnknownHostException"), generated.testMethods().get(1).thrownExceptions());
+	}
+
+	@Test
 	void shouldProduceStableClassNamesForMultipleClusters() {
 		TestClass source = source("Example", junit4Imports(), setup("Before", "@Before", "import org.junit.Before;"));
 		TestCase first = testCase(0, "alpha", source, testAnnotation("Test", "@Test"), assertion("assertTrue(true);"));
@@ -125,6 +150,10 @@ class ImplicitSetupTestClassRefactorerTest {
 
 	private TestCase testCase(int index, String name, TestClass source, CodeAnnotation annotation, CodeStatement... statements) {
 		return new TestCase(name, new CodeBlock(List.of(statements)), source, List.of(annotation));
+	}
+
+	private TestCase testCase(int index, String name, TestClass source, CodeAnnotation annotation, List<String> thrownExceptions, CodeStatement... statements) {
+		return new TestCase(name, new CodeBlock(List.of(statements)), source, List.of(annotation), thrownExceptions);
 	}
 
 	private TestClass source(String name, List<String> imports, SetupAnnotation setupAnnotation) {

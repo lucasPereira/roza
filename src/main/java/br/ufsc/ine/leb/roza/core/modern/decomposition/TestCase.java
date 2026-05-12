@@ -14,16 +14,22 @@ public final class TestCase {
 	private final CodeBlock body;
 	private final TestClass sourceTestClass;
 	private final List<CodeAnnotation> annotations;
+	private final List<String> thrownExceptions;
 
 	public TestCase(String name, CodeBlock body) {
 		this(name, body, null, List.of());
 	}
 
 	public TestCase(String name, CodeBlock body, TestClass sourceTestClass, List<CodeAnnotation> annotations) {
+		this(name, body, sourceTestClass, annotations, List.of());
+	}
+
+	public TestCase(String name, CodeBlock body, TestClass sourceTestClass, List<CodeAnnotation> annotations, List<String> thrownExceptions) {
 		this.name = Objects.requireNonNull(name);
 		this.body = Objects.requireNonNull(body);
 		this.sourceTestClass = sourceTestClass;
 		this.annotations = List.copyOf(Objects.requireNonNull(annotations));
+		this.thrownExceptions = List.copyOf(Objects.requireNonNull(thrownExceptions));
 	}
 
 	public String name() {
@@ -40,5 +46,9 @@ public final class TestCase {
 
 	public List<CodeAnnotation> annotations() {
 		return annotations;
+	}
+
+	public List<String> thrownExceptions() {
+		return thrownExceptions;
 	}
 }

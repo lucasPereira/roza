@@ -1,6 +1,7 @@
 package br.ufsc.ine.leb.roza.core.modern.decomposition;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -79,7 +80,18 @@ public final class DefaultTestCaseDecomposer implements TestCaseDecomposer {
 			}
 		}
 		statements.addAll(testMethod.body().statements());
-		return new TestCase(testMethod.name(), new CodeBlock(statements), testClass, testMethod.annotations());
+		return new TestCase(testMethod.name(), new CodeBlock(statements), testClass, testMethod.annotations(), thrownExceptions(testClass, testMethod));
+	}
+
+	private List<String> thrownExceptions(TestClass testClass, TestMethod testMethod) {
+		Set<String> thrownExceptions = new LinkedHashSet<>();
+		testClass.fixtures()
+				.stream()
+				.filter(fixture -> fixture.kind() == FixtureKind.BEFORE)
+				.map(FixtureMethod::thrownExceptions)
+				.forEach(thrownExceptions::addAll);
+		thrownExceptions.addAll(testMethod.thrownExceptions());
+		return List.copyOf(thrownExceptions);
 	}
 
 	private List<CodeStatement> beforeStatements(TestClass testClass) {

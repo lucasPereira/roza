@@ -157,7 +157,7 @@ public final class JunitTestClassParser implements TestClassParser {
 	}
 
 	private FixtureMethod extractFixture(MethodDeclaration parsedMethod) {
-		return new FixtureMethod(fixtureKind(parsedMethod), parsedMethod.getNameAsString(), annotations(parsedMethod.getAnnotations()), body(parsedMethod));
+		return new FixtureMethod(fixtureKind(parsedMethod), parsedMethod.getNameAsString(), annotations(parsedMethod.getAnnotations()), thrownExceptions(parsedMethod), body(parsedMethod));
 	}
 
 	private FixtureKind fixtureKind(MethodDeclaration parsedMethod) {
@@ -178,7 +178,11 @@ public final class JunitTestClassParser implements TestClassParser {
 	}
 
 	private TestMethod extractTestMethod(MethodDeclaration parsedMethod) {
-		return new TestMethod(parsedMethod.getNameAsString(), annotations(parsedMethod.getAnnotations()), body(parsedMethod));
+		return new TestMethod(parsedMethod.getNameAsString(), annotations(parsedMethod.getAnnotations()), thrownExceptions(parsedMethod), body(parsedMethod));
+	}
+
+	private List<String> thrownExceptions(MethodDeclaration parsedMethod) {
+		return parsedMethod.getThrownExceptions().stream().map(Object::toString).collect(Collectors.toList());
 	}
 
 	private CodeBlock body(MethodDeclaration parsedMethod) {

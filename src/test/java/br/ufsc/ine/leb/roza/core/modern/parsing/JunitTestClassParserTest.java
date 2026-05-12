@@ -63,6 +63,15 @@ class JunitTestClassParserTest {
 	}
 
 	@Test
+	void shouldParseThrownExceptionsFromFixturesAndTests() {
+		ParsedTestClasses parsed = parse("import org.junit.Before; import org.junit.Test; class Example { @Before public void setup() throws IOException { prepare(); } @Test public void test() throws IOException, InterruptedException { assertTrue(true); } }");
+
+		TestClass testClass = parsed.testClasses().get(0);
+		assertEquals(List.of("IOException"), testClass.fixtures().get(0).thrownExceptions());
+		assertEquals(List.of("IOException", "InterruptedException"), testClass.testMethods().get(0).thrownExceptions());
+	}
+
+	@Test
 	void shouldInferJunit4SetupAnnotationFromJunit4TestImportWhenFixtureIsMissing() {
 		ParsedTestClasses parsed = parse("import org.junit.Test; class Example { @Test public void test() { assertTrue(true); } }");
 

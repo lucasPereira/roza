@@ -71,9 +71,15 @@ public final class ImplicitSetupTestClassRefactorer implements TestClassRefactor
 		boolean hasSetup = !setup.statements().isEmpty();
 		List<FixtureMethod> fixtures = !hasSetup
 				? List.of()
-				: List.of(new FixtureMethod(FixtureKind.BEFORE, "setup", List.of(setupAnnotation.annotation()), new CodeBlock(setup.statements())));
+				: List.of(new FixtureMethod(FixtureKind.BEFORE, "setup", List.of(setupAnnotation.annotation()), setupThrownExceptions(testCases), new CodeBlock(setup.statements())));
 		List<TestMethod> testMethods = testMethods(testCases, sharedPrefixSize);
 		return new TestClass(className, packageName.orElse(null), imports(testCases, hasSetup ? Optional.of(setupAnnotation) : Optional.empty()), hasSetup ? setupAnnotation : null, setup.fields(), fixtures, List.<HelperMethod>of(), testMethods);
+	}
+
+	private List<String> setupThrownExceptions(List<TestCase> testCases) {
+		Set<String> thrownExceptions = new LinkedHashSet<>();
+		testCases.stream().map(TestCase::thrownExceptions).forEach(thrownExceptions::addAll);
+		return List.copyOf(thrownExceptions);
 	}
 
 	private int commonNonAssertionPrefixSize(List<TestCase> testCases) {
@@ -117,7 +123,7 @@ public final class ImplicitSetupTestClassRefactorer implements TestClassRefactor
 					VariableDeclarator variable = declaration.get().getVariable(index);
 					fields.add(new Field(List.of("private"), variable.getType().asString(), variable.getNameAsString(), Optional.empty()));
 					variable.getInitializer()
-							.map(initializer -> variable.getNameAsString() + " = " + initializer + ";")
+							.map(initializer -> setupAssignment(variable, initializer.toString()))
 							.map(text -> new CodeStatement(text, text))
 							.ifPresent(statements::add);
 				}
@@ -126,6 +132,13 @@ public final class ImplicitSetupTestClassRefactorer implements TestClassRefactor
 			}
 		}
 		return new SetupExtraction(fields, statements);
+	}
+
+	private String setupAssignment(VariableDeclarator variable, String initializer) {
+		if (variable.getType().isArrayType() && initializer.startsWith("{")) {
+			return variable.getNameAsString() + " = new " + variable.getType().asString() + " " + initializer + ";";
+		}
+		return variable.getNameAsString() + " = " + initializer + ";";
 	}
 
 	private Optional<VariableDeclarationExpr> variableDeclaration(CodeStatement statement) {
@@ -174,7 +187,7 @@ public final class ImplicitSetupTestClassRefactorer implements TestClassRefactor
 
 	private TestMethod testMethod(TestCase testCase, int sharedPrefixSize, String methodName) {
 		List<CodeStatement> statements = testCase.body().statements().subList(sharedPrefixSize, testCase.body().statements().size());
-		return new TestMethod(methodName, testCase.annotations(), new CodeBlock(statements));
+		return new TestMethod(methodName, testCase.annotations(), testCase.thrownExceptions(), new CodeBlock(statements));
 	}
 
 	private Optional<String> packageName(List<TestCase> testCases) {

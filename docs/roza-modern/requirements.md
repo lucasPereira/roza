@@ -189,6 +189,7 @@ Acceptance criteria:
 - AC-140: `TestCase` preserves the original parsed test method name so refactoring can use it later, even when names are duplicated.
 - AC-141: `TestCase` preserves a reference to its source `TestClass` so refactoring can reuse original imports and setup-annotation decisions.
 - AC-273: `TestCase` preserves the original parsed test method annotations so generated test methods can keep their original JUnit style.
+- AC-299: `TestCase` preserves thrown exceptions from supported source fixture and test methods so refactoring can render compilable generated setup and test methods.
 - AC-144: The default decomposition implementation preserves assertions in the decomposed `TestCase` body.
 - AC-145: The default decomposition implementation orders the decomposed body as field declarations that are not initialized in supported `@Before` fixtures, supported `@Before` statements, then original test body statements.
 - AC-215: When a supported `@Before` fixture assigns to a parsed field, the default decomposition implementation turns that assignment into a local variable declaration with initialization at the assignment position.
@@ -306,6 +307,8 @@ Acceptance criteria:
 - AC-279: `ImplicitSetupTestClassRefactorer` leaves assertion calls unchanged and never moves assertion statements into setup.
 - AC-280: If clustered tests disagree on setup annotation, `ImplicitSetupTestClassRefactorer` prefers the JUnit 5 setup annotation already determined by parsing/decomposition.
 - AC-281: Refactoring output remains structured `TestClass` models; source-code rendering is a separate concern.
+- AC-300: When a local array declaration is moved into setup, `ImplicitSetupTestClassRefactorer` renders the setup assignment with explicit array creation, such as `values = new String[] { "a" };`.
+- AC-301: `ImplicitSetupTestClassRefactorer` preserves decomposed thrown exceptions on generated setup and test methods.
 - AC-292: `ImplicitSetupTestClassRefactorer` exposes an implicit-setup package policy configuration.
 - AC-293: The default implicit-setup package policy materializes generated test classes in Java's default package.
 - AC-294: `ImplicitSetupTestClassRefactorer` makes generated test method names unique inside each generated class.
@@ -531,6 +534,7 @@ public final class TestCase {
 	public CodeBlock body();
 	public Optional<TestClass> sourceTestClass();
 	public List<CodeAnnotation> annotations();
+	public List<String> thrownExceptions();
 }
 ```
 

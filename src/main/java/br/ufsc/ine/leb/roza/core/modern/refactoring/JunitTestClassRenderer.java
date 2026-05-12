@@ -49,21 +49,22 @@ public final class JunitTestClassRenderer {
 
 	private void addFixtures(List<String> lines, List<FixtureMethod> fixtures) {
 		for (FixtureMethod fixture : fixtures) {
-			addMethod(lines, fixture.annotations(), fixture.name(), fixture.body().statements());
+			addMethod(lines, fixture.annotations(), fixture.name(), fixture.thrownExceptions(), fixture.body().statements());
 		}
 	}
 
 	private void addTestMethods(List<String> lines, List<TestMethod> testMethods) {
 		for (TestMethod testMethod : testMethods) {
-			addMethod(lines, testMethod.annotations(), testMethod.name(), testMethod.body().statements());
+			addMethod(lines, testMethod.annotations(), testMethod.name(), testMethod.thrownExceptions(), testMethod.body().statements());
 		}
 	}
 
-	private void addMethod(List<String> lines, List<CodeAnnotation> annotations, String name, List<CodeStatement> statements) {
+	private void addMethod(List<String> lines, List<CodeAnnotation> annotations, String name, List<String> thrownExceptions, List<CodeStatement> statements) {
 		for (CodeAnnotation annotation : annotations) {
 			lines.add("\t" + annotation.text());
 		}
-		lines.add("\tpublic void " + name + "() {");
+		String throwsClause = thrownExceptions.isEmpty() ? "" : " throws " + String.join(", ", thrownExceptions);
+		lines.add("\tpublic void " + name + "()" + throwsClause + " {");
 		lines.addAll(statements.stream().map(statement -> "\t\t" + statement.normalizedText()).collect(Collectors.toList()));
 		lines.add("\t}");
 		lines.add("");
