@@ -86,7 +86,11 @@ public final class JunitTestClassParser implements TestClassParser {
 		List<FixtureMethod> fixtures = parsedClass.getMethods().stream().filter(this::isFixtureMethod).map(this::extractFixture).collect(Collectors.toList());
 		List<HelperMethod> helperMethods = parsedClass.getMethods().stream().filter(method -> !isTestMethod(method)).filter(method -> !isFixtureMethod(method)).map(this::extractHelper).collect(Collectors.toList());
 		List<TestMethod> testMethods = parsedClass.getMethods().stream().filter(this::isTestMethod).map(this::extractTestMethod).collect(Collectors.toList());
-		return new TestClass(parsedClass.getNameAsString(), imports, setupAnnotation(imports, fixtures, testMethods), fields, fixtures, helperMethods, testMethods);
+		return new TestClass(parsedClass.getNameAsString(), packageName(unit).orElse(null), imports, setupAnnotation(imports, fixtures, testMethods), fields, fixtures, helperMethods, testMethods);
+	}
+
+	private Optional<String> packageName(CompilationUnit unit) {
+		return unit.getPackageDeclaration().map(declaration -> declaration.getNameAsString());
 	}
 
 	private List<String> imports(CompilationUnit unit) {

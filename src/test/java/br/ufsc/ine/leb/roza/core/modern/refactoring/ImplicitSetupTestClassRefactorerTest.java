@@ -29,6 +29,7 @@ class ImplicitSetupTestClassRefactorerTest {
 		TestClass generated = refactor(first, second).testClasses().get(0);
 
 		assertEquals("TestClass1", generated.name());
+		assertEquals(Optional.empty(), generated.packageName());
 		assertEquals(List.of("private Sut sut;"), fields(generated));
 		assertEquals(List.of("@Before"), annotations(generated.fixtures().get(0).annotations()));
 		assertEquals(List.of("sut = new Sut();", "sut.save(1);"), statements(generated.fixtures().get(0)));
@@ -77,8 +78,49 @@ class ImplicitSetupTestClassRefactorerTest {
 		assertEquals(List.of("TestClass1", "TestClass2"), refactored.testClasses().stream().map(TestClass::name).collect(Collectors.toList()));
 	}
 
+	@Test
+	void shouldMakeDuplicateGeneratedTestMethodNamesUnique() {
+		TestClass alphaSource = source("AlphaTest", junit4Imports(), setup("Before", "@Before", "import org.junit.Before;"));
+		TestClass betaSource = source("BetaTest", junit4Imports(), setup("Before", "@Before", "import org.junit.Before;"));
+		TestCase first = testCase(0, "testDistance", alphaSource, testAnnotation("Test", "@Test"), assertion("assertTrue(true);"));
+		TestCase second = testCase(1, "testDistance", betaSource, testAnnotation("Test", "@Test"), assertion("assertTrue(false);"));
+
+		TestClass generated = refactor(first, second).testClasses().get(0);
+
+		assertEquals(List.of("testDistance", "betaTestTestDistance"), generated.testMethods().stream().map(br.ufsc.ine.leb.roza.core.modern.parsing.TestMethod::name).collect(Collectors.toList()));
+	}
+
+	@Test
+	void shouldUseSourcePackageWhenPackagePartitioningIsSelected() {
+		TestClass source = source("Example", junit4Imports(), setup("Before", "@Before", "import org.junit.Before;"));
+		TestCase first = testCase(0, "alpha", source, testAnnotation("Test", "@Test"), assertion("assertTrue(true);"));
+		TestCase second = testCase(1, "beta", source, testAnnotation("Test", "@Test"), assertion("assertTrue(false);"));
+
+		TestClass generated = refactor(ImplicitSetupPackagePolicy.PACKAGE_PARTITIONING, first, second).testClasses().get(0);
+
+		assertEquals("example.tests", generated.packageName().orElseThrow());
+	}
+
+	@Test
+	void shouldSplitMixedPackageClustersWhenPackagePartitioningIsSelected() {
+		TestClass firstSource = source("FirstTest", "first.package", junit4Imports(), setup("Before", "@Before", "import org.junit.Before;"));
+		TestClass secondSource = source("SecondTest", "second.package", junit4Imports(), setup("Before", "@Before", "import org.junit.Before;"));
+		TestCase first = testCase(0, "alpha", firstSource, testAnnotation("Test", "@Test"), assertion("assertTrue(true);"));
+		TestCase second = testCase(1, "beta", secondSource, testAnnotation("Test", "@Test"), assertion("assertTrue(false);"));
+
+		RefactoredTestClasses refactored = refactor(ImplicitSetupPackagePolicy.PACKAGE_PARTITIONING, first, second);
+
+		assertEquals(List.of("TestClass1", "TestClass2"), refactored.testClasses().stream().map(TestClass::name).collect(Collectors.toList()));
+		assertEquals("first.package", refactored.testClasses().get(0).packageName().orElseThrow());
+		assertEquals("second.package", refactored.testClasses().get(1).packageName().orElseThrow());
+	}
+
 	private RefactoredTestClasses refactor(TestCase first, TestCase second) {
 		return new ImplicitSetupTestClassRefactorer().refactor(new TestCaseClusters(List.of(new TestCaseCluster(0, first).merge(new TestCaseCluster(1, second)))));
+	}
+
+	private RefactoredTestClasses refactor(ImplicitSetupPackagePolicy packagePolicy, TestCase first, TestCase second) {
+		return new ImplicitSetupTestClassRefactorer(packagePolicy).refactor(new TestCaseClusters(List.of(new TestCaseCluster(0, first).merge(new TestCaseCluster(1, second)))));
 	}
 
 	private TestCase testCase(int index, String name, TestClass source, CodeAnnotation annotation, CodeStatement... statements) {
@@ -86,7 +128,11 @@ class ImplicitSetupTestClassRefactorerTest {
 	}
 
 	private TestClass source(String name, List<String> imports, SetupAnnotation setupAnnotation) {
-		return new TestClass(name, imports, setupAnnotation, List.of(), List.<FixtureMethod>of(), List.of(), List.of());
+		return source(name, "example.tests", imports, setupAnnotation);
+	}
+
+	private TestClass source(String name, String packageName, List<String> imports, SetupAnnotation setupAnnotation) {
+		return new TestClass(name, packageName, imports, setupAnnotation, List.of(), List.<FixtureMethod>of(), List.of(), List.of());
 	}
 
 	private List<String> junit4Imports() {

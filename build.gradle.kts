@@ -77,14 +77,14 @@ tasks.test {
 
 tasks.register<JavaExec>("runLegacyRozaUi") {
     group = "application"
-    description = "Runs the legacy Roza UI."
+    description = "Runs the legacy Róża UI."
     classpath = sourceSets.main.get().runtimeClasspath
     mainClass.set("br.ufsc.ine.leb.roza.ui.legacy.LegacyRozaUi")
 }
 
 tasks.register<JavaExec>("runModernRozaUi") {
     group = "application"
-    description = "Runs the modern Roza UI."
+    description = "Runs the modern Róża UI."
     classpath = sourceSets.main.get().runtimeClasspath
     mainClass.set("br.ufsc.ine.leb.roza.ui.modern.ModernRozaUi")
     jvmArgs(

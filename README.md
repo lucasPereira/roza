@@ -1,6 +1,6 @@
-# Roza
+# Róża
 
-## Running modern Roza UI
+## Running modern Róża UI
 
 From the project root, run:
 
@@ -8,7 +8,7 @@ From the project root, run:
 ./gradlew runModernRozaUi
 ```
 
-## Running legacy Roza UI
+## Running legacy Róża UI
 
 From the project root, run:
 
@@ -35,7 +35,7 @@ Run an experiment with its Gradle task:
 
 ## Deckard
 
-To use Deckard in Roza or run the Deckard-related tests, install it first:
+To use Deckard in Róża or run the Deckard-related tests, install it first:
 
 ```sh
 cd external-tools/deckard

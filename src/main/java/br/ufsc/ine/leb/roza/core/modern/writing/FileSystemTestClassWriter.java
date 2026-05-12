@@ -23,10 +23,20 @@ public final class FileSystemTestClassWriter implements TestClassWriter {
 		try {
 			Files.createDirectories(outputFolder);
 			for (TestClass testClass : testClasses.testClasses()) {
-				Files.writeString(outputFolder.resolve(testClass.name() + ".java"), renderer.render(testClass));
+				Path testClassFile = testClassFile(testClass);
+				Files.createDirectories(testClassFile.getParent());
+				Files.writeString(testClassFile, renderer.render(testClass));
 			}
 		} catch (IOException exception) {
 			throw new IllegalStateException("Could not write refactored test classes.", exception);
 		}
+	}
+
+	private Path testClassFile(TestClass testClass) {
+		Path packageFolder = testClass.packageName()
+				.map(packageName -> packageName.replace('.', '/'))
+				.map(outputFolder::resolve)
+				.orElse(outputFolder);
+		return packageFolder.resolve(testClass.name() + ".java");
 	}
 }

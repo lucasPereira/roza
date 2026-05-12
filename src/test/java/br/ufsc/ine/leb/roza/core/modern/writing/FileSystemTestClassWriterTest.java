@@ -29,6 +29,7 @@ class FileSystemTestClassWriterTest {
 	void shouldWriteRefactoredTestClassesToOutputFolder() throws IOException {
 		TestClass testClass = new TestClass(
 				"GeneratedTest",
+				"example.tests",
 				List.of("import org.junit.Test;"),
 				null,
 				List.of(),
@@ -39,10 +40,12 @@ class FileSystemTestClassWriterTest {
 
 		new FileSystemTestClassWriter(outputFolder).write(new RefactoredTestClasses(List.of(testClass)));
 
-		Path writtenFile = outputFolder.resolve("GeneratedTest.java");
+		Path writtenFile = outputFolder.resolve("example/tests/GeneratedTest.java");
 		assertTrue(Files.exists(writtenFile));
 		assertEquals(String.join(
 				"\n",
+				"package example.tests;",
+				"",
 				"import org.junit.Test;",
 				"",
 				"public class GeneratedTest {",

@@ -24,6 +24,7 @@ class JunitTestClassRendererTest {
 	void shouldRenderRefactoredTestClassAsJavaCode() {
 		TestClass testClass = new TestClass(
 				"TestClass1",
+				"example.tests",
 				List.of("import org.junit.Before;", "import org.junit.Test;"),
 				new SetupAnnotation(annotation("Before"), Optional.of("import org.junit.Before;")),
 				List.of(new Field(List.of("private"), "Sut", "sut", Optional.empty())),
@@ -35,6 +36,8 @@ class JunitTestClassRendererTest {
 
 		assertEquals(String.join(
 				"\n",
+				"package example.tests;",
+				"",
 				"import org.junit.Before;",
 				"import org.junit.Test;",
 				"",

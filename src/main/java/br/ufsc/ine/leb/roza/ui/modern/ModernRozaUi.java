@@ -5,9 +5,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -56,6 +58,7 @@ import br.ufsc.ine.leb.roza.core.modern.parsing.TestClassParser;
 import br.ufsc.ine.leb.roza.core.modern.parsing.TestCodeViolation;
 import br.ufsc.ine.leb.roza.core.modern.parsing.UnsupportedFeatureException;
 import br.ufsc.ine.leb.roza.core.modern.parsing.ViolationScope;
+import br.ufsc.ine.leb.roza.core.modern.refactoring.ImplicitSetupPackagePolicy;
 import br.ufsc.ine.leb.roza.core.modern.refactoring.ImplicitSetupTestClassRefactorer;
 import br.ufsc.ine.leb.roza.core.modern.refactoring.JunitTestClassRenderer;
 import br.ufsc.ine.leb.roza.core.modern.refactoring.RefactoredTestClasses;
@@ -138,6 +141,7 @@ public final class ModernRozaUi extends Application {
 	private final CheckBox minimumSharedPrefixStopEnabled;
 	private final TextField minimumSharedPrefixStopInput;
 	private final List<MergeTieBreakerKind> selectedTieBreakerKinds;
+	private final ComboBox<ImplicitSetupPackagePolicy> implicitSetupPackagePolicyCombo;
 	private Path sourceFolder;
 	private LoadedCodeFiles loadedCodeFiles;
 	private CodeFile selectedCodeFile;
@@ -228,6 +232,7 @@ public final class ModernRozaUi extends Application {
 		minimumSharedPrefixStopEnabled = new CheckBox("Minimum shared prefix threshold");
 		minimumSharedPrefixStopInput = metricConfigurationInput("0");
 		selectedTieBreakerKinds = new ArrayList<>();
+		implicitSetupPackagePolicyCombo = implicitSetupPackagePolicyComboBox();
 
 		sourceFolder = defaultSourceFolder();
 		outputFolder = defaultOutputFolder();
@@ -273,7 +278,7 @@ public final class ModernRozaUi extends Application {
 
 		render();
 
-		stage.setTitle("Modern Roza UI");
+		stage.setTitle("Modern Róża UI");
 		stage.setScene(new Scene(root, 1100, 700));
 		stage.setMaximized(true);
 		stage.show();
@@ -391,6 +396,11 @@ public final class ModernRozaUi extends Application {
 	private VBox refactoringConfiguration() {
 		VBox configuration = new VBox(CONFIGURATION_INNER_SPACING);
 		configuration.setPadding(new Insets(0, 0, 4, 0));
+		Label packagePolicyTitle = body("Package policy");
+		packagePolicyTitle.setStyle(packagePolicyTitle.getStyle() + "-fx-font-weight: bold; -fx-text-fill: #333333;");
+		implicitSetupPackagePolicyCombo.setMaxWidth(Double.MAX_VALUE);
+		VBox.setMargin(implicitSetupPackagePolicyCombo, MARGIN_AFTER_CONFIGURATION_GROUP);
+
 		Button refactorButton = new Button(PipelineStage.REFACTORING.actionLabel());
 		refactorButton.setMaxWidth(Double.MAX_VALUE);
 		refactorButton.setStyle(primaryButtonStyle());
@@ -403,7 +413,7 @@ public final class ModernRozaUi extends Application {
 		refactorCurrentLevelButton.setDisable(!stageActionEnabled(PipelineStage.REFACTORING));
 		refactorCurrentLevelButton.setOnAction(event -> runRefactoringCurrentLevel());
 
-		configuration.getChildren().addAll(refactorButton, refactorCurrentLevelButton);
+		configuration.getChildren().addAll(packagePolicyTitle, implicitSetupPackagePolicyCombo, refactorButton, refactorCurrentLevelButton);
 		return configuration;
 	}
 
@@ -602,6 +612,28 @@ public final class ModernRozaUi extends Application {
 		comboBox.setButtonCell(new ListCell<>() {
 			@Override
 			protected void updateItem(MergeTieBreakerKind item, boolean empty) {
+				super.updateItem(item, empty);
+				setText(empty || item == null ? null : item.displayName());
+			}
+		});
+		return comboBox;
+	}
+
+	private ComboBox<ImplicitSetupPackagePolicy> implicitSetupPackagePolicyComboBox() {
+		ComboBox<ImplicitSetupPackagePolicy> comboBox = new ComboBox<>();
+		comboBox.getItems().addAll(ImplicitSetupPackagePolicy.values());
+		comboBox.getSelectionModel().select(ImplicitSetupPackagePolicy.DEFAULT_PACKAGE);
+		comboBox.setStyle(singleLineComboBoxStyle());
+		comboBox.setCellFactory(list -> new ListCell<>() {
+			@Override
+			protected void updateItem(ImplicitSetupPackagePolicy item, boolean empty) {
+				super.updateItem(item, empty);
+				setText(empty || item == null ? null : item.displayName());
+			}
+		});
+		comboBox.setButtonCell(new ListCell<>() {
+			@Override
+			protected void updateItem(ImplicitSetupPackagePolicy item, boolean empty) {
 				super.updateItem(item, empty);
 				setText(empty || item == null ? null : item.displayName());
 			}
@@ -922,7 +954,7 @@ public final class ModernRozaUi extends Application {
 
 	private void refactor(TestCaseClusters clusters) {
 		try {
-			TestClassRefactorer refactorer = new ImplicitSetupTestClassRefactorer();
+			TestClassRefactorer refactorer = new ImplicitSetupTestClassRefactorer(selectedImplicitSetupPackagePolicy());
 			refactoredTestClasses = refactorer.refactor(clusters);
 			selectedRefactoredTestClass = refactoredTestClasses.testClasses().isEmpty() ? null : refactoredTestClasses.testClasses().get(0);
 			refactoringError = null;
@@ -935,6 +967,11 @@ public final class ModernRozaUi extends Application {
 			writingError = null;
 		}
 		render();
+	}
+
+	private ImplicitSetupPackagePolicy selectedImplicitSetupPackagePolicy() {
+		ImplicitSetupPackagePolicy packagePolicy = implicitSetupPackagePolicyCombo.getSelectionModel().getSelectedItem();
+		return packagePolicy == null ? ImplicitSetupPackagePolicy.DEFAULT_PACKAGE : packagePolicy;
 	}
 
 	private void runWriting() {
@@ -1437,7 +1474,12 @@ public final class ModernRozaUi extends Application {
 		return row;
 	}
 
+	/** Refactoring tab: per-level cluster tiles for the selected merge level. */
 	private VBox refactoringLevelClustersPanel(int levelIndex, ScrollPane clustersScroll) {
+		return levelClustersPanel(levelIndex, clustersScroll);
+	}
+
+	private VBox levelClustersPanel(int levelIndex, ScrollPane clustersScroll) {
 		ClusteringLevel level = clusteringLevels.get(levelIndex);
 		VBox panel = new VBox(8);
 		// FlowPane column count is not fixed: prefWrapLength tracks the scroll viewport width.
@@ -1459,17 +1501,17 @@ public final class ModernRozaUi extends Application {
 		title.setStyle(title.getStyle() + "-fx-font-weight: bold; -fx-text-fill: #333333;");
 		title.setMaxWidth(Double.MAX_VALUE);
 		panel.getChildren().add(title);
+		Optional<MergeCandidate> merge = levelIndex > 0 ? level.acceptedMerge() : Optional.empty();
 		FlowPane clusterTiles = new FlowPane(Orientation.HORIZONTAL, 8, 8);
 		clusterTiles.setRowValignment(VPos.TOP);
 		clusterTiles.prefWrapLengthProperty().bind(usableWrapWidth);
 		clusterTiles.maxWidthProperty().bind(usableWrapWidth);
 		List<TestCaseCluster> clusters = level.clusters();
-		Optional<MergeCandidate> merge = levelIndex > 0 ? level.acceptedMerge() : Optional.empty();
 		int mergedClusterIndex = -1;
 		if (merge.isPresent()) {
-			List<Integer> mergedKeys = merge.get().mergedCluster().testCaseIndexes();
+			Set<Integer> mergedKeys = clusterKey(merge.get().mergedCluster());
 			for (int i = 0; i < clusters.size(); i++) {
-				if (clusters.get(i).testCaseIndexes().equals(mergedKeys)) {
+				if (clusterKey(clusters.get(i)).equals(mergedKeys)) {
 					mergedClusterIndex = i;
 					break;
 				}
@@ -1486,17 +1528,42 @@ public final class ModernRozaUi extends Application {
 		} else {
 			orderedClusters.addAll(clusters);
 		}
+		Map<Set<Integer>, Double> formationSimilaritiesByCluster = clusterFormationSimilaritiesByCluster(clusteringLevels, levelIndex);
 		for (int i = 0; i < orderedClusters.size(); i++) {
 			boolean emphasizeMerge = mergedClusterIndex >= 0 && i == 0;
 			TestCaseCluster tileCluster = orderedClusters.get(i);
-			Optional<Double> mergeStepSimilarity = merge.map(MergeCandidate::similarity);
-			clusterTiles.getChildren().add(clusterBlockView(tileCluster, i, emphasizeMerge, mergeStepSimilarity));
+			Optional<Double> formationSimilarity = clusterFormationSimilarity(tileCluster, formationSimilaritiesByCluster);
+			clusterTiles.getChildren().add(clusterBlockView(tileCluster, i, emphasizeMerge, formationSimilarity));
 		}
 		panel.getChildren().add(clusterTiles);
 		return panel;
 	}
 
-	private VBox clusterBlockView(TestCaseCluster cluster, int paletteIndex, boolean mergeEmphasis, Optional<Double> mergeStepSimilarity) {
+	static Map<Set<Integer>, Double> clusterFormationSimilaritiesByCluster(List<ClusteringLevel> levels, int levelIndex) {
+		Map<Set<Integer>, Double> similaritiesByCluster = new HashMap<>();
+		for (int i = 1; i <= Math.min(levelIndex, levels.size() - 1); i++) {
+			Optional<MergeCandidate> merge = levels.get(i).acceptedMerge();
+			merge.ifPresent(candidate -> similaritiesByCluster.put(clusterKey(candidate.mergedCluster()), candidate.similarity()));
+		}
+		return similaritiesByCluster;
+	}
+
+	static Optional<Double> clusterFormationSimilarity(TestCaseCluster cluster, Map<Set<Integer>, Double> similaritiesByCluster) {
+		Double formationSimilarity = similaritiesByCluster.get(clusterKey(cluster));
+		if (formationSimilarity != null) {
+			return Optional.of(formationSimilarity);
+		}
+		if (cluster.size() == 1) {
+			return Optional.of(1.0);
+		}
+		return Optional.empty();
+	}
+
+	static Set<Integer> clusterKey(TestCaseCluster cluster) {
+		return Set.copyOf(cluster.testCaseIndexes());
+	}
+
+	private VBox clusterBlockView(TestCaseCluster cluster, int paletteIndex, boolean mergeEmphasis, Optional<Double> formationSimilarity) {
 		VBox block = new VBox(4);
 		block.setAlignment(Pos.TOP_LEFT);
 		block.setMaxHeight(Region.USE_PREF_SIZE);
@@ -1507,7 +1574,7 @@ public final class ModernRozaUi extends Application {
 		String palette = CLUSTER_BLOCK_STYLES[paletteIndex % CLUSTER_BLOCK_STYLES.length];
 		String emphasis = mergeEmphasis ? MERGED_CLUSTER_BLOCK_EMPHASIS : "";
 		block.setStyle(FONT_FAMILY + palette + emphasis);
-		mergeStepSimilarity.ifPresent(similarity -> {
+		formationSimilarity.ifPresent(similarity -> {
 			Label similarityLine = body("Similarity: " + formatSimilarity(similarity));
 			similarityLine.setMaxWidth(Region.USE_PREF_SIZE);
 			similarityLine.setStyle(similarityLine.getStyle() + "-fx-font-size: 11px; -fx-text-fill: #6b7280;");

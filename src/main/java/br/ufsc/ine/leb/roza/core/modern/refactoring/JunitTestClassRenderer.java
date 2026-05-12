@@ -15,6 +15,10 @@ public final class JunitTestClassRenderer {
 
 	public String render(TestClass testClass) {
 		List<String> lines = new ArrayList<>();
+		testClass.packageName().ifPresent(packageName -> {
+			lines.add("package " + packageName + ";");
+			lines.add("");
+		});
 		lines.addAll(testClass.imports());
 		if (!testClass.imports().isEmpty()) {
 			lines.add("");

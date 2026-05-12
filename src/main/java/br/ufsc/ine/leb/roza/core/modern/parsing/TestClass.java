@@ -7,6 +7,7 @@ import java.util.Optional;
 public final class TestClass {
 
 	private final String name;
+	private final String packageName;
 	private final List<String> imports;
 	private final SetupAnnotation setupAnnotation;
 	private final List<Field> fields;
@@ -15,7 +16,7 @@ public final class TestClass {
 	private final List<TestMethod> testMethods;
 
 	public TestClass(String name, List<Field> fields, List<FixtureMethod> fixtures, List<HelperMethod> helperMethods, List<TestMethod> testMethods) {
-		this(name, List.of(), null, fields, fixtures, helperMethods, testMethods);
+		this(name, null, List.of(), null, fields, fixtures, helperMethods, testMethods);
 	}
 
 	public TestClass(
@@ -26,7 +27,20 @@ public final class TestClass {
 			List<FixtureMethod> fixtures,
 			List<HelperMethod> helperMethods,
 			List<TestMethod> testMethods) {
+		this(name, null, imports, setupAnnotation, fields, fixtures, helperMethods, testMethods);
+	}
+
+	public TestClass(
+			String name,
+			String packageName,
+			List<String> imports,
+			SetupAnnotation setupAnnotation,
+			List<Field> fields,
+			List<FixtureMethod> fixtures,
+			List<HelperMethod> helperMethods,
+			List<TestMethod> testMethods) {
 		this.name = Objects.requireNonNull(name);
+		this.packageName = packageName;
 		this.imports = List.copyOf(Objects.requireNonNull(imports));
 		this.setupAnnotation = setupAnnotation;
 		this.fields = List.copyOf(Objects.requireNonNull(fields));
@@ -37,6 +51,10 @@ public final class TestClass {
 
 	public String name() {
 		return name;
+	}
+
+	public Optional<String> packageName() {
+		return Optional.ofNullable(packageName);
 	}
 
 	public List<String> imports() {

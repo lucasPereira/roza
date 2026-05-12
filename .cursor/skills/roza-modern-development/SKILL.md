@@ -1,15 +1,15 @@
 ---
 name: roza-modern-development
-description: Maintains requirements, acceptance criteria, decisions, and implementation knowledge for the modern Roza architecture. Use only when work explicitly targets modern Roza, core.modern, docs/roza-modern, or requirements for the modern architecture; do not use for legacy Roza work unless comparing it with modern Roza.
+description: Maintains requirements, acceptance criteria, decisions, and implementation knowledge for the modern Róża architecture. Use only when work explicitly targets modern Róża, core.modern, docs/roza-modern, or requirements for the modern architecture; do not use for legacy Róża work unless comparing it with modern Róża.
 ---
 
-# Roza Modern Development
+# Róża Modern Development
 
 ## Quick Start
 
-Before answering or implementing work about modern Roza or `core.modern`:
+Before answering or implementing work about modern Róża or `core.modern`:
 
-1. Read `docs/roza-modern/requirements.md` as the user-driven source of truth: what the user said or confirmed modern Roza must do, what constraints it must satisfy, which acceptance criteria define done, and which requirement questions need the user's decision.
+1. Read `docs/roza-modern/requirements.md` as the user-driven source of truth: what the user said or confirmed modern Róża must do, what constraints it must satisfy, which acceptance criteria define done, and which requirement questions need the user's decision.
 2. Read `docs/roza-modern/knowledge.md` as the agent-maintained understanding: current vocabulary, design rationale, architectural decisions, implementation discoveries, model knowledge, hypotheses, and interview backlog.
 3. Classify the user's message:
    - Update `requirements.md` only when the user states or confirms required behavior, constraints, acceptance criteria, or a question that must be answered before requirements are complete.
@@ -35,13 +35,13 @@ Preserve history unless the user explicitly supersedes a requirement. When a req
 
 ## Requirement Capture Rules
 
-Treat user statements as candidate requirements when they are explicitly scoped to modern Roza and use language such as:
+Treat user statements as candidate requirements when they are explicitly scoped to modern Róża and use language such as:
 
 - "deve", "precisa", "é importante", "sempre", "nunca"
-- "modern Roza", "core.modern", "pipeline", "etapa", "interface"
+- "modern Róża", "core.modern", "pipeline", "etapa", "interface"
 - extensibility expectations for languages, frameworks, refactorings, or implementations
 
-Do not treat generic Roza, legacy Roza, pipeline, or automated test-code refactoring discussion as modern Roza requirements unless the user explicitly connects it to modern Roza or `core.modern`.
+Do not treat generic Róża, legacy Róża, pipeline, or automated test-code refactoring discussion as modern Róża requirements unless the user explicitly connects it to modern Róża or `core.modern`.
 
 For each candidate requirement, decide whether to:
 
@@ -61,13 +61,13 @@ When implementing `core.modern`:
 - Keep stages independent. A stage should depend on input/output contracts, not concrete implementations of other stages.
 - Support interchangeable implementations for each stage.
 - Prefer extension points over language-, framework-, or refactoring-specific assumptions.
-- Do not use or reuse classes from legacy Roza. Modern Roza implementation must be written from scratch.
+- Do not use or reuse classes from legacy Róża. Modern Róża implementation must be written from scratch.
 - Never allow imports between `core.modern` and `core.legacy` in either direction.
 - Validate that new code does not couple unrelated stages directly.
 
 ## Interview Workflow
 
-When the user asks to define or discover modern Roza requirements:
+When the user asks to define or discover modern Róża requirements:
 
 1. Summarize the known requirements briefly.
 2. Ask focused questions that reduce architectural uncertainty.
@@ -76,7 +76,7 @@ When the user asks to define or discover modern Roza requirements:
 
 ## Final Response Checklist
 
-When finishing modern Roza work, mention:
+When finishing modern Róża work, mention:
 
 - which requirement or knowledge files were updated,
 - whether implementation was changed,

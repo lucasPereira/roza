@@ -1,7 +1,7 @@
 Strategy;Global threshold;Subject;Java files;Skipped files;Classes;Attributes;Setup methods;Test methods;Tests per class;Statements;Unique duplicates;Total duplicates;Total duplicate reduction;Total duplicate reduction percent;Runtime millis
 Original;;Apache Commons Lang;328;2;276;739;40;4683;16.97;13573;1619;4792;0;0.00;0
 Local-only refactoring;;Apache Commons Lang;328;2;276;90;43;4683;16.97;13541;1616;4760;32;0.67;441
-Roza global clustering (threshold 0.2);0.2;Apache Commons Lang;328;2;2999;612;401;4683;1.56;12337;1125;3529;1263;26.36;42048
-Roza global clustering (threshold 0.3);0.3;Apache Commons Lang;328;2;3140;615;383;4683;1.49;12495;1161;3657;1135;23.69;39682
-Roza global clustering (threshold 0.4);0.4;Apache Commons Lang;328;2;3441;557;334;4683;1.36;12908;1240;4048;744;15.53;35880
-Roza global clustering (threshold 0.5);0.5;Apache Commons Lang;328;2;3708;469;264;4683;1.26;13345;1321;4469;323;6.74;32594
+Róża global clustering (threshold 0.2);0.2;Apache Commons Lang;328;2;2999;612;401;4683;1.56;12337;1125;3529;1263;26.36;42048
+Róża global clustering (threshold 0.3);0.3;Apache Commons Lang;328;2;3140;615;383;4683;1.49;12495;1161;3657;1135;23.69;39682
+Róża global clustering (threshold 0.4);0.4;Apache Commons Lang;328;2;3441;557;334;4683;1.36;12908;1240;4048;744;15.53;35880
+Róża global clustering (threshold 0.5);0.5;Apache Commons Lang;328;2;3708;469;264;4683;1.26;13345;1321;4469;323;6.74;32594

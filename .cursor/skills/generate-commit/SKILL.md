@@ -1,15 +1,15 @@
 ---
 name: generate-commit
 description: >-
-  Roza (Java/Gradle): in the roza submodule repo root, build one subject line
+  Róża (Java/Gradle): in the roza submodule repo root, build one subject line
   (no conventional type/slug prefix; first letter uppercase), stage with
   `git add -A`, show **`git status`** after staging and the **composed commit
   message** (one line; **hard cap 72 characters**—shorten until compliant), wait
   for explicit user approval, then run **`git commit -m "…"`**. Use when the user
-  attaches this skill or asks to generate commit / mensagem de commit for Roza.
+  attaches this skill or asks to generate commit / mensagem de commit for Róża.
 ---
 
-# Generate commit for Roza (single subject line)
+# Generate commit for Róża (single subject line)
 
 ## How to invoke
 
@@ -30,7 +30,7 @@ Attach this **`SKILL.md`** (or ask the agent to follow it). Do **not** rely on o
 
 ## Repo root (mandatory)
 
-The Git repository is the **Roza submodule** (`roza/`), **not** the doctorate workspace root.
+The Git repository is the **Róża submodule** (`roza/`), **not** the doctorate workspace root.
 
 Run all Git commands **from `roza/`** (e.g. `cd roza` or `git -C <path-to-roza>`).
 

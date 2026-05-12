@@ -1,0 +1,9 @@
+[submodule "external-projects/java-string-similarity"]
+	path = external-projects/java-string-similarity
+	url = https://github.com/tdebatty/java-string-similarity.git
+[submodule "external-projects/commons-csv"]
+	path = external-projects/commons-csv
+	url = https://github.com/apache/commons-csv.git
+[submodule "external-projects/commons-text"]
+	path = external-projects/commons-text
+	url = https://github.com/apache/commons-text.git

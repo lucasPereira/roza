@@ -1,20 +1,20 @@
-# Roza Modern Requirements
+# Róża Modern Requirements
 
-This document stores requirements and acceptance criteria for modern Roza in `br.ufsc.ine.leb.roza.core.modern`.
+This document stores requirements and acceptance criteria for modern Róża in `br.ufsc.ine.leb.roza.core.modern`.
 
 ## Scope
 
-Modern Roza is an extensible pipeline for automatic refactoring of test code. It loads raw code files that may contain tests, parses those files to identify test classes, analyzes/refactors the identified tests, and produces refactored tests as output.
+Modern Róża is an extensible pipeline for automatic refactoring of test code. It loads raw code files that may contain tests, parses those files to identify test classes, analyzes/refactors the identified tests, and produces refactored tests as output.
 
 ## Functional Requirements
 
 ### REQ-001: Automated Test Refactoring Pipeline
 
-Modern Roza must provide a pipeline for automatic test-code refactoring.
+Modern Róża must provide a pipeline for automatic test-code refactoring.
 
 Acceptance criteria:
 
-- AC-001: Given raw code files that may contain tests, modern Roza can execute a refactoring pipeline that identifies and refactors tests.
+- AC-001: Given raw code files that may contain tests, modern Róża can execute a refactoring pipeline that identifies and refactors tests.
 - AC-002: The pipeline output is refactored test code.
 - AC-003: The pipeline model does not assume a single refactoring strategy.
 
@@ -51,7 +51,7 @@ Acceptance criteria:
 
 ### REQ-005: Broad Extensibility
 
-Modern Roza must be extensible enough to support different programming languages, test frameworks, refactoring types, and analysis strategies.
+Modern Róża must be extensible enough to support different programming languages, test frameworks, refactoring types, and analysis strategies.
 
 Acceptance criteria:
 
@@ -62,7 +62,7 @@ Acceptance criteria:
 
 ### REQ-006: Raw Code File Loading Input
 
-Modern Roza must load raw code files as its initial input.
+Modern Róża must load raw code files as its initial input.
 
 Acceptance criteria:
 
@@ -71,16 +71,16 @@ Acceptance criteria:
 
 ### REQ-007: Loading Stage
 
-The first stage of the modern Roza pipeline must be the loading stage, responsible for loading raw code files into memory.
+The first stage of the modern Róża pipeline must be the loading stage, responsible for loading raw code files into memory.
 
 Acceptance criteria:
 
 - AC-020: The loading stage is represented by one interface named `CodeFileLoader`, shared by all code-loading implementations.
 - AC-021: The loading interface has a single method named `load`.
 - AC-022: Concrete loading implementations receive their required loading parameters through their constructors.
-- AC-023: Modern Roza can support different loading implementations through the same loading interface.
+- AC-023: Modern Róża can support different loading implementations through the same loading interface.
 - AC-024: Loading implementations may include recursive filesystem loading, Java-extension filesystem loading, parameterized-extension filesystem loading, Git-based loading, and other future loading strategies.
-- AC-025: The `load` method loads raw code files rather than parsed modern Roza test models.
+- AC-025: The `load` method loads raw code files rather than parsed modern Róża test models.
 - AC-026: The loading stage does not guarantee that each loaded code file contains a test class.
 - AC-032: The `load` method returns `LoadedCodeFiles`.
 - AC-033: `LoadedCodeFiles` contains `CodeFile` instances.
@@ -99,7 +99,7 @@ Acceptance criteria:
 
 ### REQ-008: Parsing Stage
 
-The second stage of the modern Roza pipeline must be the parsing stage, responsible for reading loaded raw code files and building ASTs for identified test classes.
+The second stage of the modern Róża pipeline must be the parsing stage, responsible for reading loaded raw code files and building ASTs for identified test classes.
 
 Acceptance criteria:
 
@@ -114,10 +114,10 @@ Acceptance criteria:
 - AC-042: `ParsedTestClasses` contains a list of `TestClass` instances.
 - AC-079: `ParsedTestClasses` exposes the parsed test classes through `testClasses()`.
 - AC-119: The first parsing implementation is Java-first rather than language-universal.
-- AC-120: Concrete Java parsers may use JavaParser internally, but JavaParser types must not appear in the public modern Roza parsing contract.
+- AC-120: Concrete Java parsers may use JavaParser internally, but JavaParser types must not appear in the public modern Róża parsing contract.
 - AC-150: The first concrete parser implementation is named `JunitTestClassParser` because it supports a conservative JUnit subset on Java source code, not every Java test framework.
 - AC-121: Unsupported parsing features are handled by `UnsupportedFeaturePolicy`.
-- AC-122: Unsupported feature validation runs in a separate validator before extracting modern Roza domain models.
+- AC-122: Unsupported feature validation runs in a separate validator before extracting modern Róża domain models.
 - AC-123: The parser identifies unsupported-subset violations before downstream stages refactor tests.
 - AC-124: Unsupported-subset violations are reported as structured parsing output instead of being silently accepted.
 - AC-180: `ParsedTestClasses` exposes unsupported-subset violations through `violations()`.
@@ -157,7 +157,7 @@ Acceptance criteria:
 - AC-132: `CodeStatement` exposes original text, normalized text, and whether the statement is an assertion.
 - AC-133: The first parser treats control-flow blocks such as `for`, `while`, and `if` as top-level statements rather than flattening their internals.
 - AC-134: Static members, nested classes, unsupported lifecycle features, parameterized tests, inheritance, wildcard imports, and other listed unsupported features are rejected or skipped according to `UnsupportedFeaturePolicy`.
-- AC-135: Modern Roza starts conservative: unsupported features should be removed from the unsupported list only when real support is implemented.
+- AC-135: Modern Róża starts conservative: unsupported features should be removed from the unsupported list only when real support is implemented.
 - AC-136: JUnit 4 `@After` and JUnit 5 `@AfterEach` are unsupported in the first parser slice and are handled according to `UnsupportedFeaturePolicy`.
 - AC-137: Parsed field types preserve complex Java type text needed by decomposition, including generics, nested generics, wildcard generics, qualified types, generic arrays, arrays, and multidimensional arrays.
 - AC-151: `JunitTestClassParser` marks assertions using an explicit supported assertion method list covering JUnit 4, current JUnit Jupiter assertions, and Hamcrest `assertThat`, for unqualified calls and for calls on typical receivers (`Assert`, `Assertions`, `MatcherAssert`, and the usual fully qualified type names), not by checking whether a method name starts with `assert`.
@@ -165,10 +165,11 @@ Acceptance criteria:
 - AC-270: `TestClass` exposes the setup annotation that should be used if later refactoring needs to generate implicit setup.
 - AC-271: If a supported setup fixture exists, the `TestClass` setup annotation comes from that fixture.
 - AC-272: If no supported setup fixture exists, the parser infers the `TestClass` setup annotation from the class's supported `@Test` annotation usage: JUnit 5 uses `@BeforeEach`; otherwise JUnit 4 uses `@Before`.
+- AC-291: `TestClass` exposes the original Java package name when the parsed source class declares one.
 
 ### REQ-010: Decomposition Stage
 
-The third stage of the modern Roza pipeline must be the decomposition stage, responsible for separating each test from its original test class while carrying the code required by that test.
+The third stage of the modern Róża pipeline must be the decomposition stage, responsible for separating each test from its original test class while carrying the code required by that test.
 
 Acceptance criteria:
 
@@ -197,7 +198,7 @@ Acceptance criteria:
 
 ### REQ-011: Measurement Stage
 
-The fourth stage of the modern Roza pipeline must be the measurement stage, responsible for applying a similarity metric to each pair of decomposed tests.
+The fourth stage of the modern Róża pipeline must be the measurement stage, responsible for applying a similarity metric to each pair of decomposed tests.
 
 Acceptance criteria:
 
@@ -251,7 +252,7 @@ Acceptance criteria:
 
 ### REQ-012: Clustering Stage
 
-The fifth stage of the modern Roza pipeline must be the clustering stage, responsible for grouping the tests that are most similar to each other according to the similarity matrix.
+The fifth stage of the modern Róża pipeline must be the clustering stage, responsible for grouping the tests that are most similar to each other according to the similarity matrix.
 
 Acceptance criteria:
 
@@ -283,7 +284,7 @@ Acceptance criteria:
 
 ### REQ-013: Refactoring Stage
 
-The sixth stage of the modern Roza pipeline must be the refactoring stage, responsible for receiving test groups and deciding what refactoring to apply to them.
+The sixth stage of the modern Róża pipeline must be the refactoring stage, responsible for receiving test groups and deciding what refactoring to apply to them.
 
 Acceptance criteria:
 
@@ -298,17 +299,22 @@ Acceptance criteria:
 - AC-102: `RefactoredTestClasses` exposes refactored test classes through `testClasses()`.
 - AC-103: `RefactoredTestClasses.testClasses()` returns `TestClass` instances.
 - AC-274: The first concrete refactoring implementation is named `ImplicitSetupTestClassRefactorer`.
-- AC-275: `ImplicitSetupTestClassRefactorer` creates one generated `TestClass` per cluster.
+- AC-275: With the default-package policy, `ImplicitSetupTestClassRefactorer` creates one generated `TestClass` per cluster.
 - AC-276: `ImplicitSetupTestClassRefactorer` moves the common initial non-assertion statement prefix of a cluster into a generated setup method.
 - AC-277: `ImplicitSetupTestClassRefactorer` converts local variable declarations moved into setup into fields plus setup assignments.
 - AC-278: `ImplicitSetupTestClassRefactorer` preserves each generated test method's original parsed test annotations.
 - AC-279: `ImplicitSetupTestClassRefactorer` leaves assertion calls unchanged and never moves assertion statements into setup.
 - AC-280: If clustered tests disagree on setup annotation, `ImplicitSetupTestClassRefactorer` prefers the JUnit 5 setup annotation already determined by parsing/decomposition.
 - AC-281: Refactoring output remains structured `TestClass` models; source-code rendering is a separate concern.
+- AC-292: `ImplicitSetupTestClassRefactorer` exposes an implicit-setup package policy configuration.
+- AC-293: The default implicit-setup package policy materializes generated test classes in Java's default package.
+- AC-294: `ImplicitSetupTestClassRefactorer` makes generated test method names unique inside each generated class.
+- AC-296: The package-partitioning implicit-setup package policy partitions each cluster by source package before generating test classes.
+- AC-297: With the package-partitioning policy, `ImplicitSetupTestClassRefactorer` preserves the source package name on generated classes for each package partition.
 
 ### REQ-014: Writing Stage
 
-The final stage of the modern Roza pipeline must be the writing stage, responsible for writing refactored test classes to an output destination.
+The final stage of the modern Róża pipeline must be the writing stage, responsible for writing refactored test classes to an output destination.
 
 Acceptance criteria:
 
@@ -326,6 +332,7 @@ Acceptance criteria:
 - AC-288: `FileSystemTestClassWriter` receives its output folder through its constructor.
 - AC-289: `FileSystemTestClassWriter` renders each refactored `TestClass` as Java source and writes one `.java` file per class.
 - AC-290: `FileSystemTestClassWriter` creates the output folder when it does not already exist.
+- AC-295: `FileSystemTestClassWriter` writes packaged generated classes under the directory path that corresponds to their package name.
 
 ## Architectural Constraints
 
@@ -339,19 +346,19 @@ Pipeline stages should remain loosely coupled through explicit input/output cont
 
 ### NFR-003: Legacy Isolation
 
-The existing Roza implementation lives under `core.legacy`. Modern Roza architecture work should go under `core.modern` unless the user explicitly asks to change legacy code. Imports between `core.modern` and `core.legacy` must not cross in either direction.
+The existing Róża implementation lives under `core.legacy`. Modern Róża architecture work should go under `core.modern` unless the user explicitly asks to change legacy code. Imports between `core.modern` and `core.legacy` must not cross in either direction.
 
 Acceptance criteria:
 
-- AC-035: Modern Roza implementation must not use classes from legacy Roza.
-- AC-036: Modern Roza implementation must not reuse classes from legacy Roza.
-- AC-037: Modern Roza implementation must be written from scratch.
+- AC-035: Modern Róża implementation must not use classes from legacy Róża.
+- AC-036: Modern Róża implementation must not reuse classes from legacy Róża.
+- AC-037: Modern Róża implementation must be written from scratch.
 - AC-038: Code in `core.modern` must not import from `core.legacy`.
 - AC-156: Code in `core.legacy` must not import from `core.modern`.
 
 ### NFR-006: UI Isolation
 
-The existing UI must be separated from the new modern Roza UI so manual testing can evolve independently for legacy and modern implementations.
+The existing UI must be separated from the new modern Róża UI so manual testing can evolve independently for legacy and modern implementations.
 
 Acceptance criteria:
 
@@ -359,7 +366,7 @@ Acceptance criteria:
 - AC-158: The modern UI package starts under `br.ufsc.ine.leb.roza.ui.modern`.
 - AC-159: The existing Gradle UI entry point continues to run the legacy UI until a modern UI entry point is implemented.
 - AC-160: The modern UI uses JavaFX 17.x for the first slice, without upgrading the project Java version unless a concrete JavaFX/JDK limitation requires it.
-- AC-161: The modern UI skeleton has a top pipeline bar that represents the modern Roza pipeline stages.
+- AC-161: The modern UI skeleton has a top pipeline bar that represents the modern Róża pipeline stages.
 - AC-162: The modern UI skeleton allows navigation only to the current stage and stages already completed.
 - AC-163: The modern UI skeleton uses distinct visual states for completed stages, the current pending stage, and blocked future stages.
 - AC-164: The modern UI skeleton shows the selected stage configuration and action button in a left sidebar.
@@ -377,7 +384,7 @@ Acceptance criteria:
 - AC-177: The modern UI loading configuration has accepted extension checkboxes for `.java` and `.txt`.
 - AC-178: Triggering `Load` in the modern UI uses the filesystem code file loader and advances to `Parsing` when loading succeeds.
 - AC-179: The modern UI `Parsing` center shows the loaded file list after `Load`; selecting a loaded file shows that file's content.
-- AC-216: The modern UI loading source folder defaults to Roza's own test source folder, `roza/src/test/java`.
+- AC-216: The modern UI loading source folder defaults to Róża's own test source folder, `roza/src/test/java`.
 - AC-195: The modern UI `Parsing` center shows parsing violations at the top when violations exist.
 - AC-196: The modern UI `Parsing` violation viewer shows one violation at a time with previous and next controls.
 - AC-197: The modern UI selects the loaded file for the class referenced by the displayed parsing violation, including the first displayed violation.
@@ -415,14 +422,15 @@ Acceptance criteria:
 - AC-284: The modern UI `Writing` center shows a list of generated test classes.
 - AC-285: Selecting a generated test class in the modern UI `Writing` center shows its rendered Java code on the right.
 - AC-286: The modern UI `Refactoring` configuration exposes a `Refactor Current level` action that runs `ImplicitSetupTestClassRefactorer` over the currently selected clustering level.
+- AC-298: The modern UI `Refactoring` configuration exposes the implicit-setup package policy used by `ImplicitSetupTestClassRefactorer`.
 - AC-268: In the modern UI sidebar, pipeline stages without visible configuration controls show their primary action button at the same top height as the loading stage's first control and the refactoring action button, without empty placeholder spacing above the action.
 - AC-269: The modern UI `Writing` configuration shows an output folder chooser button and a selected-path label, following the loading source folder pattern.
-- AC-270: The modern UI `Writing` output folder defaults to Roza's `output/writer` folder.
+- AC-270: The modern UI `Writing` output folder defaults to Róża's `output/writer` folder.
 - AC-271: Triggering `Write` in the modern UI writes the rendered refactored test classes to the selected output folder.
 
 ### NFR-004: Minimal Code Comments
 
-Modern Roza code must not include comments unless they explain something that is not obvious from the code itself.
+Modern Róża code must not include comments unless they explain something that is not obvious from the code itself.
 
 Acceptance criteria:
 
@@ -431,16 +439,16 @@ Acceptance criteria:
 
 ### NFR-005: Requirements API Snapshot
 
-This requirements document must keep an up-to-date snapshot of the current modern Roza public API contracts.
+This requirements document must keep an up-to-date snapshot of the current modern Róża public API contracts.
 
 Acceptance criteria:
 
-- AC-138: When a modern Roza pipeline interface or stage boundary container is added, removed, or changed, the Current API Contracts section must be updated in the same task.
+- AC-138: When a modern Róża pipeline interface or stage boundary container is added, removed, or changed, the Current API Contracts section must be updated in the same task.
 - AC-139: The API snapshot must distinguish implemented contracts from contracts that are only confirmed but not yet implemented.
 
 ## Current API Contracts
 
-This section is the current requirements-level pipeline contract snapshot. It includes each pipeline interface and its immediate stage boundary containers. It must be updated whenever a modern Roza pipeline interface or stage boundary container changes.
+This section is the current requirements-level pipeline contract snapshot. It includes each pipeline interface and its immediate stage boundary containers. It must be updated whenever a modern Róża pipeline interface or stage boundary container changes.
 
 ### Implemented: Loading
 
@@ -477,6 +485,7 @@ public final class ParsedTestClasses {
 
 public final class TestClass {
 	public String name();
+	public Optional<String> packageName();
 	public List<String> imports();
 	public Optional<SetupAnnotation> setupAnnotation();
 	public List<Field> fields();
@@ -584,7 +593,14 @@ public final class RefactoredTestClasses {
 	public List<TestClass> testClasses();
 }
 
+public enum ImplicitSetupPackagePolicy {
+	DEFAULT_PACKAGE,
+	PACKAGE_PARTITIONING
+}
+
 public final class ImplicitSetupTestClassRefactorer implements TestClassRefactorer {
+	public ImplicitSetupTestClassRefactorer();
+	public ImplicitSetupTestClassRefactorer(ImplicitSetupPackagePolicy packagePolicy);
 	public RefactoredTestClasses refactor(TestCaseClusters clusters);
 }
 ```
@@ -624,7 +640,7 @@ Clarify whether the first implementation should be only interfaces/model contrac
 
 ### Q-005: Should TestClass use an existing AST abstraction?
 
-Explore whether modern Roza should use or adapt an existing AST abstraction for `TestClass`, while respecting the requirement that modern Roza must not use or reuse legacy Roza classes.
+Explore whether modern Róża should use or adapt an existing AST abstraction for `TestClass`, while respecting the requirement that modern Róża must not use or reuse legacy Róża classes.
 
 ### Q-006: What is the detailed design of TestClass?
 
@@ -660,7 +676,7 @@ The current clustering implementation requires the matrix size, test case by ind
 
 ## Change Log
 
-- 2026-05-10: Created initial requirements from the first modern Roza architecture description.
+- 2026-05-10: Created initial requirements from the first modern Róża architecture description.
 - 2026-05-10: Refined the input requirement from project-level input to loading tests.
 - 2026-05-10: Added the first pipeline stage, `loading`, and its shared loading interface constraints.
 - 2026-05-10: Confirmed the loading interface name as `TestCodeLoader` and clarified that `load` loads raw test code.
@@ -668,7 +684,7 @@ The current clustering implementation requires the matrix size, test case by ind
 - 2026-05-10: Refined loading to load raw code files that may or may not contain tests, reopened the loading interface naming question, and clarified that parsing determines test classes.
 - 2026-05-10: Confirmed the loading interface name as `CodeFileLoader`, replacing the earlier `TestCodeLoader` candidate.
 - 2026-05-10: Confirmed that `CodeFileLoader.load` returns `LoadedCodeFiles`, composed of `CodeFile` instances, and that `CodeFile` starts without predefined attributes.
-- 2026-05-10: Added the constraint that modern Roza must not use or reuse legacy Roza classes and must be implemented from scratch.
+- 2026-05-10: Added the constraint that modern Róża must not use or reuse legacy Róża classes and must be implemented from scratch.
 - 2026-05-10: Confirmed the parsing interface as `TestClassParser`, with `parse` returning `ParsedTestClasses`, which contains `TestClass` instances.
 - 2026-05-10: Added `TestClass` as the generalized root AST abstraction for identified test classes.
 - 2026-05-10: Deferred the detailed `TestClass` design until the whole pipeline is understood at a high level.
@@ -687,7 +703,7 @@ The current clustering implementation requires the matrix size, test case by ind
 - 2026-05-10: Confirmed the clustering interface as `TestMethodClusterer`, its method as `cluster`, and its contract from `TestMethodSimilarityMatrix` to `TestMethodClusters`.
 - 2026-05-10: Confirmed the refactoring interface as `TestClassRefactorer`, its method as `refactor`, and its contract from `TestMethodClusters` to `RefactoredTestClasses`.
 - 2026-05-10: Confirmed the final stage as `writing`, represented by `TestClassWriter.write(RefactoredTestClasses)` without returning a serialized model.
-- 2026-05-10: Added the constraint that modern Roza code should not include comments unless they explain non-obvious information.
+- 2026-05-10: Added the constraint that modern Róża code should not include comments unless they explain non-obvious information.
 - 2026-05-10: Moved the loading contract to the `core.modern.loading` package.
 - 2026-05-10: Added acceptance criteria for the first filesystem `CodeFileLoader` implementation, covering folder inclusion, recursion, and extension filtering.
 - 2026-05-11: Confirmed `LoadedCodeFiles` and `CodeFile` as concrete loading data classes rather than extension interfaces.
@@ -695,7 +711,7 @@ The current clustering implementation requires the matrix size, test case by ind
 - 2026-05-11: Added `UnsupportedFeaturePolicy` and fail-fast/diagnostic handling for unsupported parser features.
 - 2026-05-11: Marked JUnit 4 `@After` and JUnit 5 `@AfterEach` as unsupported in the first parser slice.
 - 2026-05-11: Confirmed that parsed fields must preserve complex Java type text such as generics and multidimensional arrays.
-- 2026-05-11: Added the Current API Contracts snapshot and the requirement to keep it updated whenever public modern Roza contracts change.
+- 2026-05-11: Added the Current API Contracts snapshot and the requirement to keep it updated whenever public modern Róża contracts change.
 - 2026-05-11: Narrowed the Current API Contracts snapshot to pipeline interfaces only.
 - 2026-05-11: Refined the Current API Contracts snapshot to include pipeline interfaces and immediate stage boundary containers.
 - 2026-05-11: Renamed decomposed test terminology from test method to test case: `TestCaseDecomposer`, `DecomposedTestCases`, `TestCase`, `TestCaseSimilarityMeasurer`, `TestCaseSimilarityMatrix`, `TestCaseClusterer`, `TestCaseClusters`, and `TestCaseCluster`.
@@ -730,7 +746,7 @@ The current clustering implementation requires the matrix size, test case by ind
 - 2026-05-11: Fixed ranked-list selection so it synchronizes both source and target controls without resetting scroll.
 - 2026-05-11: Changed the modern UI `Clustering` ranked list from selected-source targets to global source-target pairs.
 - 2026-05-11: Corrected default decomposition so supported `@Before` assignments to fields become initialized local declarations.
-- 2026-05-11: Set the modern UI default loading source folder to Roza's own test sources.
+- 2026-05-11: Set the modern UI default loading source folder to Róża's own test sources.
 - 2026-05-11: Narrowed the modern UI `Clustering` ranked score list.
 - 2026-05-11: Shortened the modern UI `Clustering` ranked-order button text.
 - 2026-05-11: Added modern LCS measurement and exposed it in the modern UI metric dropdown.

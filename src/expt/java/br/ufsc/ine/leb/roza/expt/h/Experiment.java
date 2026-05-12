@@ -77,7 +77,7 @@ public class Experiment {
 			System.out.printf("Running global clustering with threshold %s.%n", threshold);
 			long globalStarted = System.nanoTime();
 			List<TestClass> rozaClasses = refactorGlobally(subject.tests, threshold);
-			rows.add(measure(String.format("Roza global clustering (threshold %s)", threshold), threshold, rozaClasses, subject, elapsedMillis(globalStarted)));
+			rows.add(measure(String.format("Róża global clustering (threshold %s)", threshold), threshold, rozaClasses, subject, elapsedMillis(globalStarted)));
 		}
 		writeSummary(rows);
 	}
@@ -227,7 +227,7 @@ public class Experiment {
 		csv.addLine("Source repository", "https://github.com/apache/commons-lang");
 		csv.addLine("Source commit", SOURCE_COMMIT);
 		csv.addLine("Source folder", "src/test/java/org/apache/commons/lang3");
-		csv.addLine("Roza resource folder", SUBJECT_TESTS);
+		csv.addLine("Róża resource folder", SUBJECT_TESTS);
 		csv.addLine("File limit environment variable", FILE_LIMIT_ENVIRONMENT_VARIABLE);
 		csv.addLine("File limit value", getFileLimit() <= 0 ? "all" : getFileLimit());
 		csv.addLine("Similarity metric", "LCCSS");

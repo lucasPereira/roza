@@ -14,7 +14,7 @@ public final class RozaProjectPaths {
 	public static RozaProjectPaths forDeckard(Path rozaRoot) {
 		Path normalized = normalize(rozaRoot);
 		if (!Files.isDirectory(normalized.resolve("external-tools/deckard"))) {
-			throw new IllegalArgumentException("Deckard measurement must run from the Roza project root.");
+			throw new IllegalArgumentException("Deckard measurement must run from the Róża project root.");
 		}
 		return new RozaProjectPaths(normalized);
 	}
@@ -22,7 +22,7 @@ public final class RozaProjectPaths {
 	public static RozaProjectPaths forJplag(Path rozaRoot) {
 		Path normalized = normalize(rozaRoot);
 		if (!Files.isRegularFile(normalized.resolve("external-tools/jplag/jplag-2.11.9.jar"))) {
-			throw new IllegalArgumentException("JPlag measurement must run from the Roza project root with the JPlag jar available.");
+			throw new IllegalArgumentException("JPlag measurement must run from the Róża project root with the JPlag jar available.");
 		}
 		return new RozaProjectPaths(normalized);
 	}
@@ -30,7 +30,7 @@ public final class RozaProjectPaths {
 	public static RozaProjectPaths forSimian(Path rozaRoot) {
 		Path normalized = normalize(rozaRoot);
 		if (!Files.isRegularFile(normalized.resolve("external-tools/simian/simian-2.5.10.jar"))) {
-			throw new IllegalArgumentException("Simian measurement must run from the Roza project root with the Simian jar available.");
+			throw new IllegalArgumentException("Simian measurement must run from the Róża project root with the Simian jar available.");
 		}
 		return new RozaProjectPaths(normalized);
 	}

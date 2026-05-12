@@ -56,6 +56,13 @@ class JunitTestClassParserTest {
 	}
 
 	@Test
+	void shouldParsePackageName() {
+		ParsedTestClasses parsed = parse("package example.tests; import org.junit.Test; class Example { @Test public void test() { assertTrue(true); } }");
+
+		assertEquals("example.tests", parsed.testClasses().get(0).packageName().orElseThrow());
+	}
+
+	@Test
 	void shouldInferJunit4SetupAnnotationFromJunit4TestImportWhenFixtureIsMissing() {
 		ParsedTestClasses parsed = parse("import org.junit.Test; class Example { @Test public void test() { assertTrue(true); } }");
 
