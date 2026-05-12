@@ -392,6 +392,7 @@ Acceptance criteria:
 - AC-265: The modern UI `Clustering` configuration allows enabling zero or more stop criteria.
 - AC-266: The modern UI `Clustering` configuration allows configuring ordered merge tie breaker fallbacks.
 - AC-267: Triggering `Cluster` runs the configured agglomerative clusterer and shows the resulting clusters while keeping the ranked similarity inspection available.
+- AC-268: In the modern UI sidebar, pipeline stages without visible configuration controls show their primary action button at the same top height as the loading stage's first control and the refactoring action button, without empty placeholder spacing above the action.
 
 ### NFR-004: Minimal Code Comments
 
@@ -685,3 +686,4 @@ The current clustering implementation requires the matrix size, test case by ind
 - 2026-05-11: Validated JPlag execution through the existing jar and added modern JPlag sensitivity, HTML report parsing, directional scoring, and UI selection requirements.
 - 2026-05-11: Validated Simian execution through the existing jar and added modern Simian threshold, XML report parsing, asymmetric line-coverage scoring, and UI selection requirements.
 - 2026-05-12: Implemented the first modern clustering slice with agglomerative hierarchical clustering, linkage strategies, composable stop criteria, ordered merge tie breakers, level inspection, and JavaFX clustering configuration/output.
+- 2026-05-12: Confirmed that modern UI sidebar stages without visible configuration controls should align their primary action button with the first visible loading control and the refactoring action.

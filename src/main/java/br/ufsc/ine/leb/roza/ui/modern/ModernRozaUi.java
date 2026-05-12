@@ -111,8 +111,6 @@ public final class ModernRozaUi extends Application {
 	private final CheckBox recursiveLoading;
 	private final CheckBox javaExtension;
 	private final CheckBox txtExtension;
-	private final ComboBox<String> parserImplementationCombo;
-	private final ComboBox<String> decomposerImplementationCombo;
 	private final ComboBox<String> metricCombo;
 	private final TextField deckardMinTokensInput;
 	private final TextField deckardStrideInput;
@@ -166,16 +164,6 @@ public final class ModernRozaUi extends Application {
 		recursiveLoading.setSelected(true);
 		javaExtension.setSelected(true);
 		txtExtension.setSelected(false);
-
-		parserImplementationCombo = new ComboBox<>();
-		parserImplementationCombo.getItems().add("JUnit");
-		parserImplementationCombo.getSelectionModel().selectFirst();
-		parserImplementationCombo.setStyle(singleLineComboBoxStyle());
-
-		decomposerImplementationCombo = new ComboBox<>();
-		decomposerImplementationCombo.getItems().add("Default");
-		decomposerImplementationCombo.getSelectionModel().selectFirst();
-		decomposerImplementationCombo.setStyle(singleLineComboBoxStyle());
 
 		metricCombo = new ComboBox<>();
 		metricCombo.getItems().add("LCCSS");
@@ -312,7 +300,7 @@ public final class ModernRozaUi extends Application {
 				runStage(selectedStage);
 			});
 
-			if (selectedStage == PipelineStage.REFACTORING) {
+			if (configuration.getChildren().isEmpty()) {
 				configurationSidebar.getChildren().add(actionButton);
 			} else {
 				configurationSidebar.getChildren().addAll(configuration, actionButton);
@@ -381,26 +369,12 @@ public final class ModernRozaUi extends Application {
 	private VBox parsingConfiguration() {
 		VBox configuration = new VBox(CONFIGURATION_INNER_SPACING);
 		configuration.setPadding(new Insets(0, 0, 4, 0));
-
-		Label parserTitle = body("Parser implementation");
-		parserTitle.setStyle(parserTitle.getStyle() + "-fx-font-weight: bold; -fx-text-fill: #333333;");
-
-		parserImplementationCombo.setMaxWidth(Double.MAX_VALUE);
-
-		configuration.getChildren().addAll(parserTitle, parserImplementationCombo);
 		return configuration;
 	}
 
 	private VBox decompositionConfiguration() {
 		VBox configuration = new VBox(CONFIGURATION_INNER_SPACING);
 		configuration.setPadding(new Insets(0, 0, 4, 0));
-
-		Label decomposerTitle = body("Decomposer implementation");
-		decomposerTitle.setStyle(decomposerTitle.getStyle() + "-fx-font-weight: bold; -fx-text-fill: #333333;");
-
-		decomposerImplementationCombo.setMaxWidth(Double.MAX_VALUE);
-
-		configuration.getChildren().addAll(decomposerTitle, decomposerImplementationCombo);
 		return configuration;
 	}
 
