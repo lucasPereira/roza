@@ -1,79 +1,47 @@
 ---
 name: generate-commit
-description: >-
-  Róża (Java/Gradle): in the roza submodule repo root, build one subject line
-  (no conventional type/slug prefix; first letter uppercase), stage with
-  `git add -A`, show **`git status`** after staging and the **composed commit
-  message** (one line; **hard cap 72 characters**—shorten until compliant), wait
-  for explicit user approval, then run **`git commit -m "…"`**. Use when the user
-  attaches this skill or asks to generate commit / mensagem de commit for Róża.
+description: Generate a Róża commit proposal from pending Git changes and commit it only after user approval of a verified ≤72-character subject.
+disable-model-invocation: true
 ---
 
-# Generate commit for Róża (single subject line)
+# Generate commit for Róża
 
-## How to invoke
+This skill prepares one Róża commit with a single subject line. Follow [Repository scope](#repository-scope), [Commit subject](#commit-subject), and [Approval workflow](#approval-workflow) in order.
 
-Attach this **`SKILL.md`** (or ask the agent to follow it). Do **not** rely on or add Cursor slash commands for this workflow unless the user explicitly requests them.
+## Repository scope
 
-## Goal
+Run Git commands from the Róża repository root, wherever that checkout lives. The message must reflect the full tree versus `HEAD`: staged changes, unstaged changes, and untracked files, respecting `.gitignore`.
 
-1. Derive **one** commit message line: a **short subject** only (no body in this workflow).
+**Inspect before staging.** Run `git status` and `git diff HEAD` to understand all pending changes before composing the subject. If the tree is clean, report that and stop without running `git add` or `git commit`.
 
-   **Format (mandatory):**
+## Commit subject
 
-   - **No** conventional prefix such as `feat:`, `fix:`, `chore:`, or scoped `docs-modern:` — the line is **only** the summary text.
-   - **First character must be uppercase** (English: capitalize the first letter of the sentence; Portuguese: capitalize the first letter of the first word per normal orthography).
-   - **Imperative mood**, present tense summary of **everything** not yet committed in **this** repo (same intent as before, without a slug).
-   - **Length (non-negotiable):** the **entire** line must be **≤72 characters**. Treat **72** as a **hard** ceiling: if the draft is **73+**, shorten **before** the user ever sees it (see **Verify length** in Steps). Never depend on tools to truncate for you.
+The commit message is a single short subject line that summarizes every pending change in the Róża repository.
 
-2. **Stage** everything not yet committed (`git add -A`), then show the user **only**: full **`git status`** output (after the add) **and** the **composed commit message line** (the same ≤72-character line you verified). Then **ask for explicit approval** before running **`git commit`**. If the user does not approve, **do not** commit; offer `git reset` to unstage if they want to undo staging. Do **not** show **`git diff --cached`** unless the user explicitly asks for a patch preview.
+**Use one line only.** Do not add a body. Do not use conventional prefixes, scoped prefixes, or slugs such as `feat:`, `fix:`, `chore:`, or `docs-modern:`.
 
-## Repo root (mandatory)
+**Start uppercase and use imperative mood.** Prefer English unless the user asks for Portuguese. The first character must be uppercase.
 
-The Git repository is the **Róża submodule** (`roza/`), **not** the doctorate workspace root.
+**Enforce the 72-character maximum length.** Count the exact visible characters in the full subject before showing it to the user. If it is 73 characters or more, rewrite and recount until it is 72 characters or fewer. Never depend on tools to truncate the message.
 
-Run all Git commands **from `roza/`** (e.g. `cd roza` or `git -C <path-to-roza>`).
+**Compress unrelated changes carefully.** If pending changes are unrelated, still propose one umbrella subject within 72 characters and warn that bundling unrelated work is risky. Offer to split only if the user asks.
 
-## Scope
+## Approval workflow
 
-The message must reflect the **full** tree vs `HEAD` before staging: staged, unstaged, and **untracked** paths (respecting `.gitignore` via normal Git rules).
+These steps preserve the staging, approval, decline, and failure gates.
 
-## Steps
-
-1. `cd` to the **roza** submodule root (or use `git -C <roza-root>`).
-2. Run `git status` and `git diff HEAD` (and short/porcelain status if useful) to understand **all** pending changes.
-3. If there is **nothing** to commit (clean tree), report that and **stop** — do not run `git add` or `git commit`.
-4. Compose **one** subject line covering the full picture: **no** `type:` prefix; **first character uppercase**; imperative; **≤72** characters total.
-5. **Verify length (mandatory):** count characters in the **full** string exactly as the user will see it. If the count is **greater than 72**, rewrite and re-count until **≤72**. Repeat until compliant.
-6. Stage everything not yet committed: **`git add -A`** at the **roza** repo root (adds new files, stages modifications, stages removals; honors ignored files).
-7. After staging, show the user (before asking approval):
-   - **`git status`**: paste the **full** output (branch, ahead/behind if any, and the whole “Changes to be committed” section).
-   - The **commit message** you composed: the single line (and optionally the exact `git commit -m "…"` command using that line).
-8. **Stop and ask for explicit approval** (e.g. yes / ok / pode / aprovo) to run the commit. Do **not** run `git commit` until the user confirms.
-9. After approval: run **`git commit -m "…"`** once with the exact composed subject line only (quote safely for the shell). Do **not** add a second `-m`, a here-doc, or an editor-driven multi-line message unless the user explicitly asks for that.
-10. If the user declines approval, do **not** commit. Optionally offer **`git reset`** (mixed or keep their preference) to unstage if they want to revert the index.
-11. If `git commit` fails (e.g. hook failure, GPG signing issues), report the error output; do not claim success.
-
-## Subject line rules
-
-- Prefer **English** unless the user asks for Portuguese.
-- **No** `slug:` / `type:` prefix; **do** start with an **uppercase** letter.
-- One line; **hard cap 72 characters** for the **entire** line—**no** “close enough” overruns. Avoid vague verbs (“Update stuff”). If changes are unrelated, compress into one umbrella summary **≤72** and warn in chat that bundling unrelated work is risky; offer to split only if the user asks.
-
-### Long summaries and laundry lists
-
-Comma-separated or “and also …” lists **will** blow the 72-character budget. **Compress** (stronger umbrella verb + one object) or **split scope** in your head—still keep **this** proposed line within 72 chars.
+1. Compose and verify the subject using [Commit subject](#commit-subject).
+2. Run `git add -A` at the repository root.
+3. Paste the full `git status` output after staging.
+4. Paste the single subject line.
+5. Do not paste `git diff --cached` unless the user asks for a patch preview.
+6. Ask for explicit approval: `yes`, `ok`, `pode`, `aprovo`, or equivalent.
+7. Do not run `git commit` before approval.
+8. If approved, run one `git commit -m "…"` with the exact subject.
+9. Do not add a second `-m`, here-doc, or editor body unless the user asks.
+10. If the user declines, do not commit; offer `git reset` to unstage.
+11. If `git commit` fails, paste the error output and do not claim success.
 
 ## Examples
 
-```text
-Move legacy loader fixtures to test/resources/legacy/loader
-```
-
-```text
-Rename runRozaUi Gradle task to runLegacyRozaUi
-```
-
-```text
-Document modern and legacy import isolation in modern docs
-```
+See [examples.md](examples.md) for sample valid subject lines.

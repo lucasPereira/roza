@@ -18,7 +18,9 @@ From the project root, run:
 
 ## Running Experiments
 
-Experiment inputs are stored under `src/expt/resources`, and generated outputs are written under `experiment-results`.
+Experiment inputs are stored under `src/expt/resources`.
+
+Generated outputs are written under `experiment-results`.
 
 Run an experiment with its Gradle task:
 
