@@ -138,7 +138,7 @@ fun registerExperimentTask(
     }
 }
 
-registerExperimentTask("runExperimentA", "Runs experiment a, which compares similarity metrics for reuse-oriented refactoring candidates.", "br.ufsc.ine.leb.roza.expt.a.Experiment")
+registerExperimentTask("runExperimentA", "Runs experiment a, which compares similarity metrics for refactoring candidates.", "br.ufsc.ine.leb.roza.expt.a.Experiment")
 
 registerExperimentTask("runExperimentB", "Runs experiment b, which generates a compact similarity measurement example.", "br.ufsc.ine.leb.roza.expt.b.Examples")
 
