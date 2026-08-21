@@ -7,3 +7,7 @@
 [submodule "external-projects/commons-text"]
 	path = external-projects/commons-text
 	url = https://github.com/apache/commons-text.git
+[submodule "external-projects/saas-unificado"]
+	path = external-projects/saas-unificado
+	url = https://github.com/lucasPereira/saas-unificado.git
+	branch = roza
