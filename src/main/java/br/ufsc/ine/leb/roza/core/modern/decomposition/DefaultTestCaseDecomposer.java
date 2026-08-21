@@ -26,11 +26,11 @@ public final class DefaultTestCaseDecomposer implements TestCaseDecomposer {
 		Set<String> excludedClasses = excludedClasses(parsedTestClasses.violations());
 		Set<String> excludedMethods = excludedMethods(parsedTestClasses.violations());
 		for (TestClass testClass : parsedTestClasses.testClasses()) {
-			if (excludedClasses.contains(testClass.name())) {
+			if (excludedClasses.contains(testClass.qualifiedName())) {
 				continue;
 			}
 			for (TestMethod testMethod : testClass.testMethods()) {
-				if (excludedMethods.contains(methodKey(testClass.name(), testMethod.name()))) {
+				if (excludedMethods.contains(methodKey(testClass.qualifiedName(), testMethod.name()))) {
 					continue;
 				}
 				testCases.add(decompose(testClass, testMethod));

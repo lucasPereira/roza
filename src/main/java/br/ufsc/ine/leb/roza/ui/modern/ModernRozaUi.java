@@ -62,6 +62,7 @@ import br.ufsc.ine.leb.roza.core.modern.parsing.ParsingException;
 import br.ufsc.ine.leb.roza.core.modern.parsing.TestClass;
 import br.ufsc.ine.leb.roza.core.modern.parsing.TestClassParser;
 import br.ufsc.ine.leb.roza.core.modern.parsing.TestCodeViolation;
+import br.ufsc.ine.leb.roza.core.modern.parsing.TestMethod;
 import br.ufsc.ine.leb.roza.core.modern.parsing.UnsupportedFeatureException;
 import br.ufsc.ine.leb.roza.core.modern.parsing.ViolationScope;
 import br.ufsc.ine.leb.roza.core.modern.refactoring.ImplicitSetupPackagePolicy;
@@ -870,7 +871,7 @@ public final class ModernRozaUi extends Application {
 		if (loadedCodeFiles == null) {
 			return;
 		}
-		Pattern classDeclaration = Pattern.compile("\\bclass\\s+" + Pattern.quote(violation.testClassName()) + "\\b");
+		Pattern classDeclaration = Pattern.compile("\\bclass\\s+" + Pattern.quote(simpleClassName(violation.testClassName())) + "\\b");
 		for (CodeFile file : loadedCodeFiles.codeFiles()) {
 			if (classDeclaration.matcher(file.content()).find()) {
 				selectedCodeFile = file;
@@ -1310,16 +1311,13 @@ public final class ModernRozaUi extends Application {
 				.map(TestCodeViolation::testClassName)
 				.collect(Collectors.toSet());
 		parsedTestClasses.testClasses().stream()
-				.filter(testClass -> excludedClasses.contains(testClass.name()))
-				.flatMap(testClass -> testClass.testMethods().stream().map(testMethod -> testClass.name() + "." + testMethod.name()))
+				.filter(testClass -> excludedClasses.contains(testClass.qualifiedName()))
+				.flatMap(testClass -> testClass.testMethods().stream().map(testMethod -> testKey(testClass, testMethod)))
 				.forEach(excludedTests::add);
 		return excludedTests.size();
 	}
 
 	private long acceptedTestCount() {
-		if (decomposedTestCases != null) {
-			return decomposedTestCases.testCases().size();
-		}
 		Set<String> excludedClasses = parsedTestClasses.violations().stream()
 				.filter(violation -> violation.scope() == ViolationScope.TEST_CLASS)
 				.map(TestCodeViolation::testClassName)
@@ -1329,15 +1327,27 @@ public final class ModernRozaUi extends Application {
 				.map(this::violationTestKey)
 				.collect(Collectors.toSet());
 		return parsedTestClasses.testClasses().stream()
-				.filter(testClass -> !excludedClasses.contains(testClass.name()))
+				.filter(testClass -> !excludedClasses.contains(testClass.qualifiedName()))
 				.flatMap(testClass -> testClass.testMethods()
 						.stream()
-						.filter(testMethod -> !excludedTests.contains(testClass.name() + "." + testMethod.name())))
+						.filter(testMethod -> !excludedTests.contains(testKey(testClass, testMethod))))
 				.count();
+	}
+
+	private String testKey(TestClass testClass, TestMethod testMethod) {
+		return testClass.qualifiedName() + "." + testMethod.name();
 	}
 
 	private String violationTestKey(TestCodeViolation violation) {
 		return violation.testClassName() + "." + violation.testMethodName().orElse("");
+	}
+
+	private String simpleClassName(String className) {
+		int separator = className.lastIndexOf('.');
+		if (separator == -1) {
+			return className;
+		}
+		return className.substring(separator + 1);
 	}
 
 	private void refreshSimilaritySelectionControls() {

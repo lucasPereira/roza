@@ -52,7 +52,7 @@ public final class DefaultTestCodeAnalytics implements TestCodeAnalytics {
 	private List<TestClass> violationFreeTestClasses(ParsedTestClasses parsedTestClasses) {
 		Set<String> excludedClasses = classesWithAnyViolation(parsedTestClasses);
 		return parsedTestClasses.testClasses().stream()
-				.filter(testClass -> !excludedClasses.contains(testClass.name()))
+				.filter(testClass -> !excludedClasses.contains(testClass.qualifiedName()))
 				.collect(Collectors.toList());
 	}
 

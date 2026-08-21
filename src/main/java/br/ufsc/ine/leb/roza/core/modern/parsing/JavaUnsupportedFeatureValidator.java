@@ -55,12 +55,15 @@ final class JavaUnsupportedFeatureValidator {
 	}
 
 	private String testClassName(CompilationUnit unit) {
-		return unit.getTypes()
+		String simpleName = unit.getTypes()
 				.stream()
 				.filter(type -> type.isClassOrInterfaceDeclaration())
 				.map(type -> type.asClassOrInterfaceDeclaration().getNameAsString())
 				.findFirst()
 				.orElse("<unknown>");
+		return unit.getPackageDeclaration()
+				.map(declaration -> declaration.getNameAsString() + "." + simpleName)
+				.orElse(simpleName);
 	}
 
 	private void validateImports(CompilationUnit unit, String testClassName, List<TestCodeViolation> violations) {

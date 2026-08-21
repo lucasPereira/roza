@@ -53,6 +53,13 @@ public final class TestClass {
 		return name;
 	}
 
+	public String qualifiedName() {
+		if (packageName == null || packageName.isEmpty()) {
+			return name;
+		}
+		return packageName + "." + name;
+	}
+
 	public Optional<String> packageName() {
 		return Optional.ofNullable(packageName);
 	}

@@ -60,6 +60,7 @@ class JunitTestClassParserTest {
 		ParsedTestClasses parsed = parse("package example.tests; import org.junit.Test; class Example { @Test public void test() { assertTrue(true); } }");
 
 		assertEquals("example.tests", parsed.testClasses().get(0).packageName().orElseThrow());
+		assertEquals("example.tests.Example", parsed.testClasses().get(0).qualifiedName());
 	}
 
 	@Test
@@ -277,6 +278,13 @@ class JunitTestClassParserTest {
 		assertTrue(
 				parsed.violations().stream().anyMatch(violation -> violation.description().contains(expectedDescription)),
 				name + " should mention " + expectedDescription + " but was " + parsed.violations().stream().map(TestCodeViolation::description).collect(Collectors.toList()));
+	}
+
+	@Test
+	void shouldQualifyViolationClassNameWithPackage() {
+		ParsedTestClasses parsed = parse("package example.tests; class Example { void helper() { } @Test public void test() { assertTrue(true); } }");
+
+		assertEquals("example.tests.Example", parsed.violations().get(0).testClassName());
 	}
 
 	@Test

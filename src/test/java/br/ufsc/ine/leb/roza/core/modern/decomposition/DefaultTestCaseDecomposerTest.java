@@ -159,6 +159,36 @@ class DefaultTestCaseDecomposerTest {
 		assertEquals("first", decomposed.testCases().get(0).name());
 	}
 
+	@Test
+	void shouldKeepHomonymClassInAnotherPackage() {
+		TestClass accepted = new TestClass(
+				"Example",
+				"other.tests",
+				List.of(),
+				null,
+				List.of(),
+				List.of(),
+				List.of(),
+				List.of(testMethod("test", "assertTrue(true);")));
+		TestClass rejected = new TestClass(
+				"Example",
+				"example.tests",
+				List.of(),
+				null,
+				List.of(),
+				List.of(),
+				List.of(),
+				List.of(testMethod("test", "assertTrue(true);")));
+		ParsedTestClasses parsedTestClasses = new ParsedTestClasses(
+				List.of(accepted, rejected),
+				List.of(new TestCodeViolation(ViolationScope.TEST_CLASS, "example.tests.Example", "Unsupported helper method: helper")));
+
+		DecomposedTestCases decomposed = decomposer.decompose(parsedTestClasses);
+
+		assertEquals(1, decomposed.testCases().size());
+		assertEquals("other.tests.Example", decomposed.testCases().get(0).sourceTestClass().orElseThrow().qualifiedName());
+	}
+
 	private ParsedTestClasses parsedTestClasses(TestClass testClass) {
 		return new ParsedTestClasses(List.of(testClass));
 	}
