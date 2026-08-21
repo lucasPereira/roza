@@ -163,8 +163,6 @@ Checked inside bodies of `@Test`, unsupported test methods, fixtures, helpers, a
 | `Unsupported lambda expression` | `Runnable r = () -> {};` outside an assertion. |
 | `Unsupported method reference` | `Runnable r = this::run;` outside an assertion. |
 | `Unsupported anonymous class` | `new Runnable() { public void run() {} }` |
-| `Unsupported thread creation` | `new Thread(...)` |
-| `Unsupported network object creation: Socket` / `URL` | `new Socket(...)`, `new URL(...)` |
 | `Unsupported local class: Local` | Class declared inside a method. |
 | `Unsupported for loop` | `for (int i = 0; i < n; i++) { ... }` |
 | `Unsupported for-each loop` | `for (String s : list) { ... }` |
@@ -186,35 +184,6 @@ class Example { @Test public void t() { Runnable r = () -> {}; assertTrue(true);
 
 ```java
 class Example { @Test public void t() { for (int i = 0; i < 1; i++) { assertTrue(true); } } }
-```
-
----
-
-## Disallowed method calls (by name / receiver)
-
-Messages are prefixed as below; the full description includes the call expression.
-
-| Description (prefix) | Example |
-| --- | --- |
-| `Unsupported reflection call:` | `Class.forName("x")`, `type.getMethod("m")`, `getDeclaredField`, … |
-| `Unsupported side-effect or time-related call:` | Calls with receiver `Files`, `Paths`, `DriverManager`, `URL`, `Socket`, `Clock`, `Instant`, `LocalDate`, `LocalDateTime`, … |
-| `Unsupported system call:` | `System.currentTimeMillis()`, `nanoTime`, `exit`, `getProperty` |
-| `Unsupported async call:` | `CompletableFuture...`, `Executors...` |
-
-```java
-class Example { @Test public void t() { Class.forName("java.lang.String"); } }
-```
-
-```java
-class Example { @Test public void t() { java.nio.file.Files.readAllBytes(null); } }
-```
-
-```java
-class Example { @Test public void t() { System.currentTimeMillis(); } }
-```
-
-```java
-class Example { @Test public void t() { CompletableFuture.runAsync(() -> {}); } }
 ```
 
 ---

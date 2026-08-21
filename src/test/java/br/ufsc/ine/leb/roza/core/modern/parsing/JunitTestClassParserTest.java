@@ -401,15 +401,6 @@ class JunitTestClassParserTest {
 				unsupported("continue statement", "class Example { @Test public void test() { while (true) { continue; } } }", "continue statement"),
 				unsupported("helper return value", "class Example { int helper() { return 1; } @Test public void test() { assertTrue(true); } }", "helper method"),
 				unsupported("explicit throw", "class Example { @Test public void test() { throw new RuntimeException(); } }", "throw statement"),
-				unsupported("thread creation", "class Example { @Test public void test() { new Thread(); } }", "thread creation"),
-				unsupported("async call", "class Example { @Test public void test() { CompletableFuture.runAsync(task); } }", "async"),
-				unsupported("reflection Class.forName", "class Example { @Test public void test() { Class.forName(\"Example\"); } }", "reflection"),
-				unsupported("reflection getDeclaredMethod", "class Example { @Test public void test() { type.getDeclaredMethod(\"test\"); } }", "reflection"),
-				unsupported("file side effect", "class Example { @Test public void test() { Files.readAllBytes(path); } }", "side-effect"),
-				unsupported("network side effect", "class Example { @Test public void test() { new Socket(\"localhost\", 80); } }", "Socket"),
-				unsupported("url side effect", "class Example { @Test public void test() { new URL(\"http://localhost\"); } }", "URL"),
-				unsupported("database side effect", "class Example { @Test public void test() { DriverManager.getConnection(url); } }", "side-effect"),
-				unsupported("time call", "class Example { @Test public void test() { System.currentTimeMillis(); } }", "system call"),
 				unsupported("explicit this", "class Example { @Test public void test() { this.toString(); } }", "this expression"),
 				unsupported("explicit super", "class Example { @Test public void test() { super.toString(); } }", "super expression"));
 	}

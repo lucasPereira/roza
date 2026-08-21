@@ -226,12 +226,6 @@ final class JavaUnsupportedFeatureValidator {
 		node.findAll(ObjectCreationExpr.class).stream()
 				.filter(creation -> creation.getAnonymousClassBody().isPresent())
 				.forEach(creation -> violation(violations, testClassName, testMethodName, "Unsupported anonymous class", creation));
-		node.findAll(ObjectCreationExpr.class).stream()
-				.filter(creation -> "Thread".equals(creation.getType().asString()))
-				.forEach(creation -> violation(violations, testClassName, testMethodName, "Unsupported thread creation", creation));
-		node.findAll(ObjectCreationExpr.class).stream()
-				.filter(creation -> Set.of("Socket", "URL").contains(creation.getType().asString()))
-				.forEach(creation -> violation(violations, testClassName, testMethodName, "Unsupported network object creation: " + creation.getType(), creation));
 		node.findAll(ClassOrInterfaceDeclaration.class).forEach(type -> violation(violations, testClassName, testMethodName, "Unsupported local class: " + type.getNameAsString(), type));
 		node.findAll(ForStmt.class).forEach(statement -> violation(violations, testClassName, testMethodName, "Unsupported for loop", statement));
 		node.findAll(ForEachStmt.class).forEach(statement -> violation(violations, testClassName, testMethodName, "Unsupported for-each loop", statement));
@@ -246,7 +240,6 @@ final class JavaUnsupportedFeatureValidator {
 		node.findAll(ThrowStmt.class).forEach(statement -> violation(violations, testClassName, testMethodName, "Unsupported explicit throw statement", statement));
 		node.findAll(ThisExpr.class).forEach(expression -> violation(violations, testClassName, testMethodName, "Unsupported explicit this expression", expression));
 		node.findAll(SuperExpr.class).forEach(expression -> violation(violations, testClassName, testMethodName, "Unsupported explicit super expression", expression));
-		node.findAll(MethodCallExpr.class).forEach(call -> validateMethodCall(call, testClassName, testMethodName, violations));
 	}
 
 	private boolean hasAssertionMethodAncestor(Node node) {
@@ -259,26 +252,6 @@ final class JavaUnsupportedFeatureValidator {
 			current = parent.getParentNode();
 		}
 		return false;
-	}
-
-	private void validateMethodCall(MethodCallExpr call, String testClassName, Optional<String> testMethodName, List<TestCodeViolation> violations) {
-		String scope = call.getScope().map(Object::toString).orElse("");
-		String name = call.getNameAsString();
-		if ("Class".equals(scope) && "forName".equals(name)) {
-			violation(violations, testClassName, testMethodName, "Unsupported reflection call: " + call, call);
-		}
-		if (Set.of("getDeclaredMethod", "getDeclaredField", "getMethod", "getField").contains(name)) {
-			violation(violations, testClassName, testMethodName, "Unsupported reflection call: " + call, call);
-		}
-		if (Set.of("Files", "Paths", "DriverManager", "URL", "Socket", "Clock", "Instant", "LocalDate", "LocalDateTime").contains(scope)) {
-			violation(violations, testClassName, testMethodName, "Unsupported side-effect or time-related call: " + call, call);
-		}
-		if ("System".equals(scope) && Set.of("currentTimeMillis", "nanoTime", "exit", "getProperty").contains(name)) {
-			violation(violations, testClassName, testMethodName, "Unsupported system call: " + call, call);
-		}
-		if (Set.of("CompletableFuture", "Executors").contains(scope)) {
-			violation(violations, testClassName, testMethodName, "Unsupported async call: " + call, call);
-		}
 	}
 
 	private void classViolation(List<TestCodeViolation> violations, String testClassName, String description) {
