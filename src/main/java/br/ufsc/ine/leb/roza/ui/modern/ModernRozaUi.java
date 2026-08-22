@@ -1593,7 +1593,7 @@ public final class ModernRozaUi extends Application {
 		Tab setupsTab = new Tab("Setups", growable(classSetupsView(testClass)));
 		Tab codeTab = new Tab("Code", growable(classCodeView(testClass)));
 		Tab violationsTab = new Tab("Violations", classViolationsView(testClass));
-		tabPane.getTabs().addAll(summaryTab, attributesTab, setupsTab, testsTab, codeTab, violationsTab);
+		tabPane.getTabs().addAll(summaryTab, attributesTab, setupsTab, testsTab, violationsTab, codeTab);
 		return tabPane;
 	}
 
