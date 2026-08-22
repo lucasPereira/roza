@@ -128,6 +128,7 @@ fun registerExperimentTask(
     taskDescription: String,
     experimentMainClass: String,
     experimentArgs: List<String> = emptyList(),
+    maxHeapSize: String? = null,
 ) {
     tasks.register<JavaExec>(taskName) {
         group = "verification"
@@ -135,29 +136,69 @@ fun registerExperimentTask(
         classpath = sourceSets["expt"].runtimeClasspath
         mainClass.set(experimentMainClass)
         args(experimentArgs)
+        maxHeapSize?.let { heap -> this.maxHeapSize = heap }
     }
 }
 
-registerExperimentTask("runExperimentA", "Runs experiment a, which compares similarity metrics for refactoring candidates.", "br.ufsc.ine.leb.roza.expt.a.Experiment")
+registerExperimentTask(
+    "runExperimentA",
+    "Runs experiment a, which compares similarity metrics for refactoring candidates.",
+    "br.ufsc.ine.leb.roza.expt.a.Experiment",
+)
 
-registerExperimentTask("runExperimentB", "Runs experiment b, which generates a compact similarity measurement example.", "br.ufsc.ine.leb.roza.expt.b.Examples")
+registerExperimentTask(
+    "runExperimentB",
+    "Runs experiment b, which generates a compact similarity measurement example.",
+    "br.ufsc.ine.leb.roza.expt.b.Examples",
+)
 
-registerExperimentTask("runExperimentC", "Runs experiment c, which compares clustering configurations for implicit-setup refactoring.", "br.ufsc.ine.leb.roza.expt.c.Experiment")
+registerExperimentTask(
+    "runExperimentC",
+    "Runs experiment c, which compares clustering configurations for implicit-setup refactoring.",
+    "br.ufsc.ine.leb.roza.expt.c.Experiment",
+)
 
-registerExperimentTask("runExperimentD", "Runs experiment d, which measures reuse after refactoring 16 student programs.", "br.ufsc.ine.leb.roza.expt.d.Experiment")
+registerExperimentTask(
+    "runExperimentD",
+    "Runs experiment d, which measures reuse after refactoring 16 student programs.",
+    "br.ufsc.ine.leb.roza.expt.d.Experiment",
+)
 
-registerExperimentTask("runExperimentE", "Runs experiment e, which refactors the banking-system use case.", "br.ufsc.ine.leb.roza.expt.e.Experiment")
+registerExperimentTask(
+    "runExperimentE",
+    "Runs experiment e, which refactors the banking-system use case.",
+    "br.ufsc.ine.leb.roza.expt.e.Experiment",
+)
 
-registerExperimentTask("runExperimentF", "Runs experiment f, which measures reuse after refactoring 47 student programs.", "br.ufsc.ine.leb.roza.expt.f.Experiment")
+registerExperimentTask(
+    "runExperimentF",
+    "Runs experiment f, which measures reuse after refactoring 47 student programs.",
+    "br.ufsc.ine.leb.roza.expt.f.Experiment",
+)
 
-registerExperimentTask("runExperimentG", "Runs experiment g, which benchmarks baseline and optimized clustering scalability on Apache Commons Lang.", "br.ufsc.ine.leb.roza.expt.g.Experiment")
+registerExperimentTask(
+    "runExperimentG",
+    "Runs experiment g, which benchmarks baseline and optimized clustering scalability on Apache Commons Lang.",
+    "br.ufsc.ine.leb.roza.expt.g.Experiment",
+)
 
-registerExperimentTask("runExperimentH", "Runs experiment h, which compares original, local-only, and global refactoring on Apache Commons Lang.", "br.ufsc.ine.leb.roza.expt.h.Experiment")
+registerExperimentTask(
+    "runExperimentH",
+    "Runs experiment h, which compares original, local-only, and global refactoring on Apache Commons Lang.",
+    "br.ufsc.ine.leb.roza.expt.h.Experiment",
+)
 
 registerExperimentTask(
     "runExperimentI",
-    "Runs experiment i, which measures eligible and per-level refactored metrics on Róża tests with LCCSS and LCS.",
+    "Runs experiment i, which measures eligible and per-level refactored metrics on Róża tests with LCCSS.",
     "br.ufsc.ine.leb.roza.expt.i.Experiment",
+)
+
+registerExperimentTask(
+    "runExperimentJ",
+    "Runs experiment j, which measures eligible and per-level refactored metrics on SAAS tests with LCCSS.",
+    "br.ufsc.ine.leb.roza.expt.j.Experiment",
+    maxHeapSize = "8g",
 )
 
 spotless {
