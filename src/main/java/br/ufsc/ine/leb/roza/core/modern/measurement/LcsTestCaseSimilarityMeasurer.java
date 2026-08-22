@@ -1,11 +1,10 @@
 package br.ufsc.ine.leb.roza.core.modern.measurement;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
+import br.ufsc.ine.leb.roza.core.modern.arrangement.ArrangeProjection;
 import br.ufsc.ine.leb.roza.core.modern.decomposition.DecomposedTestCases;
 import br.ufsc.ine.leb.roza.core.modern.decomposition.TestCase;
-import br.ufsc.ine.leb.roza.core.modern.parsing.CodeStatement;
 
 public final class LcsTestCaseSimilarityMeasurer implements TestCaseSimilarityMeasurer {
 
@@ -24,23 +23,10 @@ public final class LcsTestCaseSimilarityMeasurer implements TestCaseSimilarityMe
 	}
 
 	private double measure(TestCase source, TestCase target) {
-		List<String> sourceProjection = projection(source);
-		List<String> targetProjection = projection(target);
+		List<String> sourceProjection = ArrangeProjection.normalizedStatements(source);
+		List<String> targetProjection = ArrangeProjection.normalizedStatements(target);
 		int commonSubsequenceSize = commonSubsequenceSize(sourceProjection, targetProjection);
-		int totalProjectionSize = sourceProjection.size() + targetProjection.size();
-		if (totalProjectionSize == 0) {
-			return 0.0;
-		}
-		return (2.0 * commonSubsequenceSize) / totalProjectionSize;
-	}
-
-	private List<String> projection(TestCase testCase) {
-		return testCase.body()
-				.statements()
-				.stream()
-				.takeWhile(statement -> !statement.isAssertion())
-				.map(CodeStatement::normalizedText)
-				.collect(Collectors.toList());
+		return DiceMatchSimilarity.score(commonSubsequenceSize, sourceProjection.size(), targetProjection.size());
 	}
 
 	private int commonSubsequenceSize(List<String> source, List<String> target) {

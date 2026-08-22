@@ -20,7 +20,7 @@ public final class DefaultTestCodeAnalytics implements TestCodeAnalytics {
 		Objects.requireNonNull(refactoredTestClasses);
 		OriginalTestCodeMetrics original = originalMetrics(originalTestClasses, acceptedTestCases);
 		TestCodeMetricComparison comparison = new TestCodeMetricComparison(
-				TestClassMetricsCalculator.forEligibleCode(originalTestClasses, acceptedTestCases),
+				TestClassMetricsCalculator.forEligibleSetupCode(originalTestClasses, acceptedTestCases),
 				metricsFor(refactoredTestClasses.testClasses()));
 		return new TestCodeAnalyticsReport(original, comparison);
 	}
@@ -41,7 +41,7 @@ public final class DefaultTestCodeAnalytics implements TestCodeAnalytics {
 	}
 
 	private TestClassMetrics metricsFor(List<TestClass> testClasses) {
-		return TestClassMetricsCalculator.forTestClasses(testClasses);
+		return TestClassMetricsCalculator.forSetupCode(testClasses);
 	}
 
 	private Set<String> classesWithAnyViolation(ParsedTestClasses parsedTestClasses) {

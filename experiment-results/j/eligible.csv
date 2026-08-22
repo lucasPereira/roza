@@ -1,2 +1,2 @@
-test_classes;test_methods;setup_methods;attributes;total_statements;duplicated_statements;duplication_rate
-760;3560;685;7465;23478;18726;79.8
+test_classes;test_methods;setup_methods;attributes;setup_statements;duplicated_setup_statements;setup_duplication_rate
+870;3560;789;8352;25193;20148;80.0

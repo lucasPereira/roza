@@ -21,9 +21,11 @@ import br.ufsc.ine.leb.roza.core.modern.loading.FileSystemCodeFileLoader;
 import br.ufsc.ine.leb.roza.core.modern.loading.LoadedCodeFiles;
 import br.ufsc.ine.leb.roza.core.modern.measurement.LccssTestCaseSimilarityMeasurer;
 import br.ufsc.ine.leb.roza.core.modern.measurement.TestCaseSimilarityMatrix;
+import br.ufsc.ine.leb.roza.core.modern.measurement.TestCaseSimilarityMeasurer;
 import br.ufsc.ine.leb.roza.core.modern.parsing.JunitTestClassParser;
 import br.ufsc.ine.leb.roza.core.modern.parsing.ParsedTestClasses;
 import br.ufsc.ine.leb.roza.core.modern.refactoring.ImplicitSetupTestClassRefactorer;
+import br.ufsc.ine.leb.roza.core.modern.refactoring.TestClassRefactorer;
 
 public final class Experiment {
 
@@ -43,7 +45,7 @@ public final class Experiment {
 				subject.parsedTestClasses().violations().size(),
 				elapsedSeconds(startedAt));
 		writeEligibleMetrics(subject);
-		writeClusteringLevelMetrics(subject);
+		writeClusteringLevelMetrics(subject, "refactored-by-level.csv", "LCCSS", new LccssTestCaseSimilarityMeasurer(), new ImplicitSetupTestClassRefactorer());
 		System.out.printf(
 				"Experiment j finished. Eligible tests: %d. Results: %s. Total time: %.1fs%n",
 				subject.acceptedTestCases().testCases().size(),
@@ -59,19 +61,19 @@ public final class Experiment {
 		return new Subject(parsed, accepted);
 	}
 
-	private static List<ClusteringLevel> clusteringLevels(DecomposedTestCases accepted) {
+	private static List<ClusteringLevel> clusteringLevels(DecomposedTestCases accepted, String metricLabel, TestCaseSimilarityMeasurer measurer) {
 		long startedAt = System.currentTimeMillis();
-		System.out.printf("Measuring LCCSS similarity for %d tests...%n", accepted.testCases().size());
-		TestCaseSimilarityMatrix matrix = new LccssTestCaseSimilarityMeasurer().measure(accepted);
-		System.out.printf("LCCSS similarity measured in %.1fs%n", elapsedSeconds(startedAt));
+		System.out.printf("Measuring %s similarity for %d tests...%n", metricLabel, accepted.testCases().size());
+		TestCaseSimilarityMatrix matrix = measurer.measure(accepted);
+		System.out.printf("%s similarity measured in %.1fs%n", metricLabel, elapsedSeconds(startedAt));
 		long clusteringStartedAt = System.currentTimeMillis();
-		System.out.println("Generating clustering levels...");
+		System.out.printf("Generating clustering levels for %s...%n", metricLabel);
 		AgglomerativeHierarchicalTestCaseClusterer clusterer = new AgglomerativeHierarchicalTestCaseClusterer(
 				new SingleLinkage(),
 				new CompositeStopCriterion(List.of()),
 				new CompositeMergeTieBreaker(List.of(new StableTestCaseOrderMergeTieBreaker())));
 		List<ClusteringLevel> levels = clusterer.generateLevels(matrix);
-		System.out.printf("Clustering levels generated in %.1fs%n", elapsedSeconds(clusteringStartedAt));
+		System.out.printf("%s clustering levels generated in %.1fs%n", metricLabel, elapsedSeconds(clusteringStartedAt));
 		return levels;
 	}
 
@@ -82,10 +84,12 @@ public final class Experiment {
 				"test_methods",
 				"setup_methods",
 				"attributes",
-				"total_statements",
-				"duplicated_statements",
-				"duplication_rate");
-		TestClassMetrics metrics = TestClassMetricsCalculator.forEligibleCode(subject.parsedTestClasses(), subject.acceptedTestCases());
+				"setup_statements",
+				"duplicated_setup_statements",
+				"setup_duplication_rate");
+		TestClassMetrics metrics = TestClassMetricsCalculator.forEligibleSetupCode(
+				subject.parsedTestClasses(),
+				subject.acceptedTestCases());
 		writer.addLine(
 				metrics.testClasses(),
 				metrics.testMethods(),
@@ -97,10 +101,14 @@ public final class Experiment {
 		RESULTS.writeContetAsString("eligible.csv", writer.getContent());
 	}
 
-	private static void writeClusteringLevelMetrics(Subject subject) {
+	private static void writeClusteringLevelMetrics(
+			Subject subject,
+			String outputFile,
+			String metricLabel,
+			TestCaseSimilarityMeasurer measurer,
+			TestClassRefactorer refactorer) {
 		long startedAt = System.currentTimeMillis();
-		ImplicitSetupTestClassRefactorer refactorer = new ImplicitSetupTestClassRefactorer();
-		List<ClusteringLevel> levels = clusteringLevels(subject.acceptedTestCases());
+		List<ClusteringLevel> levels = clusteringLevels(subject.acceptedTestCases(), metricLabel, measurer);
 		CommaSeparatedValues writer = new CommaSeparatedValues();
 		writer.addLine(
 				"level",
@@ -108,16 +116,21 @@ public final class Experiment {
 				"test_methods",
 				"setup_methods",
 				"attributes",
-				"total_statements",
-				"duplicated_statements",
-				"duplication_rate");
+				"setup_statements",
+				"duplicated_setup_statements",
+				"setup_duplication_rate");
 		int levelCount = levels.size();
 		for (ClusteringLevel level : levels) {
 			int displayLevel = displayLevel(level);
 			if (displayLevel == 1 || displayLevel % PROGRESS_INTERVAL == 0 || displayLevel == levelCount) {
-				System.out.printf("Refactoring level %d/%d (%.1fs elapsed)%n", displayLevel, levelCount, elapsedSeconds(startedAt));
+				System.out.printf(
+						"Refactoring %s level %d/%d (%.1fs elapsed)%n",
+						metricLabel,
+						displayLevel,
+						levelCount,
+						elapsedSeconds(startedAt));
 			}
-			TestClassMetrics metrics = TestClassMetricsCalculator.forTestClasses(
+			TestClassMetrics metrics = TestClassMetricsCalculator.forSetupCode(
 					refactorer.refactor(new TestCaseClusters(level.clusters())).testClasses());
 			writer.addLine(
 					displayLevel,
@@ -129,8 +142,8 @@ public final class Experiment {
 					metrics.duplicatedStatements(),
 					formatDuplicationRate(metrics.duplicationRate()));
 		}
-		RESULTS.writeContetAsString("refactored-by-level.csv", writer.getContent());
-		System.out.printf("Wrote refactored metrics for %d levels in %.1fs%n", levelCount, elapsedSeconds(startedAt));
+		RESULTS.writeContetAsString(outputFile, writer.getContent());
+		System.out.printf("Wrote %s metrics for %d levels in %.1fs%n", metricLabel, levelCount, elapsedSeconds(startedAt));
 	}
 
 	private static int displayLevel(ClusteringLevel level) {

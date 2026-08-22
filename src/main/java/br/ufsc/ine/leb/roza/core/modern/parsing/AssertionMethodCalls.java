@@ -26,9 +26,6 @@ final class AssertionMethodCalls {
 			"Assertions",
 			"MatcherAssert");
 
-	private AssertionMethodCalls() {
-	}
-
 	static boolean isAssertionMethod(MethodCallExpr call) {
 		String name = call.getNameAsString();
 		if (!JunitAssertionMethods.contains(name)) {

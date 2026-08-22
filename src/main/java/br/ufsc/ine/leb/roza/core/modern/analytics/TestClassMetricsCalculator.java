@@ -1,53 +1,41 @@
 package br.ufsc.ine.leb.roza.core.modern.analytics;
 
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import br.ufsc.ine.leb.roza.core.modern.decomposition.DecomposedTestCases;
 import br.ufsc.ine.leb.roza.core.modern.parsing.ParsedTestClasses;
 import br.ufsc.ine.leb.roza.core.modern.parsing.TestClass;
-import br.ufsc.ine.leb.roza.core.modern.parsing.TestCodeViolation;
 
 public final class TestClassMetricsCalculator {
 
-	private TestClassMetricsCalculator() {
+	public static TestClassMetrics forSetupCode(List<TestClass> testClasses) {
+		SetupCodeDuplicationAnalyzer.DuplicationMetrics duplication = SetupCodeDuplicationAnalyzer.analyze(testClasses);
+		return metrics(testClasses, duplication.totalStatements(), duplication.duplicatedStatements());
 	}
 
-	public static TestClassMetrics forTestClasses(List<TestClass> testClasses) {
+	private static TestClassMetrics metrics(List<TestClass> testClasses, int totalStatements, int duplicatedStatements) {
 		int testMethods = testClasses.stream().mapToInt(testClass -> testClass.testMethods().size()).sum();
 		int setupMethods = testClasses.stream().mapToInt(testClass -> testClass.fixtures().size()).sum();
 		int attributes = testClasses.stream().mapToInt(testClass -> testClass.fields().size()).sum();
-		TestClassDuplicationAnalyzer.DuplicationMetrics duplication = TestClassDuplicationAnalyzer.analyze(testClasses);
 		return new TestClassMetrics(
 				testClasses.size(),
 				testMethods,
 				setupMethods,
 				attributes,
-				duplication.totalStatements(),
-				duplication.duplicatedStatements());
+				totalStatements,
+				duplicatedStatements);
 	}
 
-	public static TestClassMetrics forEligibleCode(ParsedTestClasses parsedTestClasses, DecomposedTestCases acceptedTestCases) {
-		int testClassesWithoutViolations = parsedTestClasses.testClasses().size() - classesWithAnyViolation(parsedTestClasses).size();
-		TestClassMetrics eligibleMetrics = forTestClasses(violationFreeTestClasses(parsedTestClasses));
-		return new TestClassMetrics(
-				testClassesWithoutViolations,
-				acceptedTestCases.testCases().size(),
-				eligibleMetrics.setupMethods(),
-				eligibleMetrics.attributes(),
-				eligibleMetrics.totalStatements(),
-				eligibleMetrics.duplicatedStatements());
+	public static TestClassMetrics forEligibleSetupCode(ParsedTestClasses parsedTestClasses, DecomposedTestCases acceptedTestCases) {
+		List<TestClass> acceptedClasses = AcceptedTestClassProjection.project(parsedTestClasses);
+		assertAcceptedTestCount(acceptedClasses, acceptedTestCases);
+		return forSetupCode(acceptedClasses);
 	}
 
-	private static List<TestClass> violationFreeTestClasses(ParsedTestClasses parsedTestClasses) {
-		Set<String> excludedClasses = classesWithAnyViolation(parsedTestClasses);
-		return parsedTestClasses.testClasses().stream()
-				.filter(testClass -> !excludedClasses.contains(testClass.qualifiedName()))
-				.collect(Collectors.toList());
-	}
-
-	private static Set<String> classesWithAnyViolation(ParsedTestClasses parsedTestClasses) {
-		return parsedTestClasses.violations().stream().map(TestCodeViolation::testClassName).collect(Collectors.toSet());
+	private static void assertAcceptedTestCount(List<TestClass> acceptedClasses, DecomposedTestCases acceptedTestCases) {
+		int acceptedMethods = acceptedClasses.stream().mapToInt(testClass -> testClass.testMethods().size()).sum();
+		if (acceptedMethods != acceptedTestCases.testCases().size()) {
+			throw new IllegalStateException("Eligible source projection and decomposed test cases must contain the same tests.");
+		}
 	}
 }

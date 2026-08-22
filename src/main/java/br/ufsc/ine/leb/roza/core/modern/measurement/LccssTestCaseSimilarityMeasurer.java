@@ -1,11 +1,10 @@
 package br.ufsc.ine.leb.roza.core.modern.measurement;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
+import br.ufsc.ine.leb.roza.core.modern.arrangement.ArrangeProjection;
 import br.ufsc.ine.leb.roza.core.modern.decomposition.DecomposedTestCases;
 import br.ufsc.ine.leb.roza.core.modern.decomposition.TestCase;
-import br.ufsc.ine.leb.roza.core.modern.parsing.CodeStatement;
 
 public final class LccssTestCaseSimilarityMeasurer implements TestCaseSimilarityMeasurer {
 
@@ -24,30 +23,9 @@ public final class LccssTestCaseSimilarityMeasurer implements TestCaseSimilarity
 	}
 
 	private double measure(TestCase source, TestCase target) {
-		List<String> sourceProjection = projection(source);
-		List<String> targetProjection = projection(target);
-		int commonPrefixSize = commonPrefixSize(sourceProjection, targetProjection);
-		int totalProjectionSize = sourceProjection.size() + targetProjection.size();
-		if (totalProjectionSize == 0) {
-			return 0.0;
-		}
-		return (2.0 * commonPrefixSize) / totalProjectionSize;
-	}
-
-	private List<String> projection(TestCase testCase) {
-		return testCase.body()
-				.statements()
-				.stream()
-				.takeWhile(statement -> !statement.isAssertion())
-				.map(CodeStatement::normalizedText)
-				.collect(Collectors.toList());
-	}
-
-	private int commonPrefixSize(List<String> source, List<String> target) {
-		int commonPrefixSize = 0;
-		while (commonPrefixSize < source.size() && commonPrefixSize < target.size() && source.get(commonPrefixSize).equals(target.get(commonPrefixSize))) {
-			commonPrefixSize++;
-		}
-		return commonPrefixSize;
+		List<String> sourceProjection = ArrangeProjection.normalizedStatements(source);
+		List<String> targetProjection = ArrangeProjection.normalizedStatements(target);
+		int commonPrefixSize = TextualPrefixSimilarity.commonPrefixSize(sourceProjection, targetProjection);
+		return DiceMatchSimilarity.score(commonPrefixSize, sourceProjection.size(), targetProjection.size());
 	}
 }

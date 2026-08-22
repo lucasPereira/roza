@@ -15,9 +15,6 @@ final class TestCaseProjectionMaterializer {
 
 	private static final int FIRST_PROJECTED_BODY_LINE = 3;
 
-	private TestCaseProjectionMaterializer() {
-	}
-
 	static List<MaterializedTestCase> materialize(List<TestCase> testCases, Path materializerDirectory, String classNamePrefix) throws IOException {
 		List<MaterializedTestCase> materializedTestCases = new ArrayList<>();
 		for (int index = 0; index < testCases.size(); index++) {

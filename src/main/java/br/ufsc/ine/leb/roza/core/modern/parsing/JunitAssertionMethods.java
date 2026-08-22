@@ -27,9 +27,6 @@ final class JunitAssertionMethods {
 			"assertTrue",
 			"fail");
 
-	private JunitAssertionMethods() {
-	}
-
 	static boolean contains(String name) {
 		return NAMES.contains(name);
 	}

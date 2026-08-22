@@ -52,7 +52,6 @@ import br.ufsc.ine.leb.roza.core.modern.measurement.SimianTestCaseSimilarityMeas
 import br.ufsc.ine.leb.roza.core.modern.measurement.TestCaseSimilarityMatrix;
 import br.ufsc.ine.leb.roza.core.modern.measurement.TestCaseSimilarityMeasurer;
 import br.ufsc.ine.leb.roza.core.modern.parsing.CodeStatement;
-import br.ufsc.ine.leb.roza.core.modern.parsing.Field;
 import br.ufsc.ine.leb.roza.core.modern.parsing.FixtureKind;
 import br.ufsc.ine.leb.roza.core.modern.parsing.FixtureMethod;
 import br.ufsc.ine.leb.roza.core.modern.parsing.JunitTestClassParser;
@@ -68,7 +67,6 @@ import br.ufsc.ine.leb.roza.core.modern.parsing.ViolationScope;
 import br.ufsc.ine.leb.roza.core.modern.refactoring.ImplicitSetupTestClassRefactorer;
 import br.ufsc.ine.leb.roza.core.modern.refactoring.JunitTestClassRenderer;
 import br.ufsc.ine.leb.roza.core.modern.refactoring.RefactoredTestClasses;
-import br.ufsc.ine.leb.roza.core.modern.refactoring.TestClassRefactorer;
 import br.ufsc.ine.leb.roza.core.modern.writing.FileSystemTestClassWriter;
 import br.ufsc.ine.leb.roza.core.modern.writing.TestClassWriter;
 import javafx.beans.binding.Bindings;
@@ -1007,8 +1005,7 @@ public final class ModernRozaUi extends Application {
 
 	private void refactor(TestCaseClusters clusters) {
 		try {
-			TestClassRefactorer refactorer = new ImplicitSetupTestClassRefactorer();
-			refactoredTestClasses = refactorer.refactor(clusters);
+			refactoredTestClasses = new ImplicitSetupTestClassRefactorer().refactor(clusters);
 			selectedRefactoredTestClass = refactoredTestClasses.testClasses().isEmpty() ? null : refactoredTestClasses.testClasses().get(0);
 			refactoringError = null;
 			writingError = null;

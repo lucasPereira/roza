@@ -1,0 +1,4 @@
+control;test_classes;test_methods;setup_methods;attributes;setup_statements;duplicated_setup_statements;setup_duplication_rate
+original-filtered;81;365;59;298;1776;1171;65.9
+decomposed-unrecomposed;365;365;0;0;3685;3094;84.0
+source-partition;81;365;59;374;1764;1163;65.9

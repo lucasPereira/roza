@@ -46,12 +46,12 @@ class DefaultTestCodeAnalyticsTest {
 		assertEquals(4, report.original().testMethods());
 		assertEquals(2, report.original().testMethodsWithoutViolations());
 		assertEquals(2, report.original().testMethodsWithViolations());
-		assertEquals(1, report.comparison().original().testClasses());
+		assertEquals(2, report.comparison().original().testClasses());
 		assertEquals(2, report.comparison().original().testMethods());
 		assertEquals(1, report.comparison().original().setupMethods());
-		assertEquals(2, report.comparison().original().attributes());
-		assertEquals(2, report.comparison().original().totalStatements());
-		assertEquals(0, report.comparison().original().duplicatedStatements());
+		assertEquals(3, report.comparison().original().attributes());
+		assertEquals(3, report.comparison().original().totalStatements());
+		assertEquals(1, report.comparison().original().duplicatedStatements());
 		assertEquals(1, report.comparison().refactored().testClasses());
 		assertEquals(2, report.comparison().refactored().testMethods());
 		assertEquals(1, report.comparison().refactored().setupMethods());
