@@ -60,6 +60,24 @@ class DefaultTestCodeAnalyticsTest {
 		assertEquals(1, report.comparison().refactored().duplicatedStatements());
 	}
 
+	@Test
+	void shouldIncludeUnsupportedTestLikeMethodsInOriginalTestCounts() {
+		ParsedTestClasses original = new ParsedTestClasses(
+				List.of(testClass("ExampleTest", 0, 0, "acceptedTest")),
+				List.of(new TestCodeViolation(
+						ViolationScope.TEST_METHOD,
+						"ExampleTest",
+						"parameterizedTest",
+						"Unsupported test method annotation: ParameterizedTest")));
+		DecomposedTestCases accepted = new DecomposedTestCases(List.of(testCase("acceptedTest")));
+
+		TestCodeAnalyticsReport report = new DefaultTestCodeAnalytics().analyze(original, accepted, new RefactoredTestClasses(List.of()));
+
+		assertEquals(2, report.original().testMethods());
+		assertEquals(1, report.original().testMethodsWithoutViolations());
+		assertEquals(1, report.original().testMethodsWithViolations());
+	}
+
 	private TestClass testClass(String name, int fields, int fixtures, String... tests) {
 		return new TestClass(
 				name,

@@ -39,6 +39,7 @@ import br.ufsc.ine.leb.roza.core.modern.decomposition.DefaultTestCaseDecomposer;
 import br.ufsc.ine.leb.roza.core.modern.decomposition.DecomposedTestCases;
 import br.ufsc.ine.leb.roza.core.modern.decomposition.TestCase;
 import br.ufsc.ine.leb.roza.core.modern.decomposition.TestCaseDecomposer;
+import br.ufsc.ine.leb.roza.core.modern.decomposition.TestCodeEligibilitySummary;
 import br.ufsc.ine.leb.roza.core.modern.loading.CodeFile;
 import br.ufsc.ine.leb.roza.core.modern.loading.FileSystemCodeFileLoader;
 import br.ufsc.ine.leb.roza.core.modern.loading.LoadedCodeFiles;
@@ -1593,7 +1594,7 @@ public final class ModernRozaUi extends Application {
 	}
 
 	private long totalTestCount() {
-		return parsedTestClasses.testClasses().stream().mapToInt(testClass -> testClass.testMethods().size()).sum();
+		return testCodeEligibilitySummary().totalTestCount();
 	}
 
 	private long classViolationCount() {
@@ -1605,53 +1606,19 @@ public final class ModernRozaUi extends Application {
 	}
 
 	private long methodLevelViolationTestCount() {
-		return parsedTestClasses.violations().stream()
-				.filter(violation -> violation.scope() == ViolationScope.TEST_METHOD)
-				.map(this::violationTestKey)
-				.distinct()
-				.count();
+		return testCodeEligibilitySummary().methodLevelViolationTestCount();
 	}
 
 	private long excludedTestCount() {
-		Set<String> excludedTests = new HashSet<>();
-		parsedTestClasses.violations().stream()
-				.filter(violation -> violation.scope() == ViolationScope.TEST_METHOD)
-				.map(this::violationTestKey)
-				.forEach(excludedTests::add);
-		Set<String> excludedClasses = parsedTestClasses.violations().stream()
-				.filter(violation -> violation.scope() == ViolationScope.TEST_CLASS)
-				.map(TestCodeViolation::testClassName)
-				.collect(Collectors.toSet());
-		parsedTestClasses.testClasses().stream()
-				.filter(testClass -> excludedClasses.contains(testClass.qualifiedName()))
-				.flatMap(testClass -> testClass.testMethods().stream().map(testMethod -> testKey(testClass, testMethod)))
-				.forEach(excludedTests::add);
-		return excludedTests.size();
+		return testCodeEligibilitySummary().testsWithViolationsCount();
 	}
 
 	private long acceptedTestCount() {
-		Set<String> excludedClasses = parsedTestClasses.violations().stream()
-				.filter(violation -> violation.scope() == ViolationScope.TEST_CLASS)
-				.map(TestCodeViolation::testClassName)
-				.collect(Collectors.toSet());
-		Set<String> excludedTests = parsedTestClasses.violations().stream()
-				.filter(violation -> violation.scope() == ViolationScope.TEST_METHOD)
-				.map(this::violationTestKey)
-				.collect(Collectors.toSet());
-		return parsedTestClasses.testClasses().stream()
-				.filter(testClass -> !excludedClasses.contains(testClass.qualifiedName()))
-				.flatMap(testClass -> testClass.testMethods()
-						.stream()
-						.filter(testMethod -> !excludedTests.contains(testKey(testClass, testMethod))))
-				.count();
+		return testCodeEligibilitySummary().acceptedTestCount();
 	}
 
-	private String testKey(TestClass testClass, TestMethod testMethod) {
-		return testClass.qualifiedName() + "." + testMethod.name();
-	}
-
-	private String violationTestKey(TestCodeViolation violation) {
-		return violation.testClassName() + "." + violation.testMethodName().orElse("");
+	private TestCodeEligibilitySummary testCodeEligibilitySummary() {
+		return new TestCodeEligibilitySummary(parsedTestClasses);
 	}
 
 	private void refreshSimilaritySelectionControls() {
@@ -1853,14 +1820,11 @@ public final class ModernRozaUi extends Application {
 	}
 
 	private List<List<String>> classSummaryRows(TestClass testClass) {
-		long tests = testClass.testMethods().size();
+		TestCodeEligibilitySummary eligibilitySummary = testCodeEligibilitySummary();
+		long tests = eligibilitySummary.totalTestCount(testClass);
 		List<TestCodeViolation> violations = violationsForClass(testClass);
 		long classLevelViolations = violations.stream().filter(violation -> violation.scope() == ViolationScope.TEST_CLASS).count();
-		long methodLevelViolations = violations.stream()
-				.filter(violation -> violation.scope() == ViolationScope.TEST_METHOD)
-				.map(this::violationTestKey)
-				.distinct()
-				.count();
+		long methodLevelViolations = eligibilitySummary.methodLevelViolationTestCount(testClass);
 		return List.of(
 				List.of("Attributes", formatNumber(testClass.fields().size())),
 				List.of("Setups", formatNumber(setupMethodsInClass(testClass).size())),
@@ -1941,23 +1905,7 @@ public final class ModernRozaUi extends Application {
 	}
 
 	private long excludedTestsInClass(TestClass testClass) {
-		boolean classExcluded = parsedTestClasses.violations()
-				.stream()
-				.anyMatch(violation -> violation.scope() == ViolationScope.TEST_CLASS
-						&& violation.testClassName().equals(testClass.qualifiedName()));
-		if (classExcluded) {
-			return testClass.testMethods().size();
-		}
-		Set<String> excludedMethods = parsedTestClasses.violations()
-				.stream()
-				.filter(violation -> violation.scope() == ViolationScope.TEST_METHOD
-						&& violation.testClassName().equals(testClass.qualifiedName()))
-				.map(this::violationTestKey)
-				.collect(Collectors.toSet());
-		return testClass.testMethods()
-				.stream()
-				.filter(testMethod -> excludedMethods.contains(testKey(testClass, testMethod)))
-				.count();
+		return testCodeEligibilitySummary().testsWithViolationsCount(testClass);
 	}
 
 	private String formatClassSetupMethodCode(TestClass testClass, FixtureMethod setup) {
