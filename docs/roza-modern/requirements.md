@@ -220,6 +220,14 @@ Acceptance criteria:
 - AC-147: LCCSS score is `(2 * commonPrefixSize) / (sourceProjectionSize + targetProjectionSize)`.
 - AC-148: LCCSS score is `0.0` when both projected statement lists are empty for distinct test cases.
 - AC-149: LCCSS measurement must use `CodeStatement.isAssertion()` to find the first assertion; it must not infer assertions from statement text during measurement.
+- AC-312: Setup Extraction Potential (SEP) measures the absolute number of statements in the common contiguous pre-assertion prefix of two tests.
+- AC-313: SEP scores are nonnegative statement counts and are not normalized to the interval from `0.0` to `1.0`.
+- AC-314: SEP preserves LCCSS as a separate selectable measurement metric.
+- AC-315: Greedy Admissible Prefix (GAP) measures the largest pre-assertion prefix obtained by greedily matching dependency-ready statements from either test against the other test's textual order.
+- AC-316: Maximum Admissible Prefix (MAP) measures the largest pre-assertion prefix obtained by searching dependency-ready matching choices from either test against the other test's textual order.
+- AC-317: GAP and MAP dependency analysis preserves read-after-write, write-after-read, and write-after-write ordering; an unparseable statement falls back to textual prefix matching.
+- AC-318: GAP and MAP apply Dice normalization to their selected prefix and record the same best bidirectional score in both matrix directions.
+- AC-319: MAP limits its search and falls back to GAP for that pair when it exceeds the configured node limit.
 - AC-218: LCS measurement uses the same pre-assertion projection as LCCSS, stopping at the first `CodeStatement.isAssertion()` statement.
 - AC-219: LCS compares the projected statement lists by counting the longest common subsequence while preserving statement order.
 - AC-220: LCS score is `(2 * commonSubsequenceSize) / (sourceProjectionSize + targetProjectionSize)`.
@@ -392,7 +400,7 @@ Acceptance criteria:
 - AC-201: The modern UI parsing violation viewer shows the code snippet for the displayed violation without an extra card-style white background.
 - AC-202: The modern UI `Decomposition` center shows a summary with the number of classes with class-level violations, tests with method-level violations, tests excluded by violations, and accepted tests.
 - AC-203: After decomposition, the modern UI `Measurement` center shows all decomposed tests and the code for the selected test.
-- AC-205: The modern UI `Measurement` configuration exposes a metric dropdown with `LCCSS` selected by default and `LCS` as an alternative.
+- AC-205: The modern UI `Measurement` configuration exposes a metric dropdown with `LCCSS` selected by default and GAP, MAP, SEP, LCS, Deckard, JPlag, and Simian as alternatives.
 - AC-206: Triggering `Measure` in the modern UI uses the selected similarity measurer and advances to `Clustering` when measurement succeeds.
 - AC-207: The modern UI `Clustering` center shows source and target test selectors.
 - AC-208: The modern UI `Clustering` center shows a ranked source-target similarity pair list.

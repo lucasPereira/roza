@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
 import br.ufsc.ine.leb.roza.core.modern.analytics.DefaultTestCodeAnalytics;
 import br.ufsc.ine.leb.roza.core.modern.analytics.OriginalTestCodeMetrics;
 import br.ufsc.ine.leb.roza.core.modern.analytics.TestClassMetrics;
+import br.ufsc.ine.leb.roza.core.modern.analytics.TestClassMetricsCalculator;
 import br.ufsc.ine.leb.roza.core.modern.analytics.TestCodeAnalytics;
 import br.ufsc.ine.leb.roza.core.modern.analytics.TestCodeAnalyticsReport;
 import br.ufsc.ine.leb.roza.core.modern.analytics.TestCodeMetricComparison;
@@ -43,10 +44,13 @@ import br.ufsc.ine.leb.roza.core.modern.loading.FileSystemCodeFileLoader;
 import br.ufsc.ine.leb.roza.core.modern.loading.LoadedCodeFiles;
 import br.ufsc.ine.leb.roza.core.modern.measurement.DeckardMeasurementConfiguration;
 import br.ufsc.ine.leb.roza.core.modern.measurement.DeckardTestCaseSimilarityMeasurer;
+import br.ufsc.ine.leb.roza.core.modern.measurement.GreedyAdmissiblePrefixSimilarityMeasurer;
 import br.ufsc.ine.leb.roza.core.modern.measurement.JplagMeasurementConfiguration;
 import br.ufsc.ine.leb.roza.core.modern.measurement.JplagTestCaseSimilarityMeasurer;
 import br.ufsc.ine.leb.roza.core.modern.measurement.LccssTestCaseSimilarityMeasurer;
 import br.ufsc.ine.leb.roza.core.modern.measurement.LcsTestCaseSimilarityMeasurer;
+import br.ufsc.ine.leb.roza.core.modern.measurement.MaxAdmissiblePrefixSimilarityMeasurer;
+import br.ufsc.ine.leb.roza.core.modern.measurement.SetupExtractionPotentialTestCaseSimilarityMeasurer;
 import br.ufsc.ine.leb.roza.core.modern.measurement.SimianMeasurementConfiguration;
 import br.ufsc.ine.leb.roza.core.modern.measurement.SimianTestCaseSimilarityMeasurer;
 import br.ufsc.ine.leb.roza.core.modern.measurement.TestCaseSimilarityMatrix;
@@ -78,8 +82,10 @@ import javafx.geometry.Pos;
 import javafx.geometry.VPos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
@@ -99,6 +105,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
+import javafx.stage.Modality;
 
 public final class ModernRozaUi extends Application {
 
@@ -114,15 +121,12 @@ public final class ModernRozaUi extends Application {
 	/** Appended to the palette style for the cluster produced by the level's accepted merge. */
 	private static final String MERGED_CLUSTER_BLOCK_EMPHASIS =
 			"-fx-border-width: 2; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.12), 6, 0, 0, 1);";
-	private static final int CONFIGURATION_INNER_SPACING = 10;
+	private static final int TOP_REFACTORING_LEVEL_LIMIT = 10;
+	/** Intragroup spacing (label + control, controls within the same block). */
+	private static final int SPACING_X = 8;
+	/** Extragroup spacing (between separate configuration blocks or major sections). */
+	private static final int SPACING_4X = SPACING_X * 4;
 	private static final int SIDEBAR_WIDTH = 320;
-	private static final Insets MARGIN_AFTER_CONFIGURATION_GROUP = new Insets(0, 0, 12, 0);
-	private static final Insets MARGIN_SECTION_TITLE_AFTER_GROUP = new Insets(4, 0, 0, 0);
-	private static final Insets MARGIN_ACTION_BUTTON_TOP = new Insets(12, 0, 0, 0);
-	/** Matches vertical gap above the stage action button (sidebar spacing + button top margin). */
-	private static final int CONFIGURATION_SIDEBAR_SPACING = 14;
-	private static final int CONFIGURATION_GROUP_VERTICAL_GAP =
-			CONFIGURATION_SIDEBAR_SPACING + (int) MARGIN_ACTION_BUTTON_TOP.getTop();
 
 	private final PipelineState pipelineState;
 	private final HBox pipelineBar;
@@ -163,6 +167,12 @@ public final class ModernRozaUi extends Application {
 	private List<ClusteringLevel> clusteringLevels;
 	private String clusteringError;
 	private int selectedRefactoringLevelIndex;
+	private List<Integer> cachedTopRefactoringLevelIndices;
+	private boolean topRefactoringLevelsComputing;
+	private int topRefactoringRankCycleIndex;
+	private ListView<Integer> refactoringLevelList;
+	private ScrollPane refactoringClustersPane;
+	private Button refactoringTopLevelButton;
 	private RefactoredTestClasses refactoredTestClasses;
 	private TestClass selectedRefactoredTestClass;
 	private String refactoringError;
@@ -173,15 +183,16 @@ public final class ModernRozaUi extends Application {
 	private boolean suppressSimilarityComboListener;
 	private HBox decompositionClassesRow;
 	private TextArea measurementTestBodyArea;
+	private TextArea parsingFileContentArea;
 	private TextArea clusteringSourceCodeArea;
 	private TextArea clusteringTargetCodeArea;
 	private final ViolationContextExtractor violationContextExtractor = new ViolationContextExtractor();
 
 	public ModernRozaUi() {
 		pipelineState = new PipelineState();
-		pipelineBar = new HBox(8);
-		configurationSidebar = new VBox(CONFIGURATION_SIDEBAR_SPACING);
-		contentArea = new VBox(14);
+		pipelineBar = new HBox(SPACING_X);
+		configurationSidebar = new VBox(SPACING_4X);
+		contentArea = new VBox(SPACING_4X);
 		recursiveLoading = new CheckBox("Enabled");
 		javaExtension = new CheckBox(".java");
 		txtExtension = new CheckBox(".txt");
@@ -191,6 +202,9 @@ public final class ModernRozaUi extends Application {
 
 		metricCombo = new ComboBox<>();
 		metricCombo.getItems().add("LCCSS");
+		metricCombo.getItems().add("GAP");
+		metricCombo.getItems().add("MAP");
+		metricCombo.getItems().add("SEP");
 		metricCombo.getItems().add("LCS");
 		metricCombo.getItems().add("Deckard");
 		metricCombo.getItems().add("JPlag");
@@ -289,7 +303,7 @@ public final class ModernRozaUi extends Application {
 
 	private void renderPipelineBar() {
 		pipelineBar.getChildren().clear();
-		pipelineBar.setPadding(new Insets(16));
+		pipelineBar.setPadding(new Insets(SPACING_4X));
 		pipelineBar.setAlignment(Pos.CENTER_LEFT);
 		pipelineBar.setStyle(FONT_FAMILY + "-fx-background-color: #333333;");
 
@@ -313,7 +327,7 @@ public final class ModernRozaUi extends Application {
 	private void renderConfigurationSidebar() {
 		PipelineStage selectedStage = pipelineState.selectedStage();
 		configurationSidebar.getChildren().clear();
-		configurationSidebar.setPadding(new Insets(18));
+		configurationSidebar.setPadding(new Insets(SPACING_4X));
 		configurationSidebar.setPrefWidth(SIDEBAR_WIDTH);
 		configurationSidebar.setStyle(FONT_FAMILY + "-fx-background-color: #edf1f5;");
 
@@ -342,7 +356,6 @@ public final class ModernRozaUi extends Application {
 					configurationSidebar.getChildren().add(parsingBlock);
 				} else {
 					configurationSidebar.getChildren().addAll(configuration, parsingBlock);
-					VBox.setMargin(parsingBlock, MARGIN_ACTION_BUTTON_TOP);
 				}
 			} else if (selectedStage == PipelineStage.DECOMPOSITION) {
 				VBox decompositionBlock = decompositionActionBlock(actionButton);
@@ -350,29 +363,25 @@ public final class ModernRozaUi extends Application {
 					configurationSidebar.getChildren().add(decompositionBlock);
 				} else {
 					configurationSidebar.getChildren().addAll(configuration, decompositionBlock);
-					VBox.setMargin(decompositionBlock, MARGIN_ACTION_BUTTON_TOP);
 				}
 			} else if (configuration.getChildren().isEmpty()) {
 				configurationSidebar.getChildren().add(actionButton);
 			} else {
 				configurationSidebar.getChildren().addAll(configuration, actionButton);
-				VBox.setMargin(actionButton, MARGIN_ACTION_BUTTON_TOP);
 			}
 		}
 	}
 
 	private VBox parsingActionBlock(Button parseButton) {
-		VBox block = new VBox(CONFIGURATION_INNER_SPACING);
-		block.setPadding(new Insets(0, 0, 4, 0));
+		VBox block = new VBox(SPACING_4X);
 		block.setMaxWidth(Double.MAX_VALUE);
 		VBox summary = loadedFilesSummary();
-		VBox.setMargin(summary, new Insets(4, 0, 12, 0));
 		block.getChildren().addAll(parseButton, summary);
 		return block;
 	}
 
 	private VBox loadedFilesSummary() {
-		VBox summary = new VBox(8);
+		VBox summary = new VBox(SPACING_X);
 		summary.setMaxWidth(Double.MAX_VALUE);
 		int loadedFileCount = loadedCodeFiles == null ? 0 : loadedCodeFiles.codeFiles().size();
 		summary.getChildren().add(sidebarStatisticsTable(List.of(List.of("Loaded files", formatNumber(loadedFileCount)))));
@@ -380,16 +389,186 @@ public final class ModernRozaUi extends Application {
 	}
 
 	private VBox decompositionActionBlock(Button decomposeButton) {
-		VBox block = new VBox(CONFIGURATION_INNER_SPACING);
-		block.setPadding(new Insets(0, 0, 4, 0));
+		VBox block = new VBox(SPACING_4X);
 		block.setMaxWidth(Double.MAX_VALUE);
 		block.getChildren().add(decomposeButton);
 		if (parsedTestClasses != null) {
-			VBox summary = decompositionSummary();
-			VBox.setMargin(summary, new Insets(4, 0, 12, 0));
-			block.getChildren().add(summary);
+			block.getChildren().add(decompositionSummary());
 		}
 		return block;
+	}
+
+	private void showConfigurationHelpDialog(String title, String introduction, List<ConfigurationHelpEntry> entries) {
+		Dialog<Void> dialog = new Dialog<>();
+		dialog.initModality(Modality.APPLICATION_MODAL);
+		if (configurationSidebar.getScene() != null) {
+			dialog.initOwner(configurationSidebar.getScene().getWindow());
+		}
+		dialog.setTitle(title);
+		dialog.getDialogPane().getButtonTypes().add(ButtonType.CLOSE);
+
+		VBox content = new VBox(SPACING_4X);
+		content.setPadding(new Insets(SPACING_X, 0, SPACING_X, 0));
+		content.setMaxWidth(Double.MAX_VALUE);
+		if (introduction != null && !introduction.isBlank()) {
+			Label introductionLabel = body(introduction);
+			introductionLabel.setWrapText(true);
+			introductionLabel.setStyle(introductionLabel.getStyle() + "-fx-font-size: 13px; -fx-text-fill: #4b5563;");
+			content.getChildren().add(introductionLabel);
+		}
+		for (ConfigurationHelpEntry entry : entries) {
+			content.getChildren().add(configurationHelpEntry(entry));
+		}
+
+		ScrollPane scrollPane = new ScrollPane(content);
+		scrollPane.setFitToWidth(true);
+		scrollPane.setPrefViewportWidth(520);
+		scrollPane.setPrefViewportHeight(480);
+		scrollPane.setStyle("-fx-background-color: transparent; -fx-background: transparent;");
+
+		dialog.getDialogPane().setContent(scrollPane);
+		dialog.getDialogPane().setPrefWidth(560);
+		dialog.showAndWait();
+	}
+
+	private void showMeasurementMetricHelpDialog() {
+		showConfigurationHelpDialog("Measurement metrics", null, measurementMetricHelpEntries());
+	}
+
+	private void showLinkageMethodHelpDialog() {
+		showConfigurationHelpDialog(
+				"Linkage methods",
+				"Róża builds clusters bottom up, repeatedly merging the two most similar groups. Linkage decides how group similarity is computed from the pairwise similarities between individual tests.",
+				linkageMethodHelpEntries());
+	}
+
+	private void showStopCriteriaHelpDialog() {
+		showConfigurationHelpDialog(
+				"Stop criteria",
+				"Stop criteria tell clustering when to stop merging. You can add several; clustering stops as soon as any one of them is satisfied. With none configured, merging continues until no candidates remain.",
+				stopCriterionHelpEntries());
+	}
+
+	private void showMergeTieBreakersHelpDialog() {
+		showConfigurationHelpDialog(
+				"Merge tie breakers",
+				"Sometimes two merges reach the same similarity score. Tie breakers pick one. They are tried in list order; the first breaker that selects a single merge wins. With none configured, an unresolved tie stops clustering.",
+				mergeTieBreakerHelpEntries());
+	}
+
+	private List<ConfigurationHelpEntry> measurementMetricHelpEntries() {
+		return List.of(
+				new ConfigurationHelpEntry(
+						"LCCSS",
+						"Longest Common Contiguous Start Subsequence. Looks at how much setup code two tests share at the beginning, before either one starts asserting. The more statements match in order from the top, the higher the score. Normalized with Dice. Useful when you care about shared setup at the very start of each test."),
+				new ConfigurationHelpEntry(
+						"GAP",
+						"Greedy Admissible Prefix. Like LCCSS, but willing to shuffle one test's arrange when dependencies allow, trying to line up with the other test's order as it goes. Fast, but may stop short of the longest prefix a deeper search could find. Normalized with Dice. Useful when you care about similarity despite reorderable arrange statements and want a fast answer."),
+				new ConfigurationHelpEntry(
+						"MAP",
+						"Maximum Admissible Prefix. Can reorder arrange statements when dependencies allow, and searches matching choices for the longest admissible prefix instead of stopping at the first greedy fit. Search is limited to 50,000 states; if that limit is hit, the score uses the greedy result instead. Normalized with Dice. Useful when you care about finding the longest dependency-respecting shared prefix."),
+				new ConfigurationHelpEntry(
+						"SEP",
+						"Setup Extraction Potential. Same shared opening as LCCSS, but reports the raw count of matching statements instead of a normalized score. Ten shared statements beat two, even if the shorter pair looks proportionally closer under LCCSS. Useful when you care about how much setup you can actually extract."),
+				new ConfigurationHelpEntry(
+						"LCS",
+						"Longest Common Subsequence. Finds the longest stretch of arrange statements both tests have in common, keeping order but allowing gaps. Unlike LCCSS, a match in the middle still counts. Normalized with Dice. Useful when you care about similar arrange code even when it is not a clean prefix match."),
+				new ConfigurationHelpEntry(
+						"Deckard",
+						"External tree-based clone detector. Parses Java into syntax trees, fingerprints similar subtrees, and reports clones. Róża runs it on arrange projections and scores how much of the source arrange is covered by fragments that match the target. Useful when you care about structural similarity from an external clone detector."),
+				new ConfigurationHelpEntry(
+						"JPlag",
+						"External program similarity detector. Turns each arrange projection into tokens and looks for long matching runs between the two using Greedy String Tiling. Róża reads the directional coverage from JPlag's HTML report. Sensitivity sets the minimum run length. Useful when you care about token-level overlap from an external similarity tool."),
+				new ConfigurationHelpEntry(
+						"Simian",
+						"External duplicate-code detector. Finds identical blocks of consecutive lines above a minimum size. Róża runs it on arrange projections and scores how much of the source arrange falls inside blocks reported as duplicates with the target. Threshold is the minimum block size in lines. Useful when you care about exact duplicate lines from an external duplicate-code detector."));
+	}
+
+	private List<ConfigurationHelpEntry> linkageMethodHelpEntries() {
+		return List.of(
+				new ConfigurationHelpEntry(
+						"Single",
+						"Looks at the strongest link between the two groups. Group similarity is the highest pairwise similarity between any test in one group and any test in the other. Tends to form loose, chain-like clusters."),
+				new ConfigurationHelpEntry(
+						"Complete",
+						"Looks at the weakest link between the two groups. Group similarity is the lowest pairwise similarity across every test pair joining the two groups. Tends to keep clusters compact and internally similar."),
+				new ConfigurationHelpEntry(
+						"Average",
+						"Averages pairwise similarities across all test pairs joining the two groups. A middle ground between single and complete linkage."));
+	}
+
+	private List<ConfigurationHelpEntry> stopCriterionHelpEntries() {
+		return List.of(
+				new ConfigurationHelpEntry(
+						"Minimum similarity",
+						"Stops before the next merge when that merge's similarity falls to this value or below. Default 0.0 only stops at zero similarity, so clustering keeps going until similarities run out or another criterion stops it."),
+				new ConfigurationHelpEntry(
+						"Maximum tests per cluster",
+						"Stops when the next merge would create a cluster larger than the limit. Default 1 allows only single-test clusters, so no merge can happen."),
+				new ConfigurationHelpEntry(
+						"Minimum tests per cluster",
+						"Stops once every current cluster already has at least this many tests. Default 1 is already satisfied before the first merge, so raise it when you want clustering to continue until clusters grow."),
+				new ConfigurationHelpEntry(
+						"Maximum merge level",
+						"Stops after a fixed number of merge steps. Level 1 is the starting point, before any merge. Default 1 stops before the first merge."),
+				new ConfigurationHelpEntry(
+						"Target cluster count",
+						"Stops when the number of clusters reaches this count or fewer. Each cluster becomes a test class after refactoring. Default 1 keeps merging until every test case is grouped into a single test class."),
+				new ConfigurationHelpEntry(
+						"Minimum shared prefix",
+						"Stops when the merged cluster's common contiguous prefix of test-body statements falls to this size or below. Default 0 stops only when the candidate merge would leave no shared prefix at all."));
+	}
+
+	private List<ConfigurationHelpEntry> mergeTieBreakerHelpEntries() {
+		return List.of(
+				new ConfigurationHelpEntry(
+						"Largest merged cluster",
+						"Prefers the merge that would create the bigger resulting cluster."),
+				new ConfigurationHelpEntry(
+						"Smallest merged cluster",
+						"Prefers the merge that would create the smaller resulting cluster."),
+				new ConfigurationHelpEntry(
+						"Stable test order",
+						"Prefers the merge whose resulting test index order comes first. Keeps results repeatable when other breakers still leave a tie."));
+	}
+
+	private HBox configurationTitleRow(String title, Runnable helpAction) {
+		Label titleLabel = body(title);
+		titleLabel.setStyle(titleLabel.getStyle() + "-fx-font-weight: bold; -fx-text-fill: #333333;");
+		Button helpButton = configurationHelpButton(helpAction);
+		HBox titleRow = new HBox(SPACING_X, titleLabel, helpButton);
+		titleRow.setAlignment(Pos.CENTER_LEFT);
+		HBox.setHgrow(titleLabel, Priority.ALWAYS);
+		return titleRow;
+	}
+
+	private VBox configurationHelpEntry(ConfigurationHelpEntry entry) {
+		VBox block = new VBox(SPACING_X);
+		Label nameLabel = body(entry.name());
+		nameLabel.setStyle(nameLabel.getStyle() + "-fx-font-weight: bold; -fx-text-fill: #333333; -fx-font-size: 14px;");
+		Label descriptionLabel = body(entry.description());
+		descriptionLabel.setStyle(descriptionLabel.getStyle() + "-fx-font-size: 13px; -fx-text-fill: #4b5563;");
+		block.getChildren().addAll(nameLabel, descriptionLabel);
+		return block;
+	}
+
+	private static final class ConfigurationHelpEntry {
+
+		private final String name;
+		private final String description;
+
+		private ConfigurationHelpEntry(String name, String description) {
+			this.name = name;
+			this.description = description;
+		}
+
+		private String name() {
+			return name;
+		}
+
+		private String description() {
+			return description;
+		}
 	}
 
 	private VBox configurationFor(PipelineStage selectedStage) {
@@ -414,8 +593,7 @@ public final class ModernRozaUi extends Application {
 		if (selectedStage == PipelineStage.WRITING) {
 			return writingConfiguration();
 		}
-		VBox configuration = new VBox(CONFIGURATION_INNER_SPACING);
-		configuration.setPadding(new Insets(0, 0, 4, 0));
+		VBox configuration = new VBox(SPACING_X);
 		for (String item : selectedStage.configurationItems()) {
 			configuration.getChildren().add(configurationRow(item));
 		}
@@ -423,32 +601,28 @@ public final class ModernRozaUi extends Application {
 	}
 
 	private VBox loadingConfiguration() {
-		VBox configuration = new VBox(CONFIGURATION_INNER_SPACING);
-		configuration.setPadding(new Insets(0, 0, 4, 0));
 		Button sourceFolderButton = new Button("Source folder");
 		sourceFolderButton.setMaxWidth(Double.MAX_VALUE);
 		sourceFolderButton.setStyle(secondaryButtonStyle());
 		sourceFolderButton.setOnAction(event -> chooseSourceFolder());
 
 		Label selectedFolder = body(sourceFolderText());
-		VBox.setMargin(selectedFolder, new Insets(4, 0, 12, 0));
+		VBox sourceFolderGroup = new VBox(SPACING_X, sourceFolderButton, selectedFolder);
 
 		Label recursiveSectionTitle = body("Recursive loading");
 		recursiveSectionTitle.setStyle(recursiveSectionTitle.getStyle() + "-fx-font-weight: bold; -fx-text-fill: #333333;");
-		VBox.setMargin(recursiveLoading, MARGIN_AFTER_CONFIGURATION_GROUP);
+		VBox recursiveGroup = new VBox(SPACING_X, recursiveSectionTitle, recursiveLoading);
 
 		Label acceptedExtensions = body("Accepted extensions");
-		VBox.setMargin(acceptedExtensions, MARGIN_SECTION_TITLE_AFTER_GROUP);
 		acceptedExtensions.setStyle(acceptedExtensions.getStyle() + "-fx-font-weight: bold; -fx-text-fill: #333333;");
+		VBox extensionsGroup = new VBox(SPACING_X, acceptedExtensions, javaExtension, txtExtension);
 
-		configuration.getChildren().addAll(sourceFolderButton, selectedFolder, recursiveSectionTitle, recursiveLoading, acceptedExtensions,
-				javaExtension, txtExtension);
+		VBox configuration = new VBox(SPACING_4X, sourceFolderGroup, recursiveGroup, extensionsGroup);
 		return configuration;
 	}
 
 	private VBox refactoringConfiguration() {
-		VBox configuration = new VBox(CONFIGURATION_INNER_SPACING);
-		configuration.setPadding(new Insets(0, 0, 4, 0));
+		VBox configuration = new VBox(SPACING_X);
 
 		Button refactorButton = new Button(PipelineStage.REFACTORING.actionLabel());
 		refactorButton.setMaxWidth(Double.MAX_VALUE);
@@ -467,44 +641,34 @@ public final class ModernRozaUi extends Application {
 	}
 
 	private VBox writingConfiguration() {
-		VBox configuration = new VBox(CONFIGURATION_INNER_SPACING);
-		configuration.setPadding(new Insets(0, 0, 4, 0));
 		Button outputFolderButton = new Button("Output folder");
 		outputFolderButton.setMaxWidth(Double.MAX_VALUE);
 		outputFolderButton.setStyle(secondaryButtonStyle());
 		outputFolderButton.setOnAction(event -> chooseOutputFolder());
 
 		Label selectedFolder = body(outputFolderText());
-		VBox.setMargin(selectedFolder, new Insets(4, 0, 12, 0));
-
-		configuration.getChildren().addAll(outputFolderButton, selectedFolder);
+		VBox configuration = new VBox(SPACING_X, outputFolderButton, selectedFolder);
 		return configuration;
 	}
 
 	private VBox parsingConfiguration() {
-		VBox configuration = new VBox(CONFIGURATION_INNER_SPACING);
-		configuration.setPadding(new Insets(0, 0, 4, 0));
-		return configuration;
+		return new VBox(SPACING_X);
 	}
 
 	private VBox decompositionConfiguration() {
-		VBox configuration = new VBox(CONFIGURATION_INNER_SPACING);
-		configuration.setPadding(new Insets(0, 0, 4, 0));
-		return configuration;
+		return new VBox(SPACING_X);
 	}
 
 	private VBox measurementConfiguration() {
-		VBox metricBlock = new VBox(CONFIGURATION_INNER_SPACING);
-		Label metricTitle = body("Similarity metric");
-		metricTitle.setStyle(metricTitle.getStyle() + "-fx-font-weight: bold; -fx-text-fill: #333333;");
+		VBox metricBlock = new VBox(SPACING_X);
+		HBox metricTitleRow = configurationTitleRow("Measurement metric", this::showMeasurementMetricHelpDialog);
 		metricCombo.setMaxWidth(Double.MAX_VALUE);
-		metricBlock.getChildren().addAll(metricTitle, metricCombo);
+		metricBlock.getChildren().addAll(metricTitleRow, metricCombo);
 
-		VBox configuration = new VBox(CONFIGURATION_GROUP_VERTICAL_GAP);
-		configuration.setPadding(new Insets(0, 0, 4, 0));
+		VBox configuration = new VBox(SPACING_4X);
 		configuration.getChildren().add(metricBlock);
 		if ("Deckard".equals(metricCombo.getSelectionModel().getSelectedItem())) {
-			VBox deckardFields = new VBox(CONFIGURATION_GROUP_VERTICAL_GAP);
+			VBox deckardFields = new VBox(SPACING_X);
 			deckardFields.getChildren().addAll(
 					configurationInput("Minimum tokens", deckardMinTokensInput),
 					configurationInput("Stride", deckardStrideInput),
@@ -512,34 +676,37 @@ public final class ModernRozaUi extends Application {
 			configuration.getChildren().add(deckardFields);
 		}
 		if ("JPlag".equals(metricCombo.getSelectionModel().getSelectedItem())) {
-			VBox jplagFields = new VBox(CONFIGURATION_GROUP_VERTICAL_GAP);
+			VBox jplagFields = new VBox(SPACING_X);
 			jplagFields.getChildren().add(configurationInput("Sensitivity", jplagSensitivityInput));
 			configuration.getChildren().add(jplagFields);
 		}
 		if ("Simian".equals(metricCombo.getSelectionModel().getSelectedItem())) {
-			VBox simianFields = new VBox(CONFIGURATION_GROUP_VERTICAL_GAP);
+			VBox simianFields = new VBox(SPACING_X);
 			simianFields.getChildren().add(configurationInput("Threshold", simianThresholdInput));
 			configuration.getChildren().add(simianFields);
 		}
 		return configuration;
 	}
 
+	private Button configurationHelpButton(Runnable action) {
+		Button helpButton = new Button("?");
+		helpButton.setMinWidth(Region.USE_PREF_SIZE);
+		helpButton.setMaxWidth(Region.USE_PREF_SIZE);
+		helpButton.setStyle(secondaryButtonStyle() + "-fx-font-size: 12px; -fx-padding: 2 8;");
+		helpButton.setOnAction(event -> action.run());
+		return helpButton;
+	}
+
 	private VBox clusteringConfiguration() {
-		VBox linkageBlock = new VBox(CONFIGURATION_INNER_SPACING);
-		Label linkageTitle = body("Linkage method");
-		linkageTitle.setStyle(linkageTitle.getStyle() + "-fx-font-weight: bold; -fx-text-fill: #333333;");
+		VBox linkageBlock = new VBox(SPACING_X);
 		linkageMethodCombo.setMaxWidth(Double.MAX_VALUE);
-		linkageBlock.getChildren().addAll(linkageTitle, linkageMethodCombo);
+		linkageBlock.getChildren().addAll(configurationTitleRow("Linkage method", this::showLinkageMethodHelpDialog), linkageMethodCombo);
 
-		VBox stopCriteriaBlock = new VBox(CONFIGURATION_INNER_SPACING);
-		Label stopCriteriaTitle = body("Stop criteria");
-		stopCriteriaTitle.setStyle(stopCriteriaTitle.getStyle() + "-fx-font-weight: bold; -fx-text-fill: #333333;");
-		stopCriteriaBlock.getChildren().addAll(stopCriteriaTitle, stopCriterionEditor());
+		VBox stopCriteriaBlock = new VBox(SPACING_X);
+		stopCriteriaBlock.getChildren().addAll(configurationTitleRow("Stop criteria", this::showStopCriteriaHelpDialog), stopCriterionEditor());
 
-		VBox tieBreakersBlock = new VBox(CONFIGURATION_INNER_SPACING);
-		Label tieBreakersTitle = body("Merge tie breakers");
-		tieBreakersTitle.setStyle(tieBreakersTitle.getStyle() + "-fx-font-weight: bold; -fx-text-fill: #333333;");
-		tieBreakersBlock.getChildren().addAll(tieBreakersTitle, tieBreakerEditor());
+		VBox tieBreakersBlock = new VBox(SPACING_X);
+		tieBreakersBlock.getChildren().addAll(configurationTitleRow("Merge tie breakers", this::showMergeTieBreakersHelpDialog), tieBreakerEditor());
 
 		Button clusterButton = new Button(PipelineStage.CLUSTERING.actionLabel());
 		clusterButton.setMaxWidth(Double.MAX_VALUE);
@@ -547,15 +714,13 @@ public final class ModernRozaUi extends Application {
 		clusterButton.setDisable(!stageActionEnabled(PipelineStage.CLUSTERING));
 		clusterButton.setOnAction(event -> runStage(PipelineStage.CLUSTERING));
 
-		VBox configuration = new VBox(CONFIGURATION_GROUP_VERTICAL_GAP);
-		configuration.setPadding(new Insets(0, 0, 4, 0));
+		VBox configuration = new VBox(SPACING_4X);
 		configuration.getChildren().addAll(linkageBlock, stopCriteriaBlock, tieBreakersBlock, clusterButton);
-		VBox.setMargin(clusterButton, MARGIN_ACTION_BUTTON_TOP);
 		return configuration;
 	}
 
 	private VBox stopCriterionEditor() {
-		VBox editor = new VBox(8);
+		VBox editor = new VBox(SPACING_X);
 		for (int index = 0; index < selectedStopCriteria.size(); index++) {
 			editor.getChildren().add(stopCriterionRow(index));
 		}
@@ -598,7 +763,7 @@ public final class ModernRozaUi extends Application {
 			selectedStopCriteria.remove(index);
 			renderConfigurationSidebar();
 		});
-		HBox row = new HBox(8);
+		HBox row = new HBox(SPACING_X);
 		row.getChildren().addAll(comboBox, valueInput, remove);
 		HBox.setHgrow(comboBox, Priority.ALWAYS);
 		HBox.setHgrow(valueInput, Priority.NEVER);
@@ -629,7 +794,7 @@ public final class ModernRozaUi extends Application {
 	}
 
 	private VBox tieBreakerEditor() {
-		VBox editor = new VBox(8);
+		VBox editor = new VBox(SPACING_X);
 		for (int index = 0; index < selectedTieBreakerKinds.size(); index++) {
 			editor.getChildren().add(tieBreakerRow(index));
 		}
@@ -657,7 +822,7 @@ public final class ModernRozaUi extends Application {
 			selectedTieBreakerKinds.remove(index);
 			renderConfigurationSidebar();
 		});
-		HBox row = new HBox(8);
+		HBox row = new HBox(SPACING_X);
 		row.getChildren().addAll(comboBox, remove);
 		HBox.setHgrow(comboBox, Priority.ALWAYS);
 		HBox.setHgrow(remove, Priority.NEVER);
@@ -736,7 +901,7 @@ public final class ModernRozaUi extends Application {
 	}
 
 	private VBox configurationInput(String label, TextField input) {
-		VBox row = new VBox(4);
+		VBox row = new VBox(SPACING_X);
 		Label title = body(label);
 		title.setStyle(title.getStyle() + "-fx-font-weight: bold; -fx-text-fill: #333333;");
 		row.getChildren().addAll(title, input);
@@ -876,6 +1041,9 @@ public final class ModernRozaUi extends Application {
 		clusteringLevels = null;
 		clusteringError = null;
 		selectedRefactoringLevelIndex = 0;
+		cachedTopRefactoringLevelIndices = null;
+		topRefactoringLevelsComputing = false;
+		topRefactoringRankCycleIndex = 0;
 		clearRefactoringResults();
 	}
 
@@ -981,6 +1149,7 @@ public final class ModernRozaUi extends Application {
 			testCaseClusters = new TestCaseClusters(clusteringLevels.get(clusteringLevels.size() - 1).clusters());
 			clusteringError = null;
 			clearRefactoringResults();
+			scheduleBestRefactoringLevelComputation();
 			pipelineState.runSelectedStage();
 		} catch (RuntimeException exception) {
 			testCaseClusters = null;
@@ -1045,6 +1214,15 @@ public final class ModernRozaUi extends Application {
 	}
 
 	private TestCaseSimilarityMeasurer selectedSimilarityMeasurer() {
+		if ("GAP".equals(metricCombo.getSelectionModel().getSelectedItem())) {
+			return new GreedyAdmissiblePrefixSimilarityMeasurer();
+		}
+		if ("MAP".equals(metricCombo.getSelectionModel().getSelectedItem())) {
+			return new MaxAdmissiblePrefixSimilarityMeasurer();
+		}
+		if ("SEP".equals(metricCombo.getSelectionModel().getSelectedItem())) {
+			return new SetupExtractionPotentialTestCaseSimilarityMeasurer();
+		}
 		if ("Deckard".equals(metricCombo.getSelectionModel().getSelectedItem())) {
 			return new DeckardTestCaseSimilarityMeasurer(deckardConfiguration());
 		}
@@ -1129,8 +1307,12 @@ public final class ModernRozaUi extends Application {
 		PipelineStage selectedStage = pipelineState.selectedStage();
 		decompositionClassesRow = null;
 		measurementTestBodyArea = null;
+		parsingFileContentArea = null;
+		refactoringLevelList = null;
+		refactoringClustersPane = null;
+		refactoringTopLevelButton = null;
 		contentArea.getChildren().clear();
-		contentArea.setPadding(new Insets(24));
+		contentArea.setPadding(new Insets(SPACING_4X));
 		contentArea.setStyle(FONT_FAMILY + "-fx-background-color: #f4f6f8;");
 
 		if (selectedStage == PipelineStage.LOADING && loadingError != null) {
@@ -1138,7 +1320,7 @@ public final class ModernRozaUi extends Application {
 			error.setStyle(error.getStyle() + "-fx-text-fill: #991b1b;");
 			contentArea.getChildren().add(error);
 		} else if (selectedStage == PipelineStage.PARSING && loadedCodeFiles != null) {
-			VBox parsingColumn = new VBox(12);
+			VBox parsingColumn = new VBox(SPACING_4X);
 			if (parsingError != null) {
 				Label error = body("Parsing failed: " + parsingError);
 				error.setStyle(error.getStyle() + "-fx-text-fill: #991b1b;");
@@ -1148,7 +1330,7 @@ public final class ModernRozaUi extends Application {
 			contentArea.getChildren().add(parsingColumn);
 			VBox.setVgrow(parsingColumn, Priority.ALWAYS);
 		} else if (selectedStage == PipelineStage.DECOMPOSITION) {
-			VBox decompositionColumn = new VBox(12);
+			VBox decompositionColumn = new VBox(SPACING_4X);
 			if (decompositionError != null) {
 				Label error = body("Decomposition failed: " + decompositionError);
 				error.setStyle(error.getStyle() + "-fx-text-fill: #991b1b;");
@@ -1162,7 +1344,7 @@ public final class ModernRozaUi extends Application {
 			contentArea.getChildren().add(decompositionColumn);
 			VBox.setVgrow(decompositionColumn, Priority.ALWAYS);
 		} else if (selectedStage == PipelineStage.MEASUREMENT && decomposedTestCases != null) {
-			VBox measurementColumn = new VBox(12);
+			VBox measurementColumn = new VBox(SPACING_4X);
 			if (measurementError != null) {
 				Label error = body("Measurement failed: " + measurementError);
 				error.setStyle(error.getStyle() + "-fx-text-fill: #991b1b;");
@@ -1174,7 +1356,7 @@ public final class ModernRozaUi extends Application {
 			VBox.setVgrow(measurementInput, Priority.ALWAYS);
 			VBox.setVgrow(measurementColumn, Priority.ALWAYS);
 		} else if (selectedStage == PipelineStage.CLUSTERING && similarityMatrix != null) {
-			VBox clusteringColumn = new VBox(12);
+			VBox clusteringColumn = new VBox(SPACING_4X);
 			if (clusteringError != null) {
 				Label error = body("Clustering failed: " + clusteringError);
 				error.setStyle(error.getStyle() + "-fx-text-fill: #991b1b;");
@@ -1186,7 +1368,7 @@ public final class ModernRozaUi extends Application {
 			contentArea.getChildren().add(clusteringColumn);
 			VBox.setVgrow(clusteringColumn, Priority.ALWAYS);
 		} else if (selectedStage == PipelineStage.REFACTORING && clusteringLevels != null && !clusteringLevels.isEmpty()) {
-			VBox refactoringColumn = new VBox(12);
+			VBox refactoringColumn = new VBox(SPACING_4X);
 			if (clusteringError != null) {
 				Label error = body("Clustering failed: " + clusteringError);
 				error.setStyle(error.getStyle() + "-fx-text-fill: #991b1b;");
@@ -1203,7 +1385,7 @@ public final class ModernRozaUi extends Application {
 			contentArea.getChildren().add(refactoringColumn);
 			VBox.setVgrow(refactoringColumn, Priority.ALWAYS);
 		} else if (selectedStage == PipelineStage.WRITING && refactoredTestClasses != null) {
-			VBox writingColumn = new VBox(12);
+			VBox writingColumn = new VBox(SPACING_4X);
 			if (writingError != null) {
 				Label error = body("Writing failed: " + writingError);
 				error.setStyle(error.getStyle() + "-fx-text-fill: #991b1b;");
@@ -1224,7 +1406,7 @@ public final class ModernRozaUi extends Application {
 	}
 
 	private VBox decompositionSummary() {
-		VBox summary = new VBox(8);
+		VBox summary = new VBox(SPACING_X);
 		summary.setMaxWidth(Double.MAX_VALUE);
 		summary.getChildren().add(sidebarStatisticsTable(
 				List.of(
@@ -1238,10 +1420,10 @@ public final class ModernRozaUi extends Application {
 	}
 
 	private VBox analyticsView() {
-		VBox analytics = new VBox(18);
+		VBox analytics = new VBox(SPACING_4X);
 		TestCodeAnalytics analyticsGenerator = new DefaultTestCodeAnalytics();
 		TestCodeAnalyticsReport report = analyticsGenerator.analyze(parsedTestClasses, decomposedTestCases, refactoredTestClasses);
-		HBox tables = new HBox(18);
+		HBox tables = new HBox(SPACING_4X);
 		VBox original = originalCodeStatisticsTable(report.original());
 		VBox comparison = eligibleVsRefactoredStatisticsTable(report.comparison());
 		tables.getChildren().addAll(original, comparison);
@@ -1279,13 +1461,14 @@ public final class ModernRozaUi extends Application {
 						List.of("Total statements", formatNumber(eligible.totalStatements()), formatNumber(refactored.totalStatements())),
 						List.of("Duplicated statements", formatNumber(eligible.duplicatedStatements()), formatNumber(refactored.duplicatedStatements())),
 						List.of("Duplication rate", formatDuplicationRate(eligible.duplicationRate()), formatDuplicationRate(refactored.duplicationRate())))));
-		section.getChildren().add(statementMetricsGlossary());
+		VBox glossary = statementMetricsGlossary();
+		VBox.setMargin(glossary, new Insets(SPACING_4X, 0, 0, 0));
+		section.getChildren().add(glossary);
 		return section;
 	}
 
 	private VBox statementMetricsGlossary() {
-		VBox glossary = new VBox(10);
-		glossary.setPadding(new Insets(4, 0, 0, 0));
+		VBox glossary = new VBox(SPACING_X);
 		glossary.getChildren().addAll(
 				glossaryEntry(
 						"Total statements",
@@ -1304,7 +1487,7 @@ public final class ModernRozaUi extends Application {
 	}
 
 	private VBox glossaryEntry(String term, String definition) {
-		VBox entry = new VBox(2);
+		VBox entry = new VBox(SPACING_X);
 		Label termLabel = body(term);
 		termLabel.setStyle(termLabel.getStyle() + "-fx-font-weight: bold; -fx-text-fill: #374151;");
 		Label definitionLabel = body(definition);
@@ -1314,7 +1497,7 @@ public final class ModernRozaUi extends Application {
 	}
 
 	private VBox analyticsSection(String titleText) {
-		VBox section = new VBox(8);
+		VBox section = new VBox(SPACING_X);
 		Label title = body(titleText);
 		title.setStyle(title.getStyle() + "-fx-font-weight: bold; -fx-text-fill: #333333;");
 		section.getChildren().add(title);
@@ -1553,6 +1736,8 @@ public final class ModernRozaUi extends Application {
 		ListView<TestClass> classList = new ListView<>();
 		classList.getItems().addAll(parsedTestClasses.testClasses());
 		classList.setPrefWidth(320);
+		classList.setMinWidth(320);
+		classList.setMaxWidth(320);
 		classList.setCellFactory(list -> new ListCell<>() {
 			@Override
 			protected void updateItem(TestClass item, boolean empty) {
@@ -1576,7 +1761,7 @@ public final class ModernRozaUi extends Application {
 		classDetailsTabs.setMaxWidth(Double.MAX_VALUE);
 		classDetailsTabs.setMaxHeight(Double.MAX_VALUE);
 
-		HBox row = new HBox(16);
+		HBox row = new HBox(SPACING_4X);
 		row.setMaxWidth(Double.MAX_VALUE);
 		row.setMaxHeight(Double.MAX_VALUE);
 		row.getChildren().addAll(classList, classDetailsTabs);
@@ -1658,7 +1843,7 @@ public final class ModernRozaUi extends Application {
 	}
 
 	private VBox classSummaryView(TestClass testClass) {
-		VBox summary = new VBox(8);
+		VBox summary = new VBox(SPACING_X);
 		summary.setMaxWidth(Double.MAX_VALUE);
 		GridPane table = statisticsTable(List.of("Metric", "Value"), classSummaryRows(testClass));
 		stretchTableHorizontally(table, 220, 120);
@@ -1685,16 +1870,14 @@ public final class ModernRozaUi extends Application {
 	}
 
 	private VBox classAttributesView(TestClass testClass) {
-		VBox attributes = new VBox(8);
+		VBox attributes = new VBox(SPACING_X);
 		attributes.setMaxWidth(Double.MAX_VALUE);
 		List<List<String>> rows = testClass.fields()
 				.stream()
 				.map(field -> List.of(field.name(), field.type(), field.initialization().map(statement -> statement.normalizedText()).orElse("")))
 				.collect(Collectors.toList());
 		if (rows.isEmpty()) {
-			Label emptyState = body("This class has no attributes.");
-			VBox.setMargin(emptyState, new Insets(8, 0, 0, 0));
-			attributes.getChildren().add(emptyState);
+			attributes.getChildren().add(body("This class has no attributes."));
 			return attributes;
 		}
 		GridPane table = statisticsTable(List.of("Name", "Type", "Initialization"), rows);
@@ -1729,7 +1912,7 @@ public final class ModernRozaUi extends Application {
 			setupCode.setText(formatClassSetupMethodCode(testClass, selected));
 		});
 
-		HBox row = new HBox(16);
+		HBox row = new HBox(SPACING_4X);
 		row.setMaxWidth(Double.MAX_VALUE);
 		row.setMaxHeight(Double.MAX_VALUE);
 		row.getChildren().addAll(setupList, setupCode);
@@ -1807,7 +1990,7 @@ public final class ModernRozaUi extends Application {
 			methodCode.setText(formatClassTestMethodCode(testClass, selected));
 		});
 
-		HBox row = new HBox(16);
+		HBox row = new HBox(SPACING_4X);
 		row.setMaxWidth(Double.MAX_VALUE);
 		row.setMaxHeight(Double.MAX_VALUE);
 		row.getChildren().addAll(testList, methodCode);
@@ -1893,7 +2076,6 @@ public final class ModernRozaUi extends Application {
 
 		Label violationIdentifier = body(formatViolationIdentifier(selectedViolation));
 		violationIdentifier.setStyle(violationIdentifier.getStyle() + "-fx-font-weight: bold; -fx-text-fill: #333333;");
-		VBox.setMargin(violationIdentifier, new Insets(8, 0, 8, 0));
 
 		TextArea violationCode = monospaceTextArea(formatViolationCode(selectedViolation));
 		TextArea contextCode = monospaceTextArea(formatViolationContext(selectedViolation));
@@ -1903,7 +2085,7 @@ public final class ModernRozaUi extends Application {
 		violationSplit.setMaxWidth(Double.MAX_VALUE);
 		violationSplit.setMaxHeight(Double.MAX_VALUE);
 
-		VBox violationDetails = new VBox(8);
+		VBox violationDetails = new VBox(SPACING_X);
 		violationDetails.getChildren().addAll(violationIdentifier, violationSplit);
 		VBox.setVgrow(violationSplit, Priority.ALWAYS);
 		HBox.setHgrow(violationDetails, Priority.ALWAYS);
@@ -1914,7 +2096,7 @@ public final class ModernRozaUi extends Application {
 			contextCode.setText(formatViolationContext(selected));
 		});
 
-		HBox row = new HBox(16);
+		HBox row = new HBox(SPACING_4X);
 		row.setMaxWidth(Double.MAX_VALUE);
 		row.setMaxHeight(Double.MAX_VALUE);
 		row.getChildren().addAll(violationList, violationDetails);
@@ -1967,19 +2149,33 @@ public final class ModernRozaUi extends Application {
 		}
 		fileList.getSelectionModel().selectedItemProperty().addListener((observable, previous, selected) -> {
 			selectedCodeFile = selected;
-			renderContentArea();
+			refreshParsingFileContent();
 		});
 
-		TextArea fileContent = new TextArea(selectedCodeFile == null ? "Select a loaded file to inspect its content." : selectedCodeFile.content());
+		String contentText = selectedCodeFile == null
+				? "Select a loaded file to inspect its content."
+				: selectedCodeFile.content();
+		TextArea fileContent = new TextArea(contentText);
 		fileContent.setEditable(false);
 		fileContent.setWrapText(false);
 		fileContent.setStyle(FONT_FAMILY + "-fx-font-family: 'Monospaced'; -fx-font-size: 13px;");
 		HBox.setHgrow(fileContent, Priority.ALWAYS);
+		parsingFileContentArea = fileContent;
 
-		HBox loadedFiles = new HBox(16);
+		HBox loadedFiles = new HBox(SPACING_4X);
 		loadedFiles.getChildren().addAll(fileList, fileContent);
 		VBox.setVgrow(loadedFiles, Priority.ALWAYS);
 		return loadedFiles;
+	}
+
+	private void refreshParsingFileContent() {
+		if (parsingFileContentArea == null) {
+			renderContentArea();
+			return;
+		}
+		parsingFileContentArea.setText(selectedCodeFile == null
+				? "Select a loaded file to inspect its content."
+				: selectedCodeFile.content());
 	}
 
 	private HBox decomposedTestsView() {
@@ -2009,7 +2205,7 @@ public final class ModernRozaUi extends Application {
 		HBox.setHgrow(bodyArea, Priority.ALWAYS);
 		measurementTestBodyArea = bodyArea;
 
-		HBox row = new HBox(16);
+		HBox row = new HBox(SPACING_4X);
 		row.getChildren().addAll(testList, bodyArea);
 		VBox.setVgrow(row, Priority.ALWAYS);
 		return row;
@@ -2027,15 +2223,15 @@ public final class ModernRozaUi extends Application {
 
 	private VBox similarityMatrixView() {
 		refreshSimilaritySelectionControls();
-		VBox matrixView = new VBox(12);
+		VBox matrixView = new VBox(SPACING_4X);
 		if (similarityMatrix.size() == 0) {
 			matrixView.getChildren().add(similaritySelectionControls());
 			return matrixView;
 		}
-		HBox rankingAndCode = new HBox(16);
+		HBox rankingAndCode = new HBox(SPACING_4X);
 		VBox ranking = rankedSimilarityList();
 
-		VBox sourceColumn = new VBox(6);
+		VBox sourceColumn = new VBox(SPACING_X);
 		Label sourceTitle = body("Source test");
 		sourceTitle.setStyle(sourceTitle.getStyle() + "-fx-font-weight: bold; -fx-text-fill: #333333;");
 		sourceTestCombo.setPrefWidth(320);
@@ -2044,7 +2240,7 @@ public final class ModernRozaUi extends Application {
 		sourceColumn.getChildren().addAll(sourceTitle, sourceTestCombo, sourceCode);
 		VBox.setVgrow(sourceCode, Priority.ALWAYS);
 
-		VBox targetColumn = new VBox(6);
+		VBox targetColumn = new VBox(SPACING_X);
 		Label targetTitle = body("Target test");
 		targetTitle.setStyle(targetTitle.getStyle() + "-fx-font-weight: bold; -fx-text-fill: #333333;");
 		targetTestCombo.setPrefWidth(320);
@@ -2062,7 +2258,7 @@ public final class ModernRozaUi extends Application {
 	}
 
 	private HBox refactoringMergeLevelsView() {
-		HBox row = new HBox(16);
+		HBox row = new HBox(SPACING_4X);
 		ListView<Integer> levelList = new ListView<>();
 		for (int index = 0; index < clusteringLevels.size(); index++) {
 			levelList.getItems().add(index);
@@ -2081,27 +2277,124 @@ public final class ModernRozaUi extends Application {
 			selectedRefactoringLevelIndex = 0;
 		}
 		levelList.getSelectionModel().select(selectedRefactoringLevelIndex);
-		VBox levelColumn = new VBox(6);
+		Button topLevelButton = new Button(refactoringTopLevelButtonLabel());
+		topLevelButton.setStyle(secondaryButtonStyle());
+		topLevelButton.setMaxWidth(Double.MAX_VALUE);
+		topLevelButton.setDisable(topRefactoringLevelsComputing
+				|| cachedTopRefactoringLevelIndices == null
+				|| cachedTopRefactoringLevelIndices.isEmpty());
+		topLevelButton.setOnAction(event -> cycleTopRefactoringLevel());
+		refactoringTopLevelButton = topLevelButton;
+		VBox levelColumn = new VBox(SPACING_X);
 		Label levelTitle = body("Level");
 		levelTitle.setStyle(levelTitle.getStyle() + "-fx-font-weight: bold; -fx-text-fill: #333333;");
-		levelColumn.getChildren().addAll(levelTitle, levelList);
+		levelColumn.getChildren().addAll(levelTitle, topLevelButton, levelList);
 		VBox.setVgrow(levelList, Priority.ALWAYS);
 		ScrollPane clustersPane = new ScrollPane();
 		clustersPane.setContent(refactoringLevelClustersPanel(selectedRefactoringLevelIndex, clustersPane));
 		clustersPane.setFitToWidth(true);
 		clustersPane.setStyle(
 				"-fx-background-color: transparent; -fx-background: transparent; -fx-border-color: transparent; -fx-border-width: 0;");
+		refactoringLevelList = levelList;
+		refactoringClustersPane = clustersPane;
 		levelList.getSelectionModel().selectedIndexProperty().addListener((observable, previous, next) -> {
 			if (next == null || next.intValue() < 0 || next.intValue() == selectedRefactoringLevelIndex) {
 				return;
 			}
+			topRefactoringRankCycleIndex = 0;
+			updateRefactoringTopLevelButton();
 			selectedRefactoringLevelIndex = next.intValue();
 			clustersPane.setContent(refactoringLevelClustersPanel(selectedRefactoringLevelIndex, clustersPane));
 		});
 		HBox.setHgrow(clustersPane, Priority.ALWAYS);
 		row.getChildren().addAll(levelColumn, clustersPane);
 		row.setFillHeight(true);
+		Platform.runLater(() -> levelList.scrollTo(selectedRefactoringLevelIndex));
 		return row;
+	}
+
+	private void scheduleBestRefactoringLevelComputation() {
+		cachedTopRefactoringLevelIndices = null;
+		topRefactoringRankCycleIndex = 0;
+		if (clusteringLevels == null || clusteringLevels.isEmpty()) {
+			topRefactoringLevelsComputing = false;
+			updateRefactoringTopLevelButton();
+			return;
+		}
+		topRefactoringLevelsComputing = true;
+		updateRefactoringTopLevelButton();
+		List<ClusteringLevel> levels = List.copyOf(clusteringLevels);
+		Thread worker = new Thread(() -> {
+			List<Integer> topLevelIndices = computeTopRefactoringLevelIndices(levels, TOP_REFACTORING_LEVEL_LIMIT);
+			Platform.runLater(() -> {
+				cachedTopRefactoringLevelIndices = topLevelIndices;
+				topRefactoringLevelsComputing = false;
+				updateRefactoringTopLevelButton();
+			});
+		}, "top-refactoring-levels");
+		worker.setDaemon(true);
+		worker.start();
+	}
+
+	private static List<Integer> computeTopRefactoringLevelIndices(List<ClusteringLevel> levels, int limit) {
+		ImplicitSetupTestClassRefactorer refactorer = new ImplicitSetupTestClassRefactorer();
+		List<int[]> rankedLevels = new ArrayList<>();
+		for (int levelIndex = 0; levelIndex < levels.size(); levelIndex++) {
+			TestClassMetrics metrics = TestClassMetricsCalculator.forSetupCode(
+					refactorer.refactor(new TestCaseClusters(levels.get(levelIndex).clusters())).testClasses());
+			rankedLevels.add(new int[] { levelIndex, metrics.duplicatedStatements() });
+		}
+		rankedLevels.sort(Comparator
+				.comparingInt((int[] entry) -> entry[1])
+				.thenComparingInt(entry -> entry[0]));
+		int resultSize = Math.min(limit, rankedLevels.size());
+		List<Integer> topLevelIndices = new ArrayList<>(resultSize);
+		for (int index = 0; index < resultSize; index++) {
+			topLevelIndices.add(rankedLevels.get(index)[0]);
+		}
+		return topLevelIndices;
+	}
+
+	private void cycleTopRefactoringLevel() {
+		if (cachedTopRefactoringLevelIndices == null || cachedTopRefactoringLevelIndices.isEmpty()) {
+			return;
+		}
+		int levelIndex = cachedTopRefactoringLevelIndices.get(topRefactoringRankCycleIndex);
+		selectRefactoringLevel(levelIndex);
+		topRefactoringRankCycleIndex = (topRefactoringRankCycleIndex + 1) % cachedTopRefactoringLevelIndices.size();
+		updateRefactoringTopLevelButton();
+	}
+
+	private String refactoringTopLevelButtonLabel() {
+		if (cachedTopRefactoringLevelIndices == null || cachedTopRefactoringLevelIndices.isEmpty()) {
+			return "Top 1";
+		}
+		return "Top " + (topRefactoringRankCycleIndex + 1);
+	}
+
+	private void selectRefactoringLevel(int levelIndex) {
+		if (clusteringLevels == null || levelIndex < 0 || levelIndex >= clusteringLevels.size()) {
+			return;
+		}
+		selectedRefactoringLevelIndex = levelIndex;
+		if (refactoringLevelList != null) {
+			refactoringLevelList.getSelectionModel().select(levelIndex);
+			int scrollToIndex = levelIndex;
+			Platform.runLater(() -> refactoringLevelList.scrollTo(scrollToIndex));
+		}
+		if (refactoringClustersPane != null) {
+			refactoringClustersPane.setContent(refactoringLevelClustersPanel(levelIndex, refactoringClustersPane));
+		}
+	}
+
+	private void updateRefactoringTopLevelButton() {
+		if (refactoringTopLevelButton == null) {
+			return;
+		}
+		refactoringTopLevelButton.setText(refactoringTopLevelButtonLabel());
+		refactoringTopLevelButton.setDisable(topRefactoringLevelsComputing
+				|| cachedTopRefactoringLevelIndices == null
+				|| cachedTopRefactoringLevelIndices.isEmpty());
 	}
 
 	/** Refactoring tab: per-level cluster tiles for the selected merge level. */
@@ -2111,9 +2404,9 @@ public final class ModernRozaUi extends Application {
 
 	private VBox levelClustersPanel(int levelIndex, ScrollPane clustersScroll) {
 		ClusteringLevel level = clusteringLevels.get(levelIndex);
-		VBox panel = new VBox(8);
+		VBox panel = new VBox(SPACING_X);
 		// FlowPane column count is not fixed: prefWrapLength tracks the scroll viewport width.
-		// Each cluster tile uses pref/max width 380 with hgap 8, so columns ≈ floor((wrap + 8) / (380 + 8))
+		// Each cluster tile uses pref/max width 380 with hgap SPACING_X, so columns ≈ floor((wrap + SPACING_X) / (380 + SPACING_X))
 		// (e.g. wrap ~800px → two columns). Fallback 280 is only when viewport width is not yet known.
 		var usableWrapWidth = Bindings.createDoubleBinding(
 				() -> {
@@ -2132,7 +2425,7 @@ public final class ModernRozaUi extends Application {
 		title.setMaxWidth(Double.MAX_VALUE);
 		panel.getChildren().add(title);
 		Optional<MergeCandidate> merge = levelIndex > 0 ? level.acceptedMerge() : Optional.empty();
-		FlowPane clusterTiles = new FlowPane(Orientation.HORIZONTAL, 8, 8);
+		FlowPane clusterTiles = new FlowPane(Orientation.HORIZONTAL, SPACING_X, SPACING_X);
 		clusterTiles.setRowValignment(VPos.TOP);
 		clusterTiles.prefWrapLengthProperty().bind(usableWrapWidth);
 		clusterTiles.maxWidthProperty().bind(usableWrapWidth);
@@ -2194,10 +2487,10 @@ public final class ModernRozaUi extends Application {
 	}
 
 	private VBox clusterBlockView(TestCaseCluster cluster, int paletteIndex, boolean mergeEmphasis, Optional<Double> formationSimilarity) {
-		VBox block = new VBox(4);
+		VBox block = new VBox(SPACING_X);
 		block.setAlignment(Pos.TOP_LEFT);
 		block.setMaxHeight(Region.USE_PREF_SIZE);
-		block.setPadding(new Insets(8, 10, 8, 10));
+		block.setPadding(new Insets(SPACING_X));
 		block.setPrefWidth(Region.USE_COMPUTED_SIZE);
 		block.setMinWidth(Region.USE_PREF_SIZE);
 		block.setMaxWidth(Region.USE_PREF_SIZE);
@@ -2205,7 +2498,8 @@ public final class ModernRozaUi extends Application {
 		String emphasis = mergeEmphasis ? MERGED_CLUSTER_BLOCK_EMPHASIS : "";
 		block.setStyle(FONT_FAMILY + palette + emphasis);
 		formationSimilarity.ifPresent(similarity -> {
-			Label similarityLine = body("Similarity: " + formatSimilarity(similarity));
+			String scoreName = setupExtractionPotentialSelected() ? "Setup extraction potential" : "Similarity";
+			Label similarityLine = body(scoreName + ": " + formatMeasurementScore(similarity));
 			similarityLine.setMaxWidth(Region.USE_PREF_SIZE);
 			similarityLine.setStyle(similarityLine.getStyle() + "-fx-font-size: 11px; -fx-text-fill: #6b7280;");
 			block.getChildren().add(similarityLine);
@@ -2245,7 +2539,7 @@ public final class ModernRozaUi extends Application {
 			codeArea.setText(renderSelectedRefactoredTestClassCode());
 		});
 
-		HBox row = new HBox(16);
+		HBox row = new HBox(SPACING_4X);
 		row.getChildren().addAll(classList, codeArea);
 		VBox.setVgrow(row, Priority.ALWAYS);
 		return row;
@@ -2258,9 +2552,9 @@ public final class ModernRozaUi extends Application {
 	}
 
 	private HBox similaritySelectionControls() {
-		HBox controls = new HBox(16);
+		HBox controls = new HBox(SPACING_4X);
 
-		VBox source = new VBox(6);
+		VBox source = new VBox(SPACING_X);
 		Label sourceTitle = body("Source test");
 		sourceTitle.setStyle(sourceTitle.getStyle() + "-fx-font-weight: bold; -fx-text-fill: #333333;");
 		sourceTestCombo.setPrefWidth(320);
@@ -2268,7 +2562,7 @@ public final class ModernRozaUi extends Application {
 		source.getChildren().addAll(sourceTitle, sourceTestCombo);
 		HBox.setHgrow(source, Priority.ALWAYS);
 
-		VBox target = new VBox(6);
+		VBox target = new VBox(SPACING_X);
 		Label targetTitle = body("Target test");
 		targetTitle.setStyle(targetTitle.getStyle() + "-fx-font-weight: bold; -fx-text-fill: #333333;");
 		targetTestCombo.setPrefWidth(320);
@@ -2291,7 +2585,7 @@ public final class ModernRozaUi extends Application {
 	}
 
 	private VBox rankedSimilarityList() {
-		VBox ranking = new VBox(8);
+		VBox ranking = new VBox(SPACING_X);
 		ranking.setPrefWidth(90);
 		Button order = new Button(rankedSimilarityDescending ? "Highest" : "Lowest");
 		order.setStyle(secondaryButtonStyle());
@@ -2408,6 +2702,14 @@ public final class ModernRozaUi extends Application {
 		return String.format(Locale.ROOT, "%.4f", similarity);
 	}
 
+	private boolean setupExtractionPotentialSelected() {
+		return "SEP".equals(metricCombo.getSelectionModel().getSelectedItem());
+	}
+
+	private String formatMeasurementScore(double score) {
+		return setupExtractionPotentialSelected() ? String.format(Locale.ROOT, "%.0f", score) : formatSimilarity(score);
+	}
+
 	private static String formatDuplicationRate(double rate) {
 		return String.format(Locale.ROOT, "%.1f%%", rate * 100.0);
 	}
@@ -2476,7 +2778,7 @@ public final class ModernRozaUi extends Application {
 		return FONT_FAMILY + "-fx-background-color: #333333; -fx-text-fill: #ffffff; -fx-background-radius: 6; -fx-padding: 10; -fx-font-weight: bold;";
 	}
 
-	private static final class SimilarityRankingItem {
+	private final class SimilarityRankingItem {
 
 		private final int sourceIndex;
 		private final int targetIndex;
@@ -2513,7 +2815,7 @@ public final class ModernRozaUi extends Application {
 		}
 
 		private String label() {
-			return formatSimilarity(similarity);
+			return formatMeasurementScore(similarity);
 		}
 	}
 }

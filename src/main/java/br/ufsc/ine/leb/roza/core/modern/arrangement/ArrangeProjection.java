@@ -8,7 +8,7 @@ import br.ufsc.ine.leb.roza.core.modern.parsing.CodeStatement;
 
 public final class ArrangeProjection {
 
-	private static List<CodeStatement> arrangeStatements(TestCase testCase) {
+	public static List<CodeStatement> arrangeStatements(TestCase testCase) {
 		return testCase.body()
 				.statements()
 				.stream()
