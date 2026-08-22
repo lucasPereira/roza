@@ -152,6 +152,7 @@ public final class ModernRozaUi extends Application {
 	private String decompositionError;
 	private TestCase selectedDecomposedTestCase;
 	private TestClass selectedParsedTestClass;
+	private String selectedClassDetailsTab = "Summary";
 	private TestMethod selectedParsedTestMethod;
 	private FixtureMethod selectedParsedFixture;
 	private TestCodeViolation selectedClassViolation;
@@ -848,6 +849,7 @@ public final class ModernRozaUi extends Application {
 		decompositionError = null;
 		selectedDecomposedTestCase = null;
 		selectedParsedTestClass = null;
+		selectedClassDetailsTab = "Summary";
 		selectedParsedTestMethod = null;
 		selectedParsedFixture = null;
 		selectedClassViolation = null;
@@ -929,9 +931,10 @@ public final class ModernRozaUi extends Application {
 			decompositionError = null;
 			selectedDecomposedTestCase = null;
 			selectedParsedTestClass = null;
-		selectedParsedTestMethod = null;
-		selectedParsedFixture = null;
-		selectedClassViolation = null;
+			selectedClassDetailsTab = "Summary";
+			selectedParsedTestMethod = null;
+			selectedParsedFixture = null;
+			selectedClassViolation = null;
 			selectedViolation = null;
 			clearMeasurementResults();
 		}
@@ -1523,6 +1526,7 @@ public final class ModernRozaUi extends Application {
 			return;
 		}
 		selectedParsedTestClass = parsedTestClasses.testClasses().isEmpty() ? null : parsedTestClasses.testClasses().get(0);
+		selectedClassDetailsTab = "Summary";
 		selectedParsedTestMethod = null;
 		selectedParsedFixture = null;
 		selectedClassViolation = null;
@@ -1594,7 +1598,24 @@ public final class ModernRozaUi extends Application {
 		Tab codeTab = new Tab("Code", growable(classCodeView(testClass)));
 		Tab violationsTab = new Tab("Violations", classViolationsView(testClass));
 		tabPane.getTabs().addAll(summaryTab, attributesTab, setupsTab, testsTab, violationsTab, codeTab);
+		bindClassDetailsTabPersistence(tabPane);
+		restoreClassDetailsTabSelection(tabPane);
 		return tabPane;
+	}
+
+	private void bindClassDetailsTabPersistence(TabPane tabPane) {
+		tabPane.getSelectionModel().selectedItemProperty().addListener((observable, previous, selected) -> {
+			if (selected != null) {
+				selectedClassDetailsTab = selected.getText();
+			}
+		});
+	}
+
+	private void restoreClassDetailsTabSelection(TabPane tabPane) {
+		tabPane.getTabs().stream()
+				.filter(tab -> selectedClassDetailsTab.equals(tab.getText()))
+				.findFirst()
+				.ifPresent(tab -> tabPane.getSelectionModel().select(tab));
 	}
 
 	private VBox classSummaryView(TestClass testClass) {
