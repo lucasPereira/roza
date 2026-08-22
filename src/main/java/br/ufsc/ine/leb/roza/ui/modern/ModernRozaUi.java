@@ -126,6 +126,8 @@ public final class ModernRozaUi extends Application {
 	private static final int SPACING_X = 8;
 	/** Extragroup spacing (between separate configuration blocks or major sections). */
 	private static final int SPACING_4X = SPACING_X * 4;
+	private static final int LIST_WIDTH_LARGE = 300;
+	private static final int LIST_WIDTH_SMALL = 100;
 	private static final int SIDEBAR_WIDTH = 320;
 
 	private final PipelineState pipelineState;
@@ -1735,9 +1737,7 @@ public final class ModernRozaUi extends Application {
 	private HBox decompositionClassesView() {
 		ListView<TestClass> classList = new ListView<>();
 		classList.getItems().addAll(parsedTestClasses.testClasses());
-		classList.setPrefWidth(320);
-		classList.setMinWidth(320);
-		classList.setMaxWidth(320);
+		configureLargeList(classList);
 		classList.setCellFactory(list -> new ListCell<>() {
 			@Override
 			protected void updateItem(TestClass item, boolean empty) {
@@ -1765,6 +1765,7 @@ public final class ModernRozaUi extends Application {
 		row.setMaxWidth(Double.MAX_VALUE);
 		row.setMaxHeight(Double.MAX_VALUE);
 		row.getChildren().addAll(classList, classDetailsTabs);
+		HBox.setHgrow(classList, Priority.NEVER);
 		HBox.setHgrow(row, Priority.ALWAYS);
 		decompositionClassesRow = row;
 		return row;
@@ -1890,7 +1891,7 @@ public final class ModernRozaUi extends Application {
 		List<FixtureMethod> setups = setupMethodsInClass(testClass);
 		ListView<FixtureMethod> setupList = new ListView<>();
 		setupList.getItems().addAll(setups);
-		setupList.setPrefWidth(280);
+		configureSmallList(setupList);
 		setupList.setCellFactory(list -> new ListCell<>() {
 			@Override
 			protected void updateItem(FixtureMethod item, boolean empty) {
@@ -1916,6 +1917,7 @@ public final class ModernRozaUi extends Application {
 		row.setMaxWidth(Double.MAX_VALUE);
 		row.setMaxHeight(Double.MAX_VALUE);
 		row.getChildren().addAll(setupList, setupCode);
+		HBox.setHgrow(setupList, Priority.NEVER);
 		HBox.setHgrow(row, Priority.ALWAYS);
 		return row;
 	}
@@ -1968,7 +1970,7 @@ public final class ModernRozaUi extends Application {
 	private HBox classTestsView(TestClass testClass) {
 		ListView<TestMethod> testList = new ListView<>();
 		testList.getItems().addAll(testClass.testMethods());
-		testList.setPrefWidth(280);
+		configureSmallList(testList);
 		testList.setCellFactory(list -> new ListCell<>() {
 			@Override
 			protected void updateItem(TestMethod item, boolean empty) {
@@ -1994,6 +1996,7 @@ public final class ModernRozaUi extends Application {
 		row.setMaxWidth(Double.MAX_VALUE);
 		row.setMaxHeight(Double.MAX_VALUE);
 		row.getChildren().addAll(testList, methodCode);
+		HBox.setHgrow(testList, Priority.NEVER);
 		HBox.setHgrow(row, Priority.ALWAYS);
 		return row;
 	}
@@ -2021,6 +2024,20 @@ public final class ModernRozaUi extends Application {
 		container.setMaxHeight(Double.MAX_VALUE);
 		VBox.setVgrow(content, Priority.ALWAYS);
 		return container;
+	}
+
+	private void configureLargeList(ListView<?> listView) {
+		configureListWidth(listView, LIST_WIDTH_LARGE);
+	}
+
+	private void configureSmallList(ListView<?> listView) {
+		configureListWidth(listView, LIST_WIDTH_SMALL);
+	}
+
+	private void configureListWidth(ListView<?> listView, int width) {
+		listView.setPrefWidth(width);
+		listView.setMinWidth(width);
+		listView.setMaxWidth(width);
 	}
 
 	private TestMethod resolveSelectedTestMethod(TestClass testClass) {
@@ -2062,7 +2079,7 @@ public final class ModernRozaUi extends Application {
 	private HBox violationInspectionView(List<TestCodeViolation> violations, TestCodeViolation selectedViolation, Consumer<TestCodeViolation> onSelectionChanged) {
 		ListView<TestCodeViolation> violationList = new ListView<>();
 		violationList.getItems().addAll(violations);
-		violationList.setPrefWidth(320);
+		configureLargeList(violationList);
 		violationList.setCellFactory(list -> new ListCell<>() {
 			@Override
 			protected void updateItem(TestCodeViolation item, boolean empty) {
@@ -2100,6 +2117,8 @@ public final class ModernRozaUi extends Application {
 		row.setMaxWidth(Double.MAX_VALUE);
 		row.setMaxHeight(Double.MAX_VALUE);
 		row.getChildren().addAll(violationList, violationDetails);
+		HBox.setHgrow(violationList, Priority.NEVER);
+		HBox.setHgrow(violationDetails, Priority.ALWAYS);
 		HBox.setHgrow(row, Priority.ALWAYS);
 		return row;
 	}
@@ -2143,7 +2162,7 @@ public final class ModernRozaUi extends Application {
 				setText(empty || item == null ? null : item.source());
 			}
 		});
-		fileList.setPrefWidth(320);
+		configureLargeList(fileList);
 		if (selectedCodeFile != null) {
 			fileList.getSelectionModel().select(selectedCodeFile);
 		}
@@ -2164,6 +2183,7 @@ public final class ModernRozaUi extends Application {
 
 		HBox loadedFiles = new HBox(SPACING_4X);
 		loadedFiles.getChildren().addAll(fileList, fileContent);
+		HBox.setHgrow(fileList, Priority.NEVER);
 		VBox.setVgrow(loadedFiles, Priority.ALWAYS);
 		return loadedFiles;
 	}
@@ -2188,7 +2208,7 @@ public final class ModernRozaUi extends Application {
 				setText(empty || item == null ? null : item.name());
 			}
 		});
-		testList.setPrefWidth(320);
+		configureLargeList(testList);
 		if (selectedDecomposedTestCase != null) {
 			testList.getSelectionModel().select(selectedDecomposedTestCase);
 		}
@@ -2207,6 +2227,7 @@ public final class ModernRozaUi extends Application {
 
 		HBox row = new HBox(SPACING_4X);
 		row.getChildren().addAll(testList, bodyArea);
+		HBox.setHgrow(testList, Priority.NEVER);
 		VBox.setVgrow(row, Priority.ALWAYS);
 		return row;
 	}
@@ -2263,8 +2284,7 @@ public final class ModernRozaUi extends Application {
 		for (int index = 0; index < clusteringLevels.size(); index++) {
 			levelList.getItems().add(index);
 		}
-		levelList.setPrefWidth(72);
-		levelList.setMinWidth(Region.USE_PREF_SIZE);
+		configureSmallList(levelList);
 		levelList.setCellFactory(items -> new ListCell<>() {
 			@Override
 			protected void updateItem(Integer item, boolean empty) {
@@ -2517,7 +2537,7 @@ public final class ModernRozaUi extends Application {
 	private HBox refactoredTestClassesView() {
 		ListView<TestClass> classList = new ListView<>();
 		classList.getItems().addAll(refactoredTestClasses.testClasses());
-		classList.setPrefWidth(320);
+		configureLargeList(classList);
 		classList.setCellFactory(list -> new ListCell<>() {
 			@Override
 			protected void updateItem(TestClass item, boolean empty) {
@@ -2541,6 +2561,7 @@ public final class ModernRozaUi extends Application {
 
 		HBox row = new HBox(SPACING_4X);
 		row.getChildren().addAll(classList, codeArea);
+		HBox.setHgrow(classList, Priority.NEVER);
 		VBox.setVgrow(row, Priority.ALWAYS);
 		return row;
 	}
@@ -2586,7 +2607,9 @@ public final class ModernRozaUi extends Application {
 
 	private VBox rankedSimilarityList() {
 		VBox ranking = new VBox(SPACING_X);
-		ranking.setPrefWidth(90);
+		ranking.setPrefWidth(LIST_WIDTH_SMALL);
+		ranking.setMinWidth(LIST_WIDTH_SMALL);
+		ranking.setMaxWidth(LIST_WIDTH_SMALL);
 		Button order = new Button(rankedSimilarityDescending ? "Highest" : "Lowest");
 		order.setStyle(secondaryButtonStyle());
 		order.setMaxWidth(Double.MAX_VALUE);
@@ -2596,6 +2619,7 @@ public final class ModernRozaUi extends Application {
 		});
 
 		ListView<SimilarityRankingItem> list = new ListView<>();
+		configureSmallList(list);
 		list.getItems().setAll(rankingItems());
 		list.setCellFactory(items -> new ListCell<>() {
 			@Override
