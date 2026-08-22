@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 
 import br.ufsc.ine.leb.roza.core.modern.parsing.CodeStatement;
-import br.ufsc.ine.leb.roza.core.modern.parsing.Field;
 import br.ufsc.ine.leb.roza.core.modern.parsing.FixtureKind;
 import br.ufsc.ine.leb.roza.core.modern.parsing.FixtureMethod;
 import br.ufsc.ine.leb.roza.core.modern.parsing.TestClass;
@@ -19,27 +18,26 @@ public final class TestClassDuplicationAnalyzer {
 
 	public static DuplicationMetrics analyze(List<TestClass> testClasses) {
 		Map<String, Integer> frequencies = new HashMap<>();
+		int totalStatements = 0;
 		for (TestClass testClass : testClasses) {
 			for (String statement : statements(testClass)) {
+				totalStatements++;
 				frequencies.merge(statement, 1, Integer::sum);
 			}
 		}
-		int uniqueDuplicatedLines = 0;
-		int duplicatedLines = 0;
+		int uniqueDuplicatedStatements = 0;
+		int duplicatedStatements = 0;
 		for (int count : frequencies.values()) {
 			if (count > 1) {
-				uniqueDuplicatedLines++;
-				duplicatedLines += count - 1;
+				uniqueDuplicatedStatements++;
+				duplicatedStatements += count - 1;
 			}
 		}
-		return new DuplicationMetrics(duplicatedLines, uniqueDuplicatedLines);
+		return new DuplicationMetrics(totalStatements, duplicatedStatements, uniqueDuplicatedStatements);
 	}
 
 	private static List<String> statements(TestClass testClass) {
 		List<String> statements = new ArrayList<>();
-		for (Field field : testClass.fields()) {
-			statements.add(fieldDeclaration(field));
-		}
 		for (FixtureMethod fixture : testClass.fixtures()) {
 			if (fixture.kind() != FixtureKind.BEFORE) {
 				continue;
@@ -60,29 +58,28 @@ public final class TestClassDuplicationAnalyzer {
 		return statements;
 	}
 
-	private static String fieldDeclaration(Field field) {
-		return field.initialization()
-				.filter(initialization -> !initialization.isAssertion())
-				.map(initialization -> field.type() + " " + field.name() + " = " + initialization.normalizedText() + ";")
-				.orElseGet(() -> field.type() + " " + field.name() + ";");
-	}
-
 	public static final class DuplicationMetrics {
 
-		private final int duplicatedLines;
-		private final int uniqueDuplicatedLines;
+		private final int totalStatements;
+		private final int duplicatedStatements;
+		private final int uniqueDuplicatedStatements;
 
-		public DuplicationMetrics(int duplicatedLines, int uniqueDuplicatedLines) {
-			this.duplicatedLines = duplicatedLines;
-			this.uniqueDuplicatedLines = uniqueDuplicatedLines;
+		public DuplicationMetrics(int totalStatements, int duplicatedStatements, int uniqueDuplicatedStatements) {
+			this.totalStatements = totalStatements;
+			this.duplicatedStatements = duplicatedStatements;
+			this.uniqueDuplicatedStatements = uniqueDuplicatedStatements;
 		}
 
-		public int duplicatedLines() {
-			return duplicatedLines;
+		public int totalStatements() {
+			return totalStatements;
 		}
 
-		public int uniqueDuplicatedLines() {
-			return uniqueDuplicatedLines;
+		public int duplicatedStatements() {
+			return duplicatedStatements;
+		}
+
+		public int uniqueDuplicatedStatements() {
+			return uniqueDuplicatedStatements;
 		}
 	}
 }

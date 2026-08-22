@@ -6,22 +6,25 @@ public final class TestClassMetrics {
 	private final int testMethods;
 	private final int setupMethods;
 	private final int attributes;
-	private final int duplicatedLines;
-	private final int uniqueDuplicatedLines;
+	private final int totalStatements;
+	private final int duplicatedStatements;
+	private final int uniqueDuplicatedStatements;
 
 	public TestClassMetrics(
 			int testClasses,
 			int testMethods,
 			int setupMethods,
 			int attributes,
-			int duplicatedLines,
-			int uniqueDuplicatedLines) {
+			int totalStatements,
+			int duplicatedStatements,
+			int uniqueDuplicatedStatements) {
 		this.testClasses = testClasses;
 		this.testMethods = testMethods;
 		this.setupMethods = setupMethods;
 		this.attributes = attributes;
-		this.duplicatedLines = duplicatedLines;
-		this.uniqueDuplicatedLines = uniqueDuplicatedLines;
+		this.totalStatements = totalStatements;
+		this.duplicatedStatements = duplicatedStatements;
+		this.uniqueDuplicatedStatements = uniqueDuplicatedStatements;
 	}
 
 	public int testClasses() {
@@ -40,11 +43,15 @@ public final class TestClassMetrics {
 		return attributes;
 	}
 
-	public int duplicatedLines() {
-		return duplicatedLines;
+	public int totalStatements() {
+		return totalStatements;
 	}
 
-	public int uniqueDuplicatedLines() {
-		return uniqueDuplicatedLines;
+	public int duplicatedStatements() {
+		return duplicatedStatements;
+	}
+
+	public int uniqueDuplicatedStatements() {
+		return uniqueDuplicatedStatements;
 	}
 }

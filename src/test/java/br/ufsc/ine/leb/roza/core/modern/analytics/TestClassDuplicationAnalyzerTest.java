@@ -23,8 +23,8 @@ class TestClassDuplicationAnalyzerTest {
 
 		TestClassDuplicationAnalyzer.DuplicationMetrics metrics = TestClassDuplicationAnalyzer.analyze(List.of(first, second));
 
-		assertEquals(1, metrics.uniqueDuplicatedLines());
-		assertEquals(1, metrics.duplicatedLines());
+		assertEquals(1, metrics.uniqueDuplicatedStatements());
+		assertEquals(1, metrics.duplicatedStatements());
 	}
 
 	@Test
@@ -35,8 +35,8 @@ class TestClassDuplicationAnalyzerTest {
 
 		TestClassDuplicationAnalyzer.DuplicationMetrics metrics = TestClassDuplicationAnalyzer.analyze(List.of(first, second));
 
-		assertEquals(0, metrics.uniqueDuplicatedLines());
-		assertEquals(0, metrics.duplicatedLines());
+		assertEquals(0, metrics.uniqueDuplicatedStatements());
+		assertEquals(0, metrics.duplicatedStatements());
 	}
 
 	@Test
@@ -49,8 +49,21 @@ class TestClassDuplicationAnalyzerTest {
 
 		TestClassDuplicationAnalyzer.DuplicationMetrics metrics = TestClassDuplicationAnalyzer.analyze(List.of(testClass));
 
-		assertEquals(1, metrics.uniqueDuplicatedLines());
-		assertEquals(1, metrics.duplicatedLines());
+		assertEquals(1, metrics.uniqueDuplicatedStatements());
+		assertEquals(1, metrics.duplicatedStatements());
+	}
+
+	@Test
+	void shouldCountTotalStatements() {
+		TestClass testClass = testClass(
+				"Example",
+				setup("sut = new Sut();"),
+				test("alpha", statement("sut.open();"), assertion("assertTrue(sut.isOpen());")),
+				test("beta", assertion("assertFalse(sut.isOpen());")));
+
+		TestClassDuplicationAnalyzer.DuplicationMetrics metrics = TestClassDuplicationAnalyzer.analyze(List.of(testClass));
+
+		assertEquals(2, metrics.totalStatements());
 	}
 
 	@Test
@@ -63,8 +76,8 @@ class TestClassDuplicationAnalyzerTest {
 
 		TestClassDuplicationAnalyzer.DuplicationMetrics metrics = TestClassDuplicationAnalyzer.analyze(List.of(testClass));
 
-		assertEquals(0, metrics.uniqueDuplicatedLines());
-		assertEquals(0, metrics.duplicatedLines());
+		assertEquals(0, metrics.uniqueDuplicatedStatements());
+		assertEquals(0, metrics.duplicatedStatements());
 	}
 
 	private TestClass testClass(String name, List<FixtureMethod> fixtures, TestMethod... testMethods) {

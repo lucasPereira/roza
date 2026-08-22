@@ -48,8 +48,9 @@ public final class DefaultTestCodeAnalytics implements TestCodeAnalytics {
 				original.testMethodsWithoutViolations(),
 				eligibleMetrics.setupMethods(),
 				eligibleMetrics.attributes(),
-				eligibleMetrics.duplicatedLines(),
-				eligibleMetrics.uniqueDuplicatedLines());
+				eligibleMetrics.totalStatements(),
+				eligibleMetrics.duplicatedStatements(),
+				eligibleMetrics.uniqueDuplicatedStatements());
 	}
 
 	private List<TestClass> violationFreeTestClasses(ParsedTestClasses parsedTestClasses) {
@@ -69,8 +70,9 @@ public final class DefaultTestCodeAnalytics implements TestCodeAnalytics {
 				testMethods,
 				setupMethods,
 				attributes,
-				duplication.duplicatedLines(),
-				duplication.uniqueDuplicatedLines());
+				duplication.totalStatements(),
+				duplication.duplicatedStatements(),
+				duplication.uniqueDuplicatedStatements());
 	}
 
 	private Set<String> classesWithAnyViolation(ParsedTestClasses parsedTestClasses) {

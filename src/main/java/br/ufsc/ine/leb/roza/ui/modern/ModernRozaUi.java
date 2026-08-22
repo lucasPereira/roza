@@ -1271,9 +1271,42 @@ public final class ModernRozaUi extends Application {
 						List.of("Test methods", formatNumber(eligible.testMethods()), formatNumber(refactored.testMethods())),
 						List.of("Setup methods", formatNumber(eligible.setupMethods()), formatNumber(refactored.setupMethods())),
 						List.of("Attributes", formatNumber(eligible.attributes()), formatNumber(refactored.attributes())),
-						List.of("Duplicated lines", formatNumber(eligible.duplicatedLines()), formatNumber(refactored.duplicatedLines())),
-						List.of("Unique duplicated lines", formatNumber(eligible.uniqueDuplicatedLines()), formatNumber(refactored.uniqueDuplicatedLines())))));
+						List.of("Total statements", formatNumber(eligible.totalStatements()), formatNumber(refactored.totalStatements())),
+						List.of("Duplicated statements", formatNumber(eligible.duplicatedStatements()), formatNumber(refactored.duplicatedStatements())),
+						List.of("Unique duplicated statements", formatNumber(eligible.uniqueDuplicatedStatements()), formatNumber(refactored.uniqueDuplicatedStatements())))));
+		section.getChildren().add(statementMetricsGlossary());
 		return section;
+	}
+
+	private VBox statementMetricsGlossary() {
+		VBox glossary = new VBox(10);
+		glossary.setPadding(new Insets(4, 0, 0, 0));
+		glossary.getChildren().addAll(
+				glossaryEntry(
+						"Total statements",
+						"Counts non-assertion statements in setup and test method bodies, normalized for comparison. "
+								+ "For example, a setup with one statement and a test with two yields 3."),
+				glossaryEntry(
+						"Duplicated statements",
+						"Counts each copy after the first of a normalized non-assertion statement "
+								+ "that appears more than once across all test classes. "
+								+ "For example, if sut = new Sut(); appears in three tests and two setups, it contributes 4."),
+				glossaryEntry(
+						"Unique duplicated statements",
+						"Counts each distinct normalized non-assertion statement text "
+								+ "that appears more than once across all test classes. "
+								+ "For example, if two different statements each appear twice, the count is 2."));
+		return glossary;
+	}
+
+	private VBox glossaryEntry(String term, String definition) {
+		VBox entry = new VBox(2);
+		Label termLabel = body(term);
+		termLabel.setStyle(termLabel.getStyle() + "-fx-font-weight: bold; -fx-text-fill: #374151;");
+		Label definitionLabel = body(definition);
+		definitionLabel.setStyle(definitionLabel.getStyle() + "-fx-font-size: 13px;");
+		entry.getChildren().addAll(termLabel, definitionLabel);
+		return entry;
 	}
 
 	private VBox analyticsSection(String titleText) {
