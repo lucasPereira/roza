@@ -5,13 +5,23 @@ public final class TestClassMetrics {
 	private final int testClasses;
 	private final int testMethods;
 	private final int setupMethods;
-	private final int fields;
+	private final int attributes;
+	private final int duplicatedLines;
+	private final int uniqueDuplicatedLines;
 
-	public TestClassMetrics(int testClasses, int testMethods, int setupMethods, int fields) {
+	public TestClassMetrics(
+			int testClasses,
+			int testMethods,
+			int setupMethods,
+			int attributes,
+			int duplicatedLines,
+			int uniqueDuplicatedLines) {
 		this.testClasses = testClasses;
 		this.testMethods = testMethods;
 		this.setupMethods = setupMethods;
-		this.fields = fields;
+		this.attributes = attributes;
+		this.duplicatedLines = duplicatedLines;
+		this.uniqueDuplicatedLines = uniqueDuplicatedLines;
 	}
 
 	public int testClasses() {
@@ -26,7 +36,15 @@ public final class TestClassMetrics {
 		return setupMethods;
 	}
 
-	public int fields() {
-		return fields;
+	public int attributes() {
+		return attributes;
+	}
+
+	public int duplicatedLines() {
+		return duplicatedLines;
+	}
+
+	public int uniqueDuplicatedLines() {
+		return uniqueDuplicatedLines;
 	}
 }

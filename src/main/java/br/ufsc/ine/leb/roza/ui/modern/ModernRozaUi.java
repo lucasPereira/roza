@@ -3,6 +3,7 @@ package br.ufsc.ine.leb.roza.ui.modern;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.function.Consumer;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -13,7 +14,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import br.ufsc.ine.leb.roza.core.modern.analytics.DefaultTestCodeAnalytics;
@@ -56,6 +56,9 @@ import br.ufsc.ine.leb.roza.core.modern.measurement.SimianTestCaseSimilarityMeas
 import br.ufsc.ine.leb.roza.core.modern.measurement.TestCaseSimilarityMatrix;
 import br.ufsc.ine.leb.roza.core.modern.measurement.TestCaseSimilarityMeasurer;
 import br.ufsc.ine.leb.roza.core.modern.parsing.CodeStatement;
+import br.ufsc.ine.leb.roza.core.modern.parsing.Field;
+import br.ufsc.ine.leb.roza.core.modern.parsing.FixtureKind;
+import br.ufsc.ine.leb.roza.core.modern.parsing.FixtureMethod;
 import br.ufsc.ine.leb.roza.core.modern.parsing.JunitTestClassParser;
 import br.ufsc.ine.leb.roza.core.modern.parsing.ParsedTestClasses;
 import br.ufsc.ine.leb.roza.core.modern.parsing.ParsingException;
@@ -64,6 +67,7 @@ import br.ufsc.ine.leb.roza.core.modern.parsing.TestClassParser;
 import br.ufsc.ine.leb.roza.core.modern.parsing.TestCodeViolation;
 import br.ufsc.ine.leb.roza.core.modern.parsing.TestMethod;
 import br.ufsc.ine.leb.roza.core.modern.parsing.UnsupportedFeatureException;
+import br.ufsc.ine.leb.roza.core.modern.parsing.ViolationContextExtractor;
 import br.ufsc.ine.leb.roza.core.modern.parsing.ViolationScope;
 import br.ufsc.ine.leb.roza.core.modern.refactoring.ImplicitSetupPackagePolicy;
 import br.ufsc.ine.leb.roza.core.modern.refactoring.ImplicitSetupTestClassRefactorer;
@@ -88,8 +92,12 @@ import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.OverrunStyle;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.SplitPane;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
@@ -114,6 +122,7 @@ public final class ModernRozaUi extends Application {
 	private static final String MERGED_CLUSTER_BLOCK_EMPHASIS =
 			"-fx-border-width: 2; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.12), 6, 0, 0, 1);";
 	private static final int CONFIGURATION_INNER_SPACING = 10;
+	private static final int SIDEBAR_WIDTH = 320;
 	private static final Insets MARGIN_AFTER_CONFIGURATION_GROUP = new Insets(0, 0, 12, 0);
 	private static final Insets MARGIN_SECTION_TITLE_AFTER_GROUP = new Insets(4, 0, 0, 0);
 	private static final Insets MARGIN_ACTION_BUTTON_TOP = new Insets(12, 0, 0, 0);
@@ -156,10 +165,14 @@ public final class ModernRozaUi extends Application {
 	private String loadingError;
 	private ParsedTestClasses parsedTestClasses;
 	private String parsingError;
-	private int selectedViolationIndex;
 	private DecomposedTestCases decomposedTestCases;
 	private String decompositionError;
 	private TestCase selectedDecomposedTestCase;
+	private TestClass selectedParsedTestClass;
+	private TestMethod selectedParsedTestMethod;
+	private FixtureMethod selectedParsedFixture;
+	private TestCodeViolation selectedClassViolation;
+	private TestCodeViolation selectedViolation;
 	private TestCaseSimilarityMatrix similarityMatrix;
 	private String measurementError;
 	private TestCaseClusters testCaseClusters;
@@ -176,6 +189,7 @@ public final class ModernRozaUi extends Application {
 	private boolean suppressSimilarityComboListener;
 	private TextArea clusteringSourceCodeArea;
 	private TextArea clusteringTargetCodeArea;
+	private final ViolationContextExtractor violationContextExtractor = new ViolationContextExtractor();
 
 	public ModernRozaUi() {
 		pipelineState = new PipelineState();
@@ -244,7 +258,6 @@ public final class ModernRozaUi extends Application {
 
 		sourceFolder = defaultSourceFolder();
 		outputFolder = defaultOutputFolder();
-		selectedViolationIndex = -1;
 		rankedSimilarityDescending = true;
 	}
 
@@ -325,7 +338,7 @@ public final class ModernRozaUi extends Application {
 		PipelineStage selectedStage = pipelineState.selectedStage();
 		configurationSidebar.getChildren().clear();
 		configurationSidebar.setPadding(new Insets(18));
-		configurationSidebar.setPrefWidth(300);
+		configurationSidebar.setPrefWidth(SIDEBAR_WIDTH);
 		configurationSidebar.setStyle(FONT_FAMILY + "-fx-background-color: #edf1f5;");
 
 		VBox configuration = configurationFor(selectedStage);
@@ -347,13 +360,60 @@ public final class ModernRozaUi extends Application {
 				runStage(selectedStage);
 			});
 
-			if (configuration.getChildren().isEmpty()) {
+			if (selectedStage == PipelineStage.PARSING) {
+				VBox parsingBlock = parsingActionBlock(actionButton);
+				if (configuration.getChildren().isEmpty()) {
+					configurationSidebar.getChildren().add(parsingBlock);
+				} else {
+					configurationSidebar.getChildren().addAll(configuration, parsingBlock);
+					VBox.setMargin(parsingBlock, MARGIN_ACTION_BUTTON_TOP);
+				}
+			} else if (selectedStage == PipelineStage.DECOMPOSITION) {
+				VBox decompositionBlock = decompositionActionBlock(actionButton);
+				if (configuration.getChildren().isEmpty()) {
+					configurationSidebar.getChildren().add(decompositionBlock);
+				} else {
+					configurationSidebar.getChildren().addAll(configuration, decompositionBlock);
+					VBox.setMargin(decompositionBlock, MARGIN_ACTION_BUTTON_TOP);
+				}
+			} else if (configuration.getChildren().isEmpty()) {
 				configurationSidebar.getChildren().add(actionButton);
 			} else {
 				configurationSidebar.getChildren().addAll(configuration, actionButton);
 				VBox.setMargin(actionButton, MARGIN_ACTION_BUTTON_TOP);
 			}
 		}
+	}
+
+	private VBox parsingActionBlock(Button parseButton) {
+		VBox block = new VBox(CONFIGURATION_INNER_SPACING);
+		block.setPadding(new Insets(0, 0, 4, 0));
+		block.setMaxWidth(Double.MAX_VALUE);
+		VBox summary = loadedFilesSummary();
+		VBox.setMargin(summary, new Insets(4, 0, 12, 0));
+		block.getChildren().addAll(parseButton, summary);
+		return block;
+	}
+
+	private VBox loadedFilesSummary() {
+		VBox summary = new VBox(8);
+		summary.setMaxWidth(Double.MAX_VALUE);
+		int loadedFileCount = loadedCodeFiles == null ? 0 : loadedCodeFiles.codeFiles().size();
+		summary.getChildren().add(sidebarStatisticsTable(List.of(List.of("Loaded files", formatNumber(loadedFileCount)))));
+		return summary;
+	}
+
+	private VBox decompositionActionBlock(Button decomposeButton) {
+		VBox block = new VBox(CONFIGURATION_INNER_SPACING);
+		block.setPadding(new Insets(0, 0, 4, 0));
+		block.setMaxWidth(Double.MAX_VALUE);
+		block.getChildren().add(decomposeButton);
+		if (parsedTestClasses != null) {
+			VBox summary = decompositionSummary();
+			VBox.setMargin(summary, new Insets(4, 0, 12, 0));
+			block.getChildren().add(summary);
+		}
+		return block;
 	}
 
 	private VBox configurationFor(PipelineStage selectedStage) {
@@ -777,10 +837,14 @@ public final class ModernRozaUi extends Application {
 	private void clearParsingAndDecompositionResults() {
 		parsedTestClasses = null;
 		parsingError = null;
-		selectedViolationIndex = -1;
 		decomposedTestCases = null;
 		decompositionError = null;
 		selectedDecomposedTestCase = null;
+		selectedParsedTestClass = null;
+		selectedParsedTestMethod = null;
+		selectedParsedFixture = null;
+		selectedClassViolation = null;
+		selectedViolation = null;
 		clearMeasurementResults();
 	}
 
@@ -838,54 +902,12 @@ public final class ModernRozaUi extends Application {
 		}
 	}
 
-	private void selectFirstViolation() {
-		if (parsedTestClasses == null || parsedTestClasses.violations().isEmpty()) {
-			selectedViolationIndex = -1;
-			return;
-		}
-		selectedViolationIndex = 0;
-		selectCodeFileForViolation(selectedViolation());
-	}
-
-	private TestCodeViolation selectedViolation() {
-		return parsedTestClasses.violations().get(selectedViolationIndex);
-	}
-
-	private void selectPreviousViolation() {
-		if (selectedViolationIndex > 0) {
-			selectedViolationIndex--;
-			selectCodeFileForViolation(selectedViolation());
-			renderContentArea();
-		}
-	}
-
-	private void selectNextViolation() {
-		if (parsedTestClasses != null && selectedViolationIndex < parsedTestClasses.violations().size() - 1) {
-			selectedViolationIndex++;
-			selectCodeFileForViolation(selectedViolation());
-			renderContentArea();
-		}
-	}
-
-	private void selectCodeFileForViolation(TestCodeViolation violation) {
-		if (loadedCodeFiles == null) {
-			return;
-		}
-		Pattern classDeclaration = Pattern.compile("\\bclass\\s+" + Pattern.quote(simpleClassName(violation.testClassName())) + "\\b");
-		for (CodeFile file : loadedCodeFiles.codeFiles()) {
-			if (classDeclaration.matcher(file.content()).find()) {
-				selectedCodeFile = file;
-				return;
-			}
-		}
-	}
-
 	private void runParsing() {
 		try {
 			TestClassParser parser = new JunitTestClassParser();
 			parsedTestClasses = parser.parse(loadedCodeFiles);
-			selectFirstViolation();
 			parsingError = null;
+			initializeDecompositionSelection();
 			decomposedTestCases = null;
 			decompositionError = null;
 			selectedDecomposedTestCase = null;
@@ -895,10 +917,14 @@ public final class ModernRozaUi extends Application {
 			parsingError = exception.getMessage() != null ? exception.getMessage() : exception.toString();
 			selectCodeFileForParseFailure(exception);
 			parsedTestClasses = null;
-			selectedViolationIndex = -1;
 			decomposedTestCases = null;
 			decompositionError = null;
 			selectedDecomposedTestCase = null;
+			selectedParsedTestClass = null;
+		selectedParsedTestMethod = null;
+		selectedParsedFixture = null;
+		selectedClassViolation = null;
+			selectedViolation = null;
 			clearMeasurementResults();
 		}
 		render();
@@ -1113,25 +1139,20 @@ public final class ModernRozaUi extends Application {
 				error.setStyle(error.getStyle() + "-fx-text-fill: #991b1b;");
 				parsingColumn.getChildren().add(error);
 			}
-			if (hasParsingViolations()) {
-				parsingColumn.getChildren().add(violationNavigator());
-			}
 			parsingColumn.getChildren().add(loadedFilesView());
 			contentArea.getChildren().add(parsingColumn);
 			VBox.setVgrow(parsingColumn, Priority.ALWAYS);
 		} else if (selectedStage == PipelineStage.DECOMPOSITION) {
 			VBox decompositionColumn = new VBox(12);
-			if (parsedTestClasses != null) {
-				decompositionColumn.getChildren().add(decompositionSummary());
-			}
 			if (decompositionError != null) {
 				Label error = body("Decomposition failed: " + decompositionError);
 				error.setStyle(error.getStyle() + "-fx-text-fill: #991b1b;");
 				decompositionColumn.getChildren().add(error);
-			} else if (decomposedTestCases != null) {
-				HBox decompositionRow = decomposedTestsView();
-				decompositionColumn.getChildren().add(decompositionRow);
-				VBox.setVgrow(decompositionRow, Priority.ALWAYS);
+			}
+			if (parsedTestClasses != null) {
+				TabPane decompositionTabs = decompositionContentTabs();
+				decompositionColumn.getChildren().add(decompositionTabs);
+				VBox.setVgrow(decompositionTabs, Priority.ALWAYS);
 			}
 			contentArea.getChildren().add(decompositionColumn);
 			VBox.setVgrow(decompositionColumn, Priority.ALWAYS);
@@ -1198,12 +1219,16 @@ public final class ModernRozaUi extends Application {
 	}
 
 	private VBox decompositionSummary() {
-		VBox summary = new VBox(6);
-		Label classViolations = body("Classes with class-level violations: " + classViolationCount());
-		Label testViolations = body("Tests with method-level violations: " + methodLevelViolationTestCount());
-		Label excludedTests = body("Tests excluded by violations: " + excludedTestCount());
-		Label acceptedTests = body("Accepted tests: " + acceptedTestCount());
-		summary.getChildren().addAll(classViolations, testViolations, excludedTests, acceptedTests);
+		VBox summary = new VBox(8);
+		summary.setMaxWidth(Double.MAX_VALUE);
+		summary.getChildren().add(sidebarStatisticsTable(
+				List.of(
+						List.of("Class-level violations", formatNumber(classViolationCount())),
+						List.of("Method-level violations", formatNumber(methodLevelViolationTestCount())),
+						List.of("Test classes", formatNumber(testClassCount())),
+						List.of("Tests", formatNumber(totalTestCount())),
+						List.of("Tests with violations", formatNumber(excludedTestCount())),
+						List.of("Accepted tests", formatNumber(acceptedTestCount())))));
 		return summary;
 	}
 
@@ -1213,7 +1238,7 @@ public final class ModernRozaUi extends Application {
 		TestCodeAnalyticsReport report = analyticsGenerator.analyze(parsedTestClasses, decomposedTestCases, refactoredTestClasses);
 		HBox tables = new HBox(18);
 		VBox original = originalCodeStatisticsTable(report.original());
-		VBox comparison = originalVsRefactoredStatisticsTable(report.comparison());
+		VBox comparison = eligibleVsRefactoredStatisticsTable(report.comparison());
 		tables.getChildren().addAll(original, comparison);
 		HBox.setHgrow(original, Priority.ALWAYS);
 		HBox.setHgrow(comparison, Priority.ALWAYS);
@@ -1235,17 +1260,19 @@ public final class ModernRozaUi extends Application {
 		return section;
 	}
 
-	private VBox originalVsRefactoredStatisticsTable(TestCodeMetricComparison comparison) {
-		VBox section = analyticsSection("Original vs. refactored");
-		TestClassMetrics original = comparison.original();
+	private VBox eligibleVsRefactoredStatisticsTable(TestCodeMetricComparison comparison) {
+		VBox section = analyticsSection("Eligible vs. refactored");
+		TestClassMetrics eligible = comparison.original();
 		TestClassMetrics refactored = comparison.refactored();
 		section.getChildren().add(statisticsTable(
-				List.of("Metric", "Original", "Refactored"),
+				List.of("Metric", "Eligible", "Refactored"),
 				List.of(
-						List.of("Test classes", formatNumber(original.testClasses()), formatNumber(refactored.testClasses())),
-						List.of("Test methods", formatNumber(original.testMethods()), formatNumber(refactored.testMethods())),
-						List.of("Setup methods", formatNumber(original.setupMethods()), formatNumber(refactored.setupMethods())),
-						List.of("Fields", formatNumber(original.fields()), formatNumber(refactored.fields())))));
+						List.of("Test classes", formatNumber(eligible.testClasses()), formatNumber(refactored.testClasses())),
+						List.of("Test methods", formatNumber(eligible.testMethods()), formatNumber(refactored.testMethods())),
+						List.of("Setup methods", formatNumber(eligible.setupMethods()), formatNumber(refactored.setupMethods())),
+						List.of("Attributes", formatNumber(eligible.attributes()), formatNumber(refactored.attributes())),
+						List.of("Duplicated lines", formatNumber(eligible.duplicatedLines()), formatNumber(refactored.duplicatedLines())),
+						List.of("Unique duplicated lines", formatNumber(eligible.uniqueDuplicatedLines()), formatNumber(refactored.uniqueDuplicatedLines())))));
 		return section;
 	}
 
@@ -1257,24 +1284,79 @@ public final class ModernRozaUi extends Application {
 		return section;
 	}
 
+	private GridPane sidebarStatisticsTable(List<List<String>> rows) {
+		GridPane table = statisticsTable(List.of("Metric", "Value"), rows, 156, 76);
+		stretchTableHorizontally(table, 156, 76);
+		return table;
+	}
+
+	private void stretchTableHorizontally(GridPane table, double... minColumnWidths) {
+		table.setMaxWidth(Double.MAX_VALUE);
+		table.getColumnConstraints().clear();
+		for (int column = 0; column < minColumnWidths.length; column++) {
+			ColumnConstraints constraints = new ColumnConstraints();
+			constraints.setMinWidth(minColumnWidths[column]);
+			constraints.setHgrow(column == 0 ? Priority.ALWAYS : Priority.NEVER);
+			table.getColumnConstraints().add(constraints);
+		}
+		for (var child : table.getChildren()) {
+			GridPane.setHgrow(child, Priority.ALWAYS);
+		}
+	}
+
 	private GridPane statisticsTable(List<String> headers, List<List<String>> rows) {
+		return statisticsTable(headers, rows, 180);
+	}
+
+	private GridPane statisticsTable(List<String> headers, List<List<String>> rows, double... minColumnWidths) {
 		GridPane table = new GridPane();
 		table.setMaxWidth(Double.MAX_VALUE);
-		for (int column = 0; column < headers.size(); column++) {
-			table.add(tableCell(headers.get(column), true), column, 0);
+		int columnCount = headers.size();
+		double[] columnWidths = columnWidths(columnCount, minColumnWidths);
+		for (int column = 0; column < columnCount; column++) {
+			Label headerCell = tableCell(headers.get(column), true, columnWidths[column]);
+			configureTableCell(headerCell, column, columnCount, true);
+			table.add(headerCell, column, 0);
 		}
 		for (int row = 0; row < rows.size(); row++) {
 			List<String> values = rows.get(row);
 			for (int column = 0; column < values.size(); column++) {
-				table.add(tableCell(values.get(column), false), column, row + 1);
+				Label cell = tableCell(values.get(column), false, columnWidths[column]);
+				configureTableCell(cell, column, columnCount, false);
+				table.add(cell, column, row + 1);
 			}
 		}
 		return table;
 	}
 
-	private Label tableCell(String text, boolean header) {
+	private double[] columnWidths(int columnCount, double... minColumnWidths) {
+		double[] widths = new double[columnCount];
+		if (minColumnWidths.length == 0) {
+			for (int column = 0; column < columnCount; column++) {
+				widths[column] = 180;
+			}
+			return widths;
+		}
+		for (int column = 0; column < columnCount; column++) {
+			widths[column] = column < minColumnWidths.length ? minColumnWidths[column] : minColumnWidths[minColumnWidths.length - 1];
+		}
+		return widths;
+	}
+
+	private void configureTableCell(Label cell, int column, int columnCount, boolean header) {
+		GridPane.setVgrow(cell, Priority.ALWAYS);
+		GridPane.setFillHeight(cell, true);
+		cell.setMaxHeight(Double.MAX_VALUE);
+		if (!header && column == columnCount - 1 && columnCount == 2) {
+			cell.setAlignment(Pos.TOP_RIGHT);
+		} else {
+			cell.setAlignment(Pos.TOP_LEFT);
+		}
+	}
+
+	private Label tableCell(String text, boolean header, double minWidth) {
 		Label cell = body(text);
-		cell.setMinWidth(180);
+		cell.setMinWidth(minWidth);
 		cell.setMaxWidth(Double.MAX_VALUE);
 		String background = header ? "#ede9fe" : "#ffffff";
 		String color = header ? "#4c1d95" : "#374151";
@@ -1282,6 +1364,14 @@ public final class ModernRozaUi extends Application {
 		cell.setStyle(FONT_FAMILY + "-fx-font-size: 13px; -fx-text-fill: " + color + "; -fx-background-color: " + background
 				+ "; -fx-border-color: #d1d5db; -fx-border-width: 0 1 1 0; -fx-padding: 8;" + weight);
 		return cell;
+	}
+
+	private long testClassCount() {
+		return parsedTestClasses.testClasses().size();
+	}
+
+	private long totalTestCount() {
+		return parsedTestClasses.testClasses().stream().mapToInt(testClass -> testClass.testMethods().size()).sum();
 	}
 
 	private long classViolationCount() {
@@ -1342,14 +1432,6 @@ public final class ModernRozaUi extends Application {
 		return violation.testClassName() + "." + violation.testMethodName().orElse("");
 	}
 
-	private String simpleClassName(String className) {
-		int separator = className.lastIndexOf('.');
-		if (separator == -1) {
-			return className;
-		}
-		return className.substring(separator + 1);
-	}
-
 	private void refreshSimilaritySelectionControls() {
 		suppressSimilarityComboListener = true;
 		try {
@@ -1401,42 +1483,382 @@ public final class ModernRozaUi extends Application {
 		}
 	}
 
-	private boolean hasParsingViolations() {
-		return parsedTestClasses != null && !parsedTestClasses.violations().isEmpty() && selectedViolationIndex >= 0;
+	private void initializeDecompositionSelection() {
+		if (parsedTestClasses == null) {
+			selectedParsedTestClass = null;
+			selectedParsedTestMethod = null;
+			selectedParsedFixture = null;
+			selectedClassViolation = null;
+			selectedViolation = null;
+			return;
+		}
+		selectedParsedTestClass = parsedTestClasses.testClasses().isEmpty() ? null : parsedTestClasses.testClasses().get(0);
+		selectedParsedTestMethod = null;
+		selectedParsedFixture = null;
+		selectedClassViolation = null;
+		selectedViolation = parsedTestClasses.violations().isEmpty() ? null : parsedTestClasses.violations().get(0);
 	}
 
-	private VBox violationNavigator() {
-		TestCodeViolation violation = selectedViolation();
+	private TabPane decompositionContentTabs() {
+		TabPane tabPane = new TabPane();
+		tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
+		tabPane.setMaxWidth(Double.MAX_VALUE);
+		tabPane.setMaxHeight(Double.MAX_VALUE);
 
-		VBox box = new VBox(8);
+		Tab classesTab = new Tab("Classes", decompositionClassesView());
+		Tab violationsTab = new Tab("Violations", decompositionViolationsView());
+		tabPane.getTabs().addAll(classesTab, violationsTab);
+		return tabPane;
+	}
 
-		Label position = body("Violation " + (selectedViolationIndex + 1) + " of " + parsedTestClasses.violations().size());
-		position.setStyle(position.getStyle() + "-fx-font-weight: bold; -fx-text-fill: #333333;");
-
-		Label description = body(violation.testClassName() + violation.testMethodName().map(method -> "." + method).orElse("")
-				+ ": " + violation.description());
-
-		Label snippet = body(violation.codeSnippet());
-		snippet.setStyle(FONT_FAMILY + "-fx-font-family: 'Monospaced'; -fx-font-size: 13px; -fx-text-fill: #333333;");
-
-		Button previous = new Button("Previous");
-		previous.setDisable(selectedViolationIndex == 0);
-		previous.setStyle(secondaryButtonStyle());
-		previous.setOnAction(event -> selectPreviousViolation());
-
-		Button next = new Button("Next");
-		next.setDisable(selectedViolationIndex == parsedTestClasses.violations().size() - 1);
-		next.setStyle(secondaryButtonStyle());
-		next.setOnAction(event -> selectNextViolation());
-
-		HBox controls = new HBox(8);
-		controls.getChildren().addAll(previous, next);
-		box.getChildren().addAll(position, description);
-		if (!violation.codeSnippet().isBlank()) {
-			box.getChildren().add(snippet);
+	private HBox decompositionClassesView() {
+		ListView<TestClass> classList = new ListView<>();
+		classList.getItems().addAll(parsedTestClasses.testClasses());
+		classList.setPrefWidth(320);
+		classList.setCellFactory(list -> new ListCell<>() {
+			@Override
+			protected void updateItem(TestClass item, boolean empty) {
+				super.updateItem(item, empty);
+				setText(empty || item == null ? null : item.qualifiedName());
+			}
+		});
+		if (selectedParsedTestClass != null) {
+			classList.getSelectionModel().select(selectedParsedTestClass);
 		}
-		box.getChildren().add(controls);
-		return box;
+		classList.getSelectionModel().selectedItemProperty().addListener((observable, previous, selected) -> {
+			selectedParsedTestClass = selected;
+			selectedParsedTestMethod = null;
+			selectedParsedFixture = null;
+			selectedClassViolation = null;
+			renderContentArea();
+		});
+
+		TabPane classDetailsTabs = classDetailsTabPane(selectedParsedTestClass);
+		HBox.setHgrow(classDetailsTabs, Priority.ALWAYS);
+		classDetailsTabs.setMaxWidth(Double.MAX_VALUE);
+		classDetailsTabs.setMaxHeight(Double.MAX_VALUE);
+
+		HBox row = new HBox(16);
+		row.setMaxWidth(Double.MAX_VALUE);
+		row.setMaxHeight(Double.MAX_VALUE);
+		row.getChildren().addAll(classList, classDetailsTabs);
+		HBox.setHgrow(row, Priority.ALWAYS);
+		return row;
+	}
+
+	private TabPane classDetailsTabPane(TestClass testClass) {
+		TabPane tabPane = new TabPane();
+		tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
+		tabPane.setMaxWidth(Double.MAX_VALUE);
+		tabPane.setMaxHeight(Double.MAX_VALUE);
+		if (testClass == null) {
+			Tab placeholderTab = new Tab("Summary");
+			placeholderTab.setContent(body("Select a class to inspect its summary."));
+			tabPane.getTabs().add(placeholderTab);
+			return tabPane;
+		}
+		Tab summaryTab = new Tab("Summary", growable(classSummaryView(testClass)));
+		Tab testsTab = new Tab("Tests", growable(classTestsView(testClass)));
+		Tab attributesTab = new Tab("Attributes", growable(classAttributesView(testClass)));
+		Tab setupsTab = new Tab("Setups", growable(classSetupsView(testClass)));
+		Tab codeTab = new Tab("Code", growable(classCodeView(testClass)));
+		Tab violationsTab = new Tab("Violations", classViolationsView(testClass));
+		tabPane.getTabs().addAll(summaryTab, attributesTab, setupsTab, testsTab, codeTab, violationsTab);
+		return tabPane;
+	}
+
+	private VBox classSummaryView(TestClass testClass) {
+		VBox summary = new VBox(8);
+		summary.setMaxWidth(Double.MAX_VALUE);
+		GridPane table = statisticsTable(List.of("Metric", "Value"), classSummaryRows(testClass));
+		stretchTableHorizontally(table, 220, 120);
+		summary.getChildren().add(table);
+		return summary;
+	}
+
+	private List<List<String>> classSummaryRows(TestClass testClass) {
+		long tests = testClass.testMethods().size();
+		List<TestCodeViolation> violations = violationsForClass(testClass);
+		long classLevelViolations = violations.stream().filter(violation -> violation.scope() == ViolationScope.TEST_CLASS).count();
+		long methodLevelViolations = violations.stream()
+				.filter(violation -> violation.scope() == ViolationScope.TEST_METHOD)
+				.map(this::violationTestKey)
+				.distinct()
+				.count();
+		return List.of(
+				List.of("Attributes", formatNumber(testClass.fields().size())),
+				List.of("Setups", formatNumber(setupMethodsInClass(testClass).size())),
+				List.of("Tests", formatNumber(tests)),
+				List.of("Helper methods", formatNumber(testClass.helperMethods().size())),
+				List.of("Class-level violations", formatNumber(classLevelViolations)),
+				List.of("Method-level violations", formatNumber(methodLevelViolations)));
+	}
+
+	private VBox classAttributesView(TestClass testClass) {
+		VBox attributes = new VBox(8);
+		attributes.setMaxWidth(Double.MAX_VALUE);
+		List<List<String>> rows = testClass.fields()
+				.stream()
+				.map(field -> List.of(field.name(), field.type(), field.initialization().map(statement -> statement.normalizedText()).orElse("")))
+				.collect(Collectors.toList());
+		if (rows.isEmpty()) {
+			Label emptyState = body("This class has no attributes.");
+			VBox.setMargin(emptyState, new Insets(8, 0, 0, 0));
+			attributes.getChildren().add(emptyState);
+			return attributes;
+		}
+		GridPane table = statisticsTable(List.of("Name", "Type", "Initialization"), rows);
+		stretchTableHorizontally(table, 160, 160, 280);
+		attributes.getChildren().add(table);
+		return attributes;
+	}
+
+	private HBox classSetupsView(TestClass testClass) {
+		List<FixtureMethod> setups = setupMethodsInClass(testClass);
+		ListView<FixtureMethod> setupList = new ListView<>();
+		setupList.getItems().addAll(setups);
+		setupList.setPrefWidth(280);
+		setupList.setCellFactory(list -> new ListCell<>() {
+			@Override
+			protected void updateItem(FixtureMethod item, boolean empty) {
+				super.updateItem(item, empty);
+				setText(empty || item == null ? null : item.name());
+			}
+		});
+
+		FixtureMethod selectedSetup = resolveSelectedFixture(setups);
+		selectedParsedFixture = selectedSetup;
+		if (selectedSetup != null) {
+			setupList.getSelectionModel().select(selectedSetup);
+		}
+
+		TextArea setupCode = monospaceTextArea(formatClassSetupMethodCode(testClass, selectedSetup));
+		HBox.setHgrow(setupCode, Priority.ALWAYS);
+		setupList.getSelectionModel().selectedItemProperty().addListener((observable, previous, selected) -> {
+			selectedParsedFixture = selected;
+			setupCode.setText(formatClassSetupMethodCode(testClass, selected));
+		});
+
+		HBox row = new HBox(16);
+		row.setMaxWidth(Double.MAX_VALUE);
+		row.setMaxHeight(Double.MAX_VALUE);
+		row.getChildren().addAll(setupList, setupCode);
+		HBox.setHgrow(row, Priority.ALWAYS);
+		return row;
+	}
+
+	private List<FixtureMethod> setupMethodsInClass(TestClass testClass) {
+		return testClass.fixtures()
+				.stream()
+				.filter(fixture -> fixture.kind() == FixtureKind.BEFORE)
+				.collect(Collectors.toList());
+	}
+
+	private FixtureMethod resolveSelectedFixture(List<FixtureMethod> setups) {
+		if (selectedParsedFixture != null) {
+			for (FixtureMethod setup : setups) {
+				if (setup == selectedParsedFixture) {
+					return setup;
+				}
+			}
+		}
+		return setups.isEmpty() ? null : setups.get(0);
+	}
+
+	private long excludedTestsInClass(TestClass testClass) {
+		boolean classExcluded = parsedTestClasses.violations()
+				.stream()
+				.anyMatch(violation -> violation.scope() == ViolationScope.TEST_CLASS
+						&& violation.testClassName().equals(testClass.qualifiedName()));
+		if (classExcluded) {
+			return testClass.testMethods().size();
+		}
+		Set<String> excludedMethods = parsedTestClasses.violations()
+				.stream()
+				.filter(violation -> violation.scope() == ViolationScope.TEST_METHOD
+						&& violation.testClassName().equals(testClass.qualifiedName()))
+				.map(this::violationTestKey)
+				.collect(Collectors.toSet());
+		return testClass.testMethods()
+				.stream()
+				.filter(testMethod -> excludedMethods.contains(testKey(testClass, testMethod)))
+				.count();
+	}
+
+	private String formatClassSetupMethodCode(TestClass testClass, FixtureMethod setup) {
+		if (setup == null || loadedCodeFiles == null) {
+			return "";
+		}
+		return violationContextExtractor.extractMethodCode(loadedCodeFiles, testClass.qualifiedName(), setup.name()).orElse("");
+	}
+
+	private HBox classTestsView(TestClass testClass) {
+		ListView<TestMethod> testList = new ListView<>();
+		testList.getItems().addAll(testClass.testMethods());
+		testList.setPrefWidth(280);
+		testList.setCellFactory(list -> new ListCell<>() {
+			@Override
+			protected void updateItem(TestMethod item, boolean empty) {
+				super.updateItem(item, empty);
+				setText(empty || item == null ? null : item.name());
+			}
+		});
+
+		TestMethod selectedTestMethod = resolveSelectedTestMethod(testClass);
+		selectedParsedTestMethod = selectedTestMethod;
+		if (selectedTestMethod != null) {
+			testList.getSelectionModel().select(selectedTestMethod);
+		}
+
+		TextArea methodCode = monospaceTextArea(formatClassTestMethodCode(testClass, selectedTestMethod));
+		HBox.setHgrow(methodCode, Priority.ALWAYS);
+		testList.getSelectionModel().selectedItemProperty().addListener((observable, previous, selected) -> {
+			selectedParsedTestMethod = selected;
+			methodCode.setText(formatClassTestMethodCode(testClass, selected));
+		});
+
+		HBox row = new HBox(16);
+		row.setMaxWidth(Double.MAX_VALUE);
+		row.setMaxHeight(Double.MAX_VALUE);
+		row.getChildren().addAll(testList, methodCode);
+		HBox.setHgrow(row, Priority.ALWAYS);
+		return row;
+	}
+
+	private TextArea classCodeView(TestClass testClass) {
+		String code = loadedCodeFiles == null
+				? ""
+				: violationContextExtractor.extractClassCode(loadedCodeFiles, testClass.qualifiedName()).orElse("");
+		TextArea codeArea = monospaceTextArea(code);
+		codeArea.setMaxWidth(Double.MAX_VALUE);
+		codeArea.setMaxHeight(Double.MAX_VALUE);
+		return codeArea;
+	}
+
+	private HBox classViolationsView(TestClass testClass) {
+		List<TestCodeViolation> violations = violationsForClass(testClass);
+		TestCodeViolation selected = resolveClassViolationSelection(violations);
+		selectedClassViolation = selected;
+		return violationInspectionView(violations, selected, violation -> selectedClassViolation = violation);
+	}
+
+	private VBox growable(javafx.scene.Node content) {
+		VBox container = new VBox(content);
+		container.setMaxWidth(Double.MAX_VALUE);
+		container.setMaxHeight(Double.MAX_VALUE);
+		VBox.setVgrow(content, Priority.ALWAYS);
+		return container;
+	}
+
+	private TestMethod resolveSelectedTestMethod(TestClass testClass) {
+		if (selectedParsedTestMethod != null) {
+			for (TestMethod testMethod : testClass.testMethods()) {
+				if (testMethod == selectedParsedTestMethod) {
+					return testMethod;
+				}
+			}
+		}
+		return testClass.testMethods().isEmpty() ? null : testClass.testMethods().get(0);
+	}
+
+	private TestCodeViolation resolveClassViolationSelection(List<TestCodeViolation> violations) {
+		if (selectedClassViolation != null && violations.stream().anyMatch(violation -> violation == selectedClassViolation)) {
+			return selectedClassViolation;
+		}
+		return violations.isEmpty() ? null : violations.get(0);
+	}
+
+	private List<TestCodeViolation> violationsForClass(TestClass testClass) {
+		return parsedTestClasses.violations()
+				.stream()
+				.filter(violation -> violation.testClassName().equals(testClass.qualifiedName()))
+				.collect(Collectors.toList());
+	}
+
+	private String formatClassTestMethodCode(TestClass testClass, TestMethod testMethod) {
+		if (testMethod == null || loadedCodeFiles == null) {
+			return "";
+		}
+		return violationContextExtractor.extractMethodCode(loadedCodeFiles, testClass.qualifiedName(), testMethod.name()).orElse("");
+	}
+
+	private HBox decompositionViolationsView() {
+		return violationInspectionView(parsedTestClasses.violations(), selectedViolation, violation -> selectedViolation = violation);
+	}
+
+	private HBox violationInspectionView(List<TestCodeViolation> violations, TestCodeViolation selectedViolation, Consumer<TestCodeViolation> onSelectionChanged) {
+		ListView<TestCodeViolation> violationList = new ListView<>();
+		violationList.getItems().addAll(violations);
+		violationList.setPrefWidth(320);
+		violationList.setCellFactory(list -> new ListCell<>() {
+			@Override
+			protected void updateItem(TestCodeViolation item, boolean empty) {
+				super.updateItem(item, empty);
+				setText(empty || item == null ? null : item.description());
+			}
+		});
+		if (selectedViolation != null) {
+			violationList.getSelectionModel().select(selectedViolation);
+		}
+
+		Label violationIdentifier = body(formatViolationIdentifier(selectedViolation));
+		violationIdentifier.setStyle(violationIdentifier.getStyle() + "-fx-font-weight: bold; -fx-text-fill: #333333;");
+		VBox.setMargin(violationIdentifier, new Insets(8, 0, 8, 0));
+
+		TextArea violationCode = monospaceTextArea(formatViolationCode(selectedViolation));
+		TextArea contextCode = monospaceTextArea(formatViolationContext(selectedViolation));
+		SplitPane violationSplit = new SplitPane(violationCode, contextCode);
+		violationSplit.setOrientation(Orientation.VERTICAL);
+		violationSplit.setDividerPositions(0.3);
+		violationSplit.setMaxWidth(Double.MAX_VALUE);
+		violationSplit.setMaxHeight(Double.MAX_VALUE);
+
+		VBox violationDetails = new VBox(8);
+		violationDetails.getChildren().addAll(violationIdentifier, violationSplit);
+		VBox.setVgrow(violationSplit, Priority.ALWAYS);
+		HBox.setHgrow(violationDetails, Priority.ALWAYS);
+		violationList.getSelectionModel().selectedItemProperty().addListener((observable, previous, selected) -> {
+			onSelectionChanged.accept(selected);
+			violationIdentifier.setText(formatViolationIdentifier(selected));
+			violationCode.setText(formatViolationCode(selected));
+			contextCode.setText(formatViolationContext(selected));
+		});
+
+		HBox row = new HBox(16);
+		row.setMaxWidth(Double.MAX_VALUE);
+		row.setMaxHeight(Double.MAX_VALUE);
+		row.getChildren().addAll(violationList, violationDetails);
+		HBox.setHgrow(row, Priority.ALWAYS);
+		return row;
+	}
+
+	private String formatViolationIdentifier(TestCodeViolation violation) {
+		if (violation == null) {
+			return "No violations to inspect.";
+		}
+		return violation.testClassName() + violation.testMethodName().map(method -> "." + method).orElse("");
+	}
+
+	private String formatViolationCode(TestCodeViolation violation) {
+		if (violation == null) {
+			return "";
+		}
+		return violation.codeSnippet();
+	}
+
+	private String formatViolationContext(TestCodeViolation violation) {
+		if (violation == null || loadedCodeFiles == null) {
+			return "";
+		}
+		return violationContextExtractor.extractContext(loadedCodeFiles, violation).orElse("");
+	}
+
+	private TextArea monospaceTextArea(String text) {
+		TextArea area = new TextArea(text);
+		area.setEditable(false);
+		area.setWrapText(false);
+		area.setStyle(FONT_FAMILY + "-fx-font-family: 'Monospaced'; -fx-font-size: 13px;");
+		return area;
 	}
 
 	private HBox loadedFilesView() {
@@ -1887,6 +2309,10 @@ public final class ModernRozaUi extends Application {
 
 	private static String formatNumber(int value) {
 		return Integer.toString(value);
+	}
+
+	private static String formatNumber(long value) {
+		return Long.toString(value);
 	}
 
 	private String actionButtonText(PipelineStage selectedStage) {

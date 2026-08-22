@@ -49,11 +49,15 @@ class DefaultTestCodeAnalyticsTest {
 		assertEquals(1, report.comparison().original().testClasses());
 		assertEquals(2, report.comparison().original().testMethods());
 		assertEquals(1, report.comparison().original().setupMethods());
-		assertEquals(2, report.comparison().original().fields());
+		assertEquals(2, report.comparison().original().attributes());
+		assertEquals(0, report.comparison().original().duplicatedLines());
+		assertEquals(0, report.comparison().original().uniqueDuplicatedLines());
 		assertEquals(1, report.comparison().refactored().testClasses());
 		assertEquals(2, report.comparison().refactored().testMethods());
 		assertEquals(1, report.comparison().refactored().setupMethods());
-		assertEquals(3, report.comparison().refactored().fields());
+		assertEquals(3, report.comparison().refactored().attributes());
+		assertEquals(1, report.comparison().refactored().duplicatedLines());
+		assertEquals(1, report.comparison().refactored().uniqueDuplicatedLines());
 	}
 
 	private TestClass testClass(String name, int fields, int fixtures, String... tests) {

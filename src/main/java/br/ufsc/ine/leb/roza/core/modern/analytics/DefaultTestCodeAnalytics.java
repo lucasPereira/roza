@@ -41,12 +41,15 @@ public final class DefaultTestCodeAnalytics implements TestCodeAnalytics {
 	}
 
 	private TestClassMetrics originalComparisonMetrics(ParsedTestClasses parsedTestClasses, OriginalTestCodeMetrics original) {
-		TestClassMetrics violationFreeClassMetrics = metricsFor(violationFreeTestClasses(parsedTestClasses));
+		List<TestClass> eligibleTestClasses = violationFreeTestClasses(parsedTestClasses);
+		TestClassMetrics eligibleMetrics = metricsFor(eligibleTestClasses);
 		return new TestClassMetrics(
 				original.testClassesWithoutViolations(),
 				original.testMethodsWithoutViolations(),
-				violationFreeClassMetrics.setupMethods(),
-				violationFreeClassMetrics.fields());
+				eligibleMetrics.setupMethods(),
+				eligibleMetrics.attributes(),
+				eligibleMetrics.duplicatedLines(),
+				eligibleMetrics.uniqueDuplicatedLines());
 	}
 
 	private List<TestClass> violationFreeTestClasses(ParsedTestClasses parsedTestClasses) {
@@ -59,8 +62,15 @@ public final class DefaultTestCodeAnalytics implements TestCodeAnalytics {
 	private TestClassMetrics metricsFor(List<TestClass> testClasses) {
 		int testMethods = testClasses.stream().mapToInt(testClass -> testClass.testMethods().size()).sum();
 		int setupMethods = testClasses.stream().mapToInt(testClass -> testClass.fixtures().size()).sum();
-		int fields = testClasses.stream().mapToInt(testClass -> testClass.fields().size()).sum();
-		return new TestClassMetrics(testClasses.size(), testMethods, setupMethods, fields);
+		int attributes = testClasses.stream().mapToInt(testClass -> testClass.fields().size()).sum();
+		TestClassDuplicationAnalyzer.DuplicationMetrics duplication = TestClassDuplicationAnalyzer.analyze(testClasses);
+		return new TestClassMetrics(
+				testClasses.size(),
+				testMethods,
+				setupMethods,
+				attributes,
+				duplication.duplicatedLines(),
+				duplication.uniqueDuplicatedLines());
 	}
 
 	private Set<String> classesWithAnyViolation(ParsedTestClasses parsedTestClasses) {
