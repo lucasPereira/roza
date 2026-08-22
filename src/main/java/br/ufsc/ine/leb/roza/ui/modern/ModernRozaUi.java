@@ -27,16 +27,11 @@ import br.ufsc.ine.leb.roza.core.modern.clustering.ClusteringLevel;
 import br.ufsc.ine.leb.roza.core.modern.clustering.CompositeMergeTieBreaker;
 import br.ufsc.ine.leb.roza.core.modern.clustering.CompositeStopCriterion;
 import br.ufsc.ine.leb.roza.core.modern.clustering.LinkageMethod;
-import br.ufsc.ine.leb.roza.core.modern.clustering.MaxLevelStopCriterion;
-import br.ufsc.ine.leb.roza.core.modern.clustering.MaxTestsPerClusterStopCriterion;
 import br.ufsc.ine.leb.roza.core.modern.clustering.MergeCandidate;
 import br.ufsc.ine.leb.roza.core.modern.clustering.MergeTieBreaker;
 import br.ufsc.ine.leb.roza.core.modern.clustering.MergeTieBreakerKind;
-import br.ufsc.ine.leb.roza.core.modern.clustering.MinimumSharedPrefixStopCriterion;
-import br.ufsc.ine.leb.roza.core.modern.clustering.MinimumTestsPerClusterStopCriterion;
-import br.ufsc.ine.leb.roza.core.modern.clustering.MinimumSimilarityStopCriterion;
 import br.ufsc.ine.leb.roza.core.modern.clustering.StopCriterion;
-import br.ufsc.ine.leb.roza.core.modern.clustering.TargetClusterCountStopCriterion;
+import br.ufsc.ine.leb.roza.core.modern.clustering.StopCriterionKind;
 import br.ufsc.ine.leb.roza.core.modern.clustering.TestCaseCluster;
 import br.ufsc.ine.leb.roza.core.modern.clustering.TestCaseClusters;
 import br.ufsc.ine.leb.roza.core.modern.decomposition.DefaultTestCaseDecomposer;
@@ -147,18 +142,7 @@ public final class ModernRozaUi extends Application {
 	private final ComboBox<TestCase> sourceTestCombo;
 	private final ComboBox<TestCase> targetTestCombo;
 	private final ComboBox<LinkageMethod> linkageMethodCombo;
-	private final CheckBox minimumSimilarityStopEnabled;
-	private final TextField minimumSimilarityStopInput;
-	private final CheckBox maxTestsPerClusterStopEnabled;
-	private final TextField maxTestsPerClusterStopInput;
-	private final CheckBox minimumTestsPerClusterStopEnabled;
-	private final TextField minimumTestsPerClusterStopInput;
-	private final CheckBox maxLevelStopEnabled;
-	private final TextField maxLevelStopInput;
-	private final CheckBox targetClusterCountStopEnabled;
-	private final TextField targetClusterCountStopInput;
-	private final CheckBox minimumSharedPrefixStopEnabled;
-	private final TextField minimumSharedPrefixStopInput;
+	private final List<SelectedStopCriterion> selectedStopCriteria;
 	private final List<MergeTieBreakerKind> selectedTieBreakerKinds;
 	private Path sourceFolder;
 	private LoadedCodeFiles loadedCodeFiles;
@@ -244,18 +228,7 @@ public final class ModernRozaUi extends Application {
 		});
 
 		linkageMethodCombo = linkageMethodComboBox();
-		minimumSimilarityStopEnabled = stopCriterionCheckBox("Stop when the best merge similarity is at or below the threshold");
-		minimumSimilarityStopInput = metricConfigurationInput(String.valueOf(MinimumSimilarityStopCriterion.DEFAULT));
-		maxTestsPerClusterStopEnabled = stopCriterionCheckBox("Stop before a merge puts more than this many tests in one cluster");
-		maxTestsPerClusterStopInput = metricConfigurationInput(String.valueOf(MaxTestsPerClusterStopCriterion.DEFAULT));
-		minimumTestsPerClusterStopEnabled = stopCriterionCheckBox("Stop when every cluster already has at least this many tests");
-		minimumTestsPerClusterStopInput = metricConfigurationInput(String.valueOf(MinimumTestsPerClusterStopCriterion.DEFAULT));
-		maxLevelStopEnabled = stopCriterionCheckBox("Stop before exceeding this merge level");
-		maxLevelStopInput = metricConfigurationInput(String.valueOf(MaxLevelStopCriterion.DEFAULT));
-		targetClusterCountStopEnabled = stopCriterionCheckBox("Stop when cluster count is at most");
-		targetClusterCountStopInput = metricConfigurationInput(String.valueOf(TargetClusterCountStopCriterion.DEFAULT));
-		minimumSharedPrefixStopEnabled = stopCriterionCheckBox("Stop before a merge when shared initial statements are at most");
-		minimumSharedPrefixStopInput = metricConfigurationInput(String.valueOf(MinimumSharedPrefixStopCriterion.DEFAULT));
+		selectedStopCriteria = new ArrayList<>();
 		selectedTieBreakerKinds = new ArrayList<>();
 
 		sourceFolder = defaultSourceFolder();
@@ -560,14 +533,7 @@ public final class ModernRozaUi extends Application {
 		VBox stopCriteriaBlock = new VBox(CONFIGURATION_INNER_SPACING);
 		Label stopCriteriaTitle = body("Stop criteria");
 		stopCriteriaTitle.setStyle(stopCriteriaTitle.getStyle() + "-fx-font-weight: bold; -fx-text-fill: #333333;");
-		stopCriteriaBlock.getChildren().addAll(
-				stopCriteriaTitle,
-				stopCriterionInput(minimumSimilarityStopEnabled, minimumSimilarityStopInput),
-				stopCriterionInput(maxTestsPerClusterStopEnabled, maxTestsPerClusterStopInput),
-				stopCriterionInput(minimumTestsPerClusterStopEnabled, minimumTestsPerClusterStopInput),
-				stopCriterionInput(maxLevelStopEnabled, maxLevelStopInput),
-				stopCriterionInput(targetClusterCountStopEnabled, targetClusterCountStopInput),
-				stopCriterionInput(minimumSharedPrefixStopEnabled, minimumSharedPrefixStopInput));
+		stopCriteriaBlock.getChildren().addAll(stopCriteriaTitle, stopCriterionEditor());
 
 		VBox tieBreakersBlock = new VBox(CONFIGURATION_INNER_SPACING);
 		Label tieBreakersTitle = body("Merge tie breakers");
@@ -587,19 +553,78 @@ public final class ModernRozaUi extends Application {
 		return configuration;
 	}
 
-	private CheckBox stopCriterionCheckBox(String text) {
-		CheckBox checkBox = new CheckBox(text);
-		checkBox.setWrapText(true);
-		checkBox.setMaxWidth(Double.MAX_VALUE);
-		return checkBox;
+	private VBox stopCriterionEditor() {
+		VBox editor = new VBox(8);
+		for (int index = 0; index < selectedStopCriteria.size(); index++) {
+			editor.getChildren().add(stopCriterionRow(index));
+		}
+		Button add = new Button("Add stop criterion");
+		add.setStyle(secondaryButtonStyle());
+		add.setMaxWidth(Double.MAX_VALUE);
+		add.setOnAction(event -> {
+			selectedStopCriteria.add(new SelectedStopCriterion(StopCriterionKind.MINIMUM_SIMILARITY));
+			renderConfigurationSidebar();
+		});
+		editor.getChildren().add(add);
+		return editor;
 	}
 
-	private VBox stopCriterionInput(CheckBox enabled, TextField input) {
-		VBox row = new VBox(4);
-		input.setDisable(!enabled.isSelected());
-		enabled.setOnAction(event -> input.setDisable(!enabled.isSelected()));
-		row.getChildren().addAll(enabled, input);
+	private HBox stopCriterionRow(int index) {
+		SelectedStopCriterion entry = selectedStopCriteria.get(index);
+		ComboBox<StopCriterionKind> comboBox = stopCriterionComboBox();
+		comboBox.getSelectionModel().select(entry.kind);
+		comboBox.valueProperty().addListener((observable, previous, selected) -> {
+			if (selected == null) {
+				return;
+			}
+			entry.kind = selected;
+			if (previous != selected) {
+				entry.value = selected.defaultValue();
+				renderConfigurationSidebar();
+			}
+		});
+		comboBox.setMinWidth(0);
+		comboBox.setMaxWidth(Double.MAX_VALUE);
+		TextField valueInput = metricConfigurationInput(entry.value);
+		valueInput.setPrefWidth(72);
+		valueInput.setMinWidth(Region.USE_PREF_SIZE);
+		valueInput.setMaxWidth(Region.USE_PREF_SIZE);
+		valueInput.textProperty().addListener((observable, previous, text) -> entry.value = text);
+		Button remove = new Button("Remove");
+		remove.setStyle(secondaryButtonStyle());
+		remove.setMinWidth(Region.USE_PREF_SIZE);
+		remove.setOnAction(event -> {
+			selectedStopCriteria.remove(index);
+			renderConfigurationSidebar();
+		});
+		HBox row = new HBox(8);
+		row.getChildren().addAll(comboBox, valueInput, remove);
+		HBox.setHgrow(comboBox, Priority.ALWAYS);
+		HBox.setHgrow(valueInput, Priority.NEVER);
+		HBox.setHgrow(remove, Priority.NEVER);
 		return row;
+	}
+
+	private ComboBox<StopCriterionKind> stopCriterionComboBox() {
+		ComboBox<StopCriterionKind> comboBox = new ComboBox<>();
+		comboBox.getItems().addAll(StopCriterionKind.values());
+		comboBox.getSelectionModel().selectFirst();
+		comboBox.setStyle(singleLineComboBoxStyle());
+		comboBox.setCellFactory(list -> new ListCell<>() {
+			@Override
+			protected void updateItem(StopCriterionKind item, boolean empty) {
+				super.updateItem(item, empty);
+				setText(empty || item == null ? null : item.displayName());
+			}
+		});
+		comboBox.setButtonCell(new ListCell<>() {
+			@Override
+			protected void updateItem(StopCriterionKind item, boolean empty) {
+				super.updateItem(item, empty);
+				setText(empty || item == null ? null : item.displayName());
+			}
+		});
+		return comboBox;
 	}
 
 	private VBox tieBreakerEditor() {
@@ -839,6 +864,7 @@ public final class ModernRozaUi extends Application {
 		targetTestCombo.getItems().clear();
 		sourceTestCombo.getSelectionModel().clearSelection();
 		targetTestCombo.getSelectionModel().clearSelection();
+		selectedStopCriteria.clear();
 		selectedTieBreakerKinds.clear();
 		clearClusteringResults();
 	}
@@ -1061,28 +1087,21 @@ public final class ModernRozaUi extends Application {
 
 	private List<StopCriterion> stopCriteria() {
 		try {
-			List<StopCriterion> criteria = new ArrayList<>();
-			if (minimumSimilarityStopEnabled.isSelected()) {
-				criteria.add(new MinimumSimilarityStopCriterion(Double.parseDouble(minimumSimilarityStopInput.getText().trim())));
-			}
-			if (maxTestsPerClusterStopEnabled.isSelected()) {
-				criteria.add(new MaxTestsPerClusterStopCriterion(Integer.parseInt(maxTestsPerClusterStopInput.getText().trim())));
-			}
-			if (minimumTestsPerClusterStopEnabled.isSelected()) {
-				criteria.add(new MinimumTestsPerClusterStopCriterion(Integer.parseInt(minimumTestsPerClusterStopInput.getText().trim())));
-			}
-			if (maxLevelStopEnabled.isSelected()) {
-				criteria.add(new MaxLevelStopCriterion(Integer.parseInt(maxLevelStopInput.getText().trim())));
-			}
-			if (targetClusterCountStopEnabled.isSelected()) {
-				criteria.add(new TargetClusterCountStopCriterion(Integer.parseInt(targetClusterCountStopInput.getText().trim())));
-			}
-			if (minimumSharedPrefixStopEnabled.isSelected()) {
-				criteria.add(new MinimumSharedPrefixStopCriterion(Integer.parseInt(minimumSharedPrefixStopInput.getText().trim())));
-			}
-			return criteria;
+			return selectedStopCriteria.stream()
+					.map(entry -> entry.kind.create(entry.value.trim()))
+					.collect(Collectors.toList());
 		} catch (NumberFormatException exception) {
 			throw new IllegalArgumentException("Clustering stop criterion values must be numeric.", exception);
+		}
+	}
+
+	private static final class SelectedStopCriterion {
+		private StopCriterionKind kind;
+		private String value;
+
+		private SelectedStopCriterion(StopCriterionKind kind) {
+			this.kind = kind;
+			this.value = kind.defaultValue();
 		}
 	}
 
