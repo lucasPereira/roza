@@ -20,7 +20,7 @@ public final class DefaultTestCodeAnalytics implements TestCodeAnalytics {
 		Objects.requireNonNull(refactoredTestClasses);
 		OriginalTestCodeMetrics original = originalMetrics(originalTestClasses, acceptedTestCases);
 		TestCodeMetricComparison comparison = new TestCodeMetricComparison(
-				originalComparisonMetrics(originalTestClasses, original),
+				TestClassMetricsCalculator.forEligibleCode(originalTestClasses, acceptedTestCases),
 				metricsFor(refactoredTestClasses.testClasses()));
 		return new TestCodeAnalyticsReport(original, comparison);
 	}
@@ -40,37 +40,8 @@ public final class DefaultTestCodeAnalytics implements TestCodeAnalytics {
 				testMethodsWithViolations);
 	}
 
-	private TestClassMetrics originalComparisonMetrics(ParsedTestClasses parsedTestClasses, OriginalTestCodeMetrics original) {
-		List<TestClass> eligibleTestClasses = violationFreeTestClasses(parsedTestClasses);
-		TestClassMetrics eligibleMetrics = metricsFor(eligibleTestClasses);
-		return new TestClassMetrics(
-				original.testClassesWithoutViolations(),
-				original.testMethodsWithoutViolations(),
-				eligibleMetrics.setupMethods(),
-				eligibleMetrics.attributes(),
-				eligibleMetrics.totalStatements(),
-				eligibleMetrics.duplicatedStatements());
-	}
-
-	private List<TestClass> violationFreeTestClasses(ParsedTestClasses parsedTestClasses) {
-		Set<String> excludedClasses = classesWithAnyViolation(parsedTestClasses);
-		return parsedTestClasses.testClasses().stream()
-				.filter(testClass -> !excludedClasses.contains(testClass.qualifiedName()))
-				.collect(Collectors.toList());
-	}
-
 	private TestClassMetrics metricsFor(List<TestClass> testClasses) {
-		int testMethods = testClasses.stream().mapToInt(testClass -> testClass.testMethods().size()).sum();
-		int setupMethods = testClasses.stream().mapToInt(testClass -> testClass.fixtures().size()).sum();
-		int attributes = testClasses.stream().mapToInt(testClass -> testClass.fields().size()).sum();
-		TestClassDuplicationAnalyzer.DuplicationMetrics duplication = TestClassDuplicationAnalyzer.analyze(testClasses);
-		return new TestClassMetrics(
-				testClasses.size(),
-				testMethods,
-				setupMethods,
-				attributes,
-				duplication.totalStatements(),
-				duplication.duplicatedStatements());
+		return TestClassMetricsCalculator.forTestClasses(testClasses);
 	}
 
 	private Set<String> classesWithAnyViolation(ParsedTestClasses parsedTestClasses) {

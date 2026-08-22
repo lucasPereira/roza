@@ -154,6 +154,12 @@ registerExperimentTask("runExperimentG", "Runs experiment g, which benchmarks ba
 
 registerExperimentTask("runExperimentH", "Runs experiment h, which compares original, local-only, and global refactoring on Apache Commons Lang.", "br.ufsc.ine.leb.roza.expt.h.Experiment")
 
+registerExperimentTask(
+    "runExperimentI",
+    "Runs experiment i, which measures eligible and per-level refactored metrics on Róża tests with LCCSS and LCS.",
+    "br.ufsc.ine.leb.roza.expt.i.Experiment",
+)
+
 spotless {
     java {
         target("src/main/java/**/*.java", "src/test/java/**/*.java", "src/expt/java/**/*.java")
