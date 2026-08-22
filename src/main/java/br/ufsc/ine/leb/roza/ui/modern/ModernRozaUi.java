@@ -171,6 +171,8 @@ public final class ModernRozaUi extends Application {
 	private boolean rankedSimilarityDescending;
 	private boolean suppressSimilaritySelectionRender;
 	private boolean suppressSimilarityComboListener;
+	private HBox decompositionClassesRow;
+	private TextArea measurementTestBodyArea;
 	private TextArea clusteringSourceCodeArea;
 	private TextArea clusteringTargetCodeArea;
 	private final ViolationContextExtractor violationContextExtractor = new ViolationContextExtractor();
@@ -1125,6 +1127,8 @@ public final class ModernRozaUi extends Application {
 
 	private void renderContentArea() {
 		PipelineStage selectedStage = pipelineState.selectedStage();
+		decompositionClassesRow = null;
+		measurementTestBodyArea = null;
 		contentArea.getChildren().clear();
 		contentArea.setPadding(new Insets(24));
 		contentArea.setStyle(FONT_FAMILY + "-fx-background-color: #f4f6f8;");
@@ -1553,7 +1557,7 @@ public final class ModernRozaUi extends Application {
 			@Override
 			protected void updateItem(TestClass item, boolean empty) {
 				super.updateItem(item, empty);
-				setText(empty || item == null ? null : item.qualifiedName());
+				updateDecompositionClassListCell(this, item, empty);
 			}
 		});
 		if (selectedParsedTestClass != null) {
@@ -1564,7 +1568,7 @@ public final class ModernRozaUi extends Application {
 			selectedParsedTestMethod = null;
 			selectedParsedFixture = null;
 			selectedClassViolation = null;
-			renderContentArea();
+			refreshDecompositionClassDetails();
 		});
 
 		TabPane classDetailsTabs = classDetailsTabPane(selectedParsedTestClass);
@@ -1577,7 +1581,42 @@ public final class ModernRozaUi extends Application {
 		row.setMaxHeight(Double.MAX_VALUE);
 		row.getChildren().addAll(classList, classDetailsTabs);
 		HBox.setHgrow(row, Priority.ALWAYS);
+		decompositionClassesRow = row;
 		return row;
+	}
+
+	private void refreshDecompositionClassDetails() {
+		if (decompositionClassesRow == null || decompositionClassesRow.getChildren().size() < 2) {
+			renderContentArea();
+			return;
+		}
+		TabPane replacement = classDetailsTabPane(selectedParsedTestClass);
+		HBox.setHgrow(replacement, Priority.ALWAYS);
+		replacement.setMaxWidth(Double.MAX_VALUE);
+		replacement.setMaxHeight(Double.MAX_VALUE);
+		decompositionClassesRow.getChildren().set(1, replacement);
+	}
+
+	private void updateDecompositionClassListCell(ListCell<TestClass> cell, TestClass item, boolean empty) {
+		if (empty || item == null) {
+			cell.setText(null);
+			cell.setStyle(null);
+			return;
+		}
+		List<TestCodeViolation> violations = violationsForClass(item);
+		if (violations.isEmpty()) {
+			cell.setText(item.qualifiedName());
+			cell.setStyle(null);
+			return;
+		}
+		boolean classViolation = violations.stream().anyMatch(violation -> violation.scope() == ViolationScope.TEST_CLASS);
+		cell.setText(item.qualifiedName() + " (" + violations.size() + ")");
+		if (cell.isSelected()) {
+			cell.setStyle(null);
+			return;
+		}
+		String color = classViolation ? "#991b1b" : "#a16207";
+		cell.setStyle(FONT_FAMILY + "-fx-text-fill: " + color + ";");
 	}
 
 	private TabPane classDetailsTabPane(TestClass testClass) {
@@ -1959,7 +1998,7 @@ public final class ModernRozaUi extends Application {
 		}
 		testList.getSelectionModel().selectedItemProperty().addListener((observable, previous, selected) -> {
 			selectedDecomposedTestCase = selected;
-			renderContentArea();
+			refreshMeasurementTestBody();
 		});
 
 		String bodyText = selectedDecomposedTestCase == null ? "Select a test to inspect its decomposed body." : formatDecomposedTestBody(selectedDecomposedTestCase);
@@ -1968,11 +2007,22 @@ public final class ModernRozaUi extends Application {
 		bodyArea.setWrapText(false);
 		bodyArea.setStyle(FONT_FAMILY + "-fx-font-family: 'Monospaced'; -fx-font-size: 13px;");
 		HBox.setHgrow(bodyArea, Priority.ALWAYS);
+		measurementTestBodyArea = bodyArea;
 
 		HBox row = new HBox(16);
 		row.getChildren().addAll(testList, bodyArea);
 		VBox.setVgrow(row, Priority.ALWAYS);
 		return row;
+	}
+
+	private void refreshMeasurementTestBody() {
+		if (measurementTestBodyArea == null) {
+			renderContentArea();
+			return;
+		}
+		measurementTestBodyArea.setText(selectedDecomposedTestCase == null
+				? "Select a test to inspect its decomposed body."
+				: formatDecomposedTestBody(selectedDecomposedTestCase));
 	}
 
 	private VBox similarityMatrixView() {
