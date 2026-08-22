@@ -2,6 +2,8 @@ package br.ufsc.ine.leb.roza.core.modern.clustering;
 
 public final class MinimumSimilarityStopCriterion implements StopCriterion {
 
+	public static final double DEFAULT = 0.0;
+
 	private final double minimumSimilarity;
 
 	public MinimumSimilarityStopCriterion(double minimumSimilarity) {

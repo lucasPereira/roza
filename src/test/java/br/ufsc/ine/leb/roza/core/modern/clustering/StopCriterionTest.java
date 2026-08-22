@@ -29,8 +29,16 @@ class StopCriterionTest {
 	}
 
 	@Test
+	void shouldStopWhenAllClustersHaveAtLeastMinimumTests() {
+		assertTrue(new MinimumTestsPerClusterStopCriterion(2).shouldStop(context(0.5, 1, clusterPair("alpha", "beta", "gamma", "delta"))));
+		assertFalse(new MinimumTestsPerClusterStopCriterion(2).shouldStop(context(0.5, 1, clusterPair("alpha", "beta", "gamma"))));
+		assertFalse(new MinimumTestsPerClusterStopCriterion(2).shouldStop(context(0.5, 1, clusters("alpha", "beta"))));
+	}
+
+	@Test
 	void shouldStopWhenNextLevelWouldExceedMaximumLevel() {
-		assertTrue(new MaxLevelStopCriterion(0).shouldStop(context(0.5, 1, clusters("alpha", "beta"))));
+		assertTrue(new MaxLevelStopCriterion(1).shouldStop(context(0.5, 1, clusters("alpha", "beta"))));
+		assertFalse(new MaxLevelStopCriterion(2).shouldStop(context(0.5, 1, clusters("alpha", "beta"))));
 	}
 
 	@Test
@@ -55,6 +63,20 @@ class StopCriterionTest {
 
 	private List<TestCaseCluster> clusters(String first, String second) {
 		return List.of(new TestCaseCluster(0, testCase(first)), new TestCaseCluster(1, testCase(second)));
+	}
+
+	private List<TestCaseCluster> clusterPair(String firstClusterFirst, String firstClusterSecond, String secondClusterFirst) {
+		return List.of(mergedCluster(0, firstClusterFirst, firstClusterSecond), new TestCaseCluster(2, testCase(secondClusterFirst)));
+	}
+
+	private List<TestCaseCluster> clusterPair(String firstClusterFirst, String firstClusterSecond, String secondClusterFirst, String secondClusterSecond) {
+		return List.of(
+				mergedCluster(0, firstClusterFirst, firstClusterSecond),
+				mergedCluster(2, secondClusterFirst, secondClusterSecond));
+	}
+
+	private TestCaseCluster mergedCluster(int firstIndex, String first, String second) {
+		return new TestCaseCluster(firstIndex, testCase(first)).merge(new TestCaseCluster(firstIndex + 1, testCase(second)));
 	}
 
 	private TestCase testCase(String name, CodeStatement... statements) {

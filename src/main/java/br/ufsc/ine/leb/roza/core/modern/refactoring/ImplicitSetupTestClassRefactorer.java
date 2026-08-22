@@ -39,15 +39,21 @@ public final class ImplicitSetupTestClassRefactorer implements TestClassRefactor
 	}
 
 	private TestClass refactor(List<TestCase> testCases, String className) {
-		int sharedPrefixSize = commonNonAssertionPrefixSize(testCases);
-		SetupAnnotation setupAnnotation = setupAnnotation(testCases);
-		SetupExtraction setup = extractSetup(testCases.get(0).body().statements().subList(0, sharedPrefixSize));
-		boolean hasSetup = !setup.statements().isEmpty();
+		int sharedPrefixSize = testCases.size() > 1 ? commonNonAssertionPrefixSize(testCases) : 0;
+		SetupExtraction setup = sharedPrefixSize > 0
+				? extractSetup(testCases.get(0).body().statements().subList(0, sharedPrefixSize))
+				: emptySetup();
+		boolean hasSetup = sharedPrefixSize > 0 && !setup.statements().isEmpty();
+		SetupAnnotation setupAnnotation = hasSetup ? setupAnnotation(testCases) : null;
 		List<FixtureMethod> fixtures = !hasSetup
 				? List.of()
 				: List.of(new FixtureMethod(FixtureKind.BEFORE, "setup", List.of(setupAnnotation.annotation()), setupThrownExceptions(testCases), new CodeBlock(setup.statements())));
 		List<TestMethod> testMethods = testMethods(testCases, sharedPrefixSize);
-		return new TestClass(className, null, imports(testCases, hasSetup ? Optional.of(setupAnnotation) : Optional.empty()), hasSetup ? setupAnnotation : null, setup.fields(), fixtures, List.<HelperMethod>of(), testMethods);
+		return new TestClass(className, null, imports(testCases, hasSetup ? Optional.of(setupAnnotation) : Optional.empty()), setupAnnotation, hasSetup ? setup.fields() : List.of(), fixtures, List.<HelperMethod>of(), testMethods);
+	}
+
+	private SetupExtraction emptySetup() {
+		return new SetupExtraction(List.of(), List.of());
 	}
 
 	private List<String> setupThrownExceptions(List<TestCase> testCases) {

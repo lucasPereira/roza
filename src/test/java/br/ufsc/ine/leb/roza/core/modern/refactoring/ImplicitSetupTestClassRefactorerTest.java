@@ -115,6 +115,18 @@ class ImplicitSetupTestClassRefactorerTest {
 		assertEquals(List.of("testDistance", "betaTestTestDistance"), generated.testMethods().stream().map(br.ufsc.ine.leb.roza.core.modern.parsing.TestMethod::name).collect(Collectors.toList()));
 	}
 
+	@Test
+	void shouldNotCreateSetupWhenClusterHasOnlyOneTestMethod() {
+		TestClass source = source("Example", junit4Imports(), setup("Before", "@Before", "import org.junit.Before;"));
+		TestCase only = testCase(0, "alpha", source, testAnnotation("Test", "@Test"), statement("Sut sut = new Sut();"), assertion("assertTrue(sut.exists());"));
+
+		TestClass generated = new ImplicitSetupTestClassRefactorer().refactor(new TestCaseClusters(List.of(new TestCaseCluster(0, only)))).testClasses().get(0);
+
+		assertEquals(List.of(), generated.fixtures());
+		assertEquals(List.of(), fields(generated));
+		assertEquals(List.of("Sut sut = new Sut();", "assertTrue(sut.exists());"), statements(generated.testMethods().get(0)));
+	}
+
 	private RefactoredTestClasses refactor(TestCase first, TestCase second) {
 		return new ImplicitSetupTestClassRefactorer().refactor(new TestCaseClusters(List.of(new TestCaseCluster(0, first).merge(new TestCaseCluster(1, second)))));
 	}

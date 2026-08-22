@@ -8,6 +8,8 @@ import br.ufsc.ine.leb.roza.core.modern.parsing.CodeStatement;
 
 public final class MinimumSharedPrefixStopCriterion implements StopCriterion {
 
+	public static final int DEFAULT = 0;
+
 	private final int threshold;
 
 	public MinimumSharedPrefixStopCriterion(int threshold) {

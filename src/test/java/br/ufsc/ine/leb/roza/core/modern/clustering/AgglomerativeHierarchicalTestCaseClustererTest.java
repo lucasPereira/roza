@@ -37,6 +37,16 @@ class AgglomerativeHierarchicalTestCaseClustererTest {
 	}
 
 	@Test
+	void shouldStopWhenAllClustersHaveAtLeastMinimumTests() {
+		TestCaseSimilarityMatrix matrix = matrix();
+
+		TestCaseClusters clusters = clusterer(new CompositeStopCriterion(List.of(new MinimumTestsPerClusterStopCriterion(2)))).cluster(matrix);
+
+		assertEquals(1, clusters.clusters().size());
+		assertEquals(List.of("alpha", "beta", "gamma"), names(clusters.clusters().get(0)));
+	}
+
+	@Test
 	void shouldExposeInitialAndAcceptedMergeLevels() {
 		TestCaseSimilarityMatrix matrix = matrix();
 

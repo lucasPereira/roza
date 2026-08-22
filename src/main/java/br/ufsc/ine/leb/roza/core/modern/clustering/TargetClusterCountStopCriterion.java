@@ -2,6 +2,8 @@ package br.ufsc.ine.leb.roza.core.modern.clustering;
 
 public final class TargetClusterCountStopCriterion implements StopCriterion {
 
+	public static final int DEFAULT = 1;
+
 	private final int targetClusterCount;
 
 	public TargetClusterCountStopCriterion(int targetClusterCount) {

@@ -33,6 +33,7 @@ import br.ufsc.ine.leb.roza.core.modern.clustering.MergeCandidate;
 import br.ufsc.ine.leb.roza.core.modern.clustering.MergeTieBreaker;
 import br.ufsc.ine.leb.roza.core.modern.clustering.MergeTieBreakerKind;
 import br.ufsc.ine.leb.roza.core.modern.clustering.MinimumSharedPrefixStopCriterion;
+import br.ufsc.ine.leb.roza.core.modern.clustering.MinimumTestsPerClusterStopCriterion;
 import br.ufsc.ine.leb.roza.core.modern.clustering.MinimumSimilarityStopCriterion;
 import br.ufsc.ine.leb.roza.core.modern.clustering.StopCriterion;
 import br.ufsc.ine.leb.roza.core.modern.clustering.TargetClusterCountStopCriterion;
@@ -150,6 +151,8 @@ public final class ModernRozaUi extends Application {
 	private final TextField minimumSimilarityStopInput;
 	private final CheckBox maxTestsPerClusterStopEnabled;
 	private final TextField maxTestsPerClusterStopInput;
+	private final CheckBox minimumTestsPerClusterStopEnabled;
+	private final TextField minimumTestsPerClusterStopInput;
 	private final CheckBox maxLevelStopEnabled;
 	private final TextField maxLevelStopInput;
 	private final CheckBox targetClusterCountStopEnabled;
@@ -241,16 +244,18 @@ public final class ModernRozaUi extends Application {
 		});
 
 		linkageMethodCombo = linkageMethodComboBox();
-		minimumSimilarityStopEnabled = new CheckBox("Minimum similarity");
-		minimumSimilarityStopInput = metricConfigurationInput("0.0");
-		maxTestsPerClusterStopEnabled = new CheckBox("Maximum tests per cluster");
-		maxTestsPerClusterStopInput = metricConfigurationInput("10");
-		maxLevelStopEnabled = new CheckBox("Maximum level");
-		maxLevelStopInput = metricConfigurationInput("1");
-		targetClusterCountStopEnabled = new CheckBox("Target cluster count");
-		targetClusterCountStopInput = metricConfigurationInput("1");
-		minimumSharedPrefixStopEnabled = new CheckBox("Minimum shared prefix threshold");
-		minimumSharedPrefixStopInput = metricConfigurationInput("0");
+		minimumSimilarityStopEnabled = stopCriterionCheckBox("Stop when the best merge similarity is at or below the threshold");
+		minimumSimilarityStopInput = metricConfigurationInput(String.valueOf(MinimumSimilarityStopCriterion.DEFAULT));
+		maxTestsPerClusterStopEnabled = stopCriterionCheckBox("Stop before a merge puts more than this many tests in one cluster");
+		maxTestsPerClusterStopInput = metricConfigurationInput(String.valueOf(MaxTestsPerClusterStopCriterion.DEFAULT));
+		minimumTestsPerClusterStopEnabled = stopCriterionCheckBox("Stop when every cluster already has at least this many tests");
+		minimumTestsPerClusterStopInput = metricConfigurationInput(String.valueOf(MinimumTestsPerClusterStopCriterion.DEFAULT));
+		maxLevelStopEnabled = stopCriterionCheckBox("Stop before exceeding this merge level");
+		maxLevelStopInput = metricConfigurationInput(String.valueOf(MaxLevelStopCriterion.DEFAULT));
+		targetClusterCountStopEnabled = stopCriterionCheckBox("Stop when cluster count is at most");
+		targetClusterCountStopInput = metricConfigurationInput(String.valueOf(TargetClusterCountStopCriterion.DEFAULT));
+		minimumSharedPrefixStopEnabled = stopCriterionCheckBox("Stop before a merge when shared initial statements are at most");
+		minimumSharedPrefixStopInput = metricConfigurationInput(String.valueOf(MinimumSharedPrefixStopCriterion.DEFAULT));
 		selectedTieBreakerKinds = new ArrayList<>();
 
 		sourceFolder = defaultSourceFolder();
@@ -559,6 +564,7 @@ public final class ModernRozaUi extends Application {
 				stopCriteriaTitle,
 				stopCriterionInput(minimumSimilarityStopEnabled, minimumSimilarityStopInput),
 				stopCriterionInput(maxTestsPerClusterStopEnabled, maxTestsPerClusterStopInput),
+				stopCriterionInput(minimumTestsPerClusterStopEnabled, minimumTestsPerClusterStopInput),
 				stopCriterionInput(maxLevelStopEnabled, maxLevelStopInput),
 				stopCriterionInput(targetClusterCountStopEnabled, targetClusterCountStopInput),
 				stopCriterionInput(minimumSharedPrefixStopEnabled, minimumSharedPrefixStopInput));
@@ -579,6 +585,13 @@ public final class ModernRozaUi extends Application {
 		configuration.getChildren().addAll(linkageBlock, stopCriteriaBlock, tieBreakersBlock, clusterButton);
 		VBox.setMargin(clusterButton, MARGIN_ACTION_BUTTON_TOP);
 		return configuration;
+	}
+
+	private CheckBox stopCriterionCheckBox(String text) {
+		CheckBox checkBox = new CheckBox(text);
+		checkBox.setWrapText(true);
+		checkBox.setMaxWidth(Double.MAX_VALUE);
+		return checkBox;
 	}
 
 	private VBox stopCriterionInput(CheckBox enabled, TextField input) {
@@ -1054,6 +1067,9 @@ public final class ModernRozaUi extends Application {
 			}
 			if (maxTestsPerClusterStopEnabled.isSelected()) {
 				criteria.add(new MaxTestsPerClusterStopCriterion(Integer.parseInt(maxTestsPerClusterStopInput.getText().trim())));
+			}
+			if (minimumTestsPerClusterStopEnabled.isSelected()) {
+				criteria.add(new MinimumTestsPerClusterStopCriterion(Integer.parseInt(minimumTestsPerClusterStopInput.getText().trim())));
 			}
 			if (maxLevelStopEnabled.isSelected()) {
 				criteria.add(new MaxLevelStopCriterion(Integer.parseInt(maxLevelStopInput.getText().trim())));
