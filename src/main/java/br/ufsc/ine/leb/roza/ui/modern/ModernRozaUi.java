@@ -1274,7 +1274,7 @@ public final class ModernRozaUi extends Application {
 						List.of("Attributes", formatNumber(eligible.attributes()), formatNumber(refactored.attributes())),
 						List.of("Total statements", formatNumber(eligible.totalStatements()), formatNumber(refactored.totalStatements())),
 						List.of("Duplicated statements", formatNumber(eligible.duplicatedStatements()), formatNumber(refactored.duplicatedStatements())),
-						List.of("Unique duplicated statements", formatNumber(eligible.uniqueDuplicatedStatements()), formatNumber(refactored.uniqueDuplicatedStatements())))));
+						List.of("Duplication rate", formatDuplicationRate(eligible.duplicationRate()), formatDuplicationRate(refactored.duplicationRate())))));
 		section.getChildren().add(statementMetricsGlossary());
 		return section;
 	}
@@ -1293,10 +1293,9 @@ public final class ModernRozaUi extends Application {
 								+ "that appears more than once across all test classes. "
 								+ "For example, if sut = new Sut(); appears in three tests and two setups, it contributes 4."),
 				glossaryEntry(
-						"Unique duplicated statements",
-						"Counts each distinct normalized non-assertion statement text "
-								+ "that appears more than once across all test classes. "
-								+ "For example, if two different statements each appear twice, the count is 2."));
+						"Duplication rate",
+						"Divides duplicated statements by total statements. "
+								+ "For example, 4 duplicated statements out of 10 total statements yields 40%."));
 		return glossary;
 	}
 
@@ -2339,6 +2338,10 @@ public final class ModernRozaUi extends Application {
 
 	private static String formatSimilarity(double similarity) {
 		return String.format(Locale.ROOT, "%.4f", similarity);
+	}
+
+	private static String formatDuplicationRate(double rate) {
+		return String.format(Locale.ROOT, "%.1f%%", rate * 100.0);
 	}
 
 	private static String formatNumber(int value) {

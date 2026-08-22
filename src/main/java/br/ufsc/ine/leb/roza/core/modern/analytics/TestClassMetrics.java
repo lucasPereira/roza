@@ -8,7 +8,6 @@ public final class TestClassMetrics {
 	private final int attributes;
 	private final int totalStatements;
 	private final int duplicatedStatements;
-	private final int uniqueDuplicatedStatements;
 
 	public TestClassMetrics(
 			int testClasses,
@@ -16,15 +15,13 @@ public final class TestClassMetrics {
 			int setupMethods,
 			int attributes,
 			int totalStatements,
-			int duplicatedStatements,
-			int uniqueDuplicatedStatements) {
+			int duplicatedStatements) {
 		this.testClasses = testClasses;
 		this.testMethods = testMethods;
 		this.setupMethods = setupMethods;
 		this.attributes = attributes;
 		this.totalStatements = totalStatements;
 		this.duplicatedStatements = duplicatedStatements;
-		this.uniqueDuplicatedStatements = uniqueDuplicatedStatements;
 	}
 
 	public int testClasses() {
@@ -51,7 +48,10 @@ public final class TestClassMetrics {
 		return duplicatedStatements;
 	}
 
-	public int uniqueDuplicatedStatements() {
-		return uniqueDuplicatedStatements;
+	public double duplicationRate() {
+		if (totalStatements == 0) {
+			return 0.0;
+		}
+		return (double) duplicatedStatements / totalStatements;
 	}
 }

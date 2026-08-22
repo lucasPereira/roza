@@ -23,7 +23,6 @@ class TestClassDuplicationAnalyzerTest {
 
 		TestClassDuplicationAnalyzer.DuplicationMetrics metrics = TestClassDuplicationAnalyzer.analyze(List.of(first, second));
 
-		assertEquals(1, metrics.uniqueDuplicatedStatements());
 		assertEquals(1, metrics.duplicatedStatements());
 	}
 
@@ -35,7 +34,6 @@ class TestClassDuplicationAnalyzerTest {
 
 		TestClassDuplicationAnalyzer.DuplicationMetrics metrics = TestClassDuplicationAnalyzer.analyze(List.of(first, second));
 
-		assertEquals(0, metrics.uniqueDuplicatedStatements());
 		assertEquals(0, metrics.duplicatedStatements());
 	}
 
@@ -49,7 +47,6 @@ class TestClassDuplicationAnalyzerTest {
 
 		TestClassDuplicationAnalyzer.DuplicationMetrics metrics = TestClassDuplicationAnalyzer.analyze(List.of(testClass));
 
-		assertEquals(1, metrics.uniqueDuplicatedStatements());
 		assertEquals(1, metrics.duplicatedStatements());
 	}
 
@@ -67,6 +64,13 @@ class TestClassDuplicationAnalyzerTest {
 	}
 
 	@Test
+	void shouldComputeDuplicationRate() {
+		TestClassMetrics metrics = new TestClassMetrics(1, 2, 0, 0, 4, 1);
+
+		assertEquals(0.25, metrics.duplicationRate(), 0.000001);
+	}
+
+	@Test
 	void shouldReportNoDuplicationForUniqueStatements() {
 		TestClass testClass = testClass(
 				"Example",
@@ -76,7 +80,6 @@ class TestClassDuplicationAnalyzerTest {
 
 		TestClassDuplicationAnalyzer.DuplicationMetrics metrics = TestClassDuplicationAnalyzer.analyze(List.of(testClass));
 
-		assertEquals(0, metrics.uniqueDuplicatedStatements());
 		assertEquals(0, metrics.duplicatedStatements());
 	}
 

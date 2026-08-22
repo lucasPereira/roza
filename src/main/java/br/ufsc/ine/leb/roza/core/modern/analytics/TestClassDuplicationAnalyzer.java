@@ -25,15 +25,13 @@ public final class TestClassDuplicationAnalyzer {
 				frequencies.merge(statement, 1, Integer::sum);
 			}
 		}
-		int uniqueDuplicatedStatements = 0;
 		int duplicatedStatements = 0;
 		for (int count : frequencies.values()) {
 			if (count > 1) {
-				uniqueDuplicatedStatements++;
 				duplicatedStatements += count - 1;
 			}
 		}
-		return new DuplicationMetrics(totalStatements, duplicatedStatements, uniqueDuplicatedStatements);
+		return new DuplicationMetrics(totalStatements, duplicatedStatements);
 	}
 
 	private static List<String> statements(TestClass testClass) {
@@ -62,12 +60,10 @@ public final class TestClassDuplicationAnalyzer {
 
 		private final int totalStatements;
 		private final int duplicatedStatements;
-		private final int uniqueDuplicatedStatements;
 
-		public DuplicationMetrics(int totalStatements, int duplicatedStatements, int uniqueDuplicatedStatements) {
+		public DuplicationMetrics(int totalStatements, int duplicatedStatements) {
 			this.totalStatements = totalStatements;
 			this.duplicatedStatements = duplicatedStatements;
-			this.uniqueDuplicatedStatements = uniqueDuplicatedStatements;
 		}
 
 		public int totalStatements() {
@@ -76,10 +72,6 @@ public final class TestClassDuplicationAnalyzer {
 
 		public int duplicatedStatements() {
 			return duplicatedStatements;
-		}
-
-		public int uniqueDuplicatedStatements() {
-			return uniqueDuplicatedStatements;
 		}
 	}
 }
