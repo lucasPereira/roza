@@ -300,7 +300,7 @@ Acceptance criteria:
 - AC-102: `RefactoredTestClasses` exposes refactored test classes through `testClasses()`.
 - AC-103: `RefactoredTestClasses.testClasses()` returns `TestClass` instances.
 - AC-274: The first concrete refactoring implementation is named `ImplicitSetupTestClassRefactorer`.
-- AC-275: With the default-package policy, `ImplicitSetupTestClassRefactorer` creates one generated `TestClass` per cluster.
+- AC-275: `ImplicitSetupTestClassRefactorer` creates one generated `TestClass` per cluster in Java's default package.
 - AC-276: `ImplicitSetupTestClassRefactorer` moves the common initial non-assertion statement prefix of a cluster into a generated setup method.
 - AC-277: `ImplicitSetupTestClassRefactorer` converts local variable declarations moved into setup into fields plus setup assignments.
 - AC-278: `ImplicitSetupTestClassRefactorer` preserves each generated test method's original parsed test annotations.
@@ -309,11 +309,7 @@ Acceptance criteria:
 - AC-281: Refactoring output remains structured `TestClass` models; source-code rendering is a separate concern.
 - AC-300: When a local array declaration is moved into setup, `ImplicitSetupTestClassRefactorer` renders the setup assignment with explicit array creation, such as `values = new String[] { "a" };`.
 - AC-301: `ImplicitSetupTestClassRefactorer` preserves decomposed thrown exceptions on generated setup and test methods.
-- AC-292: `ImplicitSetupTestClassRefactorer` exposes an implicit-setup package policy configuration.
-- AC-293: The default implicit-setup package policy materializes generated test classes in Java's default package.
 - AC-294: `ImplicitSetupTestClassRefactorer` makes generated test method names unique inside each generated class.
-- AC-296: The package-partitioning implicit-setup package policy partitions each cluster by source package before generating test classes.
-- AC-297: With the package-partitioning policy, `ImplicitSetupTestClassRefactorer` preserves the source package name on generated classes for each package partition.
 
 ### REQ-014: Writing Stage
 
@@ -425,7 +421,6 @@ Acceptance criteria:
 - AC-284: The modern UI `Writing` center shows a list of generated test classes.
 - AC-285: Selecting a generated test class in the modern UI `Writing` center shows its rendered Java code on the right.
 - AC-286: The modern UI `Refactoring` configuration exposes a `Refactor Current level` action that runs `ImplicitSetupTestClassRefactorer` over the currently selected clustering level.
-- AC-298: The modern UI `Refactoring` configuration exposes the implicit-setup package policy used by `ImplicitSetupTestClassRefactorer`.
 - AC-268: In the modern UI sidebar, pipeline stages without visible configuration controls show their primary action button at the same top height as the loading stage's first control and the refactoring action button, without empty placeholder spacing above the action.
 - AC-269: The modern UI `Writing` configuration shows an output folder chooser button and a selected-path label, following the loading source folder pattern.
 - AC-270: The modern UI `Writing` output folder defaults to Róża's `output/writer` folder.
@@ -605,14 +600,8 @@ public final class RefactoredTestClasses {
 	public List<TestClass> testClasses();
 }
 
-public enum ImplicitSetupPackagePolicy {
-	DEFAULT_PACKAGE,
-	PACKAGE_PARTITIONING
-}
-
 public final class ImplicitSetupTestClassRefactorer implements TestClassRefactorer {
 	public ImplicitSetupTestClassRefactorer();
-	public ImplicitSetupTestClassRefactorer(ImplicitSetupPackagePolicy packagePolicy);
 	public RefactoredTestClasses refactor(TestCaseClusters clusters);
 }
 ```

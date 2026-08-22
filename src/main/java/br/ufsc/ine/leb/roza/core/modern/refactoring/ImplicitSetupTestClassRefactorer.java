@@ -1,11 +1,8 @@
 package br.ufsc.ine.leb.roza.core.modern.refactoring;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -30,41 +27,18 @@ import br.ufsc.ine.leb.roza.core.modern.parsing.TestMethod;
 
 public final class ImplicitSetupTestClassRefactorer implements TestClassRefactorer {
 
-	private final ImplicitSetupPackagePolicy packagePolicy;
-
-	public ImplicitSetupTestClassRefactorer() {
-		this(ImplicitSetupPackagePolicy.DEFAULT_PACKAGE);
-	}
-
-	public ImplicitSetupTestClassRefactorer(ImplicitSetupPackagePolicy packagePolicy) {
-		this.packagePolicy = Objects.requireNonNull(packagePolicy);
-	}
-
 	@Override
 	public RefactoredTestClasses refactor(TestCaseClusters clusters) {
 		List<TestClass> testClasses = new ArrayList<>();
 		int classIndex = 1;
 		for (TestCaseCluster cluster : clusters.clusters()) {
-			for (List<TestCase> partition : partitions(cluster)) {
-				testClasses.add(refactor(partition, "TestClass" + classIndex, packageName(partition)));
-				classIndex++;
-			}
+			testClasses.add(refactor(cluster.testCases(), "TestClass" + classIndex));
+			classIndex++;
 		}
 		return new RefactoredTestClasses(testClasses);
 	}
 
-	private List<List<TestCase>> partitions(TestCaseCluster cluster) {
-		if (packagePolicy == ImplicitSetupPackagePolicy.DEFAULT_PACKAGE) {
-			return List.of(cluster.testCases());
-		}
-		Map<String, List<TestCase>> partitions = new LinkedHashMap<>();
-		for (TestCase testCase : cluster.testCases()) {
-			partitions.computeIfAbsent(testCase.sourceTestClass().orElseThrow().packageName().orElse(""), packageName -> new ArrayList<>()).add(testCase);
-		}
-		return new ArrayList<>(partitions.values());
-	}
-
-	private TestClass refactor(List<TestCase> testCases, String className, Optional<String> packageName) {
+	private TestClass refactor(List<TestCase> testCases, String className) {
 		int sharedPrefixSize = commonNonAssertionPrefixSize(testCases);
 		SetupAnnotation setupAnnotation = setupAnnotation(testCases);
 		SetupExtraction setup = extractSetup(testCases.get(0).body().statements().subList(0, sharedPrefixSize));
@@ -73,7 +47,7 @@ public final class ImplicitSetupTestClassRefactorer implements TestClassRefactor
 				? List.of()
 				: List.of(new FixtureMethod(FixtureKind.BEFORE, "setup", List.of(setupAnnotation.annotation()), setupThrownExceptions(testCases), new CodeBlock(setup.statements())));
 		List<TestMethod> testMethods = testMethods(testCases, sharedPrefixSize);
-		return new TestClass(className, packageName.orElse(null), imports(testCases, hasSetup ? Optional.of(setupAnnotation) : Optional.empty()), hasSetup ? setupAnnotation : null, setup.fields(), fixtures, List.<HelperMethod>of(), testMethods);
+		return new TestClass(className, null, imports(testCases, hasSetup ? Optional.of(setupAnnotation) : Optional.empty()), hasSetup ? setupAnnotation : null, setup.fields(), fixtures, List.<HelperMethod>of(), testMethods);
 	}
 
 	private List<String> setupThrownExceptions(List<TestCase> testCases) {
@@ -188,14 +162,6 @@ public final class ImplicitSetupTestClassRefactorer implements TestClassRefactor
 	private TestMethod testMethod(TestCase testCase, int sharedPrefixSize, String methodName) {
 		List<CodeStatement> statements = testCase.body().statements().subList(sharedPrefixSize, testCase.body().statements().size());
 		return new TestMethod(methodName, testCase.annotations(), testCase.thrownExceptions(), new CodeBlock(statements));
-	}
-
-	private Optional<String> packageName(List<TestCase> testCases) {
-		if (packagePolicy == ImplicitSetupPackagePolicy.DEFAULT_PACKAGE) {
-			return Optional.empty();
-		}
-		String packageName = testCases.get(0).sourceTestClass().orElseThrow().packageName().orElse("");
-		return packageName.isEmpty() ? Optional.empty() : Optional.of(packageName);
 	}
 
 	private List<String> imports(List<TestCase> testCases, Optional<SetupAnnotation> setupAnnotation) {

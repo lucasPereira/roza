@@ -69,7 +69,6 @@ import br.ufsc.ine.leb.roza.core.modern.parsing.TestMethod;
 import br.ufsc.ine.leb.roza.core.modern.parsing.UnsupportedFeatureException;
 import br.ufsc.ine.leb.roza.core.modern.parsing.ViolationContextExtractor;
 import br.ufsc.ine.leb.roza.core.modern.parsing.ViolationScope;
-import br.ufsc.ine.leb.roza.core.modern.refactoring.ImplicitSetupPackagePolicy;
 import br.ufsc.ine.leb.roza.core.modern.refactoring.ImplicitSetupTestClassRefactorer;
 import br.ufsc.ine.leb.roza.core.modern.refactoring.JunitTestClassRenderer;
 import br.ufsc.ine.leb.roza.core.modern.refactoring.RefactoredTestClasses;
@@ -158,7 +157,6 @@ public final class ModernRozaUi extends Application {
 	private final CheckBox minimumSharedPrefixStopEnabled;
 	private final TextField minimumSharedPrefixStopInput;
 	private final List<MergeTieBreakerKind> selectedTieBreakerKinds;
-	private final ComboBox<ImplicitSetupPackagePolicy> implicitSetupPackagePolicyCombo;
 	private Path sourceFolder;
 	private LoadedCodeFiles loadedCodeFiles;
 	private CodeFile selectedCodeFile;
@@ -254,7 +252,6 @@ public final class ModernRozaUi extends Application {
 		minimumSharedPrefixStopEnabled = new CheckBox("Minimum shared prefix threshold");
 		minimumSharedPrefixStopInput = metricConfigurationInput("0");
 		selectedTieBreakerKinds = new ArrayList<>();
-		implicitSetupPackagePolicyCombo = implicitSetupPackagePolicyComboBox();
 
 		sourceFolder = defaultSourceFolder();
 		outputFolder = defaultOutputFolder();
@@ -473,10 +470,6 @@ public final class ModernRozaUi extends Application {
 	private VBox refactoringConfiguration() {
 		VBox configuration = new VBox(CONFIGURATION_INNER_SPACING);
 		configuration.setPadding(new Insets(0, 0, 4, 0));
-		Label packagePolicyTitle = body("Package policy");
-		packagePolicyTitle.setStyle(packagePolicyTitle.getStyle() + "-fx-font-weight: bold; -fx-text-fill: #333333;");
-		implicitSetupPackagePolicyCombo.setMaxWidth(Double.MAX_VALUE);
-		VBox.setMargin(implicitSetupPackagePolicyCombo, MARGIN_AFTER_CONFIGURATION_GROUP);
 
 		Button refactorButton = new Button(PipelineStage.REFACTORING.actionLabel());
 		refactorButton.setMaxWidth(Double.MAX_VALUE);
@@ -490,7 +483,7 @@ public final class ModernRozaUi extends Application {
 		refactorCurrentLevelButton.setDisable(!stageActionEnabled(PipelineStage.REFACTORING));
 		refactorCurrentLevelButton.setOnAction(event -> runRefactoringCurrentLevel());
 
-		configuration.getChildren().addAll(packagePolicyTitle, implicitSetupPackagePolicyCombo, refactorButton, refactorCurrentLevelButton);
+		configuration.getChildren().addAll(refactorButton, refactorCurrentLevelButton);
 		return configuration;
 	}
 
@@ -689,28 +682,6 @@ public final class ModernRozaUi extends Application {
 		comboBox.setButtonCell(new ListCell<>() {
 			@Override
 			protected void updateItem(MergeTieBreakerKind item, boolean empty) {
-				super.updateItem(item, empty);
-				setText(empty || item == null ? null : item.displayName());
-			}
-		});
-		return comboBox;
-	}
-
-	private ComboBox<ImplicitSetupPackagePolicy> implicitSetupPackagePolicyComboBox() {
-		ComboBox<ImplicitSetupPackagePolicy> comboBox = new ComboBox<>();
-		comboBox.getItems().addAll(ImplicitSetupPackagePolicy.values());
-		comboBox.getSelectionModel().select(ImplicitSetupPackagePolicy.DEFAULT_PACKAGE);
-		comboBox.setStyle(singleLineComboBoxStyle());
-		comboBox.setCellFactory(list -> new ListCell<>() {
-			@Override
-			protected void updateItem(ImplicitSetupPackagePolicy item, boolean empty) {
-				super.updateItem(item, empty);
-				setText(empty || item == null ? null : item.displayName());
-			}
-		});
-		comboBox.setButtonCell(new ListCell<>() {
-			@Override
-			protected void updateItem(ImplicitSetupPackagePolicy item, boolean empty) {
 				super.updateItem(item, empty);
 				setText(empty || item == null ? null : item.displayName());
 			}
@@ -997,7 +968,7 @@ public final class ModernRozaUi extends Application {
 
 	private void refactor(TestCaseClusters clusters) {
 		try {
-			TestClassRefactorer refactorer = new ImplicitSetupTestClassRefactorer(selectedImplicitSetupPackagePolicy());
+			TestClassRefactorer refactorer = new ImplicitSetupTestClassRefactorer();
 			refactoredTestClasses = refactorer.refactor(clusters);
 			selectedRefactoredTestClass = refactoredTestClasses.testClasses().isEmpty() ? null : refactoredTestClasses.testClasses().get(0);
 			refactoringError = null;
@@ -1010,11 +981,6 @@ public final class ModernRozaUi extends Application {
 			writingError = null;
 		}
 		render();
-	}
-
-	private ImplicitSetupPackagePolicy selectedImplicitSetupPackagePolicy() {
-		ImplicitSetupPackagePolicy packagePolicy = implicitSetupPackagePolicyCombo.getSelectionModel().getSelectedItem();
-		return packagePolicy == null ? ImplicitSetupPackagePolicy.DEFAULT_PACKAGE : packagePolicy;
 	}
 
 	private void runWriting() {
