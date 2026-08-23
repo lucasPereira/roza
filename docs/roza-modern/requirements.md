@@ -318,6 +318,12 @@ Acceptance criteria:
 - AC-300: When a local array declaration is moved into setup, `ImplicitSetupTestClassRefactorer` renders the setup assignment with explicit array creation, such as `values = new String[] { "a" };`.
 - AC-301: `ImplicitSetupTestClassRefactorer` preserves decomposed thrown exceptions on generated setup and test methods.
 - AC-294: `ImplicitSetupTestClassRefactorer` makes generated test method names unique inside each generated class.
+- AC-320: A second concrete refactoring implementation is named `NonIsolatingImplicitSetupTestClassRefactorer`.
+- AC-321: `NonIsolatingImplicitSetupTestClassRefactorer` refactors clusters with two or more tests using the same implicit-setup extraction as `ImplicitSetupTestClassRefactorer`.
+- AC-322: `NonIsolatingImplicitSetupTestClassRefactorer` does not create an isolated generated class for a cluster that contains only one test.
+- AC-323: Singleton leftover tests from the same original class remain together in a residual class that preserves that class's name, package, imports, fields, fixtures, helpers, and the original leftover test methods.
+- AC-324: Residual classes omit tests that were extracted into multi-test implicit-setup classes.
+- AC-325: Residual classes use the original parsed test method bodies rather than the decomposed inlined setup bodies.
 
 ### REQ-014: Writing Stage
 
@@ -424,11 +430,13 @@ Acceptance criteria:
 - AC-265: The modern UI `Clustering` configuration allows enabling zero or more stop criteria.
 - AC-266: The modern UI `Clustering` configuration allows configuring ordered merge tie breaker fallbacks.
 - AC-267: Triggering `Cluster` runs the configured agglomerative clusterer and shows the resulting clusters while keeping the ranked similarity inspection available.
-- AC-282: Triggering `Refactor` in the modern UI runs `ImplicitSetupTestClassRefactorer` over the final clustering output, i.e., the last generated clustering level.
+- AC-282: Triggering `Refactor` in the modern UI runs the selected refactoring strategy over the final clustering output, i.e., the last generated clustering level.
 - AC-283: The modern UI stores the generated `RefactoredTestClasses` as the output consumed by the `Writing` tab.
 - AC-284: The modern UI `Writing` center shows a list of generated test classes.
 - AC-285: Selecting a generated test class in the modern UI `Writing` center shows its rendered Java code on the right.
-- AC-286: The modern UI `Refactoring` configuration exposes a `Refactor Current level` action that runs `ImplicitSetupTestClassRefactorer` over the currently selected clustering level.
+- AC-286: The modern UI `Refactoring` configuration exposes a `Refactor Current level` action that runs the selected refactoring strategy over the currently selected clustering level.
+- AC-326: The modern UI `Refactoring` configuration exposes a strategy dropdown with `Isolating implicit setup` selected by default and `Non-isolating implicit setup` as an alternative.
+- AC-327: Both modern UI refactoring actions use the strategy selected in the dropdown.
 - AC-268: In the modern UI sidebar, pipeline stages without visible configuration controls show their primary action button at the same top height as the loading stage's first control and the refactoring action button, without empty placeholder spacing above the action.
 - AC-269: The modern UI `Writing` configuration shows an output folder chooser button and a selected-path label, following the loading source folder pattern.
 - AC-270: The modern UI `Writing` output folder defaults to Róża's `output/writer` folder.
@@ -612,6 +620,11 @@ public final class ImplicitSetupTestClassRefactorer implements TestClassRefactor
 	public ImplicitSetupTestClassRefactorer();
 	public RefactoredTestClasses refactor(TestCaseClusters clusters);
 }
+
+public final class NonIsolatingImplicitSetupTestClassRefactorer implements TestClassRefactorer {
+	public NonIsolatingImplicitSetupTestClassRefactorer();
+	public RefactoredTestClasses refactor(TestCaseClusters clusters);
+}
 ```
 
 ### Implemented: Writing
@@ -764,5 +777,7 @@ The current clustering implementation requires the matrix size, test case by ind
 - 2026-05-11: Validated Simian execution through the existing jar and added modern Simian threshold, XML report parsing, asymmetric line-coverage scoring, and UI selection requirements.
 - 2026-05-12: Implemented the first modern clustering slice with agglomerative hierarchical clustering, linkage strategies, composable stop criteria, ordered merge tie breakers, level inspection, and JavaFX clustering configuration/output.
 - 2026-05-12: Implemented the first modern refactoring slice with `ImplicitSetupTestClassRefactorer`, source-class context preservation, setup annotation inference in parsing/decomposition, generated test-class rendering, and Writing-tab class/code inspection.
+- 2026-08-23: Added `NonIsolatingImplicitSetupTestClassRefactorer`, which extracts implicit setup only from multi-test clusters and keeps singleton leftovers in residual original classes.
+- 2026-08-23: The modern UI `Refactoring` configuration exposes a strategy dropdown for isolating and non-isolating implicit setup.
 - 2026-05-12: Confirmed that modern UI sidebar stages without visible configuration controls should align their primary action button with the first visible loading control and the refactoring action.
 - 2026-05-12: Confirmed the modern UI writing sidebar output folder chooser, default `output/writer` folder, and selected-folder write behavior.

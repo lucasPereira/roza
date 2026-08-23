@@ -70,7 +70,9 @@ import br.ufsc.ine.leb.roza.core.modern.parsing.ViolationContextExtractor;
 import br.ufsc.ine.leb.roza.core.modern.parsing.ViolationScope;
 import br.ufsc.ine.leb.roza.core.modern.refactoring.ImplicitSetupTestClassRefactorer;
 import br.ufsc.ine.leb.roza.core.modern.refactoring.JunitTestClassRenderer;
+import br.ufsc.ine.leb.roza.core.modern.refactoring.NonIsolatingImplicitSetupTestClassRefactorer;
 import br.ufsc.ine.leb.roza.core.modern.refactoring.RefactoredTestClasses;
+import br.ufsc.ine.leb.roza.core.modern.refactoring.TestClassRefactorer;
 import br.ufsc.ine.leb.roza.core.modern.writing.FileSystemTestClassWriter;
 import br.ufsc.ine.leb.roza.core.modern.writing.TestClassWriter;
 import javafx.beans.binding.Bindings;
@@ -129,6 +131,8 @@ public final class ModernRozaUi extends Application {
 	private static final int LIST_WIDTH_LARGE = 300;
 	private static final int LIST_WIDTH_SMALL = 100;
 	private static final int SIDEBAR_WIDTH = 320;
+	private static final String ISOLATING_IMPLICIT_SETUP_STRATEGY = "Isolating implicit setup";
+	private static final String NON_ISOLATING_IMPLICIT_SETUP_STRATEGY = "Non-isolating implicit setup";
 
 	private final PipelineState pipelineState;
 	private final HBox pipelineBar;
@@ -138,6 +142,7 @@ public final class ModernRozaUi extends Application {
 	private final CheckBox javaExtension;
 	private final CheckBox txtExtension;
 	private final ComboBox<String> metricCombo;
+	private final ComboBox<String> refactoringStrategyCombo;
 	private final TextField deckardMinTokensInput;
 	private final TextField deckardStrideInput;
 	private final TextField deckardSimilarityInput;
@@ -214,6 +219,12 @@ public final class ModernRozaUi extends Application {
 		metricCombo.getSelectionModel().selectFirst();
 		metricCombo.setStyle(singleLineComboBoxStyle());
 		metricCombo.valueProperty().addListener((observable, previous, selected) -> renderConfigurationSidebar());
+
+		refactoringStrategyCombo = new ComboBox<>();
+		refactoringStrategyCombo.getItems().add(ISOLATING_IMPLICIT_SETUP_STRATEGY);
+		refactoringStrategyCombo.getItems().add(NON_ISOLATING_IMPLICIT_SETUP_STRATEGY);
+		refactoringStrategyCombo.getSelectionModel().selectFirst();
+		refactoringStrategyCombo.setStyle(singleLineComboBoxStyle());
 
 		deckardMinTokensInput = metricConfigurationInput(String.valueOf(DeckardMeasurementConfiguration.DEFAULT_MIN_TOKENS));
 		deckardStrideInput = metricConfigurationInput(String.valueOf(DeckardMeasurementConfiguration.DEFAULT_STRIDE));
@@ -437,6 +448,13 @@ public final class ModernRozaUi extends Application {
 		showConfigurationHelpDialog("Measurement metrics", null, measurementMetricHelpEntries());
 	}
 
+	private void showRefactoringStrategyHelpDialog() {
+		showConfigurationHelpDialog(
+				"Refactoring strategies",
+				"The selected strategy is applied to the clustering result. Both Refactor actions use this choice.",
+				refactoringStrategyHelpEntries());
+	}
+
 	private void showLinkageMethodHelpDialog() {
 		showConfigurationHelpDialog(
 				"Linkage methods",
@@ -456,6 +474,16 @@ public final class ModernRozaUi extends Application {
 				"Merge tie breakers",
 				"Sometimes two merges reach the same similarity score. Tie breakers pick one. They are tried in list order; the first breaker that selects a single merge wins. With none configured, an unresolved tie stops clustering.",
 				mergeTieBreakerHelpEntries());
+	}
+
+	private List<ConfigurationHelpEntry> refactoringStrategyHelpEntries() {
+		return List.of(
+				new ConfigurationHelpEntry(
+						ISOLATING_IMPLICIT_SETUP_STRATEGY,
+						"Creates one generated class per cluster, including clusters with a single test. Singleton tests receive their full decomposed body and lose the original class-level fixture."),
+				new ConfigurationHelpEntry(
+						NON_ISOLATING_IMPLICIT_SETUP_STRATEGY,
+						"Extracts implicit setup only for clusters with two or more tests. Tests that would become singleton classes stay in residual original classes, keeping the original fields, fixtures, helpers, and test method bodies."));
 	}
 
 	private List<ConfigurationHelpEntry> measurementMetricHelpEntries() {
@@ -624,7 +652,11 @@ public final class ModernRozaUi extends Application {
 	}
 
 	private VBox refactoringConfiguration() {
-		VBox configuration = new VBox(SPACING_X);
+		VBox strategyBlock = new VBox(SPACING_X);
+		refactoringStrategyCombo.setMaxWidth(Double.MAX_VALUE);
+		strategyBlock.getChildren().addAll(
+				configurationTitleRow("Refactoring strategy", this::showRefactoringStrategyHelpDialog),
+				refactoringStrategyCombo);
 
 		Button refactorButton = new Button(PipelineStage.REFACTORING.actionLabel());
 		refactorButton.setMaxWidth(Double.MAX_VALUE);
@@ -638,8 +670,8 @@ public final class ModernRozaUi extends Application {
 		refactorCurrentLevelButton.setDisable(!stageActionEnabled(PipelineStage.REFACTORING));
 		refactorCurrentLevelButton.setOnAction(event -> runRefactoringCurrentLevel());
 
-		configuration.getChildren().addAll(refactorButton, refactorCurrentLevelButton);
-		return configuration;
+		VBox actions = new VBox(SPACING_X, refactorButton, refactorCurrentLevelButton);
+		return new VBox(SPACING_4X, strategyBlock, actions);
 	}
 
 	private VBox writingConfiguration() {
@@ -1181,7 +1213,7 @@ public final class ModernRozaUi extends Application {
 
 	private void refactor(TestCaseClusters clusters) {
 		try {
-			refactoredTestClasses = new ImplicitSetupTestClassRefactorer().refactor(clusters);
+			refactoredTestClasses = selectedTestClassRefactorer().refactor(clusters);
 			selectedRefactoredTestClass = refactoredTestClasses.testClasses().isEmpty() ? null : refactoredTestClasses.testClasses().get(0);
 			refactoringError = null;
 			writingError = null;
@@ -1213,6 +1245,13 @@ public final class ModernRozaUi extends Application {
 				linkageMethod.createLinkage(),
 				new CompositeStopCriterion(stopCriteria()),
 				new CompositeMergeTieBreaker(mergeTieBreakers()));
+	}
+
+	private TestClassRefactorer selectedTestClassRefactorer() {
+		if (NON_ISOLATING_IMPLICIT_SETUP_STRATEGY.equals(refactoringStrategyCombo.getSelectionModel().getSelectedItem())) {
+			return new NonIsolatingImplicitSetupTestClassRefactorer();
+		}
+		return new ImplicitSetupTestClassRefactorer();
 	}
 
 	private TestCaseSimilarityMeasurer selectedSimilarityMeasurer() {
