@@ -207,6 +207,13 @@ registerExperimentTask(
     "br.ufsc.ine.leb.roza.expt.k.Experiment",
 )
 
+registerExperimentTask(
+    "runExperimentL",
+    "Runs experiment l, which measures eligible and per-level refactored metrics on JFreeChart tests with LCCSS.",
+    "br.ufsc.ine.leb.roza.expt.l.Experiment",
+    maxHeapSize = "8g",
+)
+
 spotless {
     java {
         target("src/main/java/**/*.java", "src/test/java/**/*.java", "src/expt/java/**/*.java")

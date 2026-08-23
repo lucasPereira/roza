@@ -99,3 +99,13 @@ Experiment `k` measures setup duplication on the Apache Commons Math test suite 
 **Procedure.** Setup duplication counts initialized fields, fixture-method statements, and arrange code before the first recognized assertion, with textual surplus counting over that projection. LCCSS measurement drives single-linkage clustering with a stable test-order merge tie breaker and the full hierarchy without an extra stop criterion; the textual implicit-setup refactorer runs at every level.
 
 **Findings.** On the accepted subset, global clustering can reduce duplication below the original baseline. The best level (50) reaches 188 duplicated setup statements (−95 versus the original 283, 41.6% rate) with 89 generated classes. Coverage remains limited: only 138 of roughly 2900 annotated tests enter the pipeline, so corpus-wide duplication in Commons Math is still largely untapped by the current modern stack.
+
+## `l`: eligible and per-level refactoring metrics on JFreeChart tests
+
+Experiment `l` measures setup duplication on the JFreeChart test suite before and after implicit-setup refactoring at every agglomerative level. It applies the per-level LCCSS pipeline to the charting library added as an external submodule, probing fixture overlap on a large open-source visualization project.
+
+**Subject.** The corpus is the JFreeChart submodule: 361 test source files and 350 parsed test classes. The modern decomposition stage accepts 66 test methods across 26 eligible classes; most remaining methods are rejected as violations (abstract bases, parameterized tests, and other patterns outside the current parser). The filtered baseline has 132 setup statements and 29 duplicated setup statements (22.0% duplication rate).
+
+**Procedure.** Setup duplication counts initialized fields, fixture-method statements, and arrange code before the first recognized assertion, with textual surplus counting over that projection. LCCSS measurement drives single-linkage clustering with a stable test-order merge tie breaker and the full hierarchy without an extra stop criterion; the textual implicit-setup refactorer runs at every level.
+
+**Findings.** On the accepted subset, global clustering reduces duplication well below the original baseline. The best level (21) reaches 2 duplicated setup statements (−27 versus the original 29, 1.9% rate) with 46 generated classes. Coverage remains narrow: only 66 of roughly 2300 annotated tests enter the pipeline, so the experiment characterizes a small eligible slice rather than the full JFreeChart test base.
