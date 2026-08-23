@@ -11,3 +11,6 @@
 	path = external-projects/saas-unificado
 	url = https://github.com/lucasPereira/saas-unificado.git
 	branch = roza
+[submodule "external-projects/commons-math"]
+	path = external-projects/commons-math
+	url = https://github.com/apache/commons-math.git
