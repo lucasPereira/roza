@@ -1,0 +1,2 @@
+test_classes;test_methods;setup_methods;attributes;setup_statements;duplicated_setup_statements;setup_duplication_rate
+51;138;1;1;550;283;51.5

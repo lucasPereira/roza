@@ -201,6 +201,12 @@ registerExperimentTask(
     maxHeapSize = "8g",
 )
 
+registerExperimentTask(
+    "runExperimentK",
+    "Runs experiment k, which measures eligible and per-level refactored metrics on Apache Commons Math tests with LCCSS.",
+    "br.ufsc.ine.leb.roza.expt.k.Experiment",
+)
+
 spotless {
     java {
         target("src/main/java/**/*.java", "src/test/java/**/*.java", "src/expt/java/**/*.java")

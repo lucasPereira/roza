@@ -89,3 +89,13 @@ Experiment `j` measures setup duplication on the SAAS course-evaluation acceptan
 **Procedure.** Setup duplication counts initialized fields, fixture-method statements, and arrange code before the first recognized assertion, with textual surplus counting over that projection. LCCSS measurement drives single-linkage clustering with a stable test-order merge tie breaker and the full hierarchy without an extra stop criterion; the textual implicit-setup refactorer runs at every level. The large corpus requires an 8 GB heap for the Gradle task.
 
 **Findings.** Decomposition inflates counted duplication before clustering (82414 duplicated statements at the first level, 93.8% rate). Across later levels, duplication falls from that peak but never below the original filtered baseline; the best level (2437) still has 21075 duplicates (+927 versus the original 20148). Global redistribution increases class count (1124 classes at the best level versus 870 originally) without improving the duplication metric on this corpus.
+
+## `k`: eligible and per-level refactoring metrics on Apache Commons Math tests
+
+Experiment `k` measures setup duplication on the Apache Commons Math test suite before and after implicit-setup refactoring at every agglomerative level. It applies the same per-level LCCSS pipeline to the multi-module project added as an external submodule, probing fixture overlap on a widely used open-source numerical library.
+
+**Subject.** The corpus is the Commons Math submodule: tests are loaded from every module's test source tree (404 Java files, 323 parsed test classes). The modern decomposition stage accepts 138 test methods across 51 eligible classes; most remaining methods are rejected as violations (for example abstract fixtures, parameterized tests, and other patterns outside the current parser). The filtered baseline has 550 setup statements and 283 duplicated setup statements (51.5% duplication rate).
+
+**Procedure.** Setup duplication counts initialized fields, fixture-method statements, and arrange code before the first recognized assertion, with textual surplus counting over that projection. LCCSS measurement drives single-linkage clustering with a stable test-order merge tie breaker and the full hierarchy without an extra stop criterion; the textual implicit-setup refactorer runs at every level.
+
+**Findings.** On the accepted subset, global clustering can reduce duplication below the original baseline. The best level (50) reaches 188 duplicated setup statements (−95 versus the original 283, 41.6% rate) with 89 generated classes. Coverage remains limited: only 138 of roughly 2900 annotated tests enter the pipeline, so corpus-wide duplication in Commons Math is still largely untapped by the current modern stack.
