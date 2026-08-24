@@ -12,7 +12,7 @@ This document stores evolving knowledge discovered while designing and implement
 - Stage contract: the input/output model that allows one stage implementation to be combined with others without direct coupling.
 - Loading stage: the first modern Róża pipeline stage; it loads raw code files into memory.
 - `CodeFileLoader`: the loading stage interface, implemented by concrete raw code-file loaders.
-- `FileSystemCodeFileLoader`: the first concrete `CodeFileLoader` implementation; it loads regular files from a provided folder, optionally recursing into child folders and filtering by file extension.
+- `FileSystemCodeFileLoader`: the first concrete `CodeFileLoader` implementation; it loads regular files from one or more provided folders, optionally recursing into child folders and filtering by file extension. Several folders become one `LoadedCodeFiles` suite.
 - `LoadedCodeFiles`: the concrete result class returned by `CodeFileLoader.load`; it exposes loaded `CodeFile` instances through `codeFiles()`.
 - `CodeFile`: a concrete raw loaded code file class. Its minimum confirmed API exposes raw textual content through `content()`. Other attributes remain undefined until confirmed requirements make them necessary.
 - Parsing stage: the second modern Róża pipeline stage; it reads loaded raw code files and creates ASTs for identified test classes.

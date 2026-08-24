@@ -90,6 +90,23 @@ class FileSystemCodeFileLoaderTest {
 		assertEquals(Set.of(Path.of("child", "test.java").toString()), sources);
 	}
 
+	@Test
+	void shouldIncludeFilesFromAllProvidedFoldersWhenLoadingSeveralRoots() throws IOException {
+		Path first = folder.resolve("first");
+		Path second = folder.resolve("second");
+		createFile(first.resolve("a.java"), "a");
+		createFile(second.resolve("b.java"), "b");
+
+		Set<String> contents = new FileSystemCodeFileLoader(List.of(first, second), false, List.of("java"))
+				.load()
+				.codeFiles()
+				.stream()
+				.map(CodeFile::content)
+				.collect(Collectors.toSet());
+
+		assertEquals(Set.of("a", "b"), contents);
+	}
+
 	private Set<String> load(boolean recursive, List<String> extensions) {
 		return new FileSystemCodeFileLoader(folder, recursive, extensions)
 				.load()
