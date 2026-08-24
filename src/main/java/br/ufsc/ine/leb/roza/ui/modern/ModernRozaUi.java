@@ -483,14 +483,14 @@ public final class ModernRozaUi extends Application {
 	private void showDecomposerHelpDialog() {
 		showConfigurationHelpDialog(
 				"Decomposers",
-				"Decomposition decides which statements of a test are compared and later rewritten. Delegated setup should use the decomposer that leaves implicit setup in the original class.",
+				"Decomposition decides which statements of a test are compared. Delegated setup should use the decomposer that leaves implicit setup out of the comparison. Isolating implicit setup still writes fields and @Before from the original class when a cluster comes from that class.",
 				List.of(
 						new ConfigurationHelpEntry(
 								WITH_IMPLICIT_SETUP_DECOMPOSER,
 								"Inlines fields and @Before statements into each test. This is the decomposer for implicit-setup refactoring."),
 						new ConfigurationHelpEntry(
 								WITHOUT_IMPLICIT_SETUP_DECOMPOSER,
-								"Keeps only the original test method body. Fields and @Before stay out of the comparison, so delegated setup extracts clones that exist in the tests themselves.")));
+								"Keeps only the original test method body in the comparison. Fields and @Before stay in the original class and are still written onto a generated class when isolating implicit setup regroups tests from that class.")));
 	}
 
 	private void showLinkageMethodHelpDialog() {

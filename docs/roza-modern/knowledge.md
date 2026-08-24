@@ -37,7 +37,7 @@ This document stores evolving knowledge discovered while designing and implement
 - `TestCaseSimilarityMeasurer`: the measurement stage interface.
 - `TestCaseSimilarityMatrix`: the result returned by `TestCaseSimilarityMeasurer.measure`; the first implementation is a dense directed matrix indexed internally by source and target test case positions.
 - `LccssTestCaseSimilarityMeasurer`: projects each decomposed `TestCase` body up to the first assertion and applies textual common-prefix matching scored with `DiceMatchSimilarity`.
-- `WithoutImplicitSetupTestCaseDecomposer`: a decomposer that keeps only the original test method body, leaving fields and `@Before` statements out of the compared and rewritten test.
+- `WithoutImplicitSetupTestCaseDecomposer`: a decomposer that keeps only the original test method body in the compared `TestCase`. Fields and `@Before` stay out of measurement. Isolating implicit setup still copies them onto a generated class when the cluster comes from one source class.
 - `ContiguousCommonStatementsSimilarityMeasurer` (CCS): Dice of the longest extractable contiguous arrange run shared by two tests. It is not a substring or subsequence metric. Extractability uses exact normalized statement text, type-compatible live-ins, and at most one live-out.
 - `DelegatedSetupTestClassRefactorer`: keeps tests in their original classes and extracts shared extractable arrange runs into static methods on one public helper class per cluster, named `HelperClass1`, `HelperClass2`, and so on.
 - `GreedyAdmissiblePrefixSimilarityMeasurer` (GAP): greedily reorders dependency-ready arrange statements toward the other test's textual order and applies `DiceMatchSimilarity` to the best bidirectional prefix.
@@ -253,7 +253,7 @@ The first modern UI slice uses JavaFX 17.x while the project remains on Java 11.
 - DEC-141: `NonIsolatingImplicitSetupTestClassRefactorer` extracts implicit setup only for clusters with two or more tests; singleton leftovers return to residual original classes using the original test methods rather than decomposed bodies.
 - DEC-142: The modern UI `Refactoring` configuration selects the refactoring strategy; isolating implicit setup remains the default, and both Refactor actions use the selected strategy.
 - DEC-143: Delegated setup keeps accepted tests in their original classes. The first slice extracts shared arrange into helper methods and does not rewrite fields or `@Before` fixtures. Tests excluded by eligibility are omitted so the class matches the eligible baseline.
-- DEC-144: `WithoutImplicitSetupTestCaseDecomposer` is the decomposer for delegated setup. It copies each original test method body and does not inline fields or `@Before` statements.
+- DEC-144: `WithoutImplicitSetupTestCaseDecomposer` is the decomposer for delegated setup and for comparing tests without implicit setup. It copies each original test method body and does not inline fields or `@Before` statements. Isolating implicit setup still materializes those source fields and `@Before` on the generated class when every clustered test comes from that class.
 - DEC-145: CCS scores the longest extractable contiguous arrange run with Dice against both arrange lengths. It does not search for non-contiguous subsequences or renamed clones.
 - DEC-146: A contiguous arrange run is extractable only when JavaParser def/use succeeds, live-in names have the same type across tests, and the run has at most one live-out. Statement equality is exact normalized text. Minimum length is 1 and is UI-configurable.
 - DEC-147: Delegated setup emits one public helper class per multi-test cluster (`HelperClass1`, …) with static methods `setup1`, `setup2`, … Parameters are live-ins. The method is `void` or returns the single live-out. Created helper classes use Java's default package.
@@ -400,3 +400,4 @@ The first modern UI slice uses JavaFX 17.x while the project remains on Java 11.
 - 2026-08-23: Helper classes are not checked against the refactoring-safe subset (DEC-148).
 - 2026-08-24: The modern UI `Decomposition` tab can ignore violations so those tests still enter the rest of the pipeline, and analytics compares that same decomposed set (DEC-156).
 - 2026-08-24: Delegated setup rewrites original test method bodies, keeps only clustered tests, and still counts helper calls in setup duplication (DEC-133, DEC-157).
+- 2026-08-24: Isolating implicit setup restores source fields and `@Before` when the decomposer omitted them from measurement (DEC-144).

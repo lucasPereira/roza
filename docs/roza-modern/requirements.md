@@ -206,6 +206,7 @@ Acceptance criteria:
 - AC-370: When Ignore violations is enabled, both decomposers include parsed tests despite class-level or method-level violations, so measurement and refactoring can proceed over those tests.
 - AC-334: A second decomposer named `WithoutImplicitSetupTestCaseDecomposer` keeps only each original test method body.
 - AC-335: `WithoutImplicitSetupTestCaseDecomposer` does not inline fields or `@Before` statements into the decomposed `TestCase`.
+- AC-374: Isolating implicit setup copies the source class fields and `@Before` onto a generated class when every test in the cluster comes from that class and the `TestCase` bodies are the original test methods.
 
 ### REQ-011: Measurement Stage
 
@@ -869,5 +870,6 @@ The current clustering implementation requires the matrix size, test case by ind
 - 2026-08-24: The modern UI `Decomposition` configuration exposes `Ignore violations`. When enabled, decomposition still includes tests that have parsing violations so refactoring can proceed.
 - 2026-08-24: Analytics comparison uses the decomposed tests as the original baseline, so Ignore violations does not fail after writing.
 - 2026-08-24: Delegated setup rewrites original test method bodies and omits tests that did not enter clustering, so ineligible methods cannot inflate after-metrics. Helper calls remain in the setup projection.
+- 2026-08-24: Isolating implicit setup keeps source fields and `@Before` on generated classes when `Without implicit setup` only omitted them from the compared `TestCase`.
 - 2026-05-12: Confirmed that modern UI sidebar stages without visible configuration controls should align their primary action button with the first visible loading control and the refactoring action.
 - 2026-05-12: Confirmed the modern UI writing sidebar output folder chooser, default `output/writer` folder, and selected-folder write behavior.
