@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="920" height="520" viewBox="0 0 920 520">
+	<rect width="100%" height="100%" fill="#ffffff"/>
+	<text x="460" y="32" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="700" fill="#111827">Duplication rate</text>
+	<text x="24" y="228" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="12" fill="#374151" transform="rotate(-90 24 228)">Duplication rate (%)</text>
+	<line x1="80" y1="400" x2="880" y2="400" stroke="#e5e7eb" stroke-width="1"/>
+	<text x="72" y="404" text-anchor="end" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#6b7280">0</text>
+	<line x1="80" y1="331" x2="880" y2="331" stroke="#e5e7eb" stroke-width="1"/>
+	<text x="72" y="335" text-anchor="end" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#6b7280">20</text>
+	<line x1="80" y1="262" x2="880" y2="262" stroke="#e5e7eb" stroke-width="1"/>
+	<text x="72" y="266" text-anchor="end" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#6b7280">40</text>
+	<line x1="80" y1="194" x2="880" y2="194" stroke="#e5e7eb" stroke-width="1"/>
+	<text x="72" y="198" text-anchor="end" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#6b7280">60</text>
+	<line x1="80" y1="125" x2="880" y2="125" stroke="#e5e7eb" stroke-width="1"/>
+	<text x="72" y="129" text-anchor="end" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#6b7280">80</text>
+	<line x1="80" y1="56" x2="880" y2="56" stroke="#e5e7eb" stroke-width="1"/>
+	<text x="72" y="60" text-anchor="end" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#6b7280">100</text>
+	<line x1="80" y1="56" x2="80" y2="400" stroke="#111827" stroke-width="1.5"/>
+	<line x1="80" y1="400" x2="880" y2="400" stroke="#111827" stroke-width="1.5"/>
+	<rect x="108" y="206" width="126" height="194" fill="#6b7280"/>
+	<text x="171" y="198" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#111827">56.3%</text>
+	<text x="179" y="418" text-anchor="end" font-family="Helvetica, Arial, sans-serif" font-size="12" fill="#111827" transform="rotate(-32 179 418)">Original</text>
+	<rect x="262" y="400" width="126" height="0" fill="#2563eb"/>
+	<text x="325" y="392" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#111827">0.0%</text>
+	<text x="333" y="418" text-anchor="end" font-family="Helvetica, Arial, sans-serif" font-size="12" fill="#111827" transform="rotate(-32 333 418)">Implicit</text>
+	<rect x="416" y="314" width="126" height="86" fill="#d97706"/>
+	<text x="479" y="306" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#111827">25.0%</text>
+	<text x="487" y="418" text-anchor="end" font-family="Helvetica, Arial, sans-serif" font-size="12" fill="#111827" transform="rotate(-32 487 418)">Delegated</text>
+	<rect x="570" y="400" width="126" height="0" fill="#059669"/>
+	<text x="633" y="392" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#111827">0.0%</text>
+	<text x="641" y="418" text-anchor="end" font-family="Helvetica, Arial, sans-serif" font-size="12" fill="#111827" transform="rotate(-32 641 418)">Implicit + Delegated</text>
+	<rect x="724" y="400" width="126" height="0" fill="#7c3aed"/>
+	<text x="787" y="392" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#111827">0.0%</text>
+	<text x="795" y="418" text-anchor="end" font-family="Helvetica, Arial, sans-serif" font-size="12" fill="#111827" transform="rotate(-32 795 418)">Delegated + Implicit</text>
+</svg>

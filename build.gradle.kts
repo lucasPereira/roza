@@ -214,6 +214,12 @@ registerExperimentTask(
     maxHeapSize = "8g",
 )
 
+registerExperimentTask(
+    "runExperimentM",
+    "Runs experiment m, the bookstore use case that can be refactored by implicit setup and by delegated setup.",
+    "br.ufsc.ine.leb.roza.expt.m.Experiment",
+)
+
 spotless {
     java {
         target("src/main/java/**/*.java", "src/test/java/**/*.java", "src/expt/java/**/*.java")

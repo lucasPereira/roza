@@ -1,0 +1,6 @@
+strategy;best_level;test_classes;test_methods;setup_methods;attributes;total_statements;duplicated_statements;duplication_rate
+Original;-;2;5;0;0;16;9;56.3
+Implicit;4;2;5;2;2;7;0;0.0
+Delegated;4;2;5;0;0;12;3;25.0
+Implicit + Delegated;1;2;5;2;2;7;0;0.0
+Delegated + Implicit;3;3;5;2;2;10;0;0.0

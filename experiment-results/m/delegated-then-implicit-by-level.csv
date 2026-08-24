@@ -1,0 +1,6 @@
+level;test_classes;test_methods;setup_methods;attributes;total_statements;duplicated_statements;duplication_rate
+1;5;5;0;0;12;3;25.0
+2;4;5;1;1;11;1;9.1
+3;3;5;2;2;10;0;0.0
+4;2;5;2;2;9;0;0.0
+5;1;5;0;0;12;3;25.0
