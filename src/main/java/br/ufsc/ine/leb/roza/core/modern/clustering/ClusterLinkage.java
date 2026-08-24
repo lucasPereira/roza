@@ -5,4 +5,6 @@ import br.ufsc.ine.leb.roza.core.modern.measurement.TestCaseSimilarityMatrix;
 public interface ClusterLinkage {
 
 	double evaluate(TestCaseSimilarityMatrix matrix, TestCaseCluster first, TestCaseCluster second);
+
+	double combinedSimilarity(double similarityWithFirst, double similarityWithSecond, int firstSize, int secondSize);
 }

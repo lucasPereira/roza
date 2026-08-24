@@ -15,4 +15,9 @@ public final class SingleLinkage implements ClusterLinkage {
 		}
 		return nearest;
 	}
+
+	@Override
+	public double combinedSimilarity(double similarityWithFirst, double similarityWithSecond, int firstSize, int secondSize) {
+		return Math.max(similarityWithFirst, similarityWithSecond);
+	}
 }

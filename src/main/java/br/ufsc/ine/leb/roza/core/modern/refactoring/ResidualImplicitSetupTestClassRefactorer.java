@@ -14,7 +14,7 @@ import br.ufsc.ine.leb.roza.core.modern.decomposition.TestCase;
 import br.ufsc.ine.leb.roza.core.modern.parsing.TestClass;
 import br.ufsc.ine.leb.roza.core.modern.parsing.TestMethod;
 
-public final class ResidualImplicitSetupTestClassRefactorer implements TestClassRefactorer {
+public final class ResidualImplicitSetupTestClassRefactorer implements TestClassRefactorer, RankingSetupContributor {
 
 	private final ImplicitSetupTestClassRefactorer implicitSetup = new ImplicitSetupTestClassRefactorer();
 
@@ -73,5 +73,23 @@ public final class ResidualImplicitSetupTestClassRefactorer implements TestClass
 					List.of(),
 					methods);
 		}
+	}
+
+	@Override
+	public List<TestClass> sharedRankingClasses(List<TestCase> tests) {
+		return RankingSetupSupport.originalHelperClasses(tests);
+	}
+
+	@Override
+	public List<TestClass> clusterRankingClasses(TestCaseCluster cluster) {
+		if (cluster.size() > 1) {
+			return List.of(implicitSetup.refactor(cluster.testCases(), "TestClass1"));
+		}
+		return List.of(RankingSetupSupport.originalArrangeClass(cluster.testCases().get(0)));
+	}
+
+	@Override
+	public boolean countsResidualSourceSetupWhileSingletonsRemain() {
+		return true;
 	}
 }

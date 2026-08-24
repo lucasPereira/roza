@@ -8,12 +8,12 @@ public final class SmallestMergedClusterTieBreaker implements MergeTieBreaker {
 
 	@Override
 	public Optional<MergeCandidate> breakTie(List<MergeCandidate> candidates) {
-		Optional<Integer> optionalBest = candidates.stream().map(candidate -> candidate.mergedCluster().size()).min(Integer::compareTo);
+		Optional<Integer> optionalBest = candidates.stream().map(MergeCandidate::mergedSize).min(Integer::compareTo);
 		if (optionalBest.isEmpty()) {
 			return Optional.empty();
 		}
 		int best = optionalBest.get();
-		List<MergeCandidate> selected = candidates.stream().filter(candidate -> candidate.mergedCluster().size() == best).collect(Collectors.toList());
+		List<MergeCandidate> selected = candidates.stream().filter(candidate -> candidate.mergedSize() == best).collect(Collectors.toList());
 		if (selected.size() == 1) {
 			return Optional.of(selected.get(0));
 		}

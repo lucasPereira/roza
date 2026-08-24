@@ -307,6 +307,8 @@ Acceptance criteria:
 - AC-261: An empty `CompositeMergeTieBreaker` is allowed; the agglomerative clusterer throws when an actual tie remains unresolved.
 - AC-262: The initial merge tie breakers are largest merged cluster, smallest merged cluster, and stable test-case order.
 - AC-263: Agglomerative clustering exposes generated clustering levels for inspection.
+- AC-378: Agglomerative clustering uses an incremental `MergeCandidateQueue`. After a merge, linkage for the new cluster is combined from stored pairwise similarities rather than rescanning every remaining test pair. The queue drops stale candidates before the next merge when they outnumber live pairs, and clustering progress follows accepted merges.
+- AC-379: `TestCaseSimilarityMeasurer.measure` may receive `StageProgress`. LCCSS, CCS, LCS, GAP, MAP, and SEP report progress after each source row. Deckard, JPlag, and Simian report an indeterminate start and a completed finish.
 
 ### REQ-013: Refactoring Stage
 
@@ -466,6 +468,8 @@ Acceptance criteria:
 - AC-265: The modern UI `Clustering` configuration allows enabling zero or more stop criteria.
 - AC-266: The modern UI `Clustering` configuration allows configuring ordered merge tie breaker fallbacks.
 - AC-267: Triggering `Cluster` runs the configured agglomerative clusterer and shows the resulting clusters while keeping the ranked similarity inspection available.
+- AC-380: The modern UI shows a progress bar under `Measure` and under `Cluster`. Those stages run off the JavaFX thread, keep the bar visible while they run, disable pipeline actions until they finish, and then select the next pipeline tab before rebuilding the center content.
+- AC-381: The Gradle task `runModernRozaUi` starts the modern UI with a maximum heap of `8g`.
 - AC-282: Triggering `Refactor` in the modern UI runs the selected refactoring strategy over the final clustering output, i.e., the last generated clustering level.
 - AC-283: The modern UI stores the generated `RefactoredTestClasses` as the output consumed by the `Writing` tab.
 - AC-284: The modern UI `Writing` center shows inner tabs `Test classes` and `Helpers classes`.
@@ -475,6 +479,10 @@ Acceptance criteria:
 - AC-327: Both modern UI refactoring actions use the strategy selected in the dropdown.
 - AC-376: The modern UI `Refactoring` Top ranking scores each clustering level with the currently selected refactoring strategy, counting helper classes in setup duplication the same way analytics does.
 - AC-377: The modern UI `Refactoring` Top ranking finishes and re-enables the Top button after delegated setup scoring, including when scoring throws.
+- AC-382: The modern UI shows a progress bar for Top ranking under the Top button. Ranking reports progress after each scored clustering level.
+- AC-383: The modern UI `Clustering` ranked similarity list shows at most 1000 pairs, reuses the already built clustering center when returning to the tab, and updates source/target selection without rebuilding that center.
+- AC-384: Top ranking of clustering levels scores each new merged cluster once and updates setup-duplication frequencies incrementally, instead of refactoring every cluster at every dendrogram level.
+- AC-385: Rerunning Loading, Parsing, or Decomposition clears Measure, Cluster, and Top ranking progress bars.
 - AC-351: The modern UI `Refactoring` strategy dropdown includes `Delegated setup`.
 - AC-352: The modern UI `Decomposition` configuration exposes a decomposer dropdown with `With implicit setup` and `Without implicit setup`.
 - AC-353: When CCS is selected, the modern UI `Measurement` configuration shows a minimum-length input whose default is `1`.
@@ -626,6 +634,7 @@ package br.ufsc.ine.leb.roza.core.modern.measurement;
 
 public interface TestCaseSimilarityMeasurer {
 	TestCaseSimilarityMatrix measure(DecomposedTestCases testCases);
+	default TestCaseSimilarityMatrix measure(DecomposedTestCases testCases, StageProgress progress);
 }
 
 public final class TestCaseSimilarityMatrix {
@@ -674,6 +683,15 @@ public final class TestCaseCluster {
 public final class AgglomerativeHierarchicalTestCaseClusterer implements TestCaseClusterer {
 	public TestCaseClusters cluster(TestCaseSimilarityMatrix matrix);
 	public List<ClusteringLevel> generateLevels(TestCaseSimilarityMatrix matrix);
+	public List<ClusteringLevel> generateLevels(TestCaseSimilarityMatrix matrix, StageProgress progress);
+}
+
+public final class MergeCandidateQueue {
+	public MergeCandidateQueue(List<TestCaseCluster> clusters, ClusterLinkage linkage, TestCaseSimilarityMatrix matrix);
+	public MergeCandidateQueue(List<TestCaseCluster> clusters, ClusterLinkage linkage, TestCaseSimilarityMatrix matrix, StageProgress progress);
+	public List<MergeCandidate> bestCandidates();
+	public void merge(TestCaseCluster first, TestCaseCluster second, TestCaseCluster merged);
+	public void complete();
 }
 ```
 
@@ -880,6 +898,11 @@ The current clustering implementation requires the matrix size, test case by ind
 - 2026-08-24: Delegated setup extracts arrange runs shared by at least two tests in a cluster. The modern UI Top ranking scores levels with the selected refactoring strategy, including helper classes.
 - 2026-08-24: The modern UI Top ranking for delegated setup reuses cluster extractions and always re-enables the Top button when ranking finishes.
 - 2026-08-24: Renamed the implicit-setup strategies to `Implicit setup` and `Residual implicit setup`; the residual implementation is `ResidualImplicitSetupTestClassRefactorer`.
+- 2026-08-24: Agglomerative clustering uses an incremental merge-candidate queue so each merge evaluates linkage only against the new cluster. The modern UI shows progress under Measure and Cluster, runs those stages off the JavaFX thread, and starts with an 8g heap.
+- 2026-08-24: The modern UI Top ranking shows a progress bar under the Top button. Ranking reports progress after each scored clustering level.
+- 2026-08-24: The modern UI Clustering tab keeps at most 1000 ranked pairs and reuses the clustering center when leaving and returning to the tab.
+- 2026-08-24: Top ranking scores only clusters that change between dendrogram levels and updates setup-duplication frequencies incrementally.
+- 2026-08-24: Rerunning Loading, Parsing, or Decomposition resets Measure, Cluster, and Top ranking progress bars.
 - 2026-08-24: When Ignore violations lets helper methods enter refactoring, those methods are moved to `{OriginalClassName}Helpers` classes. Call sites stay unchanged, so the result may not compile.
 - 2026-05-12: Confirmed that modern UI sidebar stages without visible configuration controls should align their primary action button with the first visible loading control and the refactoring action.
 - 2026-05-12: Confirmed the modern UI writing sidebar output folder chooser, default `output/writer` folder, and selected-folder write behavior.

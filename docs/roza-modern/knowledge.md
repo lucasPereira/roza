@@ -52,6 +52,8 @@ This document stores evolving knowledge discovered while designing and implement
 - `TestCaseClusterer`: the clustering stage interface.
 - `TestCaseClusters`: the result returned by `TestCaseClusterer.cluster`; it exposes `TestCaseCluster` instances through `clusters()`.
 - `TestCaseCluster`: the model for a cluster of test cases. It has no minimum content API yet.
+- `MergeCandidateQueue`: an incremental priority queue of cluster-pair candidates. After a merge it evaluates linkage only between the new cluster and each remaining cluster.
+- `StageProgress`: a callback of completed work over total work, used by measurement, clustering, and Top ranking so a UI can show a progress bar.
 - Refactoring stage: the sixth modern Róża pipeline stage; it receives test groups and decides what refactoring to apply to them.
 - `TestClassRefactorer`: the refactoring stage interface.
 - `RefactoredTestClasses`: the result returned by `TestClassRefactorer.refactor`; it exposes refactored `TestClass` instances through `testClasses()`.
@@ -220,6 +222,13 @@ The first modern UI slice uses JavaFX 17.x while the project remains on Java 11.
 - DEC-102: `CompositeMergeTieBreaker` uses ordered fallback semantics and accepts an empty list; unresolved actual ties throw an exception.
 - DEC-103: The first deterministic merge-tie fallback is `StableTestCaseOrderMergeTieBreaker`, based on original similarity-matrix indexes rather than random choice.
 - DEC-104: Agglomerative clustering exposes generated `ClusteringLevel` objects so tests and the UI can inspect the clustering sequence.
+- DEC-162: Agglomerative clustering keeps an incremental `MergeCandidateQueue`. After a merge, linkage of the new cluster is combined from stored pairwise similarities (single max, complete min, average size-weighted). Stale candidates are dropped before choosing the next merge when they outnumber live pairs. Tie breakers use cluster sizes and sorted indexes and do not allocate a merged cluster. Clustering progress counts accepted merges.
+- DEC-163: The modern UI runs Measure and Cluster on background threads. Progress bars under those actions stay in the sidebar so they can move as soon as the action starts. Completing either stage paints the next pipeline tab before rebuilding the center content. Pairwise measurers report after each source row. Deckard, JPlag, and Simian stay indeterminate until they finish.
+- DEC-165: Top ranking reports `StageProgress` after each clustering level. The modern UI shows that progress under the Top button.
+- DEC-167: The modern UI Clustering ranked list keeps at most 1000 pairs. Measure precomputes that ranking off the JavaFX thread. Returning to Clustering reuses the existing center instead of rebuilding it.
+- DEC-168: Top ranking walks consecutive clustering levels and scores only clusters that appeared or disappeared. Setup-duplication frequencies are updated from those clusters' setup projections. Original helper classes and delegated source fields/fixtures are counted once. Residual implicit setup counts original fields and `@Before` while leftover singletons of that source remain.
+- DEC-169: Clearing measurement or clustering results zeros the Measure, Cluster, and Top ranking progress bars so a later pipeline restart does not show a completed bar.
+- DEC-166: When helper methods appear on source test classes that entered refactoring, they are moved to `{OriginalClassName}Helpers` classes so regrouped tests can use them. Call sites are not rewritten, so the output may not compile.
 - DEC-105: Divisive hierarchical clustering is registered as future work, not part of the first clustering slice.
 - DEC-106: `TestClass` exposes original import declarations because refactoring and rendering need to carry source-class context into generated classes.
 - DEC-107: Parsing defines each `TestClass` setup annotation for generated implicit setup. It reuses an existing supported fixture annotation when present; otherwise it infers `@BeforeEach` from JUnit 5 `@Test` usage and `@Before` otherwise.
@@ -232,7 +241,7 @@ The first modern UI slice uses JavaFX 17.x while the project remains on Java 11.
 - DEC-114: The modern UI `Refactoring` tab has two actions: `Refactor` uses the final clustering level, while `Refactor Current level` uses the level selected in the level inspector. Both actions use the strategy selected in the refactoring configuration.
 - DEC-115: The first writing implementation is `FileSystemTestClassWriter`; it renders refactored `TestClass` models as Java files in a configured output folder.
 - DEC-116: `TestClass` preserves source package names so rendered/generated classes can compile when tests rely on same-package type visibility.
-- DEC-117: `ImplicitSetupTestClassRefactorer` assigns unique generated method names inside each generated class.
+- DEC-117: `ImplicitSetupTestClassRefactorer` assigns unique generated method names inside each generated class. The first test in cluster order keeps the original name. A later test with the same name is renamed to `decapitalize(sourceClassName) + capitalize(originalName)`, then a numeric suffix if that name is also taken. Delegated setup and residual implicit setup reuse `SetupExtractionSupport.testMethods()`, so they share this rule.
 - DEC-118: `ImplicitSetupTestClassRefactorer` materializes one generated class per cluster in Java's default package.
 - DEC-119: `TestMethod`, `FixtureMethod`, and decomposed `TestCase` preserve declared thrown exceptions so generated setup and test methods can remain compilable.
 - DEC-120: `ImplicitSetupTestClassRefactorer` rewrites moved local array declarations as explicit array creation assignments in generated setup methods.
@@ -261,7 +270,6 @@ The first modern UI slice uses JavaFX 17.x while the project remains on Java 11.
 - DEC-159: The modern UI Top ranking of clustering levels uses the currently selected refactoring strategy and includes helper classes in the setup-duplication score. Changing the strategy recomputes the ranking.
 - DEC-160: Delegated setup caches n-way extraction by cluster indexes so Top ranking does not re-extract the same cluster at every dendrogram level. `ExtractableArrangeRuns` parses each test body once per extraction. The ranking worker always clears its computing state.
 - DEC-161: The default implicit-setup strategy is labeled `Implicit setup`. The variant that keeps singleton leftovers in residual original classes is labeled `Residual implicit setup` and is implemented by `ResidualImplicitSetupTestClassRefactorer`.
-- DEC-166: When helper methods appear on source test classes that entered refactoring, they are moved to `{OriginalClassName}Helpers` classes so regrouped tests can use them. Call sites are not rewritten, so the output may not compile.
 - DEC-148: The parser treats any compilation unit without `@Test` as a helper class. Helper classes may contain helper methods and are not checked against the refactoring-safe subset. AC-188 still rejects helper methods inside classes that also contain `@Test`.
 - DEC-149: `FileSystemTestClassWriter` writes everything into one output folder. Test classes go in the default package at the folder root. Existing helper classes keep their original packages. Created helper classes go in the default package.
 - DEC-150: The first delegated-setup slice does not combine with implicit setup in one run, does not rewrite existing fixtures, and does not emit multi-return holder types.
@@ -409,4 +417,10 @@ The first modern UI slice uses JavaFX 17.x while the project remains on Java 11.
 - 2026-08-24: Delegated setup extracts arrange runs shared by any two or more tests in a cluster, and the Top ranking uses the selected refactoring strategy (DEC-158, DEC-159).
 - 2026-08-24: Top ranking of delegated setup reuses per-cluster extractions and always re-enables the Top button (DEC-160).
 - 2026-08-24: Renamed isolating/non-isolating implicit setup to `Implicit setup` and `Residual implicit setup` (DEC-161).
+- 2026-08-24: Agglomerative clustering uses an incremental merge-candidate queue, and the modern UI shows Measure/Cluster progress on background threads with an 8g heap (DEC-162, DEC-163, DEC-164).
+- 2026-08-24: Top ranking shows a progress bar and reports after each scored clustering level (DEC-165).
+- 2026-08-24: Clustering ranked similarity inspection keeps at most 1000 pairs and reuses the tab center (DEC-167).
+- 2026-08-24: Top ranking scores only new merged clusters and updates setup-duplication frequencies incrementally (DEC-168).
+- 2026-08-24: Restarting the pipeline from Loading, Parsing, or Decomposition resets stage progress bars (DEC-169).
 - 2026-08-24: Original helper methods on source test classes are moved to `{OriginalClassName}Helpers` during refactoring, without rewriting call sites (DEC-166).
+- 2026-08-24: Duplicate test names from different source classes that land in the same cluster keep the first original name and prefix the later ones (DEC-117). Cobertura's two `testSearchJarsForSourceInJar` methods are the observed case.

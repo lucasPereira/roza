@@ -20,7 +20,7 @@ import br.ufsc.ine.leb.roza.core.modern.parsing.HelperMethod;
 import br.ufsc.ine.leb.roza.core.modern.parsing.TestClass;
 import br.ufsc.ine.leb.roza.core.modern.parsing.TestMethod;
 
-public final class DelegatedSetupTestClassRefactorer implements TestClassRefactorer {
+public final class DelegatedSetupTestClassRefactorer implements TestClassRefactorer, RankingSetupContributor {
 
 	private final int minimumLength;
 	private final Map<List<Integer>, List<ExtractableArrangeRun>> nWayByClusterIndexes = new LinkedHashMap<>();
@@ -192,5 +192,42 @@ public final class DelegatedSetupTestClassRefactorer implements TestClassRefacto
 
 	private CodeStatement statement(String text) {
 		return new CodeStatement(text, text);
+	}
+
+	@Override
+	public List<TestClass> sharedRankingClasses(List<TestCase> tests) {
+		List<TestClass> classes = new ArrayList<>(RankingSetupSupport.originalHelperClasses(tests));
+		Map<String, TestClass> sources = new LinkedHashMap<>();
+		for (TestCase testCase : tests) {
+			testCase.sourceTestClass().ifPresent(source -> sources.putIfAbsent(source.qualifiedName(), source));
+		}
+		for (TestClass source : sources.values()) {
+			classes.add(RankingSetupSupport.fieldsAndFixturesClass(source));
+		}
+		return classes;
+	}
+
+	@Override
+	public List<TestClass> clusterRankingClasses(TestCaseCluster cluster) {
+		if (cluster.size() < 2) {
+			return List.of(RankingSetupSupport.originalArrangeClass(cluster.testCases().get(0)));
+		}
+		List<TestCase> originalCases = originalMethodBodies(cluster.testCases());
+		List<ExtractableArrangeRun> runs = nWayByClusterIndexes.computeIfAbsent(
+				cluster.testCaseIndexes(),
+				indexes -> ExtractableArrangeRuns.nWay(originalCases, minimumLength, extractableSession));
+		String helperName = "HelperClass" + cluster.firstTestCaseIndex();
+		List<TestMethod> methods = new ArrayList<>();
+		for (int testIndex = 0; testIndex < originalCases.size(); testIndex++) {
+			TestCase testCase = originalCases.get(testIndex);
+			CodeBlock body = runs.isEmpty() ? testCase.body() : replaceRuns(testCase, runs, testIndex, helperName);
+			methods.add(new TestMethod(testCase.name(), testCase.annotations(), testCase.thrownExceptions(), body));
+		}
+		List<TestClass> classes = new ArrayList<>();
+		classes.add(new TestClass("Cluster", null, List.of(), null, List.of(), List.of(), List.of(), methods));
+		if (!runs.isEmpty()) {
+			classes.add(helperClass(helperName, imports(cluster.testCases()), runs));
+		}
+		return classes;
 	}
 }

@@ -2,6 +2,7 @@ package br.ufsc.ine.leb.roza.core.modern.measurement;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -102,6 +103,24 @@ class LccssTestCaseSimilarityMeasurerTest {
 		assertEquals(0.0, matrix.similarity(1, 2));
 		assertEquals(1.0, matrix.similarity(2, 0));
 		assertEquals(0.0, matrix.similarity(2, 1));
+	}
+
+	@Test
+	void shouldReportMeasurementProgressAfterEachSourceRow() {
+		DecomposedTestCases testCases = testCases(
+				testCase("first", statement("a();")),
+				testCase("second", statement("b();")),
+				testCase("third", statement("a();")));
+		List<Integer> completed = new ArrayList<>();
+		List<Integer> totals = new ArrayList<>();
+
+		measurer.measure(testCases, (done, total) -> {
+			completed.add(done);
+			totals.add(total);
+		});
+
+		assertEquals(List.of(2, 4, 6), completed);
+		assertEquals(List.of(6, 6, 6), totals);
 	}
 
 	private DecomposedTestCases testCases(TestCase... testCases) {

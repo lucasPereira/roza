@@ -14,4 +14,9 @@ public final class AverageLinkage implements ClusterLinkage {
 		}
 		return sum / (first.size() * second.size());
 	}
+
+	@Override
+	public double combinedSimilarity(double similarityWithFirst, double similarityWithSecond, int firstSize, int secondSize) {
+		return (similarityWithFirst * firstSize + similarityWithSecond * secondSize) / (firstSize + secondSize);
+	}
 }

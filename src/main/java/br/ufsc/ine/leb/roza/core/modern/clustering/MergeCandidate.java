@@ -23,4 +23,8 @@ public final class MergeCandidate {
 	public TestCaseCluster mergedCluster() {
 		return pair.mergedCluster();
 	}
+
+	public int mergedSize() {
+		return pair.first().size() + pair.second().size();
+	}
 }

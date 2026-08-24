@@ -115,6 +115,7 @@ tasks.register<JavaExec>("runModernRozaUi") {
     description = "Runs the modern Róża UI."
     classpath = sourceSets.main.get().runtimeClasspath
     mainClass.set("br.ufsc.ine.leb.roza.ui.modern.ModernRozaUi")
+    maxHeapSize = "8g"
     jvmArgs(
         "--module-path",
         configurations.runtimeClasspath.get().filter { file -> file.name.startsWith("javafx-") }.asPath,

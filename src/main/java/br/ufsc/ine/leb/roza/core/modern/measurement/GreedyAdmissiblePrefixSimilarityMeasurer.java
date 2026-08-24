@@ -3,6 +3,7 @@ package br.ufsc.ine.leb.roza.core.modern.measurement;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import br.ufsc.ine.leb.roza.core.modern.StageProgress;
 import br.ufsc.ine.leb.roza.core.modern.arrangement.AdmissiblePrefixMatcher;
 import br.ufsc.ine.leb.roza.core.modern.arrangement.ArrangeDependencyGraphCache;
 import br.ufsc.ine.leb.roza.core.modern.arrangement.ArrangeProjection;
@@ -13,14 +14,21 @@ public final class GreedyAdmissiblePrefixSimilarityMeasurer implements TestCaseS
 
 	@Override
 	public TestCaseSimilarityMatrix measure(DecomposedTestCases decomposedTestCases) {
+		return measure(decomposedTestCases, StageProgress.ignore());
+	}
+
+	@Override
+	public TestCaseSimilarityMatrix measure(DecomposedTestCases decomposedTestCases, StageProgress progress) {
+		StageProgress reporter = progress == null ? StageProgress.ignore() : progress;
 		List<TestCase> testCases = decomposedTestCases.testCases();
 		List<List<String>> projections = testCases.stream()
 				.map(ArrangeProjection::normalizedStatements)
 				.collect(Collectors.toList());
 		ArrangeDependencyGraphCache graphCache = new ArrangeDependencyGraphCache();
 		TestCaseSimilarityMatrix matrix = new TestCaseSimilarityMatrix(testCases);
-		for (int source = 0; source < testCases.size(); source++) {
-			for (int target = source + 1; target < testCases.size(); target++) {
+		int n = testCases.size();
+		for (int source = 0; source < n; source++) {
+			for (int target = source + 1; target < n; target++) {
 				int prefixSize = Math.max(
 						AdmissiblePrefixMatcher.greedyPrefixSize(
 								testCases.get(source),
@@ -37,6 +45,10 @@ public final class GreedyAdmissiblePrefixSimilarityMeasurer implements TestCaseS
 				matrix.setSimilarity(source, target, score);
 				matrix.setSimilarity(target, source, score);
 			}
+			MeasurementProgress.afterUpperTriangleRow(reporter, source, n);
+		}
+		if (n <= 1) {
+			reporter.report(1, 1);
 		}
 		return matrix;
 	}

@@ -22,6 +22,8 @@ import br.ufsc.ine.leb.roza.core.modern.parsing.TestClass;
 import br.ufsc.ine.leb.roza.core.modern.parsing.TestMethod;
 import br.ufsc.ine.leb.roza.core.modern.refactoring.DelegatedSetupTestClassRefactorer;
 import br.ufsc.ine.leb.roza.core.modern.refactoring.ImplicitSetupTestClassRefactorer;
+import br.ufsc.ine.leb.roza.core.modern.refactoring.ResidualImplicitSetupTestClassRefactorer;
+import br.ufsc.ine.leb.roza.core.modern.refactoring.TestClassRefactorer;
 
 class RefactoringLevelRankerTest {
 
@@ -48,8 +50,16 @@ class RefactoringLevelRankerTest {
 	}
 
 	@Test
+	void shouldMatchFullRefactoringRankingWhenScoringLevelsIncrementally() {
+		List<ClusteringLevel> levels = exampleLevels();
+		assertEquals(fullRanking(levels, new DelegatedSetupTestClassRefactorer()), RefactoringLevelRanker.topLevelIndices(levels, new DelegatedSetupTestClassRefactorer(), 10));
+		assertEquals(fullRanking(levels, new ImplicitSetupTestClassRefactorer()), RefactoringLevelRanker.topLevelIndices(levels, new ImplicitSetupTestClassRefactorer(), 10));
+		assertEquals(fullRanking(levels, new ResidualImplicitSetupTestClassRefactorer()), RefactoringLevelRanker.topLevelIndices(levels, new ResidualImplicitSetupTestClassRefactorer(), 10));
+	}
+
+	@Test
 	void shouldFinishDelegatedRankingOnAGrowingClusterChain() {
-		int testCount = 40;
+		int testCount = 80;
 		List<TestMethod> methods = new ArrayList<>();
 		for (int index = 0; index < testCount; index++) {
 			methods.add(testMethod("test" + index, statementsFor(index)));
@@ -70,7 +80,50 @@ class RefactoringLevelRankerTest {
 			levels.add(new ClusteringLevel(level, clusters));
 		}
 
-		assertTimeout(Duration.ofSeconds(5), () -> RefactoringLevelRanker.topLevelIndices(levels, new DelegatedSetupTestClassRefactorer(), 10));
+		assertTimeout(Duration.ofSeconds(3), () -> RefactoringLevelRanker.topLevelIndices(levels, new DelegatedSetupTestClassRefactorer(), 10));
+	}
+
+	@Test
+	void shouldReportProgressAfterEachLevel() {
+		TestClass source = source();
+		TestCase alpha = testCase("alpha", source, "uniqueAlpha();", "a();", "assertTrue(true);");
+		TestCase beta = testCase("beta", source, "uniqueBeta();", "a();", "assertFalse(false);");
+		List<ClusteringLevel> levels = List.of(
+				new ClusteringLevel(0, List.of(new TestCaseCluster(0, alpha), new TestCaseCluster(1, beta))),
+				new ClusteringLevel(1, List.of(new TestCaseCluster(0, alpha).merge(new TestCaseCluster(1, beta)))));
+		List<Integer> completed = new ArrayList<>();
+		List<Integer> totals = new ArrayList<>();
+
+		RefactoringLevelRanker.topLevelIndices(levels, new ImplicitSetupTestClassRefactorer(), 10, (done, total) -> {
+			completed.add(done);
+			totals.add(total);
+		});
+
+		assertEquals(List.of(0, 1, 2), completed);
+		assertEquals(List.of(2, 2, 2), totals);
+	}
+
+	private List<ClusteringLevel> exampleLevels() {
+		TestClass source = source();
+		TestCase alpha = testCase("alpha", source, "uniqueAlpha();", "a();", "b();", "c();", "assertTrue(true);");
+		TestCase beta = testCase("beta", source, "uniqueBeta();", "a();", "b();", "c();", "assertFalse(false);");
+		TestCase gamma = testCase("gamma", source, "uniqueGamma();", "d();", "e();", "f();", "assertEquals(1, 1);");
+		TestCase delta = testCase("delta", source, "uniqueDelta();", "d();", "e();", "f();", "assertEquals(2, 2);");
+		TestCaseCluster firstPair = new TestCaseCluster(0, alpha).merge(new TestCaseCluster(1, beta));
+		TestCaseCluster secondPair = new TestCaseCluster(2, gamma).merge(new TestCaseCluster(3, delta));
+		return List.of(
+				new ClusteringLevel(0, List.of(
+						new TestCaseCluster(0, alpha),
+						new TestCaseCluster(1, beta),
+						new TestCaseCluster(2, gamma),
+						new TestCaseCluster(3, delta))),
+				new ClusteringLevel(1, List.of(firstPair, secondPair)),
+				new ClusteringLevel(2, List.of(firstPair.merge(secondPair))));
+	}
+
+	private List<Integer> fullRanking(List<ClusteringLevel> levels, TestClassRefactorer refactorer) {
+		TestClassRefactorer full = clusters -> refactorer.refactor(clusters);
+		return RefactoringLevelRanker.topLevelIndices(levels, full, 10);
 	}
 
 	private String[] statementsFor(int index) {

@@ -3,6 +3,7 @@ package br.ufsc.ine.leb.roza.ui.modern;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.ArrayList;
@@ -16,6 +17,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import br.ufsc.ine.leb.roza.core.modern.StageProgress;
 import br.ufsc.ine.leb.roza.core.modern.analytics.DefaultTestCodeAnalytics;
 import br.ufsc.ine.leb.roza.core.modern.analytics.OriginalTestCodeMetrics;
 import br.ufsc.ine.leb.roza.core.modern.analytics.RefactoringLevelRanker;
@@ -80,12 +82,17 @@ import br.ufsc.ine.leb.roza.core.modern.refactoring.TestClassRefactorer;
 import br.ufsc.ine.leb.roza.core.modern.writing.FileSystemTestClassWriter;
 import br.ufsc.ine.leb.roza.core.modern.writing.TestClassWriter;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
@@ -96,6 +103,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.OverrunStyle;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
@@ -107,6 +115,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
@@ -186,7 +195,7 @@ public final class ModernRozaUi extends Application {
 	private List<ClusteringLevel> clusteringLevels;
 	private String clusteringError;
 	private int selectedRefactoringLevelIndex;
-	private int refactoringLevelRankingGeneration;
+	private volatile int refactoringLevelRankingGeneration;
 	private List<Integer> cachedTopRefactoringLevelIndices;
 	private boolean topRefactoringLevelsComputing;
 	private int topRefactoringRankCycleIndex;
@@ -200,20 +209,41 @@ public final class ModernRozaUi extends Application {
 	private Path outputFolder;
 	private String writingError;
 	private boolean rankedSimilarityDescending;
-	private boolean suppressSimilaritySelectionRender;
 	private boolean suppressSimilarityComboListener;
+	private boolean suppressRankingListListener;
+	private VBox cachedClusteringMatrixView;
+	private TestCaseSimilarityMatrix cachedClusteringMatrix;
+	private List<RankedSimilarityPairs.Item> cachedHighestRanking;
+	private List<RankedSimilarityPairs.Item> cachedLowestRanking;
+	private TestCaseSimilarityMatrix cachedRankingMatrix;
+	private ListView<RankedSimilarityPairs.Item> rankedSimilarityListView;
 	private HBox decompositionClassesRow;
 	private TextArea measurementTestBodyArea;
 	private TextArea parsingFileContentArea;
 	private TextArea clusteringSourceCodeArea;
 	private TextArea clusteringTargetCodeArea;
 	private final ViolationContextExtractor violationContextExtractor = new ViolationContextExtractor();
+	private final DoubleProperty measurementProgress = new SimpleDoubleProperty(0);
+	private final BooleanProperty measurementRunning = new SimpleBooleanProperty(false);
+	private final ProgressBar measurementProgressBar = new ProgressBar(0);
+	private final DoubleProperty clusteringProgress = new SimpleDoubleProperty(0);
+	private final BooleanProperty clusteringRunning = new SimpleBooleanProperty(false);
+	private final ProgressBar clusteringProgressBar = new ProgressBar(0);
+	private final DoubleProperty rankingProgress = new SimpleDoubleProperty(0);
+	private final ProgressBar rankingProgressBar = new ProgressBar(0);
+	private Button measureButton;
+	private Button clusterButton;
+	private volatile int measurementWorkGeneration;
+	private volatile int clusteringWorkGeneration;
 
 	public ModernRozaUi() {
 		pipelineState = new PipelineState();
 		pipelineBar = new HBox(SPACING_X);
 		configurationSidebar = new VBox(SPACING_4X);
 		contentArea = new VBox(SPACING_4X);
+		bindStageProgressBar(measurementProgressBar, measurementProgress);
+		bindStageProgressBar(clusteringProgressBar, clusteringProgress);
+		bindStageProgressBar(rankingProgressBar, rankingProgress);
 		recursiveLoading = new CheckBox("Enabled");
 		ignoreViolations = new CheckBox("Ignore violations");
 		javaExtension = new CheckBox(".java");
@@ -265,26 +295,8 @@ public final class ModernRozaUi extends Application {
 
 		sourceTestCombo = testCaseComboBox();
 		targetTestCombo = testCaseComboBox();
-		sourceTestCombo.valueProperty().addListener((observable, previous, selected) -> {
-			if (suppressSimilarityComboListener) {
-				return;
-			}
-			if (suppressSimilaritySelectionRender) {
-				updateSelectedSimilarityCodeBlocks(selectedSimilaritySourceIndex(), selectedSimilarityTargetIndex());
-			} else {
-				renderContentArea();
-			}
-		});
-		targetTestCombo.valueProperty().addListener((observable, previous, selected) -> {
-			if (suppressSimilarityComboListener) {
-				return;
-			}
-			if (suppressSimilaritySelectionRender) {
-				updateSelectedSimilarityCodeBlocks(selectedSimilaritySourceIndex(), selectedSimilarityTargetIndex());
-			} else {
-				renderContentArea();
-			}
-		});
+		sourceTestCombo.valueProperty().addListener((observable, previous, selected) -> onSimilarityComboChanged());
+		targetTestCombo.valueProperty().addListener((observable, previous, selected) -> onSimilarityComboChanged());
 
 		linkageMethodCombo = linkageMethodComboBox();
 		selectedStopCriteria = new ArrayList<>();
@@ -407,6 +419,16 @@ public final class ModernRozaUi extends Application {
 					configurationSidebar.getChildren().add(decompositionBlock);
 				} else {
 					configurationSidebar.getChildren().addAll(configuration, decompositionBlock);
+				}
+			} else if (selectedStage == PipelineStage.MEASUREMENT) {
+				measureButton = actionButton;
+				VBox measureBlock = new VBox(SPACING_X);
+				measureBlock.setMaxWidth(Double.MAX_VALUE);
+				measureBlock.getChildren().addAll(actionButton, reusableProgressBar(measurementProgressBar));
+				if (configuration.getChildren().isEmpty()) {
+					configurationSidebar.getChildren().add(measureBlock);
+				} else {
+					configurationSidebar.getChildren().addAll(configuration, measureBlock);
 				}
 			} else if (configuration.getChildren().isEmpty()) {
 				configurationSidebar.getChildren().add(actionButton);
@@ -803,14 +825,18 @@ public final class ModernRozaUi extends Application {
 		VBox tieBreakersBlock = new VBox(SPACING_X);
 		tieBreakersBlock.getChildren().addAll(configurationTitleRow("Merge tie breakers", this::showMergeTieBreakersHelpDialog), tieBreakerEditor());
 
-		Button clusterButton = new Button(PipelineStage.CLUSTERING.actionLabel());
+		clusterButton = new Button(PipelineStage.CLUSTERING.actionLabel());
 		clusterButton.setMaxWidth(Double.MAX_VALUE);
 		clusterButton.setStyle(primaryButtonStyle());
 		clusterButton.setDisable(!stageActionEnabled(PipelineStage.CLUSTERING));
 		clusterButton.setOnAction(event -> runStage(PipelineStage.CLUSTERING));
 
+		VBox clusterAction = new VBox(SPACING_X);
+		clusterAction.setMaxWidth(Double.MAX_VALUE);
+		clusterAction.getChildren().addAll(clusterButton, reusableProgressBar(clusteringProgressBar));
+
 		VBox configuration = new VBox(SPACING_4X);
-		configuration.getChildren().addAll(linkageBlock, stopCriteriaBlock, tieBreakersBlock, clusterButton);
+		configuration.getChildren().addAll(linkageBlock, stopCriteriaBlock, tieBreakersBlock, clusterAction);
 		return configuration;
 	}
 
@@ -1040,6 +1066,9 @@ public final class ModernRozaUi extends Application {
 	}
 
 	private boolean stageActionEnabled(PipelineStage selectedStage) {
+		if (measurementRunning.get() || clusteringRunning.get()) {
+			return false;
+		}
 		if (!pipelineState.selectedStageCanRun()) {
 			return false;
 		}
@@ -1123,11 +1152,23 @@ public final class ModernRozaUi extends Application {
 	private void clearMeasurementResults() {
 		similarityMatrix = null;
 		measurementError = null;
+		measurementWorkGeneration++;
+		measurementProgress.set(0);
 		sourceTestCombo.getItems().clear();
 		targetTestCombo.getItems().clear();
 		sourceTestCombo.getSelectionModel().clearSelection();
 		targetTestCombo.getSelectionModel().clearSelection();
+		clearSimilarityInspection();
 		clearClusteringResults();
+	}
+
+	private void clearSimilarityInspection() {
+		cachedClusteringMatrixView = null;
+		cachedClusteringMatrix = null;
+		cachedHighestRanking = null;
+		cachedLowestRanking = null;
+		cachedRankingMatrix = null;
+		rankedSimilarityListView = null;
 	}
 
 	private void clearClusteringResults() {
@@ -1138,6 +1179,10 @@ public final class ModernRozaUi extends Application {
 		cachedTopRefactoringLevelIndices = null;
 		topRefactoringLevelsComputing = false;
 		topRefactoringRankCycleIndex = 0;
+		clusteringWorkGeneration++;
+		clusteringProgress.set(0);
+		refactoringLevelRankingGeneration++;
+		rankingProgress.set(0);
 		clearRefactoringResults();
 	}
 
@@ -1225,37 +1270,142 @@ public final class ModernRozaUi extends Application {
 	}
 
 	private void runMeasurement() {
+		TestCaseSimilarityMeasurer measurer;
+		DecomposedTestCases cases = decomposedTestCases;
 		try {
-			TestCaseSimilarityMeasurer measurer = selectedSimilarityMeasurer();
-			similarityMatrix = measurer.measure(decomposedTestCases);
-			measurementError = null;
-			clearClusteringResults();
-			refreshSimilaritySelectionControls();
-			pipelineState.runSelectedStage();
+			measurer = selectedSimilarityMeasurer();
 		} catch (RuntimeException exception) {
-			measurementError = exception.getMessage() != null ? exception.getMessage() : exception.toString();
+			measurementError = throwableMessage(exception);
 			similarityMatrix = null;
+			measurementProgress.set(0);
+			clearSimilarityInspection();
 			clearClusteringResults();
+			render();
+			return;
 		}
-		render();
+		int generation = ++measurementWorkGeneration;
+		measurementRunning.set(true);
+		measurementProgress.set(ProgressBar.INDETERMINATE_PROGRESS);
+		if (measureButton != null) {
+			measureButton.setDisable(true);
+		}
+		Thread worker = new Thread(() -> {
+			try {
+				TestCaseSimilarityMatrix matrix = measurer.measure(cases, fxProgress(measurementProgress, generation));
+				List<RankedSimilarityPairs.Item> highest = RankedSimilarityPairs.top(matrix, true);
+				List<RankedSimilarityPairs.Item> lowest = RankedSimilarityPairs.top(matrix, false);
+				Platform.runLater(() -> completeMeasurement(generation, matrix, highest, lowest, null));
+			} catch (Throwable throwable) {
+				Platform.runLater(() -> completeMeasurement(generation, null, null, null, throwableMessage(throwable)));
+			}
+		}, "measurement");
+		worker.setDaemon(true);
+		worker.start();
+	}
+
+	private void completeMeasurement(
+			int generation,
+			TestCaseSimilarityMatrix matrix,
+			List<RankedSimilarityPairs.Item> highest,
+			List<RankedSimilarityPairs.Item> lowest,
+			String error) {
+		if (generation != measurementWorkGeneration) {
+			return;
+		}
+		measurementWorkGeneration++;
+		try {
+			if (error == null) {
+				measurementProgress.set(1.0);
+				similarityMatrix = matrix;
+				cachedRankingMatrix = matrix;
+				cachedHighestRanking = highest;
+				cachedLowestRanking = lowest;
+				measurementError = null;
+				clearClusteringResults();
+				pipelineState.runSelectedStage();
+			} else {
+				measurementProgress.set(0.0);
+				measurementError = error;
+				similarityMatrix = null;
+				clearSimilarityInspection();
+				clearClusteringResults();
+			}
+		} catch (Throwable throwable) {
+			measurementError = throwableMessage(throwable);
+			similarityMatrix = null;
+			clearSimilarityInspection();
+			clearClusteringResults();
+		} finally {
+			measurementRunning.set(false);
+		}
+		showStageResult();
 	}
 
 	private void runClustering() {
+		AgglomerativeHierarchicalTestCaseClusterer clusterer;
+		TestCaseSimilarityMatrix matrix = similarityMatrix;
 		try {
-			AgglomerativeHierarchicalTestCaseClusterer clusterer = selectedClusterer();
-			clusteringLevels = clusterer.generateLevels(similarityMatrix);
-			testCaseClusters = new TestCaseClusters(clusteringLevels.get(clusteringLevels.size() - 1).clusters());
-			clusteringError = null;
-			clearRefactoringResults();
-			scheduleBestRefactoringLevelComputation();
-			pipelineState.runSelectedStage();
+			clusterer = selectedClusterer();
 		} catch (RuntimeException exception) {
+			clusteringProgress.set(0);
 			testCaseClusters = null;
 			clusteringLevels = null;
-			clusteringError = exception.getMessage() != null ? exception.getMessage() : exception.toString();
+			clusteringError = throwableMessage(exception);
 			clearRefactoringResults();
+			render();
+			return;
 		}
-		render();
+		int generation = ++clusteringWorkGeneration;
+		clusteringRunning.set(true);
+		clusteringProgress.set(ProgressBar.INDETERMINATE_PROGRESS);
+		if (clusterButton != null) {
+			clusterButton.setDisable(true);
+		}
+		Thread worker = new Thread(() -> {
+			try {
+				List<ClusteringLevel> levels = clusterer.generateLevels(matrix, fxProgress(clusteringProgress, generation));
+				Platform.runLater(() -> completeClustering(generation, levels, null));
+			} catch (Throwable throwable) {
+				Platform.runLater(() -> completeClustering(generation, null, throwableMessage(throwable)));
+			}
+		}, "clustering");
+		worker.setDaemon(true);
+		worker.start();
+	}
+
+	private void completeClustering(int generation, List<ClusteringLevel> levels, String error) {
+		if (generation != clusteringWorkGeneration) {
+			return;
+		}
+		clusteringWorkGeneration++;
+		try {
+			if (error == null) {
+				clusteringProgress.set(1.0);
+				clusteringLevels = levels;
+				selectedRefactoringLevelIndex = clusteringLevels.size() - 1;
+				testCaseClusters = new TestCaseClusters(clusteringLevels.get(selectedRefactoringLevelIndex).clusters());
+				clusteringError = null;
+				clearRefactoringResults();
+				pipelineState.runSelectedStage();
+			} else {
+				clusteringProgress.set(0.0);
+				testCaseClusters = null;
+				clusteringLevels = null;
+				clusteringError = error;
+				clearRefactoringResults();
+			}
+		} catch (Throwable throwable) {
+			clusteringError = throwableMessage(throwable);
+			testCaseClusters = null;
+			clusteringLevels = null;
+			clearRefactoringResults();
+		} finally {
+			clusteringRunning.set(false);
+		}
+		showStageResult();
+		if (error == null && clusteringLevels != null) {
+			scheduleBestRefactoringLevelComputation();
+		}
 	}
 
 	private void runRefactoring() {
@@ -1521,7 +1671,7 @@ public final class ModernRozaUi extends Application {
 				error.setStyle(error.getStyle() + "-fx-text-fill: #991b1b;");
 				clusteringColumn.getChildren().add(error);
 			}
-			VBox matrixView = similarityMatrixView();
+			VBox matrixView = clusteringMatrixView();
 			clusteringColumn.getChildren().add(matrixView);
 			VBox.setVgrow(matrixView, Priority.ALWAYS);
 			contentArea.getChildren().add(clusteringColumn);
@@ -1802,11 +1952,11 @@ public final class ModernRozaUi extends Application {
 				targetTestCombo.getItems().setAll(testCases);
 			}
 			if (similarityMatrix.size() > 0) {
-				List<SimilarityRankingItem> ranking = rankingItems();
+				List<RankedSimilarityPairs.Item> ranking = rankingItems();
 				boolean bothEmpty = sourceTestCombo.getSelectionModel().isEmpty() && targetTestCombo.getSelectionModel().isEmpty();
 				if (bothEmpty) {
 					if (!ranking.isEmpty()) {
-						SimilarityRankingItem first = ranking.get(0);
+						RankedSimilarityPairs.Item first = ranking.get(0);
 						sourceTestCombo.getSelectionModel().select(first.sourceIndex());
 						targetTestCombo.getSelectionModel().select(first.targetIndex());
 					} else {
@@ -1825,7 +1975,7 @@ public final class ModernRozaUi extends Application {
 					int si = sourceTestCombo.getSelectionModel().getSelectedIndex();
 					int ti = targetTestCombo.getSelectionModel().getSelectedIndex();
 					if (si >= 0 && ti >= 0 && si == ti) {
-						SimilarityRankingItem first = ranking.get(0);
+						RankedSimilarityPairs.Item first = ranking.get(0);
 						sourceTestCombo.getSelectionModel().clearAndSelect(first.sourceIndex());
 						targetTestCombo.getSelectionModel().clearAndSelect(first.targetIndex());
 					}
@@ -2426,7 +2576,30 @@ public final class ModernRozaUi extends Application {
 				: formatDecomposedTestBody(selectedDecomposedTestCase));
 	}
 
+	private VBox clusteringMatrixView() {
+		if (cachedClusteringMatrixView != null && cachedClusteringMatrix == similarityMatrix) {
+			detachFromParent(cachedClusteringMatrixView);
+			return cachedClusteringMatrixView;
+		}
+		VBox matrixView = similarityMatrixView();
+		cachedClusteringMatrixView = matrixView;
+		cachedClusteringMatrix = similarityMatrix;
+		return matrixView;
+	}
+
+	private void onSimilarityComboChanged() {
+		if (suppressSimilarityComboListener) {
+			return;
+		}
+		int sourceIndex = selectedSimilaritySourceIndex();
+		int targetIndex = selectedSimilarityTargetIndex();
+		updateSelectedSimilarityCodeBlocks(sourceIndex, targetIndex);
+		selectRankingItem(sourceIndex, targetIndex);
+	}
+
 	private VBox similarityMatrixView() {
+		detachFromParent(sourceTestCombo);
+		detachFromParent(targetTestCombo);
 		refreshSimilaritySelectionControls();
 		VBox matrixView = new VBox(SPACING_4X);
 		if (similarityMatrix.size() == 0) {
@@ -2492,7 +2665,7 @@ public final class ModernRozaUi extends Application {
 		VBox levelColumn = new VBox(SPACING_X);
 		Label levelTitle = body("Level");
 		levelTitle.setStyle(levelTitle.getStyle() + "-fx-font-weight: bold; -fx-text-fill: #333333;");
-		levelColumn.getChildren().addAll(levelTitle, topLevelButton, levelList);
+		levelColumn.getChildren().addAll(levelTitle, topLevelButton, reusableProgressBar(rankingProgressBar), levelList);
 		VBox.setVgrow(levelList, Priority.ALWAYS);
 		ScrollPane clustersPane = new ScrollPane();
 		clustersPane.setContent(refactoringLevelClustersPanel(selectedRefactoringLevelIndex, clustersPane));
@@ -2523,6 +2696,7 @@ public final class ModernRozaUi extends Application {
 		int generation = ++refactoringLevelRankingGeneration;
 		if (clusteringLevels == null || clusteringLevels.isEmpty()) {
 			topRefactoringLevelsComputing = false;
+			rankingProgress.set(0);
 			updateRefactoringTopLevelButton();
 			return;
 		}
@@ -2531,17 +2705,24 @@ public final class ModernRozaUi extends Application {
 			refactorer = selectedTestClassRefactorer();
 		} catch (RuntimeException exception) {
 			topRefactoringLevelsComputing = false;
+			rankingProgress.set(0);
 			updateRefactoringTopLevelButton();
 			return;
 		}
 		topRefactoringLevelsComputing = true;
+		rankingProgress.set(ProgressBar.INDETERMINATE_PROGRESS);
 		updateRefactoringTopLevelButton();
 		List<ClusteringLevel> levels = List.copyOf(clusteringLevels);
+		StageProgress progress = fxProgress(rankingProgress, generation);
 		Thread worker = new Thread(() -> {
 			List<Integer> topLevelIndices = List.of();
 			try {
-				topLevelIndices = RefactoringLevelRanker.topLevelIndices(levels, refactorer, TOP_REFACTORING_LEVEL_LIMIT);
-			} catch (RuntimeException exception) {
+				topLevelIndices = RefactoringLevelRanker.topLevelIndices(
+						levels,
+						refactorer,
+						TOP_REFACTORING_LEVEL_LIMIT,
+						progress);
+			} catch (Throwable throwable) {
 				topLevelIndices = List.of();
 			}
 			List<Integer> result = topLevelIndices;
@@ -2551,6 +2732,7 @@ public final class ModernRozaUi extends Application {
 				}
 				cachedTopRefactoringLevelIndices = result;
 				topRefactoringLevelsComputing = false;
+				rankingProgress.set(result.isEmpty() ? 0 : 1.0);
 				updateRefactoringTopLevelButton();
 			});
 		}, "top-refactoring-levels");
@@ -2895,52 +3077,39 @@ public final class ModernRozaUi extends Application {
 		ranking.setPrefWidth(LIST_WIDTH_SMALL);
 		ranking.setMinWidth(LIST_WIDTH_SMALL);
 		ranking.setMaxWidth(LIST_WIDTH_SMALL);
+		ListView<RankedSimilarityPairs.Item> list = new ListView<>();
 		Button order = new Button(rankedSimilarityDescending ? "Highest" : "Lowest");
 		order.setStyle(secondaryButtonStyle());
 		order.setMaxWidth(Double.MAX_VALUE);
 		order.setOnAction(event -> {
 			rankedSimilarityDescending = !rankedSimilarityDescending;
-			renderContentArea();
+			order.setText(rankedSimilarityDescending ? "Highest" : "Lowest");
+			list.getItems().setAll(rankingItems());
+			selectRankingItem(selectedSimilaritySourceIndex(), selectedSimilarityTargetIndex());
 		});
-
-		ListView<SimilarityRankingItem> list = new ListView<>();
 		configureSmallList(list);
 		list.getItems().setAll(rankingItems());
 		list.setCellFactory(items -> new ListCell<>() {
 			@Override
-			protected void updateItem(SimilarityRankingItem item, boolean empty) {
+			protected void updateItem(RankedSimilarityPairs.Item item, boolean empty) {
 				super.updateItem(item, empty);
-				setText(empty || item == null ? null : item.label());
+				setText(empty || item == null ? null : formatMeasurementScore(item.similarity()));
 			}
 		});
-		int selectedTargetIndex = selectedSimilarityTargetIndex();
-		int selectedSourceIndex = selectedSimilaritySourceIndex();
-		int rankingIndex = -1;
-		List<SimilarityRankingItem> items = list.getItems();
-		for (int index = 0; index < items.size(); index++) {
-			SimilarityRankingItem item = items.get(index);
-			if (item.sourceIndex() == selectedSourceIndex && item.targetIndex() == selectedTargetIndex) {
-				rankingIndex = index;
-				break;
-			}
-		}
-		if (rankingIndex >= 0) {
-			list.getSelectionModel().select(rankingIndex);
-			final int scrollToIndex = rankingIndex;
-			Platform.runLater(() -> list.scrollTo(scrollToIndex));
-		}
+		rankedSimilarityListView = list;
+		selectRankingItem(selectedSimilaritySourceIndex(), selectedSimilarityTargetIndex());
 		list.getSelectionModel().selectedItemProperty().addListener((observable, previous, selected) -> {
-			if (selected == null) {
+			if (suppressRankingListListener || selected == null) {
 				return;
 			}
 			int sourceIndex = selected.sourceIndex();
 			int targetIndex = selected.targetIndex();
-			suppressSimilaritySelectionRender = true;
+			suppressSimilarityComboListener = true;
 			try {
 				sourceTestCombo.getSelectionModel().clearAndSelect(sourceIndex);
 				targetTestCombo.getSelectionModel().clearAndSelect(targetIndex);
 			} finally {
-				suppressSimilaritySelectionRender = false;
+				suppressSimilarityComboListener = false;
 			}
 			updateSelectedSimilarityCodeBlocks(sourceIndex, targetIndex);
 		});
@@ -2949,28 +3118,43 @@ public final class ModernRozaUi extends Application {
 		return ranking;
 	}
 
-	private List<SimilarityRankingItem> rankingItems() {
-		List<SimilarityRankingItem> items = new ArrayList<>();
-		for (int source = 0; source < similarityMatrix.size(); source++) {
-			for (int target = 0; target < similarityMatrix.size(); target++) {
-				if (source != target) {
-					items.add(new SimilarityRankingItem(
-							source,
-							target,
-							similarityMatrix.testCaseAt(source),
-							similarityMatrix.testCaseAt(target),
-							similarityMatrix.similarity(source, target)));
-				}
+	private void selectRankingItem(int sourceIndex, int targetIndex) {
+		if (rankedSimilarityListView == null) {
+			return;
+		}
+		List<RankedSimilarityPairs.Item> items = rankedSimilarityListView.getItems();
+		int rankingIndex = -1;
+		for (int index = 0; index < items.size(); index++) {
+			RankedSimilarityPairs.Item item = items.get(index);
+			if (item.sourceIndex() == sourceIndex && item.targetIndex() == targetIndex) {
+				rankingIndex = index;
+				break;
 			}
 		}
-		Comparator<SimilarityRankingItem> comparator = Comparator.comparingDouble(SimilarityRankingItem::similarity)
-				.thenComparing(item -> item.sourceTestCase().name())
-				.thenComparing(item -> item.targetTestCase().name());
-		if (rankedSimilarityDescending) {
-			comparator = comparator.reversed();
+		suppressRankingListListener = true;
+		try {
+			if (rankingIndex >= 0) {
+				rankedSimilarityListView.getSelectionModel().select(rankingIndex);
+				final int scrollToIndex = rankingIndex;
+				Platform.runLater(() -> rankedSimilarityListView.scrollTo(scrollToIndex));
+			} else {
+				rankedSimilarityListView.getSelectionModel().clearSelection();
+			}
+		} finally {
+			suppressRankingListListener = false;
 		}
-		items.sort(comparator);
-		return items;
+	}
+
+	private List<RankedSimilarityPairs.Item> rankingItems() {
+		if (similarityMatrix == null) {
+			return List.of();
+		}
+		if (cachedRankingMatrix != similarityMatrix || cachedHighestRanking == null || cachedLowestRanking == null) {
+			cachedRankingMatrix = similarityMatrix;
+			cachedHighestRanking = RankedSimilarityPairs.top(similarityMatrix, true);
+			cachedLowestRanking = RankedSimilarityPairs.top(similarityMatrix, false);
+		}
+		return rankedSimilarityDescending ? cachedHighestRanking : cachedLowestRanking;
 	}
 
 	private TextArea clusteringCodeTextArea(TestCase testCase, boolean sourcePanel) {
@@ -3027,6 +3211,71 @@ public final class ModernRozaUi extends Application {
 		return Long.toString(value);
 	}
 
+	private void showStageResult() {
+		renderPipelineBar();
+		renderConfigurationSidebar();
+		Platform.runLater(this::renderContentArea);
+	}
+
+	private static void bindStageProgressBar(ProgressBar bar, DoubleProperty progress) {
+		bar.setMaxWidth(Double.MAX_VALUE);
+		bar.setPrefHeight(10);
+		bar.progressProperty().bind(progress);
+	}
+
+	private ProgressBar reusableProgressBar(ProgressBar bar) {
+		detachFromParent(bar);
+		return bar;
+	}
+
+	private static void detachFromParent(Node node) {
+		if (node.getParent() instanceof Pane) {
+			((Pane) node.getParent()).getChildren().remove(node);
+		}
+	}
+
+	private StageProgress fxProgress(DoubleProperty property, int generation) {
+		AtomicBoolean posted = new AtomicBoolean(false);
+		return new StageProgress() {
+
+			private volatile double pendingValue;
+
+			@Override
+			public void report(int completed, int total) {
+				int current = generationOf(property);
+				if (generation != current) {
+					return;
+				}
+				pendingValue = total <= 0
+						? ProgressBar.INDETERMINATE_PROGRESS
+						: Math.min(1.0, (double) completed / (double) total);
+				if (posted.compareAndSet(false, true)) {
+					Platform.runLater(() -> {
+						posted.set(false);
+						if (generation != generationOf(property)) {
+							return;
+						}
+						property.set(pendingValue);
+					});
+				}
+			}
+		};
+	}
+
+	private int generationOf(DoubleProperty property) {
+		if (property == measurementProgress) {
+			return measurementWorkGeneration;
+		}
+		if (property == clusteringProgress) {
+			return clusteringWorkGeneration;
+		}
+		return refactoringLevelRankingGeneration;
+	}
+
+	private static String throwableMessage(Throwable throwable) {
+		return throwable.getMessage() != null ? throwable.getMessage() : throwable.toString();
+	}
+
 	private String actionButtonText(PipelineStage selectedStage) {
 		return selectedStage.actionLabel();
 	}
@@ -3081,46 +3330,5 @@ public final class ModernRozaUi extends Application {
 
 	private String secondaryButtonStyle() {
 		return FONT_FAMILY + "-fx-background-color: #333333; -fx-text-fill: #ffffff; -fx-background-radius: 6; -fx-padding: 10; -fx-font-weight: bold;";
-	}
-
-	private final class SimilarityRankingItem {
-
-		private final int sourceIndex;
-		private final int targetIndex;
-		private final TestCase sourceTestCase;
-		private final TestCase targetTestCase;
-		private final double similarity;
-
-		private SimilarityRankingItem(int sourceIndex, int targetIndex, TestCase sourceTestCase, TestCase targetTestCase, double similarity) {
-			this.sourceIndex = sourceIndex;
-			this.targetIndex = targetIndex;
-			this.sourceTestCase = sourceTestCase;
-			this.targetTestCase = targetTestCase;
-			this.similarity = similarity;
-		}
-
-		private int sourceIndex() {
-			return sourceIndex;
-		}
-
-		private int targetIndex() {
-			return targetIndex;
-		}
-
-		private TestCase sourceTestCase() {
-			return sourceTestCase;
-		}
-
-		private TestCase targetTestCase() {
-			return targetTestCase;
-		}
-
-		private double similarity() {
-			return similarity;
-		}
-
-		private String label() {
-			return formatMeasurementScore(similarity);
-		}
 	}
 }

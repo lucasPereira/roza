@@ -4,7 +4,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
@@ -72,6 +74,48 @@ class AgglomerativeHierarchicalTestCaseClustererTest {
 		assertThrows(IllegalStateException.class, () -> clusterer.cluster(matrix));
 	}
 
+	@Test
+	void shouldEvaluateLinkageOnlyForNewPairsAfterEachMerge() {
+		AtomicInteger evaluations = new AtomicInteger();
+		ClusterLinkage counting = new ClusterLinkage() {
+			private final SingleLinkage delegate = new SingleLinkage();
+
+			@Override
+			public double evaluate(TestCaseSimilarityMatrix matrix, TestCaseCluster first, TestCaseCluster second) {
+				evaluations.incrementAndGet();
+				return delegate.evaluate(matrix, first, second);
+			}
+
+			@Override
+			public double combinedSimilarity(double similarityWithFirst, double similarityWithSecond, int firstSize, int secondSize) {
+				return delegate.combinedSimilarity(similarityWithFirst, similarityWithSecond, firstSize, secondSize);
+			}
+		};
+		TestCaseSimilarityMatrix matrix = fourTestMatrix();
+
+		new AgglomerativeHierarchicalTestCaseClusterer(
+				counting,
+				new CompositeStopCriterion(List.of()),
+				new CompositeMergeTieBreaker(List.of(new StableTestCaseOrderMergeTieBreaker()))).cluster(matrix);
+
+		assertEquals(6, evaluations.get());
+	}
+
+	@Test
+	void shouldReportProgressByAcceptedMerges() {
+		List<Integer> completed = new ArrayList<>();
+		List<Integer> totals = new ArrayList<>();
+		clusterer(new CompositeStopCriterion(List.of())).generateLevels(fourTestMatrix(), (done, total) -> {
+			completed.add(done);
+			totals.add(total);
+		});
+
+		assertEquals(3, totals.get(totals.size() - 1));
+		assertEquals(3, completed.get(completed.size() - 1));
+		assertEquals(true, completed.contains(1));
+		assertEquals(true, completed.contains(2));
+	}
+
 	private AgglomerativeHierarchicalTestCaseClusterer clusterer(StopCriterion stopCriterion) {
 		return new AgglomerativeHierarchicalTestCaseClusterer(
 				new SingleLinkage(),
@@ -102,6 +146,24 @@ class AgglomerativeHierarchicalTestCaseClustererTest {
 		setSimilarity(matrix, 2, 0, 0.9);
 		setSimilarity(matrix, 1, 2, 0.2);
 		setSimilarity(matrix, 2, 1, 0.2);
+		return matrix;
+	}
+
+	private TestCaseSimilarityMatrix fourTestMatrix() {
+		TestCaseSimilarityMatrix matrix = new TestCaseSimilarityMatrix(
+				List.of(testCase("alpha"), testCase("beta"), testCase("gamma"), testCase("delta")));
+		setSimilarity(matrix, 0, 1, 0.9);
+		setSimilarity(matrix, 1, 0, 0.9);
+		setSimilarity(matrix, 0, 2, 0.5);
+		setSimilarity(matrix, 2, 0, 0.5);
+		setSimilarity(matrix, 0, 3, 0.4);
+		setSimilarity(matrix, 3, 0, 0.4);
+		setSimilarity(matrix, 1, 2, 0.3);
+		setSimilarity(matrix, 2, 1, 0.3);
+		setSimilarity(matrix, 1, 3, 0.2);
+		setSimilarity(matrix, 3, 1, 0.2);
+		setSimilarity(matrix, 2, 3, 0.1);
+		setSimilarity(matrix, 3, 2, 0.1);
 		return matrix;
 	}
 

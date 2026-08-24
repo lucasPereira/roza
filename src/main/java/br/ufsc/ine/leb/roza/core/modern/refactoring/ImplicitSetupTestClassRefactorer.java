@@ -17,7 +17,7 @@ import br.ufsc.ine.leb.roza.core.modern.parsing.TestClass;
 import br.ufsc.ine.leb.roza.core.modern.parsing.TestMethod;
 import br.ufsc.ine.leb.roza.core.modern.refactoring.SetupExtractionSupport.SetupExtraction;
 
-public final class ImplicitSetupTestClassRefactorer implements TestClassRefactorer {
+public final class ImplicitSetupTestClassRefactorer implements TestClassRefactorer, RankingSetupContributor {
 
 	@Override
 	public RefactoredTestClasses refactor(TestCaseClusters clusters) {
@@ -147,5 +147,15 @@ public final class ImplicitSetupTestClassRefactorer implements TestClassRefactor
 				testCase.annotations(),
 				testCase.thrownExceptions(),
 				testCase.body());
+	}
+
+	@Override
+	public List<TestClass> sharedRankingClasses(List<TestCase> tests) {
+		return RankingSetupSupport.originalHelperClasses(tests);
+	}
+
+	@Override
+	public List<TestClass> clusterRankingClasses(TestCaseCluster cluster) {
+		return List.of(refactor(cluster.testCases(), "TestClass1"));
 	}
 }
