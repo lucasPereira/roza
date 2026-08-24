@@ -59,6 +59,37 @@ class DelegatedSetupTestClassRefactorerTest {
 	}
 
 	@Test
+	void shouldRewriteTheOriginalMethodBodyInsteadOfAnInlinedDecomposedBody() {
+		TestClass source = source("Example", testMethod("alpha", "login();", "assertTrue(true);"), testMethod("beta", "login();", "assertFalse(false);"));
+		TestCase first = testCase("alpha", source, "Sut sut = new Sut();", "login();", "assertTrue(true);");
+		TestCase second = testCase("beta", source, "Sut sut = new Sut();", "login();", "assertFalse(false);");
+
+		RefactoredTestClasses refactored = new DelegatedSetupTestClassRefactorer().refactor(new TestCaseClusters(List.of(
+				new TestCaseCluster(0, first).merge(new TestCaseCluster(1, second)))));
+
+		assertEquals(List.of("login();"), refactored.helperClasses().get(0).helperMethods().get(0).body().statements().stream().map(CodeStatement::normalizedText).collect(Collectors.toList()));
+		assertEquals("HelperClass1.setup1();", refactored.testClasses().get(0).testMethods().get(0).body().statements().get(0).normalizedText());
+		assertEquals("assertTrue(true);", refactored.testClasses().get(0).testMethods().get(0).body().statements().get(1).normalizedText());
+		assertEquals(List.of("HelperClass1.setup1();", "assertFalse(false);"), refactored.testClasses().get(0).testMethods().get(1).body().statements().stream().map(CodeStatement::normalizedText).collect(Collectors.toList()));
+	}
+
+	@Test
+	void shouldKeepOnlyTestsThatEnteredClustering() {
+		TestClass source = source(
+				"Example",
+				testMethod("alpha", "login();", "assertTrue(true);"),
+				testMethod("beta", "login();", "assertFalse(false);"),
+				testMethod("gamma", "login();", "assertEquals(1, 1);"));
+		TestCase first = testCase("alpha", source, "login();", "assertTrue(true);");
+		TestCase second = testCase("beta", source, "login();", "assertFalse(false);");
+
+		RefactoredTestClasses refactored = new DelegatedSetupTestClassRefactorer().refactor(new TestCaseClusters(List.of(
+				new TestCaseCluster(0, first).merge(new TestCaseCluster(1, second)))));
+
+		assertEquals(List.of("alpha", "beta"), refactored.testClasses().get(0).testMethods().stream().map(TestMethod::name).collect(Collectors.toList()));
+	}
+
+	@Test
 	void shouldLeaveASingletonClusterUnchanged() {
 		TestClass source = source("Example", testMethod("alpha", "login();", "assertTrue(true);"));
 		TestCase only = testCase("alpha", source, "login();", "assertTrue(true);");

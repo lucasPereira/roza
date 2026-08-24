@@ -43,7 +43,7 @@ This document stores evolving knowledge discovered while designing and implement
 - `GreedyAdmissiblePrefixSimilarityMeasurer` (GAP): greedily reorders dependency-ready arrange statements toward the other test's textual order and applies `DiceMatchSimilarity` to the best bidirectional prefix.
 - `MaxAdmissiblePrefixSimilarityMeasurer` (MAP): searches dependency-ready matching choices for the maximum arrange prefix, with a bounded search and GAP fallback, then applies `DiceMatchSimilarity` to the best bidirectional prefix.
 - `ArrangeProjection`: extracts the pre-assertion arrange statements from a decomposed `TestCase` for LCCSS, LCS, and related measurers.
-- `SetupCodeProjection`: the common before/after analytics projection containing initialized fields as assignments, `BEFORE` fixture statements, each accepted test's statements before its first assertion, and helper-method bodies from helper classes.
+- `SetupCodeProjection`: the common before/after analytics projection containing initialized fields as assignments, `BEFORE` fixture statements, each accepted test's statements before its first assertion, and helper-method bodies from helper classes. Helper calls that remain in test arrange are counted.
 - `SetupCodeDuplicationAnalyzer`: counts textual statement surplus, `Σ(freq - 1)`, over `SetupCodeProjection`.
 - `JplagTestCaseSimilarityMeasurer`: the modern JPlag metric implementation. It projects each decomposed `TestCase` body up to the first assertion, materializes those projections as Java files, runs the existing JPlag jar, and reads directional percentages from JPlag's HTML reports.
 - `SimianTestCaseSimilarityMeasurer`: the modern Simian metric implementation. It projects each decomposed `TestCase` body up to the first assertion, materializes those projections as Java files, runs the existing Simian jar, and scores directed line coverage from Simian XML clone blocks.
@@ -252,7 +252,7 @@ The first modern UI slice uses JavaFX 17.x while the project remains on Java 11.
 - DEC-140: GAP and MAP are measurement alternatives only; they do not restore the removed admissible refactorer or alter the current implicit-setup refactoring strategy.
 - DEC-141: `NonIsolatingImplicitSetupTestClassRefactorer` extracts implicit setup only for clusters with two or more tests; singleton leftovers return to residual original classes using the original test methods rather than decomposed bodies.
 - DEC-142: The modern UI `Refactoring` configuration selects the refactoring strategy; isolating implicit setup remains the default, and both Refactor actions use the selected strategy.
-- DEC-143: Delegated setup keeps tests in their original classes. The first slice extracts shared arrange into helper methods and does not rewrite fields or `@Before` fixtures.
+- DEC-143: Delegated setup keeps accepted tests in their original classes. The first slice extracts shared arrange into helper methods and does not rewrite fields or `@Before` fixtures. Tests excluded by eligibility are omitted so the class matches the eligible baseline.
 - DEC-144: `WithoutImplicitSetupTestCaseDecomposer` is the decomposer for delegated setup. It copies each original test method body and does not inline fields or `@Before` statements.
 - DEC-145: CCS scores the longest extractable contiguous arrange run with Dice against both arrange lengths. It does not search for non-contiguous subsequences or renamed clones.
 - DEC-146: A contiguous arrange run is extractable only when JavaParser def/use succeeds, live-in names have the same type across tests, and the run has at most one live-out. Statement equality is exact normalized text. Minimum length is 1 and is UI-configurable.
@@ -264,6 +264,7 @@ The first modern UI slice uses JavaFX 17.x while the project remains on Java 11.
 - DEC-152: The modern UI `Decomposition` tab shows `Test classes`, then `Helper classes` with source code only, and `Violations` ordered by description. Test classes are ordered by package then class name. Helper classes are ordered by package then file name. The decomposition metrics table ends with `Helper files`. After refactoring, existing parsed helper classes are kept alongside created helpers.
 - DEC-154: The modern UI `Parsing` list is ordered by path. `Decomposition` test classes are ordered by package then class name, and helper classes by package then file name. `Measurement` tests are ordered by method name. `Writing` class lists use natural name order. Numbered suffixes follow numeric order (`TestClass2` before `TestClass10`).
 - DEC-156: Ignore violations is a decomposition-sidebar option. It does not hide recorded violations. It only disables eligibility filtering so those tests can continue through measurement, clustering, and refactoring. Methods that parsing never extracted as `TestMethod` remain absent. Analytics comparison projects original classes from the decomposed tests, not from `TestCodeEligibility`, so the before/after baseline stays aligned when violations are ignored.
+- DEC-157: Delegated setup finds extractable runs in original test method bodies. It does not copy decomposed inlined fields or `@Before` statements back into the rewritten tests. Each original class keeps only the tests that entered clustering.
 
 ## Hypotheses
 
@@ -398,3 +399,4 @@ The first modern UI slice uses JavaFX 17.x while the project remains on Java 11.
 - 2026-08-23: Parsing violation descriptions drop the `Unsupported` prefix (DEC-121).
 - 2026-08-23: Helper classes are not checked against the refactoring-safe subset (DEC-148).
 - 2026-08-24: The modern UI `Decomposition` tab can ignore violations so those tests still enter the rest of the pipeline, and analytics compares that same decomposed set (DEC-156).
+- 2026-08-24: Delegated setup rewrites original test method bodies, keeps only clustered tests, and still counts helper calls in setup duplication (DEC-133, DEC-157).

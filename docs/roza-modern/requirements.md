@@ -348,6 +348,8 @@ Acceptance criteria:
 - AC-346: Helper methods are static, named `setup1`, `setup2`, and so on, take live-ins as parameters, and are `void` or return the single live-out.
 - AC-347: Created helper classes are emitted in Java's default package. Existing helper classes keep the packages they were parsed with.
 - AC-348: The first delegated-setup slice does not rewrite fields or `@Before` fixtures and does not combine with implicit-setup refactoring in the same run.
+- AC-369: `DelegatedSetupTestClassRefactorer` extracts and rewrites original test method bodies, not decomposed bodies that inline fields or `@Before`.
+- AC-373: `DelegatedSetupTestClassRefactorer` keeps only tests that entered clustering in each original class, so ineligible methods do not remain in the refactored class.
 
 ### REQ-014: Writing Stage
 
@@ -866,5 +868,6 @@ The current clustering implementation requires the matrix size, test case by ind
 - 2026-08-23: Helper classes (no `@Test`) are not checked against the refactoring-safe subset, so constructors and similar constructs are not reported as violations.
 - 2026-08-24: The modern UI `Decomposition` configuration exposes `Ignore violations`. When enabled, decomposition still includes tests that have parsing violations so refactoring can proceed.
 - 2026-08-24: Analytics comparison uses the decomposed tests as the original baseline, so Ignore violations does not fail after writing.
+- 2026-08-24: Delegated setup rewrites original test method bodies and omits tests that did not enter clustering, so ineligible methods cannot inflate after-metrics. Helper calls remain in the setup projection.
 - 2026-05-12: Confirmed that modern UI sidebar stages without visible configuration controls should align their primary action button with the first visible loading control and the refactoring action.
 - 2026-05-12: Confirmed the modern UI writing sidebar output folder chooser, default `output/writer` folder, and selected-folder write behavior.

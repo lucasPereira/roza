@@ -7,6 +7,8 @@ import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 
+import br.ufsc.ine.leb.roza.core.modern.clustering.TestCaseCluster;
+import br.ufsc.ine.leb.roza.core.modern.clustering.TestCaseClusters;
 import br.ufsc.ine.leb.roza.core.modern.decomposition.DecomposedTestCases;
 import br.ufsc.ine.leb.roza.core.modern.decomposition.TestCase;
 import br.ufsc.ine.leb.roza.core.modern.parsing.CodeAnnotation;
@@ -21,6 +23,7 @@ import br.ufsc.ine.leb.roza.core.modern.parsing.TestClass;
 import br.ufsc.ine.leb.roza.core.modern.parsing.TestCodeViolation;
 import br.ufsc.ine.leb.roza.core.modern.parsing.TestMethod;
 import br.ufsc.ine.leb.roza.core.modern.parsing.ViolationScope;
+import br.ufsc.ine.leb.roza.core.modern.refactoring.DelegatedSetupTestClassRefactorer;
 import br.ufsc.ine.leb.roza.core.modern.refactoring.RefactoredTestClasses;
 
 class DefaultTestCodeAnalyticsTest {
@@ -79,6 +82,54 @@ class DefaultTestCodeAnalyticsTest {
 	}
 
 	@Test
+	void shouldCountHelperCallsAndTheExtractedBody() {
+		TestClass originalClass = testClassWithArrange("Example", "login();");
+		ParsedTestClasses original = new ParsedTestClasses(List.of(originalClass), List.of());
+		TestCase first = arrangedTestCase("alpha", originalClass, "login();");
+		TestCase second = arrangedTestCase("beta", originalClass, "login();");
+		DecomposedTestCases accepted = new DecomposedTestCases(List.of(first, second));
+		RefactoredTestClasses refactored = new DelegatedSetupTestClassRefactorer().refactor(new TestCaseClusters(List.of(
+				new TestCaseCluster(0, first).merge(new TestCaseCluster(1, second)))));
+
+		TestCodeAnalyticsReport report = new DefaultTestCodeAnalytics().analyze(original, accepted, refactored);
+
+		assertEquals(2, report.comparison().original().totalStatements());
+		assertEquals(1, report.comparison().original().duplicatedStatements());
+		assertEquals(3, report.comparison().refactored().totalStatements());
+		assertEquals(1, report.comparison().refactored().duplicatedStatements());
+	}
+
+	@Test
+	void shouldIgnoreTestsThatDidNotEnterClusteringWhenComparingDelegatedSetup() {
+		TestClass originalClass = new TestClass(
+				"Example",
+				List.of(),
+				List.of(),
+				List.of(),
+				List.of(
+						arrangedTestMethod("alpha", "login();"),
+						arrangedTestMethod("beta", "login();"),
+						arrangedTestMethod("gamma", "login();")));
+		ParsedTestClasses original = new ParsedTestClasses(
+				List.of(originalClass),
+				List.of(new TestCodeViolation(ViolationScope.TEST_METHOD, "Example", "gamma", "unsupported method")));
+		TestCase first = arrangedTestCase("alpha", originalClass, "login();");
+		TestCase second = arrangedTestCase("beta", originalClass, "login();");
+		DecomposedTestCases accepted = new DecomposedTestCases(List.of(first, second));
+		RefactoredTestClasses refactored = new DelegatedSetupTestClassRefactorer().refactor(new TestCaseClusters(List.of(
+				new TestCaseCluster(0, first).merge(new TestCaseCluster(1, second)))));
+
+		TestCodeAnalyticsReport report = new DefaultTestCodeAnalytics().analyze(original, accepted, refactored);
+
+		assertEquals(2, report.comparison().original().testMethods());
+		assertEquals(2, report.comparison().refactored().testMethods());
+		assertEquals(2, report.comparison().original().totalStatements());
+		assertEquals(1, report.comparison().original().duplicatedStatements());
+		assertEquals(3, report.comparison().refactored().totalStatements());
+		assertEquals(1, report.comparison().refactored().duplicatedStatements());
+	}
+
+	@Test
 	void shouldExcludeHelperClassesFromOriginalTestClassCountsAndStillCountTheirSetupStatements() {
 		TestClass example = new TestClass(
 				"ExampleTest",
@@ -130,6 +181,29 @@ class DefaultTestCodeAnalyticsTest {
 		assertEquals(0, report.original().testMethodsWithoutViolations());
 		assertEquals(1, report.comparison().original().testClasses());
 		assertEquals(1, report.comparison().original().testMethods());
+	}
+
+	private TestClass testClassWithArrange(String name, String arrange) {
+		return new TestClass(
+				name,
+				List.of(),
+				List.of(),
+				List.of(),
+				List.of(arrangedTestMethod("alpha", arrange), arrangedTestMethod("beta", arrange)));
+	}
+
+	private TestMethod arrangedTestMethod(String name, String arrange) {
+		return new TestMethod(name, List.of(annotation("Test")), arrangedBlock(arrange));
+	}
+
+	private TestCase arrangedTestCase(String name, TestClass source, String arrange) {
+		return new TestCase(name, arrangedBlock(arrange), source, List.of(annotation("Test")));
+	}
+
+	private CodeBlock arrangedBlock(String arrange) {
+		return new CodeBlock(List.of(
+				new CodeStatement(arrange, arrange),
+				new CodeStatement("assertTrue(true);", "assertTrue(true);", true)));
 	}
 
 	private TestClass testClass(String name, int fields, int fixtures, String... tests) {

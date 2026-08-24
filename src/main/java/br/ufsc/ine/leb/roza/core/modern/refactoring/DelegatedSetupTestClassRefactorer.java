@@ -39,23 +39,28 @@ public final class DelegatedSetupTestClassRefactorer implements TestClassRefacto
 	public RefactoredTestClasses refactor(TestCaseClusters clusters) {
 		Map<String, TestClass> originalClasses = new LinkedHashMap<>();
 		Map<String, CodeBlock> rewrittenBodies = new LinkedHashMap<>();
+		Set<String> acceptedMethods = new LinkedHashSet<>();
 		List<TestClass> helpers = new ArrayList<>();
 		int helperIndex = 1;
 		for (TestCaseCluster cluster : clusters.clusters()) {
 			for (TestCase testCase : cluster.testCases()) {
-				testCase.sourceTestClass().ifPresent(source -> originalClasses.putIfAbsent(source.qualifiedName(), source));
+				testCase.sourceTestClass().ifPresent(source -> {
+					originalClasses.putIfAbsent(source.qualifiedName(), source);
+					acceptedMethods.add(key(source, testCase));
+				});
 			}
 			if (cluster.size() < 2) {
 				continue;
 			}
-			List<ExtractableArrangeRun> runs = ExtractableArrangeRuns.nWay(cluster.testCases(), minimumLength);
+			List<TestCase> originalCases = originalMethodBodies(cluster.testCases());
+			List<ExtractableArrangeRun> runs = ExtractableArrangeRuns.nWay(originalCases, minimumLength);
 			if (runs.isEmpty()) {
 				continue;
 			}
 			String helperName = "HelperClass" + helperIndex;
 			helpers.add(helperClass(helperName, imports(cluster.testCases()), runs));
-			for (int testIndex = 0; testIndex < cluster.testCases().size(); testIndex++) {
-				TestCase testCase = cluster.testCases().get(testIndex);
+			for (int testIndex = 0; testIndex < originalCases.size(); testIndex++) {
+				TestCase testCase = originalCases.get(testIndex);
 				TestClass source = testCase.sourceTestClass().orElseThrow(
 						() -> new IllegalStateException("Delegated setup requires each test to keep its source class."));
 				rewrittenBodies.put(key(source, testCase), replaceRuns(testCase, runs, testIndex, helperName));
@@ -63,13 +68,15 @@ public final class DelegatedSetupTestClassRefactorer implements TestClassRefacto
 			helperIndex++;
 		}
 		List<TestClass> testClasses = originalClasses.values().stream()
-				.map(source -> rewrite(source, rewrittenBodies))
+				.map(source -> rewrite(source, rewrittenBodies, acceptedMethods))
+				.filter(testClass -> !testClass.testMethods().isEmpty())
 				.collect(Collectors.toList());
 		return new RefactoredTestClasses(testClasses, helpers);
 	}
 
-	private TestClass rewrite(TestClass source, Map<String, CodeBlock> rewrittenBodies) {
+	private TestClass rewrite(TestClass source, Map<String, CodeBlock> rewrittenBodies, Set<String> acceptedMethods) {
 		List<TestMethod> methods = source.testMethods().stream()
+				.filter(method -> acceptedMethods.contains(key(source, method)))
 				.map(method -> rewrittenBodies.containsKey(key(source, method))
 						? new TestMethod(method.name(), method.annotations(), method.thrownExceptions(), rewrittenBodies.get(key(source, method)))
 						: method)
@@ -114,6 +121,20 @@ public final class DelegatedSetupTestClassRefactorer implements TestClassRefacto
 			body.add(statement("return " + liveOut.name() + ";"));
 		}
 		return new HelperMethod(List.of("public", "static"), returnType, name, parameters, List.of(), new CodeBlock(body));
+	}
+
+	private List<TestCase> originalMethodBodies(List<TestCase> testCases) {
+		return testCases.stream().map(this::withOriginalMethodBody).collect(Collectors.toList());
+	}
+
+	private TestCase withOriginalMethodBody(TestCase testCase) {
+		TestClass source = testCase.sourceTestClass().orElseThrow(
+				() -> new IllegalStateException("Delegated setup requires each test to keep its source class."));
+		TestMethod method = source.testMethods().stream()
+				.filter(testMethod -> testMethod.name().equals(testCase.name()))
+				.findFirst()
+				.orElseThrow(() -> new IllegalStateException("Delegated setup requires the original test method " + source.qualifiedName() + "#" + testCase.name() + "."));
+		return new TestCase(testCase.name(), method.body(), source, testCase.annotations(), testCase.thrownExceptions());
 	}
 
 	private CodeBlock replaceRuns(TestCase testCase, List<ExtractableArrangeRun> runs, int testIndex, String helperName) {

@@ -1626,7 +1626,8 @@ public final class ModernRozaUi extends Application {
 		glossary.getChildren().addAll(
 				glossaryEntry(
 						"Total statements",
-						"Counts non-assertion statements in setup and test method bodies, normalized for comparison. "
+						"Counts non-assertion statements in setup, helper-method bodies, and test arrange, normalized for comparison. "
+								+ "Helper calls that remain in tests are included. "
 								+ "For example, a setup with one statement and a test with two yields 3."),
 				glossaryEntry(
 						"Duplicated statements",
