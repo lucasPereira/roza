@@ -18,8 +18,8 @@ import java.util.stream.Collectors;
 
 import br.ufsc.ine.leb.roza.core.modern.analytics.DefaultTestCodeAnalytics;
 import br.ufsc.ine.leb.roza.core.modern.analytics.OriginalTestCodeMetrics;
+import br.ufsc.ine.leb.roza.core.modern.analytics.RefactoringLevelRanker;
 import br.ufsc.ine.leb.roza.core.modern.analytics.TestClassMetrics;
-import br.ufsc.ine.leb.roza.core.modern.analytics.TestClassMetricsCalculator;
 import br.ufsc.ine.leb.roza.core.modern.analytics.TestCodeAnalytics;
 import br.ufsc.ine.leb.roza.core.modern.analytics.TestCodeAnalyticsReport;
 import br.ufsc.ine.leb.roza.core.modern.analytics.TestCodeMetricComparison;
@@ -186,6 +186,7 @@ public final class ModernRozaUi extends Application {
 	private List<ClusteringLevel> clusteringLevels;
 	private String clusteringError;
 	private int selectedRefactoringLevelIndex;
+	private int refactoringLevelRankingGeneration;
 	private List<Integer> cachedTopRefactoringLevelIndices;
 	private boolean topRefactoringLevelsComputing;
 	private int topRefactoringRankCycleIndex;
@@ -248,6 +249,11 @@ public final class ModernRozaUi extends Application {
 		refactoringStrategyCombo.getItems().add(DELEGATED_SETUP_STRATEGY);
 		refactoringStrategyCombo.getSelectionModel().selectFirst();
 		refactoringStrategyCombo.setStyle(singleLineComboBoxStyle());
+		refactoringStrategyCombo.valueProperty().addListener((observable, previous, selected) -> {
+			if (clusteringLevels != null) {
+				scheduleBestRefactoringLevelComputation();
+			}
+		});
 
 		deckardMinTokensInput = metricConfigurationInput(String.valueOf(DeckardMeasurementConfiguration.DEFAULT_MIN_TOKENS));
 		deckardStrideInput = metricConfigurationInput(String.valueOf(DeckardMeasurementConfiguration.DEFAULT_STRIDE));
@@ -524,7 +530,7 @@ public final class ModernRozaUi extends Application {
 						"Extracts implicit setup only for clusters with two or more tests. Tests that would become singleton classes stay in residual original classes, keeping the original fields, fixtures, helpers, and test method bodies."),
 				new ConfigurationHelpEntry(
 						DELEGATED_SETUP_STRATEGY,
-						"Keeps tests in their original classes and extracts shared contiguous arrange runs into static methods on one helper class per cluster. Requires the without-implicit-setup decomposer and pairs with CCS. Runs that would return two values, or whose live-in types disagree, are left in place."));
+						"Keeps tests in their original classes and extracts contiguous arrange runs shared by at least two tests in a cluster into static methods on one helper class per cluster. A test that does not contain a run is left unchanged. Requires the without-implicit-setup decomposer and pairs with CCS. Runs that would return two values, or whose live-in types disagree, are left in place."));
 	}
 
 	private List<ConfigurationHelpEntry> measurementMetricHelpEntries() {
@@ -2521,10 +2527,15 @@ public final class ModernRozaUi extends Application {
 		}
 		topRefactoringLevelsComputing = true;
 		updateRefactoringTopLevelButton();
+		int generation = ++refactoringLevelRankingGeneration;
 		List<ClusteringLevel> levels = List.copyOf(clusteringLevels);
+		TestClassRefactorer refactorer = selectedTestClassRefactorer();
 		Thread worker = new Thread(() -> {
-			List<Integer> topLevelIndices = computeTopRefactoringLevelIndices(levels, TOP_REFACTORING_LEVEL_LIMIT);
+			List<Integer> topLevelIndices = RefactoringLevelRanker.topLevelIndices(levels, refactorer, TOP_REFACTORING_LEVEL_LIMIT);
 			Platform.runLater(() -> {
+				if (generation != refactoringLevelRankingGeneration) {
+					return;
+				}
 				cachedTopRefactoringLevelIndices = topLevelIndices;
 				topRefactoringLevelsComputing = false;
 				updateRefactoringTopLevelButton();
@@ -2532,25 +2543,6 @@ public final class ModernRozaUi extends Application {
 		}, "top-refactoring-levels");
 		worker.setDaemon(true);
 		worker.start();
-	}
-
-	private static List<Integer> computeTopRefactoringLevelIndices(List<ClusteringLevel> levels, int limit) {
-		ImplicitSetupTestClassRefactorer refactorer = new ImplicitSetupTestClassRefactorer();
-		List<int[]> rankedLevels = new ArrayList<>();
-		for (int levelIndex = 0; levelIndex < levels.size(); levelIndex++) {
-			TestClassMetrics metrics = TestClassMetricsCalculator.forSetupCode(
-					refactorer.refactor(new TestCaseClusters(levels.get(levelIndex).clusters())).testClasses());
-			rankedLevels.add(new int[] { levelIndex, metrics.duplicatedStatements() });
-		}
-		rankedLevels.sort(Comparator
-				.comparingInt((int[] entry) -> entry[1])
-				.thenComparingInt(entry -> entry[0]));
-		int resultSize = Math.min(limit, rankedLevels.size());
-		List<Integer> topLevelIndices = new ArrayList<>(resultSize);
-		for (int index = 0; index < resultSize; index++) {
-			topLevelIndices.add(rankedLevels.get(index)[0]);
-		}
-		return topLevelIndices;
 	}
 
 	private void cycleTopRefactoringLevel() {

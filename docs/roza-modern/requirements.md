@@ -343,7 +343,8 @@ Acceptance criteria:
 - AC-325: Residual classes use the original parsed test method bodies rather than the decomposed inlined setup bodies.
 - AC-341: A third concrete refactoring implementation is named `DelegatedSetupTestClassRefactorer`.
 - AC-342: `DelegatedSetupTestClassRefactorer` keeps tests in their original classes and does not move tests into new test classes.
-- AC-343: `DelegatedSetupTestClassRefactorer` extracts n-way extractable contiguous arrange runs shared by a whole cluster into static helper methods.
+- AC-343: `DelegatedSetupTestClassRefactorer` extracts extractable contiguous arrange runs shared by at least two tests in a cluster into static helper methods. A test that does not contain a selected run is left unchanged for that run.
+- AC-375: A cluster that also contains a test with no matching arrange still receives a helper class when at least two other tests share an extractable run.
 - AC-344: Singleton clusters remain unchanged and do not receive a helper class.
 - AC-345: Each multi-test cluster with at least one extractable run receives one public helper class named `HelperClassN`.
 - AC-346: Helper methods are static, named `setup1`, `setup2`, and so on, take live-ins as parameters, and are `void` or return the single live-out.
@@ -469,6 +470,7 @@ Acceptance criteria:
 - AC-286: The modern UI `Refactoring` configuration exposes a `Refactor Current level` action that runs the selected refactoring strategy over the currently selected clustering level.
 - AC-326: The modern UI `Refactoring` configuration exposes a strategy dropdown with `Isolating implicit setup` selected by default and `Non-isolating implicit setup` as an alternative.
 - AC-327: Both modern UI refactoring actions use the strategy selected in the dropdown.
+- AC-376: The modern UI `Refactoring` Top ranking scores each clustering level with the currently selected refactoring strategy, counting helper classes in setup duplication the same way analytics does.
 - AC-351: The modern UI `Refactoring` strategy dropdown includes `Delegated setup`.
 - AC-352: The modern UI `Decomposition` configuration exposes a decomposer dropdown with `With implicit setup` and `Without implicit setup`.
 - AC-353: When CCS is selected, the modern UI `Measurement` configuration shows a minimum-length input whose default is `1`.
@@ -871,5 +873,6 @@ The current clustering implementation requires the matrix size, test case by ind
 - 2026-08-24: Analytics comparison uses the decomposed tests as the original baseline, so Ignore violations does not fail after writing.
 - 2026-08-24: Delegated setup rewrites original test method bodies and omits tests that did not enter clustering, so ineligible methods cannot inflate after-metrics. Helper calls remain in the setup projection.
 - 2026-08-24: Isolating implicit setup keeps source fields and `@Before` on generated classes when `Without implicit setup` only omitted them from the compared `TestCase`.
+- 2026-08-24: Delegated setup extracts arrange runs shared by at least two tests in a cluster. The modern UI Top ranking scores levels with the selected refactoring strategy, including helper classes.
 - 2026-05-12: Confirmed that modern UI sidebar stages without visible configuration controls should align their primary action button with the first visible loading control and the refactoring action.
 - 2026-05-12: Confirmed the modern UI writing sidebar output folder chooser, default `output/writer` folder, and selected-folder write behavior.

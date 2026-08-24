@@ -147,6 +147,9 @@ public final class DelegatedSetupTestClassRefactorer implements TestClassRefacto
 		}
 		for (ExtractableArrangeRun run : ordered) {
 			int start = run.startFor(testIndex);
+			if (start < 0) {
+				continue;
+			}
 			List<CodeStatement> replacement = List.of(call(helperName, "setup" + methodIndexes.get(run), run));
 			statements.subList(start, start + run.length()).clear();
 			statements.addAll(start, replacement);

@@ -25,15 +25,32 @@ public final class ExtractableArrangeRuns {
 		if (testCases.size() < 2 || minimumLength < 1) {
 			return List.of();
 		}
-		int shortestIndex = shortestArrangeIndex(testCases);
-		List<CodeStatement> shortest = ArrangeProjection.arrangeStatements(testCases.get(shortestIndex));
-		List<ExtractableArrangeRun> candidates = new ArrayList<>();
-		for (int start = 0; start < shortest.size(); start++) {
-			for (int length = shortest.size() - start; length >= minimumLength; length--) {
-				nWayCandidate(testCases, shortestIndex, start, length).ifPresent(candidates::add);
+		Map<List<String>, List<Occurrence>> occurrencesByText = new LinkedHashMap<>();
+		for (int testIndex = 0; testIndex < testCases.size(); testIndex++) {
+			final int currentTestIndex = testIndex;
+			List<CodeStatement> arrange = ArrangeProjection.arrangeStatements(testCases.get(testIndex));
+			for (int start = 0; start < arrange.size(); start++) {
+				for (int length = arrange.size() - start; length >= minimumLength; length--) {
+					Optional<Extractability> extractability = extractable(testCases.get(testIndex), start, length);
+					if (extractability.isEmpty()) {
+						continue;
+					}
+					List<CodeStatement> window = List.copyOf(arrange.subList(start, start + length));
+					List<String> texts = window.stream().map(CodeStatement::normalizedText).collect(Collectors.toList());
+					List<Occurrence> occurrences = occurrencesByText.computeIfAbsent(texts, key -> new ArrayList<>());
+					if (occurrences.stream().noneMatch(occurrence -> occurrence.testIndex == currentTestIndex)) {
+						occurrences.add(new Occurrence(currentTestIndex, start, window, extractability.get()));
+					}
+				}
 			}
 		}
-		candidates.sort(Comparator.comparingInt(ExtractableArrangeRun::length).reversed());
+		List<ExtractableArrangeRun> candidates = new ArrayList<>();
+		for (List<Occurrence> occurrences : occurrencesByText.values()) {
+			sharedRun(testCases.size(), occurrences).ifPresent(candidates::add);
+		}
+		candidates.sort(Comparator
+				.comparingInt(ExtractableArrangeRun::length).reversed()
+				.thenComparingInt(run -> -run.participantCount()));
 		List<ExtractableArrangeRun> selected = new ArrayList<>();
 		for (ExtractableArrangeRun candidate : candidates) {
 			if (selected.stream().noneMatch(existing -> overlapsAnyTest(existing, candidate, testCases.size()))) {
@@ -88,30 +105,24 @@ public final class ExtractableArrangeRuns {
 		return Optional.of(new Extractability(liveIns, liveOuts.stream().findFirst(), declaredInWindow));
 	}
 
-	private static Optional<ExtractableArrangeRun> nWayCandidate(List<TestCase> testCases, int shortestIndex, int start, int length) {
-		List<CodeStatement> shortest = ArrangeProjection.arrangeStatements(testCases.get(shortestIndex));
-		List<CodeStatement> window = shortest.subList(start, start + length);
-		List<String> texts = window.stream().map(CodeStatement::normalizedText).collect(Collectors.toList());
-		Optional<Extractability> shortestExtractability = extractable(testCases.get(shortestIndex), start, length);
-		if (shortestExtractability.isEmpty()) {
+	private static Optional<ExtractableArrangeRun> sharedRun(int testCount, List<Occurrence> occurrences) {
+		Set<Integer> tests = occurrences.stream().map(occurrence -> occurrence.testIndex).collect(Collectors.toCollection(LinkedHashSet::new));
+		if (tests.size() < 2) {
 			return Optional.empty();
 		}
 		List<Integer> starts = new ArrayList<>();
+		for (int index = 0; index < testCount; index++) {
+			starts.add(-1);
+		}
 		List<Extractability> extractabilities = new ArrayList<>();
-		for (int index = 0; index < testCases.size(); index++) {
-			if (index == shortestIndex) {
-				starts.add(start);
-				extractabilities.add(shortestExtractability.get());
+		for (Occurrence occurrence : occurrences) {
+			if (starts.get(occurrence.testIndex) >= 0) {
 				continue;
 			}
-			Optional<Integer> occurrence = findExtractableOccurrence(testCases.get(index), texts);
-			if (occurrence.isEmpty()) {
-				return Optional.empty();
-			}
-			starts.add(occurrence.get());
-			extractabilities.add(extractable(testCases.get(index), occurrence.get(), length).orElseThrow());
+			starts.set(occurrence.testIndex, occurrence.start);
+			extractabilities.add(occurrence.extractability);
 		}
-		return unify(window, starts, extractabilities);
+		return unify(occurrences.get(0).window, starts, extractabilities);
 	}
 
 	private static Optional<ExtractableArrangeRun> unify(List<CodeStatement> statements, List<Integer> starts, List<Extractability> extractabilities) {
@@ -133,24 +144,6 @@ public final class ExtractableArrangeRuns {
 		return Optional.of(new ExtractableArrangeRun(statements, starts, liveIns, liveOut));
 	}
 
-	private static Optional<Integer> findExtractableOccurrence(TestCase testCase, List<String> texts) {
-		List<CodeStatement> arrange = ArrangeProjection.arrangeStatements(testCase);
-		int length = texts.size();
-		for (int start = 0; start + length <= arrange.size(); start++) {
-			boolean matches = true;
-			for (int offset = 0; offset < length; offset++) {
-				if (!arrange.get(start + offset).normalizedText().equals(texts.get(offset))) {
-					matches = false;
-					break;
-				}
-			}
-			if (matches && extractable(testCase, start, length).isPresent()) {
-				return Optional.of(start);
-			}
-		}
-		return Optional.empty();
-	}
-
 	private static boolean overlapsAnyTest(ExtractableArrangeRun left, ExtractableArrangeRun right, int testCount) {
 		for (int index = 0; index < testCount; index++) {
 			if (left.overlaps(right, index)) {
@@ -158,19 +151,6 @@ public final class ExtractableArrangeRuns {
 			}
 		}
 		return false;
-	}
-
-	private static int shortestArrangeIndex(List<TestCase> testCases) {
-		int shortestIndex = 0;
-		int shortestSize = ArrangeProjection.arrangeStatements(testCases.get(0)).size();
-		for (int index = 1; index < testCases.size(); index++) {
-			int size = ArrangeProjection.arrangeStatements(testCases.get(index)).size();
-			if (size < shortestSize) {
-				shortestIndex = index;
-				shortestSize = size;
-			}
-		}
-		return shortestIndex;
 	}
 
 	private static int arrangeEnd(List<CodeStatement> body) {
@@ -231,6 +211,21 @@ public final class ExtractableArrangeRuns {
 
 		public boolean declares(String name) {
 			return declaredInWindow.contains(name);
+		}
+	}
+
+	private static final class Occurrence {
+
+		private final int testIndex;
+		private final int start;
+		private final List<CodeStatement> window;
+		private final Extractability extractability;
+
+		private Occurrence(int testIndex, int start, List<CodeStatement> window, Extractability extractability) {
+			this.testIndex = testIndex;
+			this.start = start;
+			this.window = window;
+			this.extractability = extractability;
 		}
 	}
 }

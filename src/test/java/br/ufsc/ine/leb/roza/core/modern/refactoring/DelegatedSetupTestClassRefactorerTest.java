@@ -90,6 +90,27 @@ class DelegatedSetupTestClassRefactorerTest {
 	}
 
 	@Test
+	void shouldExtractASubsetRunWhenTheClusterIncludesAnUnrelatedTest() {
+		TestClass source = source(
+				"Example",
+				testMethod("alpha", "createUser();", "login();", "assertTrue(true);"),
+				testMethod("beta", "deleteUser();", "login();", "assertFalse(false);"),
+				testMethod("gamma", "assertEquals(1, 1);"));
+		TestCase first = testCase("alpha", source, "createUser();", "login();", "assertTrue(true);");
+		TestCase second = testCase("beta", source, "deleteUser();", "login();", "assertFalse(false);");
+		TestCase unrelated = testCase("gamma", source, "assertEquals(1, 1);");
+
+		RefactoredTestClasses refactored = new DelegatedSetupTestClassRefactorer().refactor(new TestCaseClusters(List.of(
+				new TestCaseCluster(0, first).merge(new TestCaseCluster(1, second)).merge(new TestCaseCluster(2, unrelated)))));
+
+		assertEquals(1, refactored.helperClasses().size());
+		assertEquals(List.of("login();"), refactored.helperClasses().get(0).helperMethods().get(0).body().statements().stream().map(CodeStatement::normalizedText).collect(Collectors.toList()));
+		assertEquals("HelperClass1.setup1();", refactored.testClasses().get(0).testMethods().get(0).body().statements().get(1).normalizedText());
+		assertEquals("HelperClass1.setup1();", refactored.testClasses().get(0).testMethods().get(1).body().statements().get(1).normalizedText());
+		assertEquals(List.of("assertEquals(1, 1);"), refactored.testClasses().get(0).testMethods().get(2).body().statements().stream().map(CodeStatement::normalizedText).collect(Collectors.toList()));
+	}
+
+	@Test
 	void shouldLeaveASingletonClusterUnchanged() {
 		TestClass source = source("Example", testMethod("alpha", "login();", "assertTrue(true);"));
 		TestCase only = testCase("alpha", source, "login();", "assertTrue(true);");

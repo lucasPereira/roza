@@ -41,9 +41,26 @@ public final class ExtractableArrangeRun {
 		return liveOut;
 	}
 
+	public boolean appliesTo(int testIndex) {
+		return startFor(testIndex) >= 0;
+	}
+
+	public int participantCount() {
+		int count = 0;
+		for (int start : starts) {
+			if (start >= 0) {
+				count++;
+			}
+		}
+		return count;
+	}
+
 	public boolean overlaps(ExtractableArrangeRun other, int testIndex) {
 		int thisStart = startFor(testIndex);
 		int otherStart = other.startFor(testIndex);
+		if (thisStart < 0 || otherStart < 0) {
+			return false;
+		}
 		int thisEnd = thisStart + length();
 		int otherEnd = otherStart + other.length();
 		return thisStart < otherEnd && otherStart < thisEnd;
