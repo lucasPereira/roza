@@ -23,7 +23,7 @@ import br.ufsc.ine.leb.roza.core.modern.parsing.SetupAnnotation;
 import br.ufsc.ine.leb.roza.core.modern.parsing.TestClass;
 import br.ufsc.ine.leb.roza.core.modern.parsing.TestMethod;
 
-class NonIsolatingImplicitSetupTestClassRefactorerTest {
+class ResidualImplicitSetupTestClassRefactorerTest {
 
 	@Test
 	void shouldKeepSingletonLeftoversTogetherInTheOriginalClass() {
@@ -148,7 +148,7 @@ class NonIsolatingImplicitSetupTestClassRefactorerTest {
 	}
 
 	private RefactoredTestClasses refactor(TestCaseCluster... clusters) {
-		return new NonIsolatingImplicitSetupTestClassRefactorer().refactor(new TestCaseClusters(List.of(clusters)));
+		return new ResidualImplicitSetupTestClassRefactorer().refactor(new TestCaseClusters(List.of(clusters)));
 	}
 
 	private TestClass source(String name, Field field, FixtureMethod fixture, TestMethod... tests) {

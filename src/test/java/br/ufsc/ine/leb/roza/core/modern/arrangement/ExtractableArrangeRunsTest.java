@@ -1,8 +1,11 @@
 package br.ufsc.ine.leb.roza.core.modern.arrangement;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTimeout;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,6 +30,21 @@ class ExtractableArrangeRunsTest {
 		assertTrue(runs.get(0).appliesTo(0));
 		assertTrue(runs.get(0).appliesTo(1));
 		assertEquals(-1, runs.get(0).startFor(2));
+	}
+
+	@Test
+	void shouldFinishNWayWithoutReparsingEveryWindow() {
+		List<TestCase> testCases = new ArrayList<>();
+		for (int testIndex = 0; testIndex < 20; testIndex++) {
+			List<String> statements = new ArrayList<>();
+			for (int statementIndex = 0; statementIndex < 20; statementIndex++) {
+				statements.add("value" + testIndex + "_" + statementIndex + "();");
+			}
+			statements.add("assertTrue(true);");
+			testCases.add(testCase("test" + testIndex, statements.toArray(String[]::new)));
+		}
+
+		assertTimeout(Duration.ofSeconds(5), () -> ExtractableArrangeRuns.nWay(testCases, 1));
 	}
 
 	private TestCase testCase(String name, String... statements) {

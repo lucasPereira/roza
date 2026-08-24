@@ -1,7 +1,10 @@
 package br.ufsc.ine.leb.roza.core.modern.analytics;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTimeout;
 
+import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -42,6 +45,49 @@ class RefactoringLevelRankerTest {
 
 		assertEquals(List.of(1), RefactoringLevelRanker.topLevelIndices(levels, new DelegatedSetupTestClassRefactorer(), 1));
 		assertEquals(List.of(2), RefactoringLevelRanker.topLevelIndices(levels, new ImplicitSetupTestClassRefactorer(), 1));
+	}
+
+	@Test
+	void shouldFinishDelegatedRankingOnAGrowingClusterChain() {
+		int testCount = 40;
+		List<TestMethod> methods = new ArrayList<>();
+		for (int index = 0; index < testCount; index++) {
+			methods.add(testMethod("test" + index, statementsFor(index)));
+		}
+		TestClass source = new TestClass("Example", "example.tests", List.of(), null, List.of(), List.of(), List.of(), methods);
+		List<TestCaseCluster> remaining = new ArrayList<>();
+		for (int index = 0; index < testCount; index++) {
+			remaining.add(new TestCaseCluster(index, testCase("test" + index, source, statementsFor(index))));
+		}
+		List<ClusteringLevel> levels = new ArrayList<>();
+		levels.add(new ClusteringLevel(0, List.copyOf(remaining)));
+		TestCaseCluster growing = remaining.remove(0);
+		for (int level = 1; !remaining.isEmpty(); level++) {
+			growing = growing.merge(remaining.remove(0));
+			List<TestCaseCluster> clusters = new ArrayList<>();
+			clusters.add(growing);
+			clusters.addAll(remaining);
+			levels.add(new ClusteringLevel(level, clusters));
+		}
+
+		assertTimeout(Duration.ofSeconds(5), () -> RefactoringLevelRanker.topLevelIndices(levels, new DelegatedSetupTestClassRefactorer(), 10));
+	}
+
+	private String[] statementsFor(int index) {
+		return new String[] {
+				"unique" + index + "();",
+				"a();",
+				"b();",
+				"c();",
+				"d();",
+				"e();",
+				"f();",
+				"g();",
+				"h();",
+				"i();",
+				"j();",
+				"assertTrue(true);"
+		};
 	}
 
 	private TestClass source() {

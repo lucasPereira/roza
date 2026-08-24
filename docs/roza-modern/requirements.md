@@ -206,7 +206,7 @@ Acceptance criteria:
 - AC-370: When Ignore violations is enabled, both decomposers include parsed tests despite class-level or method-level violations, so measurement and refactoring can proceed over those tests.
 - AC-334: A second decomposer named `WithoutImplicitSetupTestCaseDecomposer` keeps only each original test method body.
 - AC-335: `WithoutImplicitSetupTestCaseDecomposer` does not inline fields or `@Before` statements into the decomposed `TestCase`.
-- AC-374: Isolating implicit setup copies the source class fields and `@Before` onto a generated class when every test in the cluster comes from that class and the `TestCase` bodies are the original test methods.
+- AC-374: Implicit setup copies the source class fields and `@Before` onto a generated class when every test in the cluster comes from that class and the `TestCase` bodies are the original test methods.
 
 ### REQ-011: Measurement Stage
 
@@ -335,9 +335,9 @@ Acceptance criteria:
 - AC-300: When a local array declaration is moved into setup, `ImplicitSetupTestClassRefactorer` renders the setup assignment with explicit array creation, such as `values = new String[] { "a" };`.
 - AC-301: `ImplicitSetupTestClassRefactorer` preserves decomposed thrown exceptions on generated setup and test methods.
 - AC-294: `ImplicitSetupTestClassRefactorer` makes generated test method names unique inside each generated class.
-- AC-320: A second concrete refactoring implementation is named `NonIsolatingImplicitSetupTestClassRefactorer`.
-- AC-321: `NonIsolatingImplicitSetupTestClassRefactorer` refactors clusters with two or more tests using the same implicit-setup extraction as `ImplicitSetupTestClassRefactorer`.
-- AC-322: `NonIsolatingImplicitSetupTestClassRefactorer` does not create an isolated generated class for a cluster that contains only one test.
+- AC-320: A second concrete refactoring implementation is named `ResidualImplicitSetupTestClassRefactorer`.
+- AC-321: `ResidualImplicitSetupTestClassRefactorer` refactors clusters with two or more tests using the same implicit-setup extraction as `ImplicitSetupTestClassRefactorer`.
+- AC-322: `ResidualImplicitSetupTestClassRefactorer` does not create a generated class for a cluster that contains only one test.
 - AC-323: Singleton leftover tests from the same original class remain together in a residual class that preserves that class's name, package, imports, fields, fixtures, helpers, and the original leftover test methods.
 - AC-324: Residual classes omit tests that were extracted into multi-test implicit-setup classes.
 - AC-325: Residual classes use the original parsed test method bodies rather than the decomposed inlined setup bodies.
@@ -468,9 +468,10 @@ Acceptance criteria:
 - AC-284: The modern UI `Writing` center shows inner tabs `Test classes` and `Helpers classes`.
 - AC-285: Selecting a class in either `Writing` inner tab shows its rendered Java code on the right.
 - AC-286: The modern UI `Refactoring` configuration exposes a `Refactor Current level` action that runs the selected refactoring strategy over the currently selected clustering level.
-- AC-326: The modern UI `Refactoring` configuration exposes a strategy dropdown with `Isolating implicit setup` selected by default and `Non-isolating implicit setup` as an alternative.
+- AC-326: The modern UI `Refactoring` configuration exposes a strategy dropdown with `Implicit setup` selected by default and `Residual implicit setup` as an alternative.
 - AC-327: Both modern UI refactoring actions use the strategy selected in the dropdown.
 - AC-376: The modern UI `Refactoring` Top ranking scores each clustering level with the currently selected refactoring strategy, counting helper classes in setup duplication the same way analytics does.
+- AC-377: The modern UI `Refactoring` Top ranking finishes and re-enables the Top button after delegated setup scoring, including when scoring throws.
 - AC-351: The modern UI `Refactoring` strategy dropdown includes `Delegated setup`.
 - AC-352: The modern UI `Decomposition` configuration exposes a decomposer dropdown with `With implicit setup` and `Without implicit setup`.
 - AC-353: When CCS is selected, the modern UI `Measurement` configuration shows a minimum-length input whose default is `1`.
@@ -693,8 +694,8 @@ public final class ImplicitSetupTestClassRefactorer implements TestClassRefactor
 	public RefactoredTestClasses refactor(TestCaseClusters clusters);
 }
 
-public final class NonIsolatingImplicitSetupTestClassRefactorer implements TestClassRefactorer {
-	public NonIsolatingImplicitSetupTestClassRefactorer();
+public final class ResidualImplicitSetupTestClassRefactorer implements TestClassRefactorer {
+	public ResidualImplicitSetupTestClassRefactorer();
 	public RefactoredTestClasses refactor(TestCaseClusters clusters);
 }
 
@@ -855,8 +856,8 @@ The current clustering implementation requires the matrix size, test case by ind
 - 2026-05-11: Validated Simian execution through the existing jar and added modern Simian threshold, XML report parsing, asymmetric line-coverage scoring, and UI selection requirements.
 - 2026-05-12: Implemented the first modern clustering slice with agglomerative hierarchical clustering, linkage strategies, composable stop criteria, ordered merge tie breakers, level inspection, and JavaFX clustering configuration/output.
 - 2026-05-12: Implemented the first modern refactoring slice with `ImplicitSetupTestClassRefactorer`, source-class context preservation, setup annotation inference in parsing/decomposition, generated test-class rendering, and Writing-tab class/code inspection.
-- 2026-08-23: Added `NonIsolatingImplicitSetupTestClassRefactorer`, which extracts implicit setup only from multi-test clusters and keeps singleton leftovers in residual original classes.
-- 2026-08-23: The modern UI `Refactoring` configuration exposes a strategy dropdown for isolating and non-isolating implicit setup.
+- 2026-08-23: Added `ResidualImplicitSetupTestClassRefactorer`, which extracts implicit setup only from multi-test clusters and keeps singleton leftovers in residual original classes.
+- 2026-08-23: The modern UI `Refactoring` configuration exposes a strategy dropdown for implicit setup and residual implicit setup.
 - 2026-08-23: Added delegated setup: CCS measurement, a body-only decomposer, helper-class extraction, helper-body counting, and matching modern UI controls.
 - 2026-08-23: `FileSystemTestClassWriter` now empties its output folder before writing.
 - 2026-08-23: Loading uses a single source folder. The parser treats classes without `@Test` as helpers. Writing uses one output folder: test classes and created helpers in the default package, existing helpers in their original packages. The Decomposition and Writing tabs expose helper classes separately.
@@ -872,7 +873,9 @@ The current clustering implementation requires the matrix size, test case by ind
 - 2026-08-24: The modern UI `Decomposition` configuration exposes `Ignore violations`. When enabled, decomposition still includes tests that have parsing violations so refactoring can proceed.
 - 2026-08-24: Analytics comparison uses the decomposed tests as the original baseline, so Ignore violations does not fail after writing.
 - 2026-08-24: Delegated setup rewrites original test method bodies and omits tests that did not enter clustering, so ineligible methods cannot inflate after-metrics. Helper calls remain in the setup projection.
-- 2026-08-24: Isolating implicit setup keeps source fields and `@Before` on generated classes when `Without implicit setup` only omitted them from the compared `TestCase`.
+- 2026-08-24: Implicit setup keeps source fields and `@Before` on generated classes when `Without implicit setup` only omitted them from the compared `TestCase`.
 - 2026-08-24: Delegated setup extracts arrange runs shared by at least two tests in a cluster. The modern UI Top ranking scores levels with the selected refactoring strategy, including helper classes.
+- 2026-08-24: The modern UI Top ranking for delegated setup reuses cluster extractions and always re-enables the Top button when ranking finishes.
+- 2026-08-24: Renamed the implicit-setup strategies to `Implicit setup` and `Residual implicit setup`; the residual implementation is `ResidualImplicitSetupTestClassRefactorer`.
 - 2026-05-12: Confirmed that modern UI sidebar stages without visible configuration controls should align their primary action button with the first visible loading control and the refactoring action.
 - 2026-05-12: Confirmed the modern UI writing sidebar output folder chooser, default `output/writer` folder, and selected-folder write behavior.

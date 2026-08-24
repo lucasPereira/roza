@@ -2,10 +2,12 @@ package br.ufsc.ine.leb.roza.core.modern.arrangement;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -22,30 +24,50 @@ public final class ExtractableArrangeRuns {
 	}
 
 	public static List<ExtractableArrangeRun> nWay(List<TestCase> testCases, int minimumLength) {
+		return nWay(testCases, minimumLength, new Session());
+	}
+
+	public static List<ExtractableArrangeRun> nWay(List<TestCase> testCases, int minimumLength, Session session) {
+		Objects.requireNonNull(session);
 		if (testCases.size() < 2 || minimumLength < 1) {
 			return List.of();
 		}
-		Map<List<String>, List<Occurrence>> occurrencesByText = new LinkedHashMap<>();
+		List<List<Optional<StatementDependencyAnalyzer.Analysis>>> analysesByTest = new ArrayList<>();
+		for (TestCase testCase : testCases) {
+			analysesByTest.add(session.analysesByMethod.computeIfAbsent(methodId(testCase), id -> analyses(testCase.body().statements())));
+		}
+		Map<List<String>, List<Window>> windowsByText = new LinkedHashMap<>();
 		for (int testIndex = 0; testIndex < testCases.size(); testIndex++) {
-			final int currentTestIndex = testIndex;
 			List<CodeStatement> arrange = ArrangeProjection.arrangeStatements(testCases.get(testIndex));
 			for (int start = 0; start < arrange.size(); start++) {
 				for (int length = arrange.size() - start; length >= minimumLength; length--) {
-					Optional<Extractability> extractability = extractable(testCases.get(testIndex), start, length);
-					if (extractability.isEmpty()) {
-						continue;
-					}
 					List<CodeStatement> window = List.copyOf(arrange.subList(start, start + length));
 					List<String> texts = window.stream().map(CodeStatement::normalizedText).collect(Collectors.toList());
-					List<Occurrence> occurrences = occurrencesByText.computeIfAbsent(texts, key -> new ArrayList<>());
-					if (occurrences.stream().noneMatch(occurrence -> occurrence.testIndex == currentTestIndex)) {
-						occurrences.add(new Occurrence(currentTestIndex, start, window, extractability.get()));
-					}
+					windowsByText.computeIfAbsent(texts, key -> new ArrayList<>()).add(new Window(testIndex, start, window));
 				}
 			}
 		}
 		List<ExtractableArrangeRun> candidates = new ArrayList<>();
-		for (List<Occurrence> occurrences : occurrencesByText.values()) {
+		for (List<Window> windows : windowsByText.values()) {
+			if (windows.stream().map(window -> window.testIndex).distinct().count() < 2) {
+				continue;
+			}
+			List<Occurrence> occurrences = new ArrayList<>();
+			for (Window window : windows) {
+				if (occurrences.stream().anyMatch(occurrence -> occurrence.testIndex == window.testIndex)) {
+					continue;
+				}
+				Optional<Extractability> extractability = session.extractabilityByWindow.computeIfAbsent(
+						List.of(methodId(testCases.get(window.testIndex)), window.start, window.window.size()),
+						key -> extractable(
+								testCases.get(window.testIndex),
+								window.start,
+								window.window.size(),
+								analysesByTest.get(window.testIndex)));
+				if (extractability.isPresent()) {
+					occurrences.add(new Occurrence(window.testIndex, window.start, window.window, extractability.get()));
+				}
+			}
 			sharedRun(testCases.size(), occurrences).ifPresent(candidates::add);
 		}
 		candidates.sort(Comparator
@@ -61,12 +83,19 @@ public final class ExtractableArrangeRuns {
 	}
 
 	public static Optional<Extractability> extractable(TestCase testCase, int start, int length) {
+		return extractable(testCase, start, length, analyses(testCase.body().statements()));
+	}
+
+	private static Optional<Extractability> extractable(
+			TestCase testCase,
+			int start,
+			int length,
+			List<Optional<StatementDependencyAnalyzer.Analysis>> analyses) {
 		List<CodeStatement> body = testCase.body().statements();
 		int arrangeEnd = arrangeEnd(body);
 		if (start < 0 || length < 1 || start + length > arrangeEnd) {
 			return Optional.empty();
 		}
-		List<Optional<StatementDependencyAnalyzer.Analysis>> analyses = analyses(body);
 		if (analyses.subList(start, start + length).stream().anyMatch(Optional::isEmpty)) {
 			return Optional.empty();
 		}
@@ -162,6 +191,12 @@ public final class ExtractableArrangeRuns {
 		return body.size();
 	}
 
+	private static String methodId(TestCase testCase) {
+		return testCase.sourceTestClass()
+				.map(source -> source.qualifiedName() + "#" + testCase.name())
+				.orElseGet(() -> System.identityHashCode(testCase) + "#" + testCase.name());
+	}
+
 	private static List<Optional<StatementDependencyAnalyzer.Analysis>> analyses(List<CodeStatement> statements) {
 		List<Optional<StatementDependencyAnalyzer.Analysis>> analyses = new ArrayList<>();
 		for (CodeStatement statement : statements) {
@@ -189,6 +224,12 @@ public final class ExtractableArrangeRuns {
 		return false;
 	}
 
+	public static final class Session {
+
+		private final Map<String, List<Optional<StatementDependencyAnalyzer.Analysis>>> analysesByMethod = new HashMap<>();
+		private final Map<List<?>, Optional<Extractability>> extractabilityByWindow = new HashMap<>();
+	}
+
 	public static final class Extractability {
 
 		private final List<NamedTypedVariable> liveIns;
@@ -211,6 +252,19 @@ public final class ExtractableArrangeRuns {
 
 		public boolean declares(String name) {
 			return declaredInWindow.contains(name);
+		}
+	}
+
+	private static final class Window {
+
+		private final int testIndex;
+		private final int start;
+		private final List<CodeStatement> window;
+
+		private Window(int testIndex, int start, List<CodeStatement> window) {
+			this.testIndex = testIndex;
+			this.start = start;
+			this.window = window;
 		}
 	}
 

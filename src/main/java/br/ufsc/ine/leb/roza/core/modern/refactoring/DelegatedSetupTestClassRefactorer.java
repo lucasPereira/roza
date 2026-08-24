@@ -23,6 +23,8 @@ import br.ufsc.ine.leb.roza.core.modern.parsing.TestMethod;
 public final class DelegatedSetupTestClassRefactorer implements TestClassRefactorer {
 
 	private final int minimumLength;
+	private final Map<List<Integer>, List<ExtractableArrangeRun>> nWayByClusterIndexes = new LinkedHashMap<>();
+	private final ExtractableArrangeRuns.Session extractableSession = new ExtractableArrangeRuns.Session();
 
 	public DelegatedSetupTestClassRefactorer() {
 		this(1);
@@ -53,7 +55,9 @@ public final class DelegatedSetupTestClassRefactorer implements TestClassRefacto
 				continue;
 			}
 			List<TestCase> originalCases = originalMethodBodies(cluster.testCases());
-			List<ExtractableArrangeRun> runs = ExtractableArrangeRuns.nWay(originalCases, minimumLength);
+			List<ExtractableArrangeRun> runs = nWayByClusterIndexes.computeIfAbsent(
+					cluster.testCaseIndexes(),
+					indexes -> ExtractableArrangeRuns.nWay(originalCases, minimumLength, extractableSession));
 			if (runs.isEmpty()) {
 				continue;
 			}

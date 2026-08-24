@@ -74,7 +74,7 @@ import br.ufsc.ine.leb.roza.core.modern.parsing.ViolationScope;
 import br.ufsc.ine.leb.roza.core.modern.refactoring.DelegatedSetupTestClassRefactorer;
 import br.ufsc.ine.leb.roza.core.modern.refactoring.ImplicitSetupTestClassRefactorer;
 import br.ufsc.ine.leb.roza.core.modern.refactoring.JunitTestClassRenderer;
-import br.ufsc.ine.leb.roza.core.modern.refactoring.NonIsolatingImplicitSetupTestClassRefactorer;
+import br.ufsc.ine.leb.roza.core.modern.refactoring.ResidualImplicitSetupTestClassRefactorer;
 import br.ufsc.ine.leb.roza.core.modern.refactoring.RefactoredTestClasses;
 import br.ufsc.ine.leb.roza.core.modern.refactoring.TestClassRefactorer;
 import br.ufsc.ine.leb.roza.core.modern.writing.FileSystemTestClassWriter;
@@ -135,8 +135,8 @@ public final class ModernRozaUi extends Application {
 	private static final int LIST_WIDTH_LARGE = 300;
 	private static final int LIST_WIDTH_SMALL = 100;
 	private static final int SIDEBAR_WIDTH = 320;
-	private static final String ISOLATING_IMPLICIT_SETUP_STRATEGY = "Isolating implicit setup";
-	private static final String NON_ISOLATING_IMPLICIT_SETUP_STRATEGY = "Non-isolating implicit setup";
+	private static final String IMPLICIT_SETUP_STRATEGY = "Implicit setup";
+	private static final String RESIDUAL_IMPLICIT_SETUP_STRATEGY = "Residual implicit setup";
 	private static final String DELEGATED_SETUP_STRATEGY = "Delegated setup";
 	private static final String WITH_IMPLICIT_SETUP_DECOMPOSER = "With implicit setup";
 	private static final String WITHOUT_IMPLICIT_SETUP_DECOMPOSER = "Without implicit setup";
@@ -244,8 +244,8 @@ public final class ModernRozaUi extends Application {
 		decomposerCombo.setStyle(singleLineComboBoxStyle());
 
 		refactoringStrategyCombo = new ComboBox<>();
-		refactoringStrategyCombo.getItems().add(ISOLATING_IMPLICIT_SETUP_STRATEGY);
-		refactoringStrategyCombo.getItems().add(NON_ISOLATING_IMPLICIT_SETUP_STRATEGY);
+		refactoringStrategyCombo.getItems().add(IMPLICIT_SETUP_STRATEGY);
+		refactoringStrategyCombo.getItems().add(RESIDUAL_IMPLICIT_SETUP_STRATEGY);
 		refactoringStrategyCombo.getItems().add(DELEGATED_SETUP_STRATEGY);
 		refactoringStrategyCombo.getSelectionModel().selectFirst();
 		refactoringStrategyCombo.setStyle(singleLineComboBoxStyle());
@@ -489,14 +489,14 @@ public final class ModernRozaUi extends Application {
 	private void showDecomposerHelpDialog() {
 		showConfigurationHelpDialog(
 				"Decomposers",
-				"Decomposition decides which statements of a test are compared. Delegated setup should use the decomposer that leaves implicit setup out of the comparison. Isolating implicit setup still writes fields and @Before from the original class when a cluster comes from that class.",
+				"Decomposition decides which statements of a test are compared. Delegated setup should use the decomposer that leaves implicit setup out of the comparison. Implicit setup still writes fields and @Before from the original class when a cluster comes from that class.",
 				List.of(
 						new ConfigurationHelpEntry(
 								WITH_IMPLICIT_SETUP_DECOMPOSER,
 								"Inlines fields and @Before statements into each test. This is the decomposer for implicit-setup refactoring."),
 						new ConfigurationHelpEntry(
 								WITHOUT_IMPLICIT_SETUP_DECOMPOSER,
-								"Keeps only the original test method body in the comparison. Fields and @Before stay in the original class and are still written onto a generated class when isolating implicit setup regroups tests from that class.")));
+								"Keeps only the original test method body in the comparison. Fields and @Before stay in the original class and are still written onto a generated class when implicit setup regroups tests from that class.")));
 	}
 
 	private void showLinkageMethodHelpDialog() {
@@ -523,10 +523,10 @@ public final class ModernRozaUi extends Application {
 	private List<ConfigurationHelpEntry> refactoringStrategyHelpEntries() {
 		return List.of(
 				new ConfigurationHelpEntry(
-						ISOLATING_IMPLICIT_SETUP_STRATEGY,
+						IMPLICIT_SETUP_STRATEGY,
 						"Creates one generated class per cluster, including clusters with a single test. Singleton tests receive their full decomposed body and lose the original class-level fixture."),
 				new ConfigurationHelpEntry(
-						NON_ISOLATING_IMPLICIT_SETUP_STRATEGY,
+						RESIDUAL_IMPLICIT_SETUP_STRATEGY,
 						"Extracts implicit setup only for clusters with two or more tests. Tests that would become singleton classes stay in residual original classes, keeping the original fields, fixtures, helpers, and test method bodies."),
 				new ConfigurationHelpEntry(
 						DELEGATED_SETUP_STRATEGY,
@@ -1327,8 +1327,8 @@ public final class ModernRozaUi extends Application {
 		if (DELEGATED_SETUP_STRATEGY.equals(refactoringStrategyCombo.getSelectionModel().getSelectedItem())) {
 			return new DelegatedSetupTestClassRefactorer(ccsMinimumLength());
 		}
-		if (NON_ISOLATING_IMPLICIT_SETUP_STRATEGY.equals(refactoringStrategyCombo.getSelectionModel().getSelectedItem())) {
-			return new NonIsolatingImplicitSetupTestClassRefactorer();
+		if (RESIDUAL_IMPLICIT_SETUP_STRATEGY.equals(refactoringStrategyCombo.getSelectionModel().getSelectedItem())) {
+			return new ResidualImplicitSetupTestClassRefactorer();
 		}
 		return new ImplicitSetupTestClassRefactorer();
 	}
@@ -2520,23 +2520,36 @@ public final class ModernRozaUi extends Application {
 	private void scheduleBestRefactoringLevelComputation() {
 		cachedTopRefactoringLevelIndices = null;
 		topRefactoringRankCycleIndex = 0;
+		int generation = ++refactoringLevelRankingGeneration;
 		if (clusteringLevels == null || clusteringLevels.isEmpty()) {
+			topRefactoringLevelsComputing = false;
+			updateRefactoringTopLevelButton();
+			return;
+		}
+		TestClassRefactorer refactorer;
+		try {
+			refactorer = selectedTestClassRefactorer();
+		} catch (RuntimeException exception) {
 			topRefactoringLevelsComputing = false;
 			updateRefactoringTopLevelButton();
 			return;
 		}
 		topRefactoringLevelsComputing = true;
 		updateRefactoringTopLevelButton();
-		int generation = ++refactoringLevelRankingGeneration;
 		List<ClusteringLevel> levels = List.copyOf(clusteringLevels);
-		TestClassRefactorer refactorer = selectedTestClassRefactorer();
 		Thread worker = new Thread(() -> {
-			List<Integer> topLevelIndices = RefactoringLevelRanker.topLevelIndices(levels, refactorer, TOP_REFACTORING_LEVEL_LIMIT);
+			List<Integer> topLevelIndices = List.of();
+			try {
+				topLevelIndices = RefactoringLevelRanker.topLevelIndices(levels, refactorer, TOP_REFACTORING_LEVEL_LIMIT);
+			} catch (RuntimeException exception) {
+				topLevelIndices = List.of();
+			}
+			List<Integer> result = topLevelIndices;
 			Platform.runLater(() -> {
 				if (generation != refactoringLevelRankingGeneration) {
 					return;
 				}
-				cachedTopRefactoringLevelIndices = topLevelIndices;
+				cachedTopRefactoringLevelIndices = result;
 				topRefactoringLevelsComputing = false;
 				updateRefactoringTopLevelButton();
 			});
@@ -2556,6 +2569,9 @@ public final class ModernRozaUi extends Application {
 	}
 
 	private String refactoringTopLevelButtonLabel() {
+		if (topRefactoringLevelsComputing) {
+			return "Ranking";
+		}
 		if (cachedTopRefactoringLevelIndices == null || cachedTopRefactoringLevelIndices.isEmpty()) {
 			return "Top 1";
 		}

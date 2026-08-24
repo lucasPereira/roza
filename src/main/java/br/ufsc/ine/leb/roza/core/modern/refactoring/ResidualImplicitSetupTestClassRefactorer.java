@@ -14,7 +14,7 @@ import br.ufsc.ine.leb.roza.core.modern.decomposition.TestCase;
 import br.ufsc.ine.leb.roza.core.modern.parsing.TestClass;
 import br.ufsc.ine.leb.roza.core.modern.parsing.TestMethod;
 
-public final class NonIsolatingImplicitSetupTestClassRefactorer implements TestClassRefactorer {
+public final class ResidualImplicitSetupTestClassRefactorer implements TestClassRefactorer {
 
 	private final ImplicitSetupTestClassRefactorer implicitSetup = new ImplicitSetupTestClassRefactorer();
 
