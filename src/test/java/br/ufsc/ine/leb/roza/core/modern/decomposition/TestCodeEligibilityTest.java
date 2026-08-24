@@ -128,6 +128,28 @@ class TestCodeEligibilityTest {
 		assertEquals(1, summary.methodLevelViolationTestCount());
 	}
 
+	@Test
+	void shouldAcceptAllTestsWhenIgnoringViolations() {
+		TestClass testClass = new TestClass(
+				"Example",
+				"example.tests",
+				List.of(),
+				null,
+				List.of(),
+				List.of(),
+				List.of(),
+				List.of(testMethod("first"), testMethod("second")));
+		List<TestCodeViolation> violations = List.of(
+				new TestCodeViolation(ViolationScope.TEST_CLASS, "example.tests.Example", "Helper method: helper"),
+				new TestCodeViolation(ViolationScope.TEST_METHOD, "example.tests.Example", "second", "Test method with parameters: second"));
+
+		TestCodeEligibility eligibility = TestCodeEligibility.of(violations, true);
+
+		assertEquals(true, eligibility.accepts(testClass));
+		assertEquals(true, eligibility.accepts(testClass, testClass.testMethods().get(0)));
+		assertEquals(true, eligibility.accepts(testClass, testClass.testMethods().get(1)));
+	}
+
 	private TestMethod testMethod(String name) {
 		return new TestMethod(name, List.of(new CodeAnnotation("Test", "@Test")), List.of(), new CodeBlock(List.of(statement("assertTrue(true);"))));
 	}

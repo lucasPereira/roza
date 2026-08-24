@@ -160,6 +160,21 @@ class DefaultTestCaseDecomposerTest {
 	}
 
 	@Test
+	void shouldDecomposeViolatedTestsWhenIgnoringViolations() {
+		ParsedTestClasses parsedTestClasses = new ParsedTestClasses(
+				List.of(testClass(List.of(), List.of(), List.of(testMethod("first", "assertTrue(true);"), testMethod("second", "assertFalse(false);")))),
+				List.of(
+						new TestCodeViolation(ViolationScope.TEST_CLASS, "Example", "Helper method: helper"),
+						new TestCodeViolation(ViolationScope.TEST_METHOD, "Example", "second", "Test method with parameters: second")));
+
+		DecomposedTestCases decomposed = new DefaultTestCaseDecomposer(true).decompose(parsedTestClasses);
+
+		assertEquals(2, decomposed.testCases().size());
+		assertEquals("first", decomposed.testCases().get(0).name());
+		assertEquals("second", decomposed.testCases().get(1).name());
+	}
+
+	@Test
 	void shouldKeepHomonymClassInAnotherPackage() {
 		TestClass accepted = new TestClass(
 				"Example",

@@ -146,6 +146,7 @@ public final class ModernRozaUi extends Application {
 	private final VBox configurationSidebar;
 	private final VBox contentArea;
 	private final CheckBox recursiveLoading;
+	private final CheckBox ignoreViolations;
 	private final CheckBox javaExtension;
 	private final CheckBox txtExtension;
 	private final ComboBox<String> metricCombo;
@@ -213,9 +214,11 @@ public final class ModernRozaUi extends Application {
 		configurationSidebar = new VBox(SPACING_4X);
 		contentArea = new VBox(SPACING_4X);
 		recursiveLoading = new CheckBox("Enabled");
+		ignoreViolations = new CheckBox("Ignore violations");
 		javaExtension = new CheckBox(".java");
 		txtExtension = new CheckBox(".txt");
 		recursiveLoading.setSelected(true);
+		ignoreViolations.setSelected(false);
 		javaExtension.setSelected(true);
 		txtExtension.setSelected(false);
 
@@ -735,7 +738,8 @@ public final class ModernRozaUi extends Application {
 		decomposerBlock.getChildren().addAll(
 				configurationTitleRow("Decomposer", this::showDecomposerHelpDialog),
 				decomposerCombo);
-		return decomposerBlock;
+
+		return new VBox(SPACING_4X, decomposerBlock, ignoreViolations);
 	}
 
 	private VBox measurementConfiguration() {
@@ -1117,8 +1121,6 @@ public final class ModernRozaUi extends Application {
 		targetTestCombo.getItems().clear();
 		sourceTestCombo.getSelectionModel().clearSelection();
 		targetTestCombo.getSelectionModel().clearSelection();
-		selectedStopCriteria.clear();
-		selectedTieBreakerKinds.clear();
 		clearClusteringResults();
 	}
 
@@ -1200,9 +1202,10 @@ public final class ModernRozaUi extends Application {
 
 	private void runDecomposition() {
 		try {
+			boolean ignore = ignoreViolations.isSelected();
 			TestCaseDecomposer decomposer = WITHOUT_IMPLICIT_SETUP_DECOMPOSER.equals(decomposerCombo.getSelectionModel().getSelectedItem())
-					? new WithoutImplicitSetupTestCaseDecomposer()
-					: new DefaultTestCaseDecomposer();
+					? new WithoutImplicitSetupTestCaseDecomposer(ignore)
+					: new DefaultTestCaseDecomposer(ignore);
 			decomposedTestCases = decomposer.decompose(parsedTestClasses);
 			decompositionError = null;
 			clearMeasurementResults();

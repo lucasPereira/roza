@@ -203,6 +203,7 @@ Acceptance criteria:
 - AC-192: The default decomposition implementation does not decompose tests that belong to classes with class-level violations.
 - AC-193: The default decomposition implementation does not decompose test methods with method-level violations.
 - AC-194: Downstream measurement and refactoring consume only decomposed tests, so tests discarded because of parsing violations are excluded from those stages by construction.
+- AC-370: When Ignore violations is enabled, both decomposers include parsed tests despite class-level or method-level violations, so measurement and refactoring can proceed over those tests.
 - AC-334: A second decomposer named `WithoutImplicitSetupTestCaseDecomposer` keeps only each original test method body.
 - AC-335: `WithoutImplicitSetupTestCaseDecomposer` does not inline fields or `@Before` statements into the decomposed `TestCase`.
 
@@ -428,6 +429,7 @@ Acceptance criteria:
 - AC-196: The modern UI `Parsing` violation viewer shows one violation at a time with previous and next controls.
 - AC-197: The modern UI selects the loaded file for the class referenced by the displayed parsing violation, including the first displayed violation.
 - AC-198: The modern UI parsing configuration does not expose unsupported feature policy selection.
+- AC-371: The modern UI `Decomposition` configuration exposes an `Ignore violations` checkbox, off by default. When it is on, decomposition includes tests that parsing reported as violations.
 - AC-200: The modern UI parsing violation viewer shows the violation target using `ClassName.methodName` format when a method is present.
 - AC-201: The modern UI parsing violation viewer shows the code snippet for the displayed violation without an extra card-style white background.
 - AC-202: The modern UI `Decomposition` center shows a summary with the number of classes with class-level violations, tests with method-level violations, tests excluded by violations, and accepted tests.
@@ -485,7 +487,8 @@ Acceptance criteria:
 - AC-303: If a completed pipeline is reset by rerunning an earlier stage, the modern UI hides the `Analitycs` button again.
 - AC-304: The modern UI `Analitycs` toolbar button uses light purple when not selected and dark purple when selected.
 - AC-305: The modern UI `Analitycs` center shows an original-code table with original test class and test method counts split by violation status.
-- AC-306: The modern UI `Analitycs` center shows an original-vs-refactored table whose original test-class and test-method counts match the corresponding "without violations" rows in the original-code table.
+- AC-306: The modern UI `Analitycs` center shows an original-vs-refactored table whose original test-class and test-method counts match the tests that were decomposed. When Ignore violations is off, those counts match the corresponding "without violations" rows in the original-code table.
+- AC-372: After writing, analytics still completes when Ignore violations included tests that parsing reported as violations. The comparison original baseline is those decomposed tests, not the eligibility-only subset.
 - AC-307: The modern UI `Analitycs` comparison includes only test classes, test methods, setup methods, and fields.
 - AC-308: Modern analytics is exposed through a `TestCodeAnalytics` interface in the `core.modern.analytics` package.
 - AC-309: After writing, the modern UI obtains analytics by passing the parsed original test classes, decomposed accepted test cases, and refactored test classes to a `TestCodeAnalytics` implementation.
@@ -861,5 +864,7 @@ The current clustering implementation requires the matrix size, test case by ind
 - 2026-08-23: Parsing lists files by path. Decomposition orders test classes by package and class name, and helper classes by package and file name.
 - 2026-08-23: Parsing violation descriptions no longer start with `Unsupported`.
 - 2026-08-23: Helper classes (no `@Test`) are not checked against the refactoring-safe subset, so constructors and similar constructs are not reported as violations.
+- 2026-08-24: The modern UI `Decomposition` configuration exposes `Ignore violations`. When enabled, decomposition still includes tests that have parsing violations so refactoring can proceed.
+- 2026-08-24: Analytics comparison uses the decomposed tests as the original baseline, so Ignore violations does not fail after writing.
 - 2026-05-12: Confirmed that modern UI sidebar stages without visible configuration controls should align their primary action button with the first visible loading control and the refactoring action.
 - 2026-05-12: Confirmed the modern UI writing sidebar output folder chooser, default `output/writer` folder, and selected-folder write behavior.

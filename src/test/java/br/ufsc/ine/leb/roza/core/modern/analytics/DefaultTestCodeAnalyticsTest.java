@@ -115,6 +115,23 @@ class DefaultTestCodeAnalyticsTest {
 		assertEquals(0, report.comparison().original().duplicatedStatements());
 	}
 
+	@Test
+	void shouldCompareDecomposedTestsWhenParsingViolationsWereIgnored() {
+		TestClass rejected = testClass("RejectedTest", 1, 0, "rejectedTest");
+		ParsedTestClasses original = new ParsedTestClasses(
+				List.of(rejected),
+				List.of(new TestCodeViolation(ViolationScope.TEST_CLASS, "RejectedTest", "unsupported class")));
+		DecomposedTestCases accepted = new DecomposedTestCases(List.of(
+				new TestCase("rejectedTest", block("assertTrue(true);"), rejected, List.of(annotation("Test")))));
+
+		TestCodeAnalyticsReport report = new DefaultTestCodeAnalytics().analyze(original, accepted, new RefactoredTestClasses(List.of(rejected)));
+
+		assertEquals(1, report.original().testClassesWithViolations());
+		assertEquals(0, report.original().testMethodsWithoutViolations());
+		assertEquals(1, report.comparison().original().testClasses());
+		assertEquals(1, report.comparison().original().testMethods());
+	}
+
 	private TestClass testClass(String name, int fields, int fixtures, String... tests) {
 		return new TestClass(
 				name,

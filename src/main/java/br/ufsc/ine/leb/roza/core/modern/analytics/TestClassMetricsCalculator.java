@@ -29,7 +29,7 @@ public final class TestClassMetricsCalculator {
 	}
 
 	public static TestClassMetrics forEligibleSetupCode(ParsedTestClasses parsedTestClasses, DecomposedTestCases acceptedTestCases) {
-		List<TestClass> acceptedClasses = AcceptedTestClassProjection.project(parsedTestClasses);
+		List<TestClass> acceptedClasses = AcceptedTestClassProjection.project(parsedTestClasses, acceptedTestCases);
 		assertAcceptedTestCount(acceptedClasses, acceptedTestCases);
 		return forSetupCode(acceptedClasses);
 	}

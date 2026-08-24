@@ -18,10 +18,20 @@ import br.ufsc.ine.leb.roza.core.modern.parsing.TestMethod;
 
 public final class DefaultTestCaseDecomposer implements TestCaseDecomposer {
 
+	private final boolean ignoreViolations;
+
+	public DefaultTestCaseDecomposer() {
+		this(false);
+	}
+
+	public DefaultTestCaseDecomposer(boolean ignoreViolations) {
+		this.ignoreViolations = ignoreViolations;
+	}
+
 	@Override
 	public DecomposedTestCases decompose(ParsedTestClasses parsedTestClasses) {
 		List<TestCase> testCases = new ArrayList<>();
-		TestCodeEligibility eligibility = new TestCodeEligibility(parsedTestClasses.violations());
+		TestCodeEligibility eligibility = TestCodeEligibility.of(parsedTestClasses.violations(), ignoreViolations);
 		for (TestClass testClass : parsedTestClasses.testClasses()) {
 			if (!eligibility.accepts(testClass)) {
 				continue;

@@ -238,7 +238,7 @@ The first modern UI slice uses JavaFX 17.x while the project remains on Java 11.
 - DEC-120: `ImplicitSetupTestClassRefactorer` rewrites moved local array declarations as explicit array creation assignments in generated setup methods.
 - DEC-121: The authoritative catalog of modern parsing violations (`TestCodeViolation` texts and examples) lives in `docs/violations.md`. Any change to `JavaUnsupportedFeatureValidator` must update that document in the same change so agents and humans stay aligned.
 - DEC-122: The modern UI `Analitycs` tab is a post-pipeline view: it appears only after `Writing` completes, uses purple toolbar states, and disappears when an earlier stage rerun resets the pipeline.
-- DEC-123: The modern UI `Analitycs` comparison reuses the original-code table's "without violations" counts for original test classes and test methods, so both tables report the same original baseline for those metrics.
+- DEC-123: The modern UI `Analitycs` comparison uses the decomposed tests as the original baseline. When Ignore violations is off, that baseline matches the original-code table's "without violations" counts.
 - DEC-124: Modern analytics calculations live behind the `TestCodeAnalytics` interface in `core.modern.analytics`; the UI supplies parsed original classes, decomposed accepted test cases, and refactored classes after writing and only renders the returned report.
 - DEC-125: `DiceMatchSimilarity` is the shared Dice normalization `(2 × m) / (|α| + |β|)` used by LCCSS, GAP, MAP, LCS, and CCS; it is not itself a metric name.
 - DEC-130: Experiment `i` emits `refactored-by-level.csv` for LCCSS, plus decomposed/source-partition controls and an automatic best-level summary.
@@ -263,6 +263,8 @@ The first modern UI slice uses JavaFX 17.x while the project remains on Java 11.
 - DEC-151: `FileSystemTestClassWriter` empties the configured output folder before writing so leftover files from a previous run do not remain.
 - DEC-152: The modern UI `Decomposition` tab shows `Test classes`, then `Helper classes` with source code only, and `Violations` ordered by description. Test classes are ordered by package then class name. Helper classes are ordered by package then file name. The decomposition metrics table ends with `Helper files`. After refactoring, existing parsed helper classes are kept alongside created helpers.
 - DEC-154: The modern UI `Parsing` list is ordered by path. `Decomposition` test classes are ordered by package then class name, and helper classes by package then file name. `Measurement` tests are ordered by method name. `Writing` class lists use natural name order. Numbered suffixes follow numeric order (`TestClass2` before `TestClass10`).
+- DEC-156: Ignore violations is a decomposition-sidebar option. It does not hide recorded violations. It only disables eligibility filtering so those tests can continue through measurement, clustering, and refactoring. Methods that parsing never extracted as `TestMethod` remain absent. Analytics comparison projects original classes from the decomposed tests, not from `TestCodeEligibility`, so the before/after baseline stays aligned when violations are ignored.
+
 ## Hypotheses
 
 - HYP-001: The pipeline can likely remain abstract and flexible if the generic core stops at stage contracts and each concrete purpose is isolated in implementations, especially in measurement, clustering, and refactoring. The first vertical slice should stay anchored in implicit-setup regrouping to prevent premature abstractions.
@@ -395,3 +397,4 @@ The first modern UI slice uses JavaFX 17.x while the project remains on Java 11.
 - 2026-08-23: Parsing lists files by path. Decomposition orders test classes by package then name, and helper classes by package then file name (DEC-154).
 - 2026-08-23: Parsing violation descriptions drop the `Unsupported` prefix (DEC-121).
 - 2026-08-23: Helper classes are not checked against the refactoring-safe subset (DEC-148).
+- 2026-08-24: The modern UI `Decomposition` tab can ignore violations so those tests still enter the rest of the pipeline, and analytics compares that same decomposed set (DEC-156).

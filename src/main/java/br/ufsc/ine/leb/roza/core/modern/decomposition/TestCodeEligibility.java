@@ -14,6 +14,14 @@ public final class TestCodeEligibility {
 	private final Set<String> excludedClasses;
 	private final Set<String> excludedMethods;
 
+	public static TestCodeEligibility of(List<TestCodeViolation> violations, boolean ignoreViolations) {
+		return ignoreViolations ? ignoringViolations() : new TestCodeEligibility(violations);
+	}
+
+	public static TestCodeEligibility ignoringViolations() {
+		return new TestCodeEligibility(List.of());
+	}
+
 	public TestCodeEligibility(List<TestCodeViolation> violations) {
 		excludedClasses = new HashSet<>();
 		excludedMethods = new HashSet<>();
