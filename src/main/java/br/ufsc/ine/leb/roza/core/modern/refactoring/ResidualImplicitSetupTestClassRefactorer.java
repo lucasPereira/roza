@@ -39,7 +39,7 @@ public final class ResidualImplicitSetupTestClassRefactorer implements TestClass
 			testClasses.add(residual.toTestClass());
 		}
 		testClasses.addAll(extracted);
-		return new RefactoredTestClasses(testClasses);
+		return new RefactoredTestClasses(testClasses, OriginalHelperClassExtractor.helperClasses(clusters));
 	}
 
 	private static final class ResidualSource {
@@ -70,7 +70,7 @@ public final class ResidualImplicitSetupTestClassRefactorer implements TestClass
 					source.setupAnnotation().orElse(null),
 					source.fields(),
 					source.fixtures(),
-					source.helperMethods(),
+					List.of(),
 					methods);
 		}
 	}

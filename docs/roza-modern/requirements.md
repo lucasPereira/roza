@@ -338,20 +338,23 @@ Acceptance criteria:
 - AC-320: A second concrete refactoring implementation is named `ResidualImplicitSetupTestClassRefactorer`.
 - AC-321: `ResidualImplicitSetupTestClassRefactorer` refactors clusters with two or more tests using the same implicit-setup extraction as `ImplicitSetupTestClassRefactorer`.
 - AC-322: `ResidualImplicitSetupTestClassRefactorer` does not create a generated class for a cluster that contains only one test.
-- AC-323: Singleton leftover tests from the same original class remain together in a residual class that preserves that class's name, package, imports, fields, fixtures, helpers, and the original leftover test methods.
+- AC-323: Singleton leftover tests from the same original class remain together in a residual class that preserves that class's name, package, imports, fields, fixtures, and the original leftover test methods.
 - AC-324: Residual classes omit tests that were extracted into multi-test implicit-setup classes.
 - AC-325: Residual classes use the original parsed test method bodies rather than the decomposed inlined setup bodies.
 - AC-341: A third concrete refactoring implementation is named `DelegatedSetupTestClassRefactorer`.
 - AC-342: `DelegatedSetupTestClassRefactorer` keeps tests in their original classes and does not move tests into new test classes.
 - AC-343: `DelegatedSetupTestClassRefactorer` extracts extractable contiguous arrange runs shared by at least two tests in a cluster into static helper methods. A test that does not contain a selected run is left unchanged for that run.
 - AC-375: A cluster that also contains a test with no matching arrange still receives a helper class when at least two other tests share an extractable run.
-- AC-344: Singleton clusters remain unchanged and do not receive a helper class.
+- AC-344: Singleton clusters do not receive a created `HelperClassN`. Original helper methods on those classes are still moved per AC-380.
 - AC-345: Each multi-test cluster with at least one extractable run receives one public helper class named `HelperClassN`.
 - AC-346: Helper methods are static, named `setup1`, `setup2`, and so on, take live-ins as parameters, and are `void` or return the single live-out.
 - AC-347: Created helper classes are emitted in Java's default package. Existing helper classes keep the packages they were parsed with.
 - AC-348: The first delegated-setup slice does not rewrite fields or `@Before` fixtures and does not combine with implicit-setup refactoring in the same run.
 - AC-369: `DelegatedSetupTestClassRefactorer` extracts and rewrites original test method bodies, not decomposed bodies that inline fields or `@Before`.
 - AC-373: `DelegatedSetupTestClassRefactorer` keeps only tests that entered clustering in each original class, so ineligible methods do not remain in the refactored class.
+- AC-380: When clustered tests come from source classes that contain helper methods, every refactoring strategy moves those helpers onto one helper class per original test class instead of keeping them on generated, residual, or rewritten test classes.
+- AC-381: Extracted original helper classes are named `{OriginalClassName}Helpers`, live in Java's default package, keep the original helper method signatures and bodies, and do not rewrite helper call sites in tests or fixtures.
+- AC-382: Because call sites are left unchanged, the refactored code may not compile. The extraction is assumed as done so regrouped tests can use the moved helpers.
 
 ### REQ-014: Writing Stage
 
@@ -877,5 +880,6 @@ The current clustering implementation requires the matrix size, test case by ind
 - 2026-08-24: Delegated setup extracts arrange runs shared by at least two tests in a cluster. The modern UI Top ranking scores levels with the selected refactoring strategy, including helper classes.
 - 2026-08-24: The modern UI Top ranking for delegated setup reuses cluster extractions and always re-enables the Top button when ranking finishes.
 - 2026-08-24: Renamed the implicit-setup strategies to `Implicit setup` and `Residual implicit setup`; the residual implementation is `ResidualImplicitSetupTestClassRefactorer`.
+- 2026-08-24: When Ignore violations lets helper methods enter refactoring, those methods are moved to `{OriginalClassName}Helpers` classes. Call sites stay unchanged, so the result may not compile.
 - 2026-05-12: Confirmed that modern UI sidebar stages without visible configuration controls should align their primary action button with the first visible loading control and the refactoring action.
 - 2026-05-12: Confirmed the modern UI writing sidebar output folder chooser, default `output/writer` folder, and selected-folder write behavior.

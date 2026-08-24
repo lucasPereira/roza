@@ -2,6 +2,7 @@ package br.ufsc.ine.leb.roza.core.modern.refactoring;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 import java.util.Optional;
@@ -103,7 +104,7 @@ class ResidualImplicitSetupTestClassRefactorerTest {
 	}
 
 	@Test
-	void shouldPreserveOriginalHelpersOnResidualClasses() {
+	void shouldMoveOriginalHelpersToASeparateHelperClass() {
 		HelperMethod helper = new HelperMethod(
 				List.of("private"),
 				"Sut",
@@ -122,10 +123,15 @@ class ResidualImplicitSetupTestClassRefactorerTest {
 				List.of(originalTest("alpha", "sut.save(1);", "assertTrue(sut.exists());")));
 		TestCase alpha = decomposed("alpha", source, "Sut sut = createSut();", "sut.save(1);", "assertTrue(sut.exists());");
 
-		TestClass residual = refactor(new TestCaseCluster(0, alpha)).testClasses().get(0);
+		RefactoredTestClasses refactored = refactor(new TestCaseCluster(0, alpha));
+		TestClass residual = refactored.testClasses().get(0);
 
-		assertEquals(1, residual.helperMethods().size());
-		assertEquals("createSut", residual.helperMethods().get(0).name());
+		assertTrue(residual.helperMethods().isEmpty());
+		assertEquals(1, refactored.helperClasses().size());
+		assertEquals("ExampleHelpers", refactored.helperClasses().get(0).name());
+		assertTrue(refactored.helperClasses().get(0).packageName().isEmpty());
+		assertEquals("createSut", refactored.helperClasses().get(0).helperMethods().get(0).name());
+		assertEquals("sut = createSut();", residual.fixtures().get(0).body().statements().get(0).normalizedText());
 	}
 
 	@Test

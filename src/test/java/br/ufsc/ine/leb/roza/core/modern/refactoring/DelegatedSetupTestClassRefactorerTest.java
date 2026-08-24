@@ -122,6 +122,39 @@ class DelegatedSetupTestClassRefactorerTest {
 		assertEquals(List.of("login();", "assertTrue(true);"), refactored.testClasses().get(0).testMethods().get(0).body().statements().stream().map(CodeStatement::normalizedText).collect(Collectors.toList()));
 	}
 
+	@Test
+	void shouldMoveOriginalHelpersToASeparateHelperClassAlongsideCreatedHelpers() {
+		HelperMethod originalHelper = new HelperMethod(
+				List.of("private"),
+				"Sut",
+				"createSut",
+				List.of(),
+				List.of(),
+				new CodeBlock(List.of(new CodeStatement("return new Sut();", "return new Sut();"))));
+		TestClass source = new TestClass(
+				"Example",
+				"example.tests",
+				List.of(),
+				null,
+				List.of(),
+				List.of(),
+				List.of(originalHelper),
+				List.of(
+						testMethod("alpha", "login();", "assertTrue(true);"),
+						testMethod("beta", "login();", "assertFalse(false);")));
+		TestCase first = testCase("alpha", source, "login();", "assertTrue(true);");
+		TestCase second = testCase("beta", source, "login();", "assertFalse(false);");
+
+		RefactoredTestClasses refactored = new DelegatedSetupTestClassRefactorer().refactor(new TestCaseClusters(List.of(
+				new TestCaseCluster(0, first).merge(new TestCaseCluster(1, second)))));
+
+		assertTrue(refactored.testClasses().get(0).helperMethods().isEmpty());
+		assertEquals(List.of("ExampleHelpers", "HelperClass1"), refactored.helperClasses().stream().map(TestClass::name).collect(Collectors.toList()));
+		assertEquals("createSut", refactored.helperClasses().get(0).helperMethods().get(0).name());
+		assertEquals("setup1", refactored.helperClasses().get(1).helperMethods().get(0).name());
+		assertEquals("HelperClass1.setup1();", refactored.testClasses().get(0).testMethods().get(0).body().statements().get(0).normalizedText());
+	}
+
 	private TestCase testCase(String name, TestClass source, String... statements) {
 		List<CodeStatement> coded = List.of(statements).stream().map(this::statement).collect(Collectors.toList());
 		if (coded.get(coded.size() - 1).normalizedText().startsWith("assert")) {

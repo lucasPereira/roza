@@ -42,7 +42,7 @@ public final class DelegatedSetupTestClassRefactorer implements TestClassRefacto
 		Map<String, TestClass> originalClasses = new LinkedHashMap<>();
 		Map<String, CodeBlock> rewrittenBodies = new LinkedHashMap<>();
 		Set<String> acceptedMethods = new LinkedHashSet<>();
-		List<TestClass> helpers = new ArrayList<>();
+		List<TestClass> helpers = new ArrayList<>(OriginalHelperClassExtractor.helperClasses(clusters));
 		int helperIndex = 1;
 		for (TestCaseCluster cluster : clusters.clusters()) {
 			for (TestCase testCase : cluster.testCases()) {
@@ -92,7 +92,7 @@ public final class DelegatedSetupTestClassRefactorer implements TestClassRefacto
 				source.setupAnnotation().orElse(null),
 				source.fields(),
 				source.fixtures(),
-				source.helperMethods(),
+				List.of(),
 				methods);
 	}
 

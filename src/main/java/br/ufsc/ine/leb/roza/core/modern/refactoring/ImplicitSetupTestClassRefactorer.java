@@ -12,7 +12,6 @@ import br.ufsc.ine.leb.roza.core.modern.parsing.CodeStatement;
 import br.ufsc.ine.leb.roza.core.modern.parsing.Field;
 import br.ufsc.ine.leb.roza.core.modern.parsing.FixtureKind;
 import br.ufsc.ine.leb.roza.core.modern.parsing.FixtureMethod;
-import br.ufsc.ine.leb.roza.core.modern.parsing.HelperMethod;
 import br.ufsc.ine.leb.roza.core.modern.parsing.SetupAnnotation;
 import br.ufsc.ine.leb.roza.core.modern.parsing.TestClass;
 import br.ufsc.ine.leb.roza.core.modern.parsing.TestMethod;
@@ -28,7 +27,7 @@ public final class ImplicitSetupTestClassRefactorer implements TestClassRefactor
 			testClasses.add(refactor(cluster.testCases(), "TestClass" + classIndex));
 			classIndex++;
 		}
-		return new RefactoredTestClasses(testClasses);
+		return new RefactoredTestClasses(testClasses, OriginalHelperClassExtractor.helperClasses(clusters));
 	}
 
 	TestClass refactor(List<TestCase> testCases, String className) {
@@ -60,7 +59,7 @@ public final class ImplicitSetupTestClassRefactorer implements TestClassRefactor
 				setupAnnotation,
 				hasSetup ? extracted.fields() : List.of(),
 				fixtures,
-				List.<HelperMethod>of(),
+				List.of(),
 				testMethods);
 	}
 
@@ -100,7 +99,7 @@ public final class ImplicitSetupTestClassRefactorer implements TestClassRefactor
 				setupAnnotation,
 				fields,
 				fixtures,
-				source.helperMethods(),
+				List.of(),
 				testMethods);
 	}
 
