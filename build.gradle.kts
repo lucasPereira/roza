@@ -58,6 +58,11 @@ sourceSets {
     }
 }
 
+sourceSets.named("test") {
+    compileClasspath += sourceSets["expt"].output
+    runtimeClasspath += sourceSets["expt"].output
+}
+
 dependencies {
     implementation("com.github.javaparser:javaparser-core:3.26.4")
 
@@ -218,6 +223,13 @@ registerExperimentTask(
     "runExperimentM",
     "Runs experiment m, the bookstore use case that can be refactored by implicit setup and by delegated setup.",
     "br.ufsc.ine.leb.roza.expt.m.Experiment",
+)
+
+registerExperimentTask(
+    "runExperimentN",
+    "Runs experiment n, which compares implicit, residual, and delegated setup across external projects and Róża.",
+    "br.ufsc.ine.leb.roza.expt.n.Experiment",
+    maxHeapSize = "16g",
 )
 
 spotless {
