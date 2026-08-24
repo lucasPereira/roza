@@ -17,7 +17,7 @@ This document stores evolving knowledge discovered while designing and implement
 - `CodeFile`: a concrete raw loaded code file class. Its minimum confirmed API exposes raw textual content through `content()`. Other attributes remain undefined until confirmed requirements make them necessary.
 - Parsing stage: the second modern Róża pipeline stage; it reads loaded raw code files and creates ASTs for identified test classes.
 - `TestClassParser`: the parsing stage interface.
-- `JunitTestClassParser`: the first concrete modern parser implementation. It parses Java source code for a conservative JUnit subset, while JavaParser remains an internal implementation detail.
+- `JunitTestClassParser`: the first concrete modern parser implementation. It parses Java source code for a conservative JUnit subset, while JavaParser remains an internal implementation detail. It uses JavaParser 3.26.4 at language level JAVA_17 so records parse. Nested records are extracted onto `TestClass` and rendered. A file that still cannot be parsed becomes a class-level parse-error violation and does not abort the remaining files.
 - `JunitAssertionMethods`: the internal supported assertion method list for JUnit 4, current JUnit Jupiter, and Hamcrest `assertThat`, shared by the parser and unsupported-feature validator.
 - `ParsedTestClasses`: the result returned by `TestClassParser.parse`; it exposes `TestClass` instances through `testClasses()`.
 - `UnsupportedFeaturePolicy`: the parser policy for unsupported Java test-code features. `SAFE` fails with a clear error; `UNSAFE` records diagnostics and skips unsupported input.
@@ -229,6 +229,8 @@ The first modern UI slice uses JavaFX 17.x while the project remains on Java 11.
 - DEC-168: Top ranking walks consecutive clustering levels and scores only clusters that appeared or disappeared. Setup-duplication frequencies are updated from those clusters' setup projections. Original helper classes and delegated source fields/fixtures are counted once. Residual implicit setup counts original fields and `@Before` while leftover singletons of that source remain.
 - DEC-169: Clearing measurement or clustering results zeros the Measure, Cluster, and Top ranking progress bars so a later pipeline restart does not show a completed bar.
 - DEC-166: When helper methods appear on source test classes that entered refactoring, they are moved to `{OriginalClassName}Helpers` classes so regrouped tests can use them. Call sites are not rewritten, so the output may not compile.
+- DEC-170: `JunitTestClassParser` records a class-level `Parse error` violation when JavaParser cannot parse a file and continues with the remaining loaded files. The unparseable file is not extracted as a `TestClass`.
+- DEC-171: JavaParser is 3.26.4 at language level JAVA_17. Nested records are extracted as `TestClass.nestedTypes()` and copied through implicit, residual, and delegated refactoring so Ignore violations can emit compiling classes. Nested and local records remain subset violations. Gson `Java17RecordTest` is the observed case.
 - DEC-105: Divisive hierarchical clustering is registered as future work, not part of the first clustering slice.
 - DEC-106: `TestClass` exposes original import declarations because refactoring and rendering need to carry source-class context into generated classes.
 - DEC-107: Parsing defines each `TestClass` setup annotation for generated implicit setup. It reuses an existing supported fixture annotation when present; otherwise it infers `@BeforeEach` from JUnit 5 `@Test` usage and `@Before` otherwise.
@@ -424,3 +426,4 @@ The first modern UI slice uses JavaFX 17.x while the project remains on Java 11.
 - 2026-08-24: Restarting the pipeline from Loading, Parsing, or Decomposition resets stage progress bars (DEC-169).
 - 2026-08-24: Original helper methods on source test classes are moved to `{OriginalClassName}Helpers` during refactoring, without rewriting call sites (DEC-166).
 - 2026-08-24: Duplicate test names from different source classes that land in the same cluster keep the first original name and prefix the later ones (DEC-117). Cobertura's two `testSearchJarsForSourceInJar` methods are the observed case.
+- 2026-08-24: Unparseable files become parse-error violations instead of aborting the whole parsing stage (DEC-170). Java 17 records parse, nested records are extracted and rendered, and Ignore violations can emit compiling Gson record tests (DEC-171).

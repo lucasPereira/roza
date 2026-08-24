@@ -5,8 +5,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
-import com.github.javaparser.JavaParser;
+import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
@@ -16,7 +17,12 @@ import com.github.javaparser.ast.expr.SimpleName;
 import com.github.javaparser.ast.expr.VariableDeclarationExpr;
 import com.github.javaparser.ast.stmt.ExpressionStmt;
 import com.github.javaparser.ast.type.Type;
-import com.github.javaparser.printer.PrettyPrinterConfiguration;
+import com.github.javaparser.printer.DefaultPrettyPrinter;
+import com.github.javaparser.printer.configuration.DefaultConfigurationOption;
+import com.github.javaparser.printer.configuration.DefaultPrinterConfiguration;
+import com.github.javaparser.printer.configuration.DefaultPrinterConfiguration.ConfigOption;
+import com.github.javaparser.printer.configuration.Indentation;
+import com.github.javaparser.printer.configuration.Indentation.IndentType;
 
 import br.ufsc.ine.leb.roza.core.legacy.Field;
 import br.ufsc.ine.leb.roza.core.legacy.SetupMethod;
@@ -39,7 +45,7 @@ public class JunitTestClassParser implements TestClassParser {
 	public final List<TestClass> parse(List<TextFile> files) {
 		List<TestClass> testClasses = new LinkedList<>();
 		files.forEach((file) -> {
-			CompilationUnit compilationUnit = JavaParser.parse(file.getContent());
+			CompilationUnit compilationUnit = StaticJavaParser.parse(file.getContent());
 			Optional<ClassOrInterfaceDeclaration> parsedTestClass = compilationUnit.findFirst(ClassOrInterfaceDeclaration.class);
 			String name = parsedTestClass.orElseThrow().getNameAsString();
 			List<Field> fields = extractFields(parsedTestClass.orElseThrow());
@@ -94,17 +100,14 @@ public class JunitTestClassParser implements TestClassParser {
 	}
 
 	private List<Statement> extractStatements(MethodDeclaration parsedMethod) {
-		PrettyPrinterConfiguration configuration = new PrettyPrinterConfiguration();
-		configuration.setEndOfLineCharacter(" ");
-		configuration.setIndentSize(0);
-		configuration.setPrintComments(false);
+		DefaultPrettyPrinter printer = compactPrinter();
 		List<Statement> statements = new LinkedList<>();
 		parsedMethod.getBody().orElseThrow().getStatements().forEach(statement -> {
 			if (statement.isExpressionStmt()) {
 				ExpressionStmt expression = statement.asExpressionStmt();
 				List<VariableDeclarationExpr> variableDeclarations = expression.findAll(VariableDeclarationExpr.class);
 				if (variableDeclarations.isEmpty()) {
-					statements.add(new Statement(statement.toString(configuration)));
+					statements.add(new Statement(print(printer, statement)));
 				} else {
 					variableDeclarations.forEach(variableDeclaration -> {
 						Type type = variableDeclaration.getElementType();
@@ -113,15 +116,27 @@ public class JunitTestClassParser implements TestClassParser {
 							Optional<Expression> initializer = variable.getInitializer();
 							VariableDeclarationExpr newStatement;
 							newStatement = initializer.map(value -> new VariableDeclarationExpr(new VariableDeclarator(type, name, value))).orElseGet(() -> new VariableDeclarationExpr(new VariableDeclarator(type, name)));
-							statements.add(new Statement(newStatement.toString(configuration) + ";"));
+							statements.add(new Statement(print(printer, newStatement) + ";"));
 						});
 					});
 				}
 			} else {
-				statements.add(new Statement(statement.toString(configuration)));
+				statements.add(new Statement(print(printer, statement)));
 			}
 		});
 		return statements;
+	}
+
+	private static DefaultPrettyPrinter compactPrinter() {
+		DefaultPrinterConfiguration configuration = new DefaultPrinterConfiguration();
+		configuration.addOption(new DefaultConfigurationOption(ConfigOption.END_OF_LINE_CHARACTER, " "));
+		configuration.addOption(new DefaultConfigurationOption(ConfigOption.INDENTATION, new Indentation(IndentType.SPACES, 0)));
+		configuration.addOption(new DefaultConfigurationOption(ConfigOption.PRINT_COMMENTS, false));
+		return new DefaultPrettyPrinter(configuration);
+	}
+
+	private static String print(DefaultPrettyPrinter printer, Node node) {
+		return printer.print(node);
 	}
 
 }

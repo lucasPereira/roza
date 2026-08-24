@@ -93,7 +93,8 @@ public final class DelegatedSetupTestClassRefactorer implements TestClassRefacto
 				source.fields(),
 				source.fixtures(),
 				List.of(),
-				methods);
+				methods,
+				source.nestedTypes());
 	}
 
 	private TestClass helperClass(String name, List<String> imports, List<ExtractableArrangeRun> runs) {

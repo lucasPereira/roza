@@ -52,6 +52,7 @@ public final class ImplicitSetupTestClassRefactorer implements TestClassRefactor
 		List<TestMethod> testMethods = testCases.size() > 1
 				? SetupExtractionSupport.testMethods(testCases, sharedPrefixSize)
 				: List.of(singleTestMethod(testCases.get(0)));
+		List<String> nestedTypes = homogeneousSource(testCases).map(TestClass::nestedTypes).orElse(List.of());
 		return new TestClass(
 				className,
 				null,
@@ -60,7 +61,8 @@ public final class ImplicitSetupTestClassRefactorer implements TestClassRefactor
 				hasSetup ? extracted.fields() : List.of(),
 				fixtures,
 				List.of(),
-				testMethods);
+				testMethods,
+				nestedTypes);
 	}
 
 	private TestClass refactorKeepingSourceSetup(
@@ -100,7 +102,8 @@ public final class ImplicitSetupTestClassRefactorer implements TestClassRefactor
 				fields,
 				fixtures,
 				List.of(),
-				testMethods);
+				testMethods,
+				source.nestedTypes());
 	}
 
 	private Optional<TestClass> homogeneousSource(List<TestCase> testCases) {

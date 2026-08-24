@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.expr.VariableDeclarationExpr;
 import com.github.javaparser.ast.stmt.ExpressionStmt;
@@ -14,6 +13,7 @@ import com.github.javaparser.ast.stmt.ExpressionStmt;
 import br.ufsc.ine.leb.roza.core.modern.decomposition.TestCase;
 import br.ufsc.ine.leb.roza.core.modern.parsing.CodeBlock;
 import br.ufsc.ine.leb.roza.core.modern.parsing.CodeStatement;
+import br.ufsc.ine.leb.roza.core.modern.parsing.ConfiguredJavaParser;
 import br.ufsc.ine.leb.roza.core.modern.parsing.Field;
 import br.ufsc.ine.leb.roza.core.modern.parsing.SetupAnnotation;
 import br.ufsc.ine.leb.roza.core.modern.parsing.TestMethod;
@@ -136,7 +136,7 @@ public final class SetupExtractionSupport {
 
 	private static Optional<VariableDeclarationExpr> variableDeclaration(CodeStatement statement) {
 		try {
-			ExpressionStmt expression = JavaParser.parseStatement(statement.normalizedText()).asExpressionStmt();
+			ExpressionStmt expression = ConfiguredJavaParser.parseStatement(statement.normalizedText()).asExpressionStmt();
 			return expression.getExpression().toVariableDeclarationExpr();
 		} catch (RuntimeException exception) {
 			return Optional.empty();

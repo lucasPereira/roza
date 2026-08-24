@@ -3,7 +3,6 @@ package br.ufsc.ine.leb.roza.core.modern.parsing;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
-import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
@@ -29,12 +28,12 @@ public final class ViolationContextExtractor {
 	}
 
 	private Optional<String> extractClassCode(CodeFile codeFile, String qualifiedClassName) {
-		CompilationUnit unit = JavaParser.parse(codeFile.content());
+		CompilationUnit unit = ConfiguredJavaParser.parseCompilationUnit(codeFile.content());
 		return findType(unit, qualifiedClassName).map(ClassOrInterfaceDeclaration::toString);
 	}
 
 	private Optional<String> extractMethodCode(CodeFile codeFile, String qualifiedClassName, String methodName) {
-		CompilationUnit unit = JavaParser.parse(codeFile.content());
+		CompilationUnit unit = ConfiguredJavaParser.parseCompilationUnit(codeFile.content());
 		return findType(unit, qualifiedClassName)
 				.flatMap(type -> type.getMethodsByName(methodName).stream().findFirst().map(MethodDeclaration::toString));
 	}
@@ -54,9 +53,13 @@ public final class ViolationContextExtractor {
 			if (!classDeclaration.matcher(codeFile.content()).find()) {
 				continue;
 			}
-			CompilationUnit unit = JavaParser.parse(codeFile.content());
-			if (findType(unit, qualifiedClassName).isPresent()) {
-				return Optional.of(codeFile);
+			try {
+				CompilationUnit unit = ConfiguredJavaParser.parseCompilationUnit(codeFile.content());
+				if (findType(unit, qualifiedClassName).isPresent()) {
+					return Optional.of(codeFile);
+				}
+			} catch (RuntimeException exception) {
+				continue;
 			}
 		}
 		return Optional.empty();

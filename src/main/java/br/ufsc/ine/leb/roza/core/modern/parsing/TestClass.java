@@ -14,6 +14,7 @@ public final class TestClass {
 	private final List<FixtureMethod> fixtures;
 	private final List<HelperMethod> helperMethods;
 	private final List<TestMethod> testMethods;
+	private final List<String> nestedTypes;
 
 	public TestClass(String name, List<Field> fields, List<FixtureMethod> fixtures, List<HelperMethod> helperMethods, List<TestMethod> testMethods) {
 		this(name, null, List.of(), null, fields, fixtures, helperMethods, testMethods);
@@ -39,6 +40,19 @@ public final class TestClass {
 			List<FixtureMethod> fixtures,
 			List<HelperMethod> helperMethods,
 			List<TestMethod> testMethods) {
+		this(name, packageName, imports, setupAnnotation, fields, fixtures, helperMethods, testMethods, List.of());
+	}
+
+	public TestClass(
+			String name,
+			String packageName,
+			List<String> imports,
+			SetupAnnotation setupAnnotation,
+			List<Field> fields,
+			List<FixtureMethod> fixtures,
+			List<HelperMethod> helperMethods,
+			List<TestMethod> testMethods,
+			List<String> nestedTypes) {
 		this.name = Objects.requireNonNull(name);
 		this.packageName = packageName;
 		this.imports = List.copyOf(Objects.requireNonNull(imports));
@@ -47,6 +61,7 @@ public final class TestClass {
 		this.fixtures = List.copyOf(Objects.requireNonNull(fixtures));
 		this.helperMethods = List.copyOf(Objects.requireNonNull(helperMethods));
 		this.testMethods = List.copyOf(Objects.requireNonNull(testMethods));
+		this.nestedTypes = List.copyOf(Objects.requireNonNull(nestedTypes));
 	}
 
 	public String name() {
@@ -88,6 +103,10 @@ public final class TestClass {
 		return testMethods;
 	}
 
+	public List<String> nestedTypes() {
+		return nestedTypes;
+	}
+
 	public boolean isHelperClass() {
 		return testMethods.isEmpty();
 	}
@@ -96,6 +115,6 @@ public final class TestClass {
 		if (packageName == null) {
 			return this;
 		}
-		return new TestClass(name, null, imports, setupAnnotation, fields, fixtures, helperMethods, testMethods);
+		return new TestClass(name, null, imports, setupAnnotation, fields, fixtures, helperMethods, testMethods, nestedTypes);
 	}
 }

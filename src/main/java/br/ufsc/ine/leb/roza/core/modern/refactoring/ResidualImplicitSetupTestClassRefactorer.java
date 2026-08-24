@@ -71,7 +71,8 @@ public final class ResidualImplicitSetupTestClassRefactorer implements TestClass
 					source.fields(),
 					source.fixtures(),
 					List.of(),
-					methods);
+					methods,
+					source.nestedTypes());
 		}
 	}
 

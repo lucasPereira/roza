@@ -17,6 +17,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import br.ufsc.ine.leb.roza.core.modern.loading.CodeFile;
 import br.ufsc.ine.leb.roza.core.modern.loading.LoadedCodeFiles;
+import br.ufsc.ine.leb.roza.core.modern.refactoring.JunitTestClassRenderer;
 
 class JunitTestClassParserTest {
 
@@ -35,6 +36,49 @@ class JunitTestClassParserTest {
 		assertEquals(0, parsed.violations().size());
 		assertTrue(parsed.testClasses().get(0).isHelperClass());
 		assertEquals("helper", parsed.testClasses().get(0).helperMethods().get(0).name());
+	}
+
+	@Test
+	void shouldParseLocalRecordInsideTestMethod() {
+		ParsedTestClasses parsed = parse("class Example { @Test public void test() { record LocalRecord(int i) {} assertTrue(true); } }");
+
+		assertEquals(1, parsed.testClasses().size());
+		assertEquals("Example", parsed.testClasses().get(0).name());
+		assertEquals(1, parsed.testClasses().get(0).testMethods().size());
+		assertTrue(parsed.testClasses().get(0).testMethods().get(0).body().statements().stream().anyMatch(statement -> statement.normalizedText().contains("record LocalRecord")));
+		assertTrue(parsed.violations().stream().anyMatch(violation -> containsIgnoringCase(violation.description(), "local record")));
+	}
+
+	@Test
+	void shouldExtractNestedRecordsSoIgnoreViolationsCanCompile() {
+		ParsedTestClasses parsed = parse("class Example { private record Pair(int a, int b) {} @Test public void test() { Pair pair = new Pair(1, 2); assertTrue(true); } }");
+
+		assertEquals(1, parsed.testClasses().size());
+		assertEquals(1, parsed.testClasses().get(0).nestedTypes().size());
+		assertTrue(parsed.testClasses().get(0).nestedTypes().get(0).contains("record Pair"));
+		assertTrue(parsed.violations().stream().anyMatch(violation -> containsIgnoringCase(violation.description(), "nested record")));
+		assertTrue(new JunitTestClassRenderer().render(parsed.testClasses().get(0)).contains("record Pair"));
+	}
+
+	@Test
+	void shouldSkipUnparseableFileAndContinueWithRemainingFiles() {
+		CodeFile unparseable = new CodeFile(
+				"Broken.java",
+				"class Broken { @Test public void test() { this is not java } }");
+		CodeFile parseable = new CodeFile(
+				"Example.java",
+				"class Example { @Test public void test() { assertTrue(true); } }");
+
+		ParsedTestClasses parsed = parser.parse(new LoadedCodeFiles(List.of(unparseable, parseable)));
+
+		assertEquals(1, parsed.testClasses().size());
+		assertEquals("Example", parsed.testClasses().get(0).name());
+		assertEquals(1, parsed.violations().size());
+		TestCodeViolation violation = parsed.violations().get(0);
+		assertEquals(ViolationScope.TEST_CLASS, violation.scope());
+		assertEquals("Broken.java", violation.testClassName());
+		assertTrue(violation.testMethodName().isEmpty());
+		assertTrue(containsIgnoringCase(violation.description(), "parse error"));
 	}
 
 	@Test
@@ -433,6 +477,8 @@ class JunitTestClassParserTest {
 				unsupported("multiple Before fixtures", "class Example { @Before public void first() { } @Before public void second() { } @Test public void test() { assertTrue(true); } }", "multiple @Before"),
 				unsupported("mixed Before fixtures", "class Example { @Before public void first() { } @BeforeEach public void second() { } @Test public void test() { assertTrue(true); } }", "multiple @Before"),
 				unsupported("local class", "class Example { @Test public void test() { class Local { } assertTrue(true); } }", "local class"),
+				unsupported("nested record", "class Example { private record Pair(int a, int b) {} @Test public void test() { assertTrue(true); } }", "nested record"),
+				unsupported("local record", "class Example { @Test public void test() { record LocalRecord(int i) {} assertTrue(true); } }", "local record"),
 				unsupported("enum declaration", "class Example { enum State { READY } @Test public void test() { assertTrue(true); } }", "enum declaration"),
 				unsupported("anonymous class", "class Example { @Test public void test() { Runnable value = new Runnable() { public void run() { } }; } }", "anonymous class"),
 				unsupported("lambda in method body", "class Example { @Test public void test() { Runnable value = () -> run(); } }", "lambda"),

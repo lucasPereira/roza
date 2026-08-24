@@ -28,6 +28,7 @@ public final class JunitTestClassRenderer {
 		addFields(lines, testClass.fields());
 		addFixtures(lines, testClass.fixtures());
 		addHelpers(lines, testClass.helperMethods());
+		addNestedTypes(lines, testClass.nestedTypes());
 		addTestMethods(lines, testClass.testMethods());
 		lines.add("}");
 		return String.join("\n", lines);
@@ -62,6 +63,15 @@ public final class JunitTestClassRenderer {
 			lines.add("\t" + modifiers + helper.returnType() + " " + helper.name() + "(" + parameters + ") {");
 			lines.addAll(helper.body().statements().stream().map(statement -> "\t\t" + statement.normalizedText()).collect(Collectors.toList()));
 			lines.add("\t}");
+			lines.add("");
+		}
+	}
+
+	private void addNestedTypes(List<String> lines, List<String> nestedTypes) {
+		for (String nestedType : nestedTypes) {
+			for (String line : nestedType.split("\\R")) {
+				lines.add(line.isEmpty() ? "" : "\t" + line);
+			}
 			lines.add("");
 		}
 	}

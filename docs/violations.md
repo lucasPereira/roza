@@ -1,10 +1,10 @@
 # Modern Róża parsing violations
 
-This document lists every **structured parsing violation** (`TestCodeViolation`) that modern Róża can emit when it parses a Java test source file with `JunitTestClassParser`. Violations are produced by `JavaUnsupportedFeatureValidator` before the parser builds `TestClass` models.
+This document lists every **structured parsing violation** (`TestCodeViolation`) that modern Róża can emit when it parses a Java test source file with `JunitTestClassParser`. Most violations are produced by `JavaUnsupportedFeatureValidator` before the parser builds `TestClass` models. Files that JavaParser cannot parse produce a class-level parse-error violation instead of aborting the remaining files.
 
-**Maintenance:** Whenever you add, remove, or change a violation in `JavaUnsupportedFeatureValidator`, update this file in the same change so the catalog stays accurate.
+**Maintenance:** Whenever you add, remove, or change a violation in `JavaUnsupportedFeatureValidator` or in `JunitTestClassParser` parse-failure handling, update this file in the same change so the catalog stays accurate.
 
-Violations use `ViolationScope.TEST_CLASS` (class-level) or `ViolationScope.TEST_METHOD` (scoped to a `@Test` / unsupported test method). Body checks on `@Before` / `@BeforeEach` and on lifecycle or helper methods attach snippets at **class** scope (no method name on the violation). Compilation units with no `@Test` method are helper classes and do not emit these subset violations.
+Violations use `ViolationScope.TEST_CLASS` (class-level) or `ViolationScope.TEST_METHOD` (scoped to a `@Test` / unsupported test method). Body checks on `@Before` / `@BeforeEach` and on lifecycle or helper methods attach snippets at **class** scope (no method name on the violation). Compilation units with no `@Test` method are helper classes and do not emit these subset violations. Unparseable files have no extracted `TestClass`; the violation `testClassName` is the loaded file source path.
 
 ---
 
@@ -12,8 +12,13 @@ Violations use `ViolationScope.TEST_CLASS` (class-level) or `ViolationScope.TEST
 
 | Description (prefix) | Example |
 | --- | --- |
+| `Parse error: (line 1, col 32) Parse error. Found "is", expected one of ...` | Source that JavaParser cannot parse even at language level JAVA_17. |
 | `Multiple top-level classes in the same file` | Two public classes in one `.java` file. |
 | `Wildcard import: import java.util.*;` | `import java.util.*;` |
+
+```java
+class Broken { @Test public void t() { this is not java } }
+```
 
 ```java
 class First { @Test public void t() { assertTrue(true); } }
@@ -32,6 +37,7 @@ class Example { @Test public void t() { assertTrue(true); } }
 | Description (prefix) | Example |
 | --- | --- |
 | `Nested class: Inner` | Non-static inner class inside the test class. |
+| `Nested record: Pair` | Nested Java 17 `record` inside the test class. The nested type is still extracted onto `TestClass` so Ignore violations can emit it. |
 | `Test class inheritance: Example` | `class Example extends Base { ... }` |
 | `Abstract test class: Example` | `abstract class Example { ... }` |
 | `Generic test class: Example` | `class Example<T> { ... }` |
@@ -42,6 +48,10 @@ class Example { @Test public void t() { assertTrue(true); } }
 
 ```java
 class Outer { class Inner { } @Test public void t() { assertTrue(true); } }
+```
+
+```java
+class Example { private record Pair(int a, int b) {} @Test public void t() { assertTrue(true); } }
 ```
 
 ```java
@@ -164,6 +174,7 @@ Checked inside bodies of `@Test`, unsupported test methods, fixtures, helpers, a
 | `Method reference` | `Runnable r = this::run;` outside an assertion. |
 | `Anonymous class` | `new Runnable() { public void run() {} }` |
 | `Local class: Local` | Class declared inside a method. |
+| `Local record: LocalRecord` | Java 17 `record` declared inside a method. The statement stays in the extracted test body. |
 | `For loop` | `for (int i = 0; i < n; i++) { ... }` |
 | `For-each loop` | `for (String s : list) { ... }` |
 | `While loop` | `while (cond) { ... }` |

@@ -16,6 +16,7 @@ import com.github.javaparser.ast.body.EnumDeclaration;
 import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.body.InitializerDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.ast.body.RecordDeclaration;
 import com.github.javaparser.ast.expr.AnnotationExpr;
 import com.github.javaparser.ast.expr.LambdaExpr;
 import com.github.javaparser.ast.expr.MethodCallExpr;
@@ -29,6 +30,7 @@ import com.github.javaparser.ast.stmt.DoStmt;
 import com.github.javaparser.ast.stmt.ForEachStmt;
 import com.github.javaparser.ast.stmt.ForStmt;
 import com.github.javaparser.ast.stmt.LabeledStmt;
+import com.github.javaparser.ast.stmt.LocalRecordDeclarationStmt;
 import com.github.javaparser.ast.stmt.WhileStmt;
 import com.github.javaparser.ast.stmt.SwitchStmt;
 import com.github.javaparser.ast.stmt.SynchronizedStmt;
@@ -59,6 +61,11 @@ final class JavaUnsupportedFeatureValidator {
 		validateTopLevelClasses(unit, testClassName, violations);
 		unit.findAll(ClassOrInterfaceDeclaration.class).forEach(type -> validateClass(type, testClassName, violations));
 		unit.findAll(EnumDeclaration.class).forEach(type -> classViolation(violations, testClassName, "Enum declaration: " + type.getNameAsString(), type));
+		unit.findAll(RecordDeclaration.class).forEach(type -> {
+			if (isNestedRecord(type)) {
+				classViolation(violations, testClassName, "Nested record: " + type.getNameAsString(), type);
+			}
+		});
 		if (!helperClass) {
 			unit.findAll(FieldDeclaration.class).forEach(field -> validateField(field, testClassName, violations));
 		}
@@ -128,6 +135,10 @@ final class JavaUnsupportedFeatureValidator {
 	}
 
 	private boolean isNested(ClassOrInterfaceDeclaration type) {
+		return type.getParentNode().filter(parent -> parent instanceof ClassOrInterfaceDeclaration).isPresent();
+	}
+
+	private boolean isNestedRecord(RecordDeclaration type) {
 		return type.getParentNode().filter(parent -> parent instanceof ClassOrInterfaceDeclaration).isPresent();
 	}
 
@@ -249,6 +260,7 @@ final class JavaUnsupportedFeatureValidator {
 				.filter(creation -> creation.getAnonymousClassBody().isPresent())
 				.forEach(creation -> violation(violations, testClassName, testMethodName, "Anonymous class", creation));
 		node.findAll(ClassOrInterfaceDeclaration.class).forEach(type -> violation(violations, testClassName, testMethodName, "Local class: " + type.getNameAsString(), type));
+		node.findAll(LocalRecordDeclarationStmt.class).forEach(statement -> violation(violations, testClassName, testMethodName, "Local record: " + statement.getRecordDeclaration().getNameAsString(), statement));
 		node.findAll(ForStmt.class).forEach(statement -> violation(violations, testClassName, testMethodName, "For loop", statement));
 		node.findAll(ForEachStmt.class).forEach(statement -> violation(violations, testClassName, testMethodName, "For-each loop", statement));
 		node.findAll(WhileStmt.class).forEach(statement -> violation(violations, testClassName, testMethodName, "While loop", statement));

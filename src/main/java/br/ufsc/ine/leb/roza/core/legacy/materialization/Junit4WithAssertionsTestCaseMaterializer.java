@@ -1,6 +1,6 @@
 package br.ufsc.ine.leb.roza.core.legacy.materialization;
 
-import com.github.javaparser.JavaParser;
+import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.stmt.BlockStmt;
 
 import br.ufsc.ine.leb.roza.core.legacy.TestCase;
@@ -12,7 +12,7 @@ public class Junit4WithAssertionsTestCaseMaterializer extends Junit4TestCaseMate
 	}
 
 	public void addAssertions(TestCase testCase, BlockStmt javaMethodBody) {
-		testCase.getAsserts().forEach((assertion) -> javaMethodBody.addStatement(JavaParser.parseStatement(assertion.getText())));
+		testCase.getAsserts().forEach((assertion) -> javaMethodBody.addStatement(StaticJavaParser.parseStatement(assertion.getText())));
 	}
 
 }

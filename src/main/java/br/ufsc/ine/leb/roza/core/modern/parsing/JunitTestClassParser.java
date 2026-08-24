@@ -6,7 +6,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import com.github.javaparser.JavaParser;
+import com.github.javaparser.ParseProblemException;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.ImportDeclaration;
 import com.github.javaparser.ast.Modifier;
@@ -18,7 +18,6 @@ import com.github.javaparser.ast.expr.AnnotationExpr;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.stmt.Statement;
-import com.github.javaparser.printer.PrettyPrinterConfiguration;
 
 import br.ufsc.ine.leb.roza.core.modern.loading.CodeFile;
 import br.ufsc.ine.leb.roza.core.modern.loading.LoadedCodeFiles;
@@ -45,7 +44,7 @@ public final class JunitTestClassParser implements TestClassParser {
 		List<TestCodeViolation> violations = new ArrayList<>();
 		for (CodeFile codeFile : codeFiles.codeFiles()) {
 			try {
-				CompilationUnit unit = JavaParser.parse(codeFile.content());
+				CompilationUnit unit = ConfiguredJavaParser.parseCompilationUnit(codeFile.content());
 				boolean helperClass = containsNoTests(unit);
 				List<TestCodeViolation> codeFileViolations = helperClass ? validator.validateHelperClass(unit) : validator.validate(unit);
 				diagnostics.addAll(codeFileViolations);
@@ -53,6 +52,10 @@ public final class JunitTestClassParser implements TestClassParser {
 				extractTestClass(unit).ifPresent(testClasses::add);
 			} catch (UnsupportedFeatureException exception) {
 				throw exception;
+			} catch (ParseProblemException exception) {
+				TestCodeViolation violation = parseFailureViolation(codeFile, exception);
+				diagnostics.add(violation);
+				violations.add(violation);
 			} catch (RuntimeException exception) {
 				String detail = exception.getMessage() != null ? exception.getMessage() : exception.toString();
 				throw new ParsingException(codeFile.source(), detail, exception);
@@ -63,6 +66,12 @@ public final class JunitTestClassParser implements TestClassParser {
 
 	public List<TestCodeViolation> diagnostics() {
 		return List.copyOf(diagnostics);
+	}
+
+	private TestCodeViolation parseFailureViolation(CodeFile codeFile, ParseProblemException exception) {
+		String name = codeFile.source().isBlank() ? "<unknown>" : codeFile.source();
+		String detail = exception.getMessage() != null ? exception.getMessage().trim() : exception.toString();
+		return new TestCodeViolation(ViolationScope.TEST_CLASS, name, Optional.empty(), "Parse error: " + detail, detail);
 	}
 
 	private boolean containsNoTests(CompilationUnit unit) {
@@ -84,7 +93,14 @@ public final class JunitTestClassParser implements TestClassParser {
 		List<FixtureMethod> fixtures = parsedClass.getMethods().stream().filter(this::isFixtureMethod).map(this::extractFixture).collect(Collectors.toList());
 		List<HelperMethod> helperMethods = parsedClass.getMethods().stream().filter(method -> !isTestMethod(method)).filter(method -> !isFixtureMethod(method)).map(this::extractHelper).collect(Collectors.toList());
 		List<TestMethod> testMethods = parsedClass.getMethods().stream().filter(this::isTestMethod).map(this::extractTestMethod).collect(Collectors.toList());
-		return new TestClass(parsedClass.getNameAsString(), packageName(unit).orElse(null), imports, setupAnnotation(imports, fixtures, testMethods), fields, fixtures, helperMethods, testMethods);
+		return new TestClass(parsedClass.getNameAsString(), packageName(unit).orElse(null), imports, setupAnnotation(imports, fixtures, testMethods), fields, fixtures, helperMethods, testMethods, nestedTypes(parsedClass));
+	}
+
+	private List<String> nestedTypes(ClassOrInterfaceDeclaration parsedClass) {
+		return parsedClass.getMembers().stream()
+				.filter(member -> member.isRecordDeclaration())
+				.map(member -> member.toString().trim())
+				.collect(Collectors.toList());
 	}
 
 	private Optional<String> packageName(CompilationUnit unit) {
@@ -198,23 +214,15 @@ public final class JunitTestClassParser implements TestClassParser {
 	}
 
 	private String normalize(Statement statement) {
-		return statement.toString(prettyPrinterConfiguration()).trim();
+		return ConfiguredJavaParser.printCompact(statement);
 	}
 
 	private String normalize(Expression expression) {
-		return expression.toString(prettyPrinterConfiguration()).trim();
+		return ConfiguredJavaParser.printCompact(expression);
 	}
 
 	private boolean isAssertion(Statement statement) {
 		return statement.findAll(MethodCallExpr.class).stream().anyMatch(AssertionMethodCalls::isAssertionMethod);
-	}
-
-	private PrettyPrinterConfiguration prettyPrinterConfiguration() {
-		PrettyPrinterConfiguration configuration = new PrettyPrinterConfiguration();
-		configuration.setEndOfLineCharacter(" ");
-		configuration.setIndentSize(0);
-		configuration.setPrintComments(false);
-		return configuration;
 	}
 
 	private List<CodeAnnotation> annotations(List<AnnotationExpr> annotations) {

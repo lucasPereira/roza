@@ -36,7 +36,8 @@ public final class AcceptedTestClassProjection {
 					testClass.fields(),
 					testClass.fixtures(),
 					testClass.helperMethods(),
-					acceptedMethods));
+					acceptedMethods,
+					testClass.nestedTypes()));
 		}
 		return List.copyOf(acceptedClasses);
 	}

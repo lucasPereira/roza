@@ -5,7 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
-import com.github.javaparser.JavaParser;
+import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.expr.AssignExpr;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.SimpleName;
@@ -49,7 +49,7 @@ public class JunitTestCaseExtractor implements TestCaseExtractor {
 		List<Statement> statements = new LinkedList<>();
 		testClass.getSetupMethods().forEach((setupMethod) -> setupMethod.getStatements().forEach((statement) -> {
 			Statement addedStatement = statement;
-			Optional<ExpressionStmt> expression = JavaParser.parseStatement(statement.getText()).toExpressionStmt();
+			Optional<ExpressionStmt> expression = StaticJavaParser.parseStatement(statement.getText()).toExpressionStmt();
 			if (expression.isPresent()) {
 				Optional<AssignExpr> assign = expression.get().getExpression().toAssignExpr();
 				if (assign.isPresent()) {
@@ -68,7 +68,7 @@ public class JunitTestCaseExtractor implements TestCaseExtractor {
 	}
 
 	public Boolean statementIsAssertion(Statement statement) {
-		Optional<ExpressionStmt> expressionStmtement = JavaParser.parseStatement(statement.getText()).toExpressionStmt();
+		Optional<ExpressionStmt> expressionStmtement = StaticJavaParser.parseStatement(statement.getText()).toExpressionStmt();
 		if (expressionStmtement.isEmpty()) {
 			return false;
 		}

@@ -9,7 +9,7 @@ import br.ufsc.ine.leb.roza.core.legacy.TestClass;
 import br.ufsc.ine.leb.roza.core.legacy.TestMethod;
 import br.ufsc.ine.leb.roza.core.legacy.utils.comparator.ClusterComparatorBySizeAndTestName;
 import br.ufsc.ine.leb.roza.core.legacy.utils.comparator.TestCaseComparatorByName;
-import com.github.javaparser.JavaParser;
+import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.expr.VariableDeclarationExpr;
 import com.github.javaparser.ast.stmt.ExpressionStmt;
 
@@ -47,7 +47,7 @@ public class SimpleClusterRefactor implements ClusterRefactor {
 			if (!sharedFixtures.isEmpty()) {
 				for (int index = 0; index < sharedFixtures.size(); index++) {
 					Statement statement = sharedFixtures.get(index);
-					Optional<ExpressionStmt> expression = JavaParser.parseStatement(statement.getText()).toExpressionStmt();
+					Optional<ExpressionStmt> expression = StaticJavaParser.parseStatement(statement.getText()).toExpressionStmt();
 					if (expression.isPresent()) {
 						Optional<VariableDeclarationExpr> declaration = expression.orElseThrow().getExpression().toVariableDeclarationExpr();
 						if (declaration.isPresent()) {

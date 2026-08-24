@@ -141,6 +141,9 @@ Acceptance criteria:
 - AC-189: Tear down and lifecycle methods other than the supported before fixture are unsupported in the first refactoring-safe subset.
 - AC-190: Tests without a detectable assertion are supported; metrics that stop at assertions use the whole test body when no detectable assertion exists.
 - AC-191: A detectable assertion is an assertion recognized in the current statement, including assertion calls with lambda or method-reference arguments.
+- AC-380: `JunitTestClassParser` parses Java 17 language constructs, including records, instead of treating them as unparseable source.
+- AC-381: Nested records are extracted onto `TestClass` and rendered in generated classes so Ignore violations can emit compiling types that those tests used.
+- AC-382: Nested records and local records are reported as subset violations, like nested and local classes. Local records remain in the extracted test method body.
 
 ### REQ-009: Java-First TestClass Domain Model
 
@@ -159,6 +162,7 @@ Acceptance criteria:
 - AC-127: `TestClass` exposes supported fixture methods.
 - AC-128: `TestClass` exposes supported helper methods.
 - AC-129: `TestClass` exposes supported test methods.
+- AC-383: `TestClass` exposes nested record declarations so refactoring can render them when Ignore violations keeps those tests.
 - AC-130: Parsed fields preserve type, name, supported modifiers, and optional initialization.
 - AC-131: Parsed code blocks expose top-level `CodeStatement` instances.
 - AC-132: `CodeStatement` exposes original text, normalized text, and whether the statement is an assertion.
@@ -575,6 +579,7 @@ public final class TestClass {
 	public List<FixtureMethod> fixtures();
 	public List<HelperMethod> helperMethods();
 	public List<TestMethod> testMethods();
+	public List<String> nestedTypes();
 	public boolean isHelperClass();
 }
 
@@ -904,5 +909,6 @@ The current clustering implementation requires the matrix size, test case by ind
 - 2026-08-24: Top ranking scores only clusters that change between dendrogram levels and updates setup-duplication frequencies incrementally.
 - 2026-08-24: Rerunning Loading, Parsing, or Decomposition resets Measure, Cluster, and Top ranking progress bars.
 - 2026-08-24: When Ignore violations lets helper methods enter refactoring, those methods are moved to `{OriginalClassName}Helpers` classes. Call sites stay unchanged, so the result may not compile.
+- 2026-08-24: `JunitTestClassParser` parses Java 17 records, extracts nested records onto `TestClass`, and still reports nested and local records as subset violations so Ignore violations can emit compiling Gson record tests.
 - 2026-05-12: Confirmed that modern UI sidebar stages without visible configuration controls should align their primary action button with the first visible loading control and the refactoring action.
 - 2026-05-12: Confirmed the modern UI writing sidebar output folder chooser, default `output/writer` folder, and selected-folder write behavior.

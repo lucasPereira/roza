@@ -59,8 +59,7 @@ sourceSets {
 }
 
 dependencies {
-    implementation("com.github.javaparser:javaparser-core:3.10.0")
-    implementation("com.github.javaparser:javaparser-symbol-solver-core:3.9.1")
+    implementation("com.github.javaparser:javaparser-core:3.26.4")
 
     implementation("org.jsoup:jsoup:1.11.3")
 

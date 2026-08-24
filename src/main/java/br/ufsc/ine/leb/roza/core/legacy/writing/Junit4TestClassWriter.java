@@ -5,14 +5,18 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.github.javaparser.JavaParser;
+import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.stmt.BlockStmt;
-import com.github.javaparser.printer.PrettyPrinterConfiguration;
-import com.github.javaparser.printer.PrettyPrinterConfiguration.IndentType;
+import com.github.javaparser.printer.DefaultPrettyPrinter;
+import com.github.javaparser.printer.configuration.DefaultConfigurationOption;
+import com.github.javaparser.printer.configuration.DefaultPrinterConfiguration;
+import com.github.javaparser.printer.configuration.DefaultPrinterConfiguration.ConfigOption;
+import com.github.javaparser.printer.configuration.Indentation;
+import com.github.javaparser.printer.configuration.Indentation.IndentType;
 
 import br.ufsc.ine.leb.roza.core.legacy.TestClass;
 import br.ufsc.ine.leb.roza.core.legacy.utils.FolderUtils;
@@ -27,10 +31,10 @@ public class Junit4TestClassWriter implements TestClassWriter {
 
 	@Override
 	public void write(List<TestClass> classes) {
-		PrettyPrinterConfiguration configuration = new PrettyPrinterConfiguration();
-		configuration.setIndentType(IndentType.TABS);
-		configuration.setIndentSize(1);
-		configuration.setOrderImports(true);
+		DefaultPrinterConfiguration configuration = new DefaultPrinterConfiguration();
+		configuration.addOption(new DefaultConfigurationOption(ConfigOption.INDENTATION, new Indentation(IndentType.TABS, 1)));
+		configuration.addOption(new DefaultConfigurationOption(ConfigOption.ORDER_IMPORTS, true));
+		DefaultPrettyPrinter printer = new DefaultPrettyPrinter(configuration);
 		classes.forEach(testClass -> {
 			CompilationUnit unit = new CompilationUnit();
 			String className = testClass.getName();
@@ -39,23 +43,23 @@ public class Junit4TestClassWriter implements TestClassWriter {
 				if (field.getInitialization() == null) {
 					unitTestClass.addField (field.getType(), field.getName()).setPrivate(true);
 				} else {
-					Expression initialization = JavaParser.parseExpression(field.getInitialization().getText());
+					Expression initialization = StaticJavaParser.parseExpression(field.getInitialization().getText());
 					unitTestClass.addFieldWithInitializer(field.getType(), field.getName(), initialization).setPrivate(true);
 				}
 			});
 			testClass.getSetupMethods().forEach(setupMethod -> {
 				MethodDeclaration unitSetupMethod = unitTestClass.addMethod(setupMethod.getName()).setPublic(true).addAnnotation(Before.class);
 				BlockStmt unitSetupMethodBody = new BlockStmt();
-				setupMethod.getStatements().forEach((statement) -> unitSetupMethodBody.addStatement(JavaParser.parseStatement(statement.getText())));
+				setupMethod.getStatements().forEach((statement) -> unitSetupMethodBody.addStatement(StaticJavaParser.parseStatement(statement.getText())));
 				unitSetupMethod.setBody(unitSetupMethodBody);
 			});
 			testClass.getTestMethods().forEach(testMethod -> {
 				MethodDeclaration unitTestMethod = unitTestClass.addMethod(testMethod.getName()).setPublic(true).addAnnotation(Test.class);
 				BlockStmt unitTestMethodBody = new BlockStmt();
-				testMethod.getStatements().forEach((statement) -> unitTestMethodBody.addStatement(JavaParser.parseStatement(statement.getText())));
+				testMethod.getStatements().forEach((statement) -> unitTestMethodBody.addStatement(StaticJavaParser.parseStatement(statement.getText())));
 				unitTestMethod.setBody(unitTestMethodBody);
 			});
-			String code = unit.toString(configuration);
+			String code = printer.print(unit);
 			String fileName = String.format("%s.java", className);
 			folderUtils.writeContetAsString(fileName, code);
 		});

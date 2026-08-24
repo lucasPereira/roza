@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.expr.AssignExpr;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.FieldAccessExpr;
@@ -18,12 +17,13 @@ import com.github.javaparser.ast.stmt.Statement;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 
 import br.ufsc.ine.leb.roza.core.modern.parsing.CodeStatement;
+import br.ufsc.ine.leb.roza.core.modern.parsing.ConfiguredJavaParser;
 
 public final class StatementDependencyAnalyzer {
 
 	public Optional<Analysis> analyze(CodeStatement statement) {
 		try {
-			Statement parsedStatement = JavaParser.parseStatement(statement.originalText());
+			Statement parsedStatement = ConfiguredJavaParser.parseStatement(statement.originalText());
 			DefUseVisitor visitor = new DefUseVisitor();
 			parsedStatement.accept(visitor, null);
 			return Optional.of(new Analysis(visitor.definitions, visitor.uses, visitor.declaredTypes));
