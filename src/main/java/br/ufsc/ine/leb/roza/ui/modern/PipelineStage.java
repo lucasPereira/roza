@@ -7,7 +7,7 @@ enum PipelineStage {
 			"Loading",
 			"Load",
 			List.of("Source folder", "Recursive loading", "Accepted extensions"),
-			"No previous data. Configure how source files will be loaded."),
+			"Select the source files to be loaded."),
 	PARSING(
 			"Parsing",
 			"Parse",

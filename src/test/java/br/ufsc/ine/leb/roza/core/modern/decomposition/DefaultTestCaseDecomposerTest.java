@@ -140,7 +140,7 @@ class DefaultTestCaseDecomposerTest {
 	void shouldSkipTestsFromClassWithViolation() {
 		ParsedTestClasses parsedTestClasses = new ParsedTestClasses(
 				List.of(testClass(List.of(), List.of(), List.of(testMethod("first", "assertTrue(true);"), testMethod("second", "assertFalse(false);")))),
-				List.of(new TestCodeViolation(ViolationScope.TEST_CLASS, "Example", "Unsupported helper method: helper")));
+				List.of(new TestCodeViolation(ViolationScope.TEST_CLASS, "Example", "Helper method: helper")));
 
 		DecomposedTestCases decomposed = decomposer.decompose(parsedTestClasses);
 
@@ -151,7 +151,7 @@ class DefaultTestCaseDecomposerTest {
 	void shouldSkipOnlyTestWithMethodViolation() {
 		ParsedTestClasses parsedTestClasses = new ParsedTestClasses(
 				List.of(testClass(List.of(), List.of(), List.of(testMethod("first", "assertTrue(true);"), testMethod("second", "assertFalse(false);")))),
-				List.of(new TestCodeViolation(ViolationScope.TEST_METHOD, "Example", "second", "Unsupported test method with parameters: second")));
+				List.of(new TestCodeViolation(ViolationScope.TEST_METHOD, "Example", "second", "Test method with parameters: second")));
 
 		DecomposedTestCases decomposed = decomposer.decompose(parsedTestClasses);
 
@@ -181,7 +181,7 @@ class DefaultTestCaseDecomposerTest {
 				List.of(testMethod("test", "assertTrue(true);")));
 		ParsedTestClasses parsedTestClasses = new ParsedTestClasses(
 				List.of(accepted, rejected),
-				List.of(new TestCodeViolation(ViolationScope.TEST_CLASS, "example.tests.Example", "Unsupported helper method: helper")));
+				List.of(new TestCodeViolation(ViolationScope.TEST_CLASS, "example.tests.Example", "Helper method: helper")));
 
 		DecomposedTestCases decomposed = decomposer.decompose(parsedTestClasses);
 

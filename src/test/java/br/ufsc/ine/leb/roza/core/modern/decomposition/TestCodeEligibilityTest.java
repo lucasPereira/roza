@@ -36,7 +36,7 @@ class TestCodeEligibilityTest {
 						ViolationScope.TEST_METHOD,
 						"example.tests.Example",
 						"parameterized",
-						"Unsupported test method annotation: ParameterizedTest")));
+						"Test method annotation: ParameterizedTest")));
 
 		TestCodeEligibilitySummary summary = new TestCodeEligibilitySummary(parsedTestClasses);
 
@@ -65,7 +65,7 @@ class TestCodeEligibilityTest {
 						ViolationScope.TEST_METHOD,
 						"example.tests.Example",
 						"second",
-						"Unsupported test method with parameters: second")));
+						"Test method with parameters: second")));
 
 		TestCodeEligibilitySummary summary = new TestCodeEligibilitySummary(parsedTestClasses);
 
@@ -89,7 +89,7 @@ class TestCodeEligibilityTest {
 				List.of(testMethod("first"), testMethod("second")));
 		ParsedTestClasses parsedTestClasses = new ParsedTestClasses(
 				List.of(testClass),
-				List.of(new TestCodeViolation(ViolationScope.TEST_CLASS, "example.tests.Example", "Unsupported helper method: helper")));
+				List.of(new TestCodeViolation(ViolationScope.TEST_CLASS, "example.tests.Example", "Helper method: helper")));
 
 		TestCodeEligibilitySummary summary = new TestCodeEligibilitySummary(parsedTestClasses);
 
@@ -113,12 +113,12 @@ class TestCodeEligibilityTest {
 		ParsedTestClasses parsedTestClasses = new ParsedTestClasses(
 				List.of(testClass),
 				List.of(
-						new TestCodeViolation(ViolationScope.TEST_CLASS, "example.tests.Example", "Unsupported helper method: helper"),
+						new TestCodeViolation(ViolationScope.TEST_CLASS, "example.tests.Example", "Helper method: helper"),
 						new TestCodeViolation(
 								ViolationScope.TEST_METHOD,
 								"example.tests.Example",
 								"parameterized",
-								"Unsupported test method annotation: ParameterizedTest")));
+								"Test method annotation: ParameterizedTest")));
 
 		TestCodeEligibilitySummary summary = new TestCodeEligibilitySummary(parsedTestClasses);
 

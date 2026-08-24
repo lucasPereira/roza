@@ -1,6 +1,8 @@
 package br.ufsc.ine.leb.roza.core.modern.arrangement;
 
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -24,7 +26,7 @@ public final class StatementDependencyAnalyzer {
 			Statement parsedStatement = JavaParser.parseStatement(statement.originalText());
 			DefUseVisitor visitor = new DefUseVisitor();
 			parsedStatement.accept(visitor, null);
-			return Optional.of(new Analysis(visitor.definitions, visitor.uses));
+			return Optional.of(new Analysis(visitor.definitions, visitor.uses, visitor.declaredTypes));
 		} catch (RuntimeException exception) {
 			return Optional.empty();
 		}
@@ -34,10 +36,12 @@ public final class StatementDependencyAnalyzer {
 
 		private final Set<String> definitions;
 		private final Set<String> uses;
+		private final Map<String, String> declaredTypes;
 
-		private Analysis(Set<String> definitions, Set<String> uses) {
+		private Analysis(Set<String> definitions, Set<String> uses, Map<String, String> declaredTypes) {
 			this.definitions = Set.copyOf(definitions);
 			this.uses = Set.copyOf(uses);
+			this.declaredTypes = Map.copyOf(declaredTypes);
 		}
 
 		public Set<String> definitions() {
@@ -47,17 +51,23 @@ public final class StatementDependencyAnalyzer {
 		public Set<String> uses() {
 			return uses;
 		}
+
+		public Map<String, String> declaredTypes() {
+			return declaredTypes;
+		}
 	}
 
 	private static final class DefUseVisitor extends VoidVisitorAdapter<Void> {
 
 		private final Set<String> definitions = new LinkedHashSet<>();
 		private final Set<String> uses = new LinkedHashSet<>();
+		private final Map<String, String> declaredTypes = new LinkedHashMap<>();
 
 		@Override
 		public void visit(VariableDeclarationExpr declaration, Void argument) {
 			declaration.getVariables().forEach(variable -> {
 				definitions.add(variable.getNameAsString());
+				declaredTypes.put(variable.getNameAsString(), variable.getType().asString());
 				variable.getInitializer().ifPresent(initializer -> initializer.accept(this, argument));
 			});
 		}

@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -27,10 +28,46 @@ class JunitTestClassParserTest {
 	}
 
 	@Test
-	void shouldIgnoreFileWithoutTest() {
+	void shouldParseFileWithoutTestsAsHelperClass() {
 		ParsedTestClasses parsed = parse("class Example { void helper() { run(); } }");
 
-		assertEquals(0, parsed.testClasses().size());
+		assertEquals(1, parsed.testClasses().size());
+		assertEquals(0, parsed.violations().size());
+		assertTrue(parsed.testClasses().get(0).isHelperClass());
+		assertEquals("helper", parsed.testClasses().get(0).helperMethods().get(0).name());
+	}
+
+	@Test
+	void shouldParseHelperFileWithoutTests() {
+		ParsedTestClasses parsed = parser.parse(new LoadedCodeFiles(List.of(new CodeFile(
+				"Helper.java",
+				"package example.tests; public class Helper { public static void setup1() { login(); } }"))));
+
+		assertEquals(1, parsed.testClasses().size());
+		assertEquals(0, parsed.violations().size());
+		TestClass helperClass = parsed.testClasses().get(0);
+		assertEquals("Helper", helperClass.name());
+		assertTrue(helperClass.isHelperClass());
+		assertEquals(1, helperClass.helperMethods().size());
+		assertEquals("setup1", helperClass.helperMethods().get(0).name());
+		assertEquals(List.of("login();"), helperClass.helperMethods().get(0).body().statements().stream().map(CodeStatement::normalizedText).collect(Collectors.toList()));
+	}
+
+	@Test
+	void shouldNotReportSubsetViolationsOnHelperClasses() {
+		ParsedTestClasses parsed = parse(
+				"public class IntervalDataItem { private final Number value; public IntervalDataItem(Number value) { this.value = value; } public Number getValue() { return value; } }");
+
+		assertEquals(1, parsed.testClasses().size());
+		assertTrue(parsed.testClasses().get(0).isHelperClass());
+		assertEquals(0, parsed.violations().size());
+	}
+
+	@Test
+	void shouldStillRejectHelperMethodsInsideOrdinaryTestClasses() {
+		ParsedTestClasses parsed = parse("class Example { void helper() { run(); } @Test public void test() { assertTrue(true); } }");
+
+		assertTrue(parsed.violations().stream().anyMatch(violation -> containsIgnoringCase(violation.description(), "helper method")));
 	}
 
 	@Test
@@ -276,7 +313,7 @@ class JunitTestClassParserTest {
 		ParsedTestClasses parsed = parse(content);
 
 		assertTrue(
-				parsed.violations().stream().anyMatch(violation -> violation.description().contains(expectedDescription)),
+				parsed.violations().stream().anyMatch(violation -> containsIgnoringCase(violation.description(), expectedDescription)),
 				name + " should mention " + expectedDescription + " but was " + parsed.violations().stream().map(TestCodeViolation::description).collect(Collectors.toList()));
 	}
 
@@ -296,7 +333,7 @@ class JunitTestClassParserTest {
 		assertEquals(ViolationScope.TEST_CLASS, violation.scope());
 		assertEquals("Example", violation.testClassName());
 		assertTrue(violation.testMethodName().isEmpty());
-		assertTrue(violation.description().contains("helper method"));
+		assertTrue(containsIgnoringCase(violation.description(), "helper method"));
 		assertTrue(violation.codeSnippet().contains("void helper()"));
 	}
 
@@ -335,6 +372,10 @@ class JunitTestClassParserTest {
 
 		assertEquals(0, parsed.violations().size());
 		assertTrue(parsed.testClasses().get(0).testMethods().get(0).body().statements().get(0).isAssertion());
+	}
+
+	private static boolean containsIgnoringCase(String text, String fragment) {
+		return text.toLowerCase(Locale.ROOT).contains(fragment.toLowerCase(Locale.ROOT));
 	}
 
 	private ParsedTestClasses parse(String content) {
@@ -383,7 +424,7 @@ class JunitTestClassParserTest {
 				unsupported("helper method", "class Example { void helper() { } @Test public void test() { assertTrue(true); } }", "helper method"),
 				unsupported("JUnit 4 After", "class Example { @After public void teardown() { } @Test public void test() { assertTrue(true); } }", "After"),
 				unsupported("JUnit 5 Disabled", "class Example { @Disabled @Test public void test() { assertTrue(true); } }", "Disabled"),
-				unsupported("JUnit 5 ParameterizedTest", "class Example { @ParameterizedTest public void test() { assertTrue(true); } }", "ParameterizedTest"),
+				unsupported("JUnit 5 ParameterizedTest", "class Example { @ParameterizedTest public void parameterized() { assertTrue(true); } @Test public void test() { assertTrue(true); } }", "ParameterizedTest"),
 				unsupported("Test expected attribute", "class Example { @Test(expected = RuntimeException.class) public void test() { action(); } }", "@Test attributes"),
 				unsupported("test method with parameters", "class Example { @Test public void test(int value) { assertTrue(true); } }", "parameters"),
 				unsupported("test method return type", "class Example { @Test public int test() { return 1; } }", "return type"),

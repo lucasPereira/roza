@@ -7,6 +7,7 @@ import br.ufsc.ine.leb.roza.core.modern.parsing.CodeStatement;
 import br.ufsc.ine.leb.roza.core.modern.parsing.Field;
 import br.ufsc.ine.leb.roza.core.modern.parsing.FixtureKind;
 import br.ufsc.ine.leb.roza.core.modern.parsing.FixtureMethod;
+import br.ufsc.ine.leb.roza.core.modern.parsing.HelperMethod;
 import br.ufsc.ine.leb.roza.core.modern.parsing.TestClass;
 import br.ufsc.ine.leb.roza.core.modern.parsing.TestMethod;
 
@@ -29,6 +30,12 @@ public final class SetupCodeProjection {
 			for (TestMethod testMethod : testClass.testMethods()) {
 				testMethod.body().statements().stream()
 						.takeWhile(statement -> !statement.isAssertion())
+						.map(CodeStatement::normalizedText)
+						.forEach(statements::add);
+			}
+			for (HelperMethod helper : testClass.helperMethods()) {
+				helper.body().statements().stream()
+						.filter(statement -> !statement.isAssertion() && !statement.normalizedText().startsWith("return "))
 						.map(CodeStatement::normalizedText)
 						.forEach(statements::add);
 			}

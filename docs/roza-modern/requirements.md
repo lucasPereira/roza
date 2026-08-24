@@ -96,6 +96,9 @@ Acceptance criteria:
 - AC-115: A filesystem `CodeFileLoader` implementation with a non-empty extension list does not include files whose extension is not in the list.
 - AC-116: A filesystem `CodeFileLoader` implementation with a non-empty extension list includes only files whose extension belongs to the list.
 - AC-117: A filesystem `CodeFileLoader` implementation with an empty extension list includes files regardless of extension.
+- AC-328: `JunitTestClassParser` classifies a compilation unit as a helper class when it has no `@Test` method.
+- AC-329: Loading uses a single source folder. Helper detection is a parsing concern, not a second load root or a file role.
+- AC-330: Classes without `@Test` methods are still parsed as `TestClass` models.
 
 ### REQ-008: Parsing Stage
 
@@ -130,7 +133,11 @@ Acceptance criteria:
 - AC-186: Supported methods in the first refactoring-safe subset are `@Test` methods and at most one simple `@Before` or `@BeforeEach` fixture.
 - AC-268: A class that contains both `@Before` and `@BeforeEach`, or multiple setup fixtures of either kind, is outside the first refactoring-safe subset and is reported as a class-level violation.
 - AC-187: Any annotation outside `@Test`, `@Before`, and `@BeforeEach` is unsupported in the first refactoring-safe subset.
-- AC-188: Helper methods are unsupported in the first refactoring-safe subset.
+- AC-188: Helper methods are unsupported in the first refactoring-safe subset when they appear in ordinary test-root classes.
+- AC-331: Helper classes may contain helper methods without producing the AC-188 helper-method violation.
+- AC-332: Classes that contain `@Test` methods still report helper methods as unsupported.
+- AC-333: Helper classes do not count as test classes or as violations for lacking `@Test`, and their helper-method bodies still contribute to setup duplication.
+- AC-368: Helper classes are outside the first refactoring-safe subset: constructors, inheritance, `this`, and other subset checks do not produce violations on compilation units without `@Test`.
 - AC-189: Tear down and lifecycle methods other than the supported before fixture are unsupported in the first refactoring-safe subset.
 - AC-190: Tests without a detectable assertion are supported; metrics that stop at assertions use the whole test body when no detectable assertion exists.
 - AC-191: A detectable assertion is an assertion recognized in the current statement, including assertion calls with lambda or method-reference arguments.
@@ -196,6 +203,8 @@ Acceptance criteria:
 - AC-192: The default decomposition implementation does not decompose tests that belong to classes with class-level violations.
 - AC-193: The default decomposition implementation does not decompose test methods with method-level violations.
 - AC-194: Downstream measurement and refactoring consume only decomposed tests, so tests discarded because of parsing violations are excluded from those stages by construction.
+- AC-334: A second decomposer named `WithoutImplicitSetupTestCaseDecomposer` keeps only each original test method body.
+- AC-335: `WithoutImplicitSetupTestCaseDecomposer` does not inline fields or `@Before` statements into the decomposed `TestCase`.
 
 ### REQ-011: Measurement Stage
 
@@ -220,14 +229,20 @@ Acceptance criteria:
 - AC-147: LCCSS score is `(2 * commonPrefixSize) / (sourceProjectionSize + targetProjectionSize)`.
 - AC-148: LCCSS score is `0.0` when both projected statement lists are empty for distinct test cases.
 - AC-149: LCCSS measurement must use `CodeStatement.isAssertion()` to find the first assertion; it must not infer assertions from statement text during measurement.
-- AC-312: Setup Extraction Potential (SEP) measures the absolute number of statements in the common contiguous pre-assertion prefix of two tests.
-- AC-313: SEP scores are nonnegative statement counts and are not normalized to the interval from `0.0` to `1.0`.
+- AC-312: Setup Extraction Potential (SEP) measures the common contiguous pre-assertion prefix of two tests and normalizes that length by a maximum method size.
+- AC-313: SEP score is `commonPrefixSize / maximumMethodSize`, clamped to the interval from `0.0` to `1.0`.
 - AC-314: SEP preserves LCCSS as a separate selectable measurement metric.
+- AC-360: When no maximum method size is provided, SEP uses the largest pre-assertion arrange among the measured tests. A configured maximum method size must be at least `1`.
 - AC-315: Greedy Admissible Prefix (GAP) measures the largest pre-assertion prefix obtained by greedily matching dependency-ready statements from either test against the other test's textual order.
 - AC-316: Maximum Admissible Prefix (MAP) measures the largest pre-assertion prefix obtained by searching dependency-ready matching choices from either test against the other test's textual order.
 - AC-317: GAP and MAP dependency analysis preserves read-after-write, write-after-read, and write-after-write ordering; an unparseable statement falls back to textual prefix matching.
 - AC-318: GAP and MAP apply Dice normalization to their selected prefix and record the same best bidirectional score in both matrix directions.
 - AC-319: MAP limits its search and falls back to GAP for that pair when it exceeds the configured node limit.
+- AC-336: A measurement implementation named `ContiguousCommonStatementsSimilarityMeasurer` (CCS) scores the longest extractable contiguous arrange run shared by two tests.
+- AC-337: CCS uses exact normalized statement text and does not treat renamed or non-contiguous clones as matches.
+- AC-338: CCS treats a run as extractable only when live-in names have the same type across the pair and the run has at most one live-out.
+- AC-339: CCS applies Dice normalization `(2 * matchSize) / (sourceArrangeSize + targetArrangeSize)` over the pre-assertion arrange projections.
+- AC-340: CCS rejects a minimum length smaller than 1; the default minimum length is 1.
 - AC-218: LCS measurement uses the same pre-assertion projection as LCCSS, stopping at the first `CodeStatement.isAssertion()` statement.
 - AC-219: LCS compares the projected statement lists by counting the longest common subsequence while preserving statement order.
 - AC-220: LCS score is `(2 * commonSubsequenceSize) / (sourceProjectionSize + targetProjectionSize)`.
@@ -324,6 +339,14 @@ Acceptance criteria:
 - AC-323: Singleton leftover tests from the same original class remain together in a residual class that preserves that class's name, package, imports, fields, fixtures, helpers, and the original leftover test methods.
 - AC-324: Residual classes omit tests that were extracted into multi-test implicit-setup classes.
 - AC-325: Residual classes use the original parsed test method bodies rather than the decomposed inlined setup bodies.
+- AC-341: A third concrete refactoring implementation is named `DelegatedSetupTestClassRefactorer`.
+- AC-342: `DelegatedSetupTestClassRefactorer` keeps tests in their original classes and does not move tests into new test classes.
+- AC-343: `DelegatedSetupTestClassRefactorer` extracts n-way extractable contiguous arrange runs shared by a whole cluster into static helper methods.
+- AC-344: Singleton clusters remain unchanged and do not receive a helper class.
+- AC-345: Each multi-test cluster with at least one extractable run receives one public helper class named `HelperClassN`.
+- AC-346: Helper methods are static, named `setup1`, `setup2`, and so on, take live-ins as parameters, and are `void` or return the single live-out.
+- AC-347: Created helper classes are emitted in Java's default package. Existing helper classes keep the packages they were parsed with.
+- AC-348: The first delegated-setup slice does not rewrite fields or `@Before` fixtures and does not combine with implicit-setup refactoring in the same run.
 
 ### REQ-014: Writing Stage
 
@@ -346,6 +369,9 @@ Acceptance criteria:
 - AC-289: `FileSystemTestClassWriter` renders each refactored `TestClass` as Java source and writes one `.java` file per class.
 - AC-290: `FileSystemTestClassWriter` creates the output folder when it does not already exist.
 - AC-295: `FileSystemTestClassWriter` writes packaged generated classes under the directory path that corresponds to their package name.
+- AC-349: `RefactoredTestClasses` exposes helper classes separately through `helperClasses()`.
+- AC-350: `FileSystemTestClassWriter` writes all test classes in Java's default package at the output folder root, writes existing helper classes under their original packages, and writes created helper classes in the default package.
+- AC-358: `FileSystemTestClassWriter` deletes the previous contents of the output folder before writing.
 
 ## Architectural Constraints
 
@@ -406,7 +432,8 @@ Acceptance criteria:
 - AC-201: The modern UI parsing violation viewer shows the code snippet for the displayed violation without an extra card-style white background.
 - AC-202: The modern UI `Decomposition` center shows a summary with the number of classes with class-level violations, tests with method-level violations, tests excluded by violations, and accepted tests.
 - AC-203: After decomposition, the modern UI `Measurement` center shows all decomposed tests and the code for the selected test.
-- AC-205: The modern UI `Measurement` configuration exposes a metric dropdown with `LCCSS` selected by default and GAP, MAP, SEP, LCS, Deckard, JPlag, and Simian as alternatives.
+- AC-359: Returning to the modern UI `Measurement` center keeps the previously selected decomposed test selected and scrolls the test list so that selection remains visible.
+- AC-205: The modern UI `Measurement` configuration exposes a metric dropdown with `LCCSS` selected by default and GAP, MAP, SEP, LCS, Deckard, JPlag, Simian, and CCS as alternatives.
 - AC-206: Triggering `Measure` in the modern UI uses the selected similarity measurer and advances to `Clustering` when measurement succeeds.
 - AC-207: The modern UI `Clustering` center shows source and target test selectors.
 - AC-208: The modern UI `Clustering` center shows a ranked source-target similarity pair list.
@@ -432,11 +459,24 @@ Acceptance criteria:
 - AC-267: Triggering `Cluster` runs the configured agglomerative clusterer and shows the resulting clusters while keeping the ranked similarity inspection available.
 - AC-282: Triggering `Refactor` in the modern UI runs the selected refactoring strategy over the final clustering output, i.e., the last generated clustering level.
 - AC-283: The modern UI stores the generated `RefactoredTestClasses` as the output consumed by the `Writing` tab.
-- AC-284: The modern UI `Writing` center shows a list of generated test classes.
-- AC-285: Selecting a generated test class in the modern UI `Writing` center shows its rendered Java code on the right.
+- AC-284: The modern UI `Writing` center shows inner tabs `Test classes` and `Helpers classes`.
+- AC-285: Selecting a class in either `Writing` inner tab shows its rendered Java code on the right.
 - AC-286: The modern UI `Refactoring` configuration exposes a `Refactor Current level` action that runs the selected refactoring strategy over the currently selected clustering level.
 - AC-326: The modern UI `Refactoring` configuration exposes a strategy dropdown with `Isolating implicit setup` selected by default and `Non-isolating implicit setup` as an alternative.
 - AC-327: Both modern UI refactoring actions use the strategy selected in the dropdown.
+- AC-351: The modern UI `Refactoring` strategy dropdown includes `Delegated setup`.
+- AC-352: The modern UI `Decomposition` configuration exposes a decomposer dropdown with `With implicit setup` and `Without implicit setup`.
+- AC-353: When CCS is selected, the modern UI `Measurement` configuration shows a minimum-length input whose default is `1`.
+- AC-361: When SEP is selected, the modern UI `Measurement` configuration shows a maximum-method-size input that may be left empty to use the largest arrange in the current tests.
+- AC-354: The modern UI `Decomposition` center adds a `Helper classes` tab after `Test classes` that shows helper-class source code only.
+- AC-362: The modern UI `Decomposition` `Violations` tab lists violations ordered by description, then class name, then method name.
+- AC-355: The modern UI `Decomposition` metrics table ends with a `Helper files` row.
+- AC-356: The modern UI `Writing` center separates test classes and helper classes into the inner tabs `Test classes` and `Helpers classes`.
+- AC-363: The modern UI `Writing` `Helpers classes` tab lists helper classes in natural name order, so numbered suffixes follow numeric order (`HelperClass2` before `HelperClass10`).
+- AC-364: The modern UI `Writing` `Test classes` tab lists test classes in the same natural name order.
+- AC-365: The modern UI `Parsing` file list uses natural path order on `CodeFile.source()`.
+- AC-366: The modern UI `Decomposition` `Test classes` list uses natural order by package then class name. The `Helper classes` list uses natural order by package then file name.
+- AC-367: The modern UI `Measurement` test list uses natural name order by method name.
 - AC-268: In the modern UI sidebar, pipeline stages without visible configuration controls show their primary action button at the same top height as the loading stage's first control and the refactoring action button, without empty placeholder spacing above the action.
 - AC-269: The modern UI `Writing` configuration shows an output folder chooser button and a selected-path label, following the loading source folder pattern.
 - AC-270: The modern UI `Writing` output folder defaults to Róża's `output/writer` folder.
@@ -449,6 +489,7 @@ Acceptance criteria:
 - AC-307: The modern UI `Analitycs` comparison includes only test classes, test methods, setup methods, and fields.
 - AC-308: Modern analytics is exposed through a `TestCodeAnalytics` interface in the `core.modern.analytics` package.
 - AC-309: After writing, the modern UI obtains analytics by passing the parsed original test classes, decomposed accepted test cases, and refactored test classes to a `TestCodeAnalytics` implementation.
+- AC-357: After-metrics setup projection counts helper-method bodies once and keeps helper calls that remain in test arrange.
 
 ### NFR-004: Minimal Code Comments
 
@@ -514,6 +555,7 @@ public final class TestClass {
 	public List<FixtureMethod> fixtures();
 	public List<HelperMethod> helperMethods();
 	public List<TestMethod> testMethods();
+	public boolean isHelperClass();
 }
 
 public final class SetupAnnotation {
@@ -555,6 +597,14 @@ public final class TestCase {
 	public List<CodeAnnotation> annotations();
 	public List<String> thrownExceptions();
 }
+
+public final class DefaultTestCaseDecomposer implements TestCaseDecomposer {
+	public DecomposedTestCases decompose(ParsedTestClasses parsedTestClasses);
+}
+
+public final class WithoutImplicitSetupTestCaseDecomposer implements TestCaseDecomposer {
+	public DecomposedTestCases decompose(ParsedTestClasses parsedTestClasses);
+}
 ```
 
 ### Implemented: Measurement
@@ -574,6 +624,18 @@ public final class TestCaseSimilarityMatrix {
 }
 
 public final class LcsTestCaseSimilarityMeasurer implements TestCaseSimilarityMeasurer {
+	public TestCaseSimilarityMatrix measure(DecomposedTestCases testCases);
+}
+
+public final class ContiguousCommonStatementsSimilarityMeasurer implements TestCaseSimilarityMeasurer {
+	public ContiguousCommonStatementsSimilarityMeasurer();
+	public ContiguousCommonStatementsSimilarityMeasurer(int minimumLength);
+	public TestCaseSimilarityMatrix measure(DecomposedTestCases testCases);
+}
+
+public final class SetupExtractionPotentialTestCaseSimilarityMeasurer implements TestCaseSimilarityMeasurer {
+	public SetupExtractionPotentialTestCaseSimilarityMeasurer();
+	public SetupExtractionPotentialTestCaseSimilarityMeasurer(int maximumMethodSize);
 	public TestCaseSimilarityMatrix measure(DecomposedTestCases testCases);
 }
 ```
@@ -614,6 +676,8 @@ public interface TestClassRefactorer {
 
 public final class RefactoredTestClasses {
 	public List<TestClass> testClasses();
+	public List<TestClass> helperClasses();
+	public RefactoredTestClasses plusExistingHelpers(ParsedTestClasses parsedTestClasses);
 }
 
 public final class ImplicitSetupTestClassRefactorer implements TestClassRefactorer {
@@ -623,6 +687,12 @@ public final class ImplicitSetupTestClassRefactorer implements TestClassRefactor
 
 public final class NonIsolatingImplicitSetupTestClassRefactorer implements TestClassRefactorer {
 	public NonIsolatingImplicitSetupTestClassRefactorer();
+	public RefactoredTestClasses refactor(TestCaseClusters clusters);
+}
+
+public final class DelegatedSetupTestClassRefactorer implements TestClassRefactorer {
+	public DelegatedSetupTestClassRefactorer();
+	public DelegatedSetupTestClassRefactorer(int minimumLength);
 	public RefactoredTestClasses refactor(TestCaseClusters clusters);
 }
 ```
@@ -779,5 +849,17 @@ The current clustering implementation requires the matrix size, test case by ind
 - 2026-05-12: Implemented the first modern refactoring slice with `ImplicitSetupTestClassRefactorer`, source-class context preservation, setup annotation inference in parsing/decomposition, generated test-class rendering, and Writing-tab class/code inspection.
 - 2026-08-23: Added `NonIsolatingImplicitSetupTestClassRefactorer`, which extracts implicit setup only from multi-test clusters and keeps singleton leftovers in residual original classes.
 - 2026-08-23: The modern UI `Refactoring` configuration exposes a strategy dropdown for isolating and non-isolating implicit setup.
+- 2026-08-23: Added delegated setup: CCS measurement, a body-only decomposer, helper-class extraction, helper-body counting, and matching modern UI controls.
+- 2026-08-23: `FileSystemTestClassWriter` now empties its output folder before writing.
+- 2026-08-23: Loading uses a single source folder. The parser treats classes without `@Test` as helpers. Writing uses one output folder: test classes and created helpers in the default package, existing helpers in their original packages. The Decomposition and Writing tabs expose helper classes separately.
+- 2026-08-23: Returning to the modern UI `Measurement` center restores the selected decomposed test and scrolls the test list to keep it visible.
+- 2026-08-23: SEP now reports a 0-to-1 score by dividing the shared prefix by a maximum method size.
+- 2026-08-23: The modern UI `Decomposition` tabs are `Test classes`, `Helper classes`, and `Violations` ordered by description.
+- 2026-08-23: The modern UI `Writing` `Helpers classes` tab lists helpers ordered by name.
+- 2026-08-23: Writing class lists use natural name order so `TestClass2` precedes `TestClass10`.
+- 2026-08-23: Parsing, Decomposition, and Measurement lists use the same natural name order.
+- 2026-08-23: Parsing lists files by path. Decomposition orders test classes by package and class name, and helper classes by package and file name.
+- 2026-08-23: Parsing violation descriptions no longer start with `Unsupported`.
+- 2026-08-23: Helper classes (no `@Test`) are not checked against the refactoring-safe subset, so constructors and similar constructs are not reported as violations.
 - 2026-05-12: Confirmed that modern UI sidebar stages without visible configuration controls should align their primary action button with the first visible loading control and the refactoring action.
 - 2026-05-12: Confirmed the modern UI writing sidebar output folder chooser, default `output/writer` folder, and selected-folder write behavior.

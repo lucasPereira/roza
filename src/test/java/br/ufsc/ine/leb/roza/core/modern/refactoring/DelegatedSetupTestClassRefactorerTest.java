@@ -1,0 +1,96 @@
+package br.ufsc.ine.leb.roza.core.modern.refactoring;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.junit.jupiter.api.Test;
+
+import br.ufsc.ine.leb.roza.core.modern.clustering.TestCaseCluster;
+import br.ufsc.ine.leb.roza.core.modern.clustering.TestCaseClusters;
+import br.ufsc.ine.leb.roza.core.modern.decomposition.TestCase;
+import br.ufsc.ine.leb.roza.core.modern.parsing.CodeAnnotation;
+import br.ufsc.ine.leb.roza.core.modern.parsing.CodeBlock;
+import br.ufsc.ine.leb.roza.core.modern.parsing.CodeStatement;
+import br.ufsc.ine.leb.roza.core.modern.parsing.HelperMethod;
+import br.ufsc.ine.leb.roza.core.modern.parsing.TestClass;
+import br.ufsc.ine.leb.roza.core.modern.parsing.TestMethod;
+
+class DelegatedSetupTestClassRefactorerTest {
+
+	@Test
+	void shouldExtractASharedContiguousRunIntoAHelperClass() {
+		TestClass source = source("Example", testMethod("alpha", "createUser();", "login();", "assertTrue(true);"), testMethod("beta", "deleteUser();", "login();", "assertFalse(false);"));
+		TestCase first = testCase("alpha", source, "createUser();", "login();", "assertTrue(true);");
+		TestCase second = testCase("beta", source, "deleteUser();", "login();", "assertFalse(false);");
+
+		RefactoredTestClasses refactored = new DelegatedSetupTestClassRefactorer().refactor(new TestCaseClusters(List.of(
+				new TestCaseCluster(0, first).merge(new TestCaseCluster(1, second)))));
+
+		assertEquals(1, refactored.testClasses().size());
+		assertEquals("Example", refactored.testClasses().get(0).name());
+		assertEquals(1, refactored.helperClasses().size());
+		assertEquals("HelperClass1", refactored.helperClasses().get(0).name());
+		HelperMethod helper = refactored.helperClasses().get(0).helperMethods().get(0);
+		assertEquals("setup1", helper.name());
+		assertEquals(List.of("login();"), helper.body().statements().stream().map(CodeStatement::normalizedText).collect(Collectors.toList()));
+		assertEquals("HelperClass1.setup1();", refactored.testClasses().get(0).testMethods().get(0).body().statements().get(1).normalizedText());
+		assertEquals("HelperClass1.setup1();", refactored.testClasses().get(0).testMethods().get(1).body().statements().get(1).normalizedText());
+	}
+
+	@Test
+	void shouldExtractASharedRunFromTwoOriginalClasses() {
+		TestClass firstSource = source("FirstExample", testMethod("alpha", "login();", "assertTrue(true);"));
+		TestClass secondSource = source("SecondExample", testMethod("beta", "login();", "assertFalse(false);"));
+		TestCase first = testCase("alpha", firstSource, "login();", "assertTrue(true);");
+		TestCase second = testCase("beta", secondSource, "login();", "assertFalse(false);");
+
+		RefactoredTestClasses refactored = new DelegatedSetupTestClassRefactorer().refactor(new TestCaseClusters(List.of(
+				new TestCaseCluster(0, first).merge(new TestCaseCluster(1, second)))));
+
+		assertEquals(List.of("FirstExample", "SecondExample"), refactored.testClasses().stream().map(TestClass::name).collect(Collectors.toList()));
+		assertEquals(1, refactored.helperClasses().size());
+		assertEquals("HelperClass1", refactored.helperClasses().get(0).name());
+		assertTrue(refactored.helperClasses().get(0).packageName().isEmpty());
+		assertEquals("HelperClass1.setup1();", refactored.testClasses().get(0).testMethods().get(0).body().statements().get(0).normalizedText());
+		assertEquals("HelperClass1.setup1();", refactored.testClasses().get(1).testMethods().get(0).body().statements().get(0).normalizedText());
+	}
+
+	@Test
+	void shouldLeaveASingletonClusterUnchanged() {
+		TestClass source = source("Example", testMethod("alpha", "login();", "assertTrue(true);"));
+		TestCase only = testCase("alpha", source, "login();", "assertTrue(true);");
+
+		RefactoredTestClasses refactored = new DelegatedSetupTestClassRefactorer().refactor(new TestCaseClusters(List.of(new TestCaseCluster(0, only))));
+
+		assertEquals(1, refactored.testClasses().size());
+		assertTrue(refactored.helperClasses().isEmpty());
+		assertEquals(List.of("login();", "assertTrue(true);"), refactored.testClasses().get(0).testMethods().get(0).body().statements().stream().map(CodeStatement::normalizedText).collect(Collectors.toList()));
+	}
+
+	private TestCase testCase(String name, TestClass source, String... statements) {
+		List<CodeStatement> coded = List.of(statements).stream().map(this::statement).collect(Collectors.toList());
+		if (coded.get(coded.size() - 1).normalizedText().startsWith("assert")) {
+			coded = coded.stream().map(statement -> statement.normalizedText().startsWith("assert") ? new CodeStatement(statement.normalizedText(), statement.normalizedText(), true) : statement).collect(Collectors.toList());
+		}
+		return new TestCase(name, new CodeBlock(coded), source, List.of(new CodeAnnotation("Test", "@Test")));
+	}
+
+	private TestClass source(String name, TestMethod... methods) {
+		return new TestClass(name, "example.tests", List.of(), null, List.of(), List.of(), List.of(), List.of(methods));
+	}
+
+	private TestMethod testMethod(String name, String... statements) {
+		List<CodeStatement> coded = List.of(statements).stream().map(this::statement).collect(Collectors.toList());
+		if (coded.get(coded.size() - 1).normalizedText().startsWith("assert")) {
+			coded = coded.stream().map(statement -> statement.normalizedText().startsWith("assert") ? new CodeStatement(statement.normalizedText(), statement.normalizedText(), true) : statement).collect(Collectors.toList());
+		}
+		return new TestMethod(name, List.of(new CodeAnnotation("Test", "@Test")), new CodeBlock(coded));
+	}
+
+	private CodeStatement statement(String text) {
+		return new CodeStatement(text, text, text.startsWith("assert"));
+	}
+}

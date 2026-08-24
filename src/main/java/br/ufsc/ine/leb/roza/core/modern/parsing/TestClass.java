@@ -87,4 +87,15 @@ public final class TestClass {
 	public List<TestMethod> testMethods() {
 		return testMethods;
 	}
+
+	public boolean isHelperClass() {
+		return testMethods.isEmpty();
+	}
+
+	public TestClass withoutPackage() {
+		if (packageName == null) {
+			return this;
+		}
+		return new TestClass(name, null, imports, setupAnnotation, fields, fixtures, helperMethods, testMethods);
+	}
 }

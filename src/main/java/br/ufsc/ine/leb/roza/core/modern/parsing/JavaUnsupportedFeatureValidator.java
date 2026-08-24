@@ -42,15 +42,30 @@ final class JavaUnsupportedFeatureValidator {
 	private static final Set<String> LIFECYCLE_ANNOTATIONS = Set.of("BeforeClass", "After", "AfterEach", "AfterClass", "BeforeAll", "AfterAll");
 
 	List<TestCodeViolation> validate(CompilationUnit unit) {
+		return validate(unit, false);
+	}
+
+	List<TestCodeViolation> validateHelperClass(CompilationUnit unit) {
+		return validate(unit, true);
+	}
+
+	private List<TestCodeViolation> validate(CompilationUnit unit, boolean helperClass) {
+		if (helperClass) {
+			return List.of();
+		}
 		String testClassName = testClassName(unit);
 		List<TestCodeViolation> violations = new ArrayList<>();
 		validateImports(unit, testClassName, violations);
 		validateTopLevelClasses(unit, testClassName, violations);
 		unit.findAll(ClassOrInterfaceDeclaration.class).forEach(type -> validateClass(type, testClassName, violations));
-		unit.findAll(EnumDeclaration.class).forEach(type -> classViolation(violations, testClassName, "Unsupported enum declaration: " + type.getNameAsString(), type));
-		unit.findAll(FieldDeclaration.class).forEach(field -> validateField(field, testClassName, violations));
-		unit.findAll(MethodDeclaration.class).forEach(method -> validateMethod(method, testClassName, violations));
-		validateFixtureCounts(unit, testClassName, violations);
+		unit.findAll(EnumDeclaration.class).forEach(type -> classViolation(violations, testClassName, "Enum declaration: " + type.getNameAsString(), type));
+		if (!helperClass) {
+			unit.findAll(FieldDeclaration.class).forEach(field -> validateField(field, testClassName, violations));
+		}
+		unit.findAll(MethodDeclaration.class).forEach(method -> validateMethod(method, testClassName, violations, helperClass));
+		if (!helperClass) {
+			validateFixtureCounts(unit, testClassName, violations);
+		}
 		return violations;
 	}
 
@@ -69,7 +84,7 @@ final class JavaUnsupportedFeatureValidator {
 	private void validateImports(CompilationUnit unit, String testClassName, List<TestCodeViolation> violations) {
 		for (ImportDeclaration imported : unit.getImports()) {
 			if (imported.isAsterisk()) {
-				classViolation(violations, testClassName, "Unsupported wildcard import: " + formatImportDeclaration(imported), formatImportDeclaration(imported));
+				classViolation(violations, testClassName, "Wildcard import: " + formatImportDeclaration(imported), formatImportDeclaration(imported));
 			}
 		}
 	}
@@ -90,26 +105,26 @@ final class JavaUnsupportedFeatureValidator {
 	private void validateTopLevelClasses(CompilationUnit unit, String testClassName, List<TestCodeViolation> violations) {
 		long topLevelClasses = unit.getTypes().stream().filter(type -> type.isClassOrInterfaceDeclaration()).count();
 		if (topLevelClasses > 1) {
-			classViolation(violations, testClassName, "Unsupported multiple top-level classes in the same file", unit.toString());
+			classViolation(violations, testClassName, "Multiple top-level classes in the same file", unit.toString());
 		}
 	}
 
 	private void validateClass(ClassOrInterfaceDeclaration type, String testClassName, List<TestCodeViolation> violations) {
 		if (isNested(type)) {
-			classViolation(violations, testClassName, "Unsupported nested class: " + type.getNameAsString(), type);
+			classViolation(violations, testClassName, "Nested class: " + type.getNameAsString(), type);
 		}
 		if (!type.getExtendedTypes().isEmpty()) {
-			classViolation(violations, testClassName, "Unsupported test class inheritance: " + type.getNameAsString(), type);
+			classViolation(violations, testClassName, "Test class inheritance: " + type.getNameAsString(), type);
 		}
 		if (type.isAbstract()) {
-			classViolation(violations, testClassName, "Unsupported abstract test class: " + type.getNameAsString(), type);
+			classViolation(violations, testClassName, "Abstract test class: " + type.getNameAsString(), type);
 		}
 		if (!type.getTypeParameters().isEmpty()) {
-			classViolation(violations, testClassName, "Unsupported generic test class: " + type.getNameAsString(), type);
+			classViolation(violations, testClassName, "Generic test class: " + type.getNameAsString(), type);
 		}
-		type.getAnnotations().forEach(annotation -> classViolation(violations, testClassName, "Unsupported class annotation: " + annotation, annotation));
-		type.findAll(InitializerDeclaration.class).forEach(initializer -> classViolation(violations, testClassName, "Unsupported class initializer in: " + type.getNameAsString(), initializer));
-		type.findAll(ConstructorDeclaration.class).forEach(constructor -> classViolation(violations, testClassName, "Unsupported explicit constructor: " + constructor.getNameAsString(), constructor));
+		type.getAnnotations().forEach(annotation -> classViolation(violations, testClassName, "Class annotation: " + annotation, annotation));
+		type.findAll(InitializerDeclaration.class).forEach(initializer -> classViolation(violations, testClassName, "Class initializer in: " + type.getNameAsString(), initializer));
+		type.findAll(ConstructorDeclaration.class).forEach(constructor -> classViolation(violations, testClassName, "Explicit constructor: " + constructor.getNameAsString(), constructor));
 	}
 
 	private boolean isNested(ClassOrInterfaceDeclaration type) {
@@ -123,34 +138,38 @@ final class JavaUnsupportedFeatureValidator {
 	private void validateField(FieldDeclaration field, String testClassName, List<TestCodeViolation> violations) {
 		if (field.isStatic()) {
 			String names = fieldVariableNames(field);
-			classViolation(violations, testClassName, "Unsupported static field: " + names, field);
+			classViolation(violations, testClassName, "Static field: " + names, field);
 		}
-		field.getAnnotations().forEach(annotation -> classViolation(violations, testClassName, "Unsupported field annotation: " + annotation, annotation));
+		field.getAnnotations().forEach(annotation -> classViolation(violations, testClassName, "Field annotation: " + annotation, annotation));
 		field.getVariables().forEach(variable -> {
 			if (variable.getInitializer().isPresent()) {
 				String name = variable.getNameAsString();
-				classViolation(violations, testClassName, "Unsupported field initialization: " + name, field);
+				classViolation(violations, testClassName, "Field initialization: " + name, field);
 			}
 		});
 	}
 
-	private void validateMethod(MethodDeclaration method, String testClassName, List<TestCodeViolation> violations) {
-		validateAnnotations(method, testClassName, violations);
+	private void validateMethod(MethodDeclaration method, String testClassName, List<TestCodeViolation> violations, boolean helperClass) {
+		if (!helperClass) {
+			validateAnnotations(method, testClassName, violations);
+		}
 		if (isLifecycleMethod(method)) {
-			classViolation(violations, testClassName, "Unsupported lifecycle method: " + method.getNameAsString(), method);
+			classViolation(violations, testClassName, "Lifecycle method: " + method.getNameAsString(), method);
 			method.getBody().ifPresent(body -> validateNodeBody(body, testClassName, Optional.empty(), violations));
 		} else if (isTestMethod(method)) {
 			validateTestMethod(method, testClassName, violations);
 			method.getBody().ifPresent(body -> validateNodeBody(body, testClassName, Optional.of(method.getNameAsString()), violations));
-		} else if (isUnsupportedTestMethod(method)) {
-			methodViolation(violations, testClassName, method.getNameAsString(), "Unsupported test method annotation: " + unsupportedTestAnnotation(method), method);
+		} else if (!helperClass && isUnsupportedTestMethod(method)) {
+			methodViolation(violations, testClassName, method.getNameAsString(), "Test method annotation: " + unsupportedTestAnnotation(method), method);
 			validateTestMethod(method, testClassName, violations);
 			method.getBody().ifPresent(body -> validateNodeBody(body, testClassName, Optional.of(method.getNameAsString()), violations));
 		} else if (isFixtureMethod(method)) {
 			validateFixtureMethod(method, testClassName, violations);
 			method.getBody().ifPresent(body -> validateNodeBody(body, testClassName, Optional.empty(), violations));
+		} else if (helperClass) {
+			method.getBody().ifPresent(body -> validateNodeBody(body, testClassName, Optional.empty(), violations));
 		} else {
-			classViolation(violations, testClassName, "Unsupported helper method: " + method.getNameAsString(), method);
+			classViolation(violations, testClassName, "Helper method: " + method.getNameAsString(), method);
 			method.getBody().ifPresent(body -> validateNodeBody(body, testClassName, Optional.empty(), violations));
 		}
 	}
@@ -160,58 +179,58 @@ final class JavaUnsupportedFeatureValidator {
 		for (AnnotationExpr annotation : method.getAnnotations()) {
 			String name = simpleName(annotation);
 			if (!seen.add(name)) {
-				methodViolation(violations, testClassName, method.getNameAsString(), "Unsupported repeated annotation: " + annotation, annotation);
+				methodViolation(violations, testClassName, method.getNameAsString(), "Repeated annotation: " + annotation, annotation);
 			}
 			if (!SUPPORTED_METHOD_ANNOTATIONS.contains(name)) {
 				if (isTestMethod(method) || isUnsupportedTestMethod(method)) {
-					methodViolation(violations, testClassName, method.getNameAsString(), "Unsupported method annotation: " + annotation, annotation);
+					methodViolation(violations, testClassName, method.getNameAsString(), "Method annotation: " + annotation, annotation);
 				} else {
-					classViolation(violations, testClassName, "Unsupported method annotation: " + annotation, annotation);
+					classViolation(violations, testClassName, "Method annotation: " + annotation, annotation);
 				}
 			}
 			if ("Test".equals(name) && !annotation.isMarkerAnnotationExpr()) {
-				methodViolation(violations, testClassName, method.getNameAsString(), "Unsupported @Test attributes: " + annotation, annotation);
+				methodViolation(violations, testClassName, method.getNameAsString(), "@Test attributes: " + annotation, annotation);
 			}
 			if (("Before".equals(name) || "BeforeEach".equals(name)) && !annotation.isMarkerAnnotationExpr()) {
-				classViolation(violations, testClassName, "Unsupported fixture annotation attributes: " + annotation, annotation);
+				classViolation(violations, testClassName, "Fixture annotation attributes: " + annotation, annotation);
 			}
 		}
 	}
 
 	private void validateTestMethod(MethodDeclaration method, String testClassName, List<TestCodeViolation> violations) {
 		if (!method.getParameters().isEmpty()) {
-			methodViolation(violations, testClassName, method.getNameAsString(), "Unsupported test method with parameters: " + method.getNameAsString(), method);
+			methodViolation(violations, testClassName, method.getNameAsString(), "Test method with parameters: " + method.getNameAsString(), method);
 		}
 		if (!method.getType().isVoidType()) {
-			methodViolation(violations, testClassName, method.getNameAsString(), "Unsupported test method return type: " + method.getNameAsString(), method);
+			methodViolation(violations, testClassName, method.getNameAsString(), "Test method return type: " + method.getNameAsString(), method);
 		}
 		if (method.isPrivate()) {
-			methodViolation(violations, testClassName, method.getNameAsString(), "Unsupported private test method: " + method.getNameAsString(), method);
+			methodViolation(violations, testClassName, method.getNameAsString(), "Private test method: " + method.getNameAsString(), method);
 		}
 		if (method.isStatic()) {
-			methodViolation(violations, testClassName, method.getNameAsString(), "Unsupported static test method: " + method.getNameAsString(), method);
+			methodViolation(violations, testClassName, method.getNameAsString(), "Static test method: " + method.getNameAsString(), method);
 		}
 		if (method.getBody().isEmpty()) {
-			methodViolation(violations, testClassName, method.getNameAsString(), "Unsupported test method without body: " + method.getNameAsString(), method);
+			methodViolation(violations, testClassName, method.getNameAsString(), "Test method without body: " + method.getNameAsString(), method);
 		}
 	}
 
 	private void validateFixtureMethod(MethodDeclaration method, String testClassName, List<TestCodeViolation> violations) {
 		if (method.isStatic()) {
-			classViolation(violations, testClassName, "Unsupported static fixture method: " + method.getNameAsString(), method);
+			classViolation(violations, testClassName, "Static fixture method: " + method.getNameAsString(), method);
 		}
 		if (!method.getParameters().isEmpty()) {
-			classViolation(violations, testClassName, "Unsupported fixture method with parameters: " + method.getNameAsString(), method);
+			classViolation(violations, testClassName, "Fixture method with parameters: " + method.getNameAsString(), method);
 		}
 		if (!method.getType().isVoidType()) {
-			classViolation(violations, testClassName, "Unsupported fixture method return type: " + method.getNameAsString(), method);
+			classViolation(violations, testClassName, "Fixture method return type: " + method.getNameAsString(), method);
 		}
 	}
 
 	private void validateFixtureCounts(CompilationUnit unit, String testClassName, List<TestCodeViolation> violations) {
 		long beforeFixtures = countMethodsAnnotatedWith(unit, "Before") + countMethodsAnnotatedWith(unit, "BeforeEach");
 		if (beforeFixtures > 1) {
-			classViolation(violations, testClassName, "Unsupported multiple @Before fixtures", unit.toString());
+			classViolation(violations, testClassName, "Multiple @Before fixtures", unit.toString());
 		}
 	}
 
@@ -222,27 +241,27 @@ final class JavaUnsupportedFeatureValidator {
 	private void validateNodeBody(Node node, String testClassName, Optional<String> testMethodName, List<TestCodeViolation> violations) {
 		node.findAll(LambdaExpr.class).stream()
 				.filter(lambda -> !hasAssertionMethodAncestor(lambda))
-				.forEach(lambda -> violation(violations, testClassName, testMethodName, "Unsupported lambda expression", lambda));
+				.forEach(lambda -> violation(violations, testClassName, testMethodName, "Lambda expression", lambda));
 		node.findAll(MethodReferenceExpr.class).stream()
 				.filter(reference -> !hasAssertionMethodAncestor(reference))
-				.forEach(reference -> violation(violations, testClassName, testMethodName, "Unsupported method reference", reference));
+				.forEach(reference -> violation(violations, testClassName, testMethodName, "Method reference", reference));
 		node.findAll(ObjectCreationExpr.class).stream()
 				.filter(creation -> creation.getAnonymousClassBody().isPresent())
-				.forEach(creation -> violation(violations, testClassName, testMethodName, "Unsupported anonymous class", creation));
-		node.findAll(ClassOrInterfaceDeclaration.class).forEach(type -> violation(violations, testClassName, testMethodName, "Unsupported local class: " + type.getNameAsString(), type));
-		node.findAll(ForStmt.class).forEach(statement -> violation(violations, testClassName, testMethodName, "Unsupported for loop", statement));
-		node.findAll(ForEachStmt.class).forEach(statement -> violation(violations, testClassName, testMethodName, "Unsupported for-each loop", statement));
-		node.findAll(WhileStmt.class).forEach(statement -> violation(violations, testClassName, testMethodName, "Unsupported while loop", statement));
-		node.findAll(DoStmt.class).forEach(statement -> violation(violations, testClassName, testMethodName, "Unsupported do-while loop", statement));
-		node.findAll(TryStmt.class).forEach(statement -> violation(violations, testClassName, testMethodName, "Unsupported try statement", statement));
-		node.findAll(SwitchStmt.class).forEach(statement -> violation(violations, testClassName, testMethodName, "Unsupported switch statement", statement));
-		node.findAll(SynchronizedStmt.class).forEach(statement -> violation(violations, testClassName, testMethodName, "Unsupported synchronized block", statement));
-		node.findAll(LabeledStmt.class).forEach(statement -> violation(violations, testClassName, testMethodName, "Unsupported labeled statement", statement));
-		node.findAll(BreakStmt.class).forEach(statement -> violation(violations, testClassName, testMethodName, "Unsupported break statement", statement));
-		node.findAll(ContinueStmt.class).forEach(statement -> violation(violations, testClassName, testMethodName, "Unsupported continue statement", statement));
-		node.findAll(ThrowStmt.class).forEach(statement -> violation(violations, testClassName, testMethodName, "Unsupported explicit throw statement", statement));
-		node.findAll(ThisExpr.class).forEach(expression -> violation(violations, testClassName, testMethodName, "Unsupported explicit this expression", expression));
-		node.findAll(SuperExpr.class).forEach(expression -> violation(violations, testClassName, testMethodName, "Unsupported explicit super expression", expression));
+				.forEach(creation -> violation(violations, testClassName, testMethodName, "Anonymous class", creation));
+		node.findAll(ClassOrInterfaceDeclaration.class).forEach(type -> violation(violations, testClassName, testMethodName, "Local class: " + type.getNameAsString(), type));
+		node.findAll(ForStmt.class).forEach(statement -> violation(violations, testClassName, testMethodName, "For loop", statement));
+		node.findAll(ForEachStmt.class).forEach(statement -> violation(violations, testClassName, testMethodName, "For-each loop", statement));
+		node.findAll(WhileStmt.class).forEach(statement -> violation(violations, testClassName, testMethodName, "While loop", statement));
+		node.findAll(DoStmt.class).forEach(statement -> violation(violations, testClassName, testMethodName, "Do-while loop", statement));
+		node.findAll(TryStmt.class).forEach(statement -> violation(violations, testClassName, testMethodName, "Try statement", statement));
+		node.findAll(SwitchStmt.class).forEach(statement -> violation(violations, testClassName, testMethodName, "Switch statement", statement));
+		node.findAll(SynchronizedStmt.class).forEach(statement -> violation(violations, testClassName, testMethodName, "Synchronized block", statement));
+		node.findAll(LabeledStmt.class).forEach(statement -> violation(violations, testClassName, testMethodName, "Labeled statement", statement));
+		node.findAll(BreakStmt.class).forEach(statement -> violation(violations, testClassName, testMethodName, "Break statement", statement));
+		node.findAll(ContinueStmt.class).forEach(statement -> violation(violations, testClassName, testMethodName, "Continue statement", statement));
+		node.findAll(ThrowStmt.class).forEach(statement -> violation(violations, testClassName, testMethodName, "Explicit throw statement", statement));
+		node.findAll(ThisExpr.class).forEach(expression -> violation(violations, testClassName, testMethodName, "Explicit this expression", expression));
+		node.findAll(SuperExpr.class).forEach(expression -> violation(violations, testClassName, testMethodName, "Explicit super expression", expression));
 	}
 
 	private boolean hasAssertionMethodAncestor(Node node) {

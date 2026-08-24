@@ -1,6 +1,7 @@
 package br.ufsc.ine.leb.roza.core.modern.analytics;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import br.ufsc.ine.leb.roza.core.modern.decomposition.DecomposedTestCases;
 import br.ufsc.ine.leb.roza.core.modern.parsing.ParsedTestClasses;
@@ -10,7 +11,8 @@ public final class TestClassMetricsCalculator {
 
 	public static TestClassMetrics forSetupCode(List<TestClass> testClasses) {
 		SetupCodeDuplicationAnalyzer.DuplicationMetrics duplication = SetupCodeDuplicationAnalyzer.analyze(testClasses);
-		return metrics(testClasses, duplication.totalStatements(), duplication.duplicatedStatements());
+		List<TestClass> countedClasses = testClasses.stream().filter(testClass -> !testClass.isHelperClass()).collect(Collectors.toList());
+		return metrics(countedClasses, duplication.totalStatements(), duplication.duplicatedStatements());
 	}
 
 	private static TestClassMetrics metrics(List<TestClass> testClasses, int totalStatements, int duplicatedStatements) {

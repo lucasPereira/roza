@@ -46,10 +46,8 @@ public final class JunitTestClassParser implements TestClassParser {
 		for (CodeFile codeFile : codeFiles.codeFiles()) {
 			try {
 				CompilationUnit unit = JavaParser.parse(codeFile.content());
-				if (containsNoTests(unit)) {
-					continue;
-				}
-				List<TestCodeViolation> codeFileViolations = validator.validate(unit);
+				boolean helperClass = containsNoTests(unit);
+				List<TestCodeViolation> codeFileViolations = helperClass ? validator.validateHelperClass(unit) : validator.validate(unit);
 				diagnostics.addAll(codeFileViolations);
 				violations.addAll(codeFileViolations);
 				extractTestClass(unit).ifPresent(testClasses::add);
@@ -68,7 +66,7 @@ public final class JunitTestClassParser implements TestClassParser {
 	}
 
 	private boolean containsNoTests(CompilationUnit unit) {
-		return unit.findAll(MethodDeclaration.class).stream().noneMatch(this::isTestLikeMethod);
+		return unit.findAll(MethodDeclaration.class).stream().noneMatch(this::isTestMethod);
 	}
 
 	private Optional<TestClass> extractTestClass(CompilationUnit unit) {
@@ -229,13 +227,6 @@ public final class JunitTestClassParser implements TestClassParser {
 
 	private boolean isTestMethod(MethodDeclaration method) {
 		return hasAnnotation(method, "Test");
-	}
-
-	private boolean isTestLikeMethod(MethodDeclaration method) {
-		return method.getAnnotations()
-				.stream()
-				.map(this::simpleName)
-				.anyMatch(name -> List.of("Test", "ParameterizedTest", "Theory", "TestFactory", "TestTemplate", "RepeatedTest").contains(name));
 	}
 
 	private boolean isFixtureMethod(MethodDeclaration method) {

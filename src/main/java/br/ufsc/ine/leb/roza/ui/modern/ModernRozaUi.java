@@ -4,6 +4,7 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -39,9 +40,11 @@ import br.ufsc.ine.leb.roza.core.modern.decomposition.DecomposedTestCases;
 import br.ufsc.ine.leb.roza.core.modern.decomposition.TestCase;
 import br.ufsc.ine.leb.roza.core.modern.decomposition.TestCaseDecomposer;
 import br.ufsc.ine.leb.roza.core.modern.decomposition.TestCodeEligibilitySummary;
+import br.ufsc.ine.leb.roza.core.modern.decomposition.WithoutImplicitSetupTestCaseDecomposer;
 import br.ufsc.ine.leb.roza.core.modern.loading.CodeFile;
 import br.ufsc.ine.leb.roza.core.modern.loading.FileSystemCodeFileLoader;
 import br.ufsc.ine.leb.roza.core.modern.loading.LoadedCodeFiles;
+import br.ufsc.ine.leb.roza.core.modern.measurement.ContiguousCommonStatementsSimilarityMeasurer;
 import br.ufsc.ine.leb.roza.core.modern.measurement.DeckardMeasurementConfiguration;
 import br.ufsc.ine.leb.roza.core.modern.measurement.DeckardTestCaseSimilarityMeasurer;
 import br.ufsc.ine.leb.roza.core.modern.measurement.GreedyAdmissiblePrefixSimilarityMeasurer;
@@ -68,6 +71,7 @@ import br.ufsc.ine.leb.roza.core.modern.parsing.TestMethod;
 import br.ufsc.ine.leb.roza.core.modern.parsing.UnsupportedFeatureException;
 import br.ufsc.ine.leb.roza.core.modern.parsing.ViolationContextExtractor;
 import br.ufsc.ine.leb.roza.core.modern.parsing.ViolationScope;
+import br.ufsc.ine.leb.roza.core.modern.refactoring.DelegatedSetupTestClassRefactorer;
 import br.ufsc.ine.leb.roza.core.modern.refactoring.ImplicitSetupTestClassRefactorer;
 import br.ufsc.ine.leb.roza.core.modern.refactoring.JunitTestClassRenderer;
 import br.ufsc.ine.leb.roza.core.modern.refactoring.NonIsolatingImplicitSetupTestClassRefactorer;
@@ -133,6 +137,9 @@ public final class ModernRozaUi extends Application {
 	private static final int SIDEBAR_WIDTH = 320;
 	private static final String ISOLATING_IMPLICIT_SETUP_STRATEGY = "Isolating implicit setup";
 	private static final String NON_ISOLATING_IMPLICIT_SETUP_STRATEGY = "Non-isolating implicit setup";
+	private static final String DELEGATED_SETUP_STRATEGY = "Delegated setup";
+	private static final String WITH_IMPLICIT_SETUP_DECOMPOSER = "With implicit setup";
+	private static final String WITHOUT_IMPLICIT_SETUP_DECOMPOSER = "Without implicit setup";
 
 	private final PipelineState pipelineState;
 	private final HBox pipelineBar;
@@ -142,12 +149,15 @@ public final class ModernRozaUi extends Application {
 	private final CheckBox javaExtension;
 	private final CheckBox txtExtension;
 	private final ComboBox<String> metricCombo;
+	private final ComboBox<String> decomposerCombo;
 	private final ComboBox<String> refactoringStrategyCombo;
 	private final TextField deckardMinTokensInput;
 	private final TextField deckardStrideInput;
 	private final TextField deckardSimilarityInput;
 	private final TextField jplagSensitivityInput;
 	private final TextField simianThresholdInput;
+	private final TextField ccsMinimumLengthInput;
+	private final TextField sepMaximumMethodSizeInput;
 	private final ComboBox<TestCase> sourceTestCombo;
 	private final ComboBox<TestCase> targetTestCombo;
 	private final ComboBox<LinkageMethod> linkageMethodCombo;
@@ -163,6 +173,7 @@ public final class ModernRozaUi extends Application {
 	private String decompositionError;
 	private TestCase selectedDecomposedTestCase;
 	private TestClass selectedParsedTestClass;
+	private TestClass selectedParsedHelperClass;
 	private String selectedClassDetailsTab = "Summary";
 	private TestMethod selectedParsedTestMethod;
 	private FixtureMethod selectedParsedFixture;
@@ -182,6 +193,7 @@ public final class ModernRozaUi extends Application {
 	private Button refactoringTopLevelButton;
 	private RefactoredTestClasses refactoredTestClasses;
 	private TestClass selectedRefactoredTestClass;
+	private TestClass selectedRefactoredHelperClass;
 	private String refactoringError;
 	private Path outputFolder;
 	private String writingError;
@@ -216,13 +228,21 @@ public final class ModernRozaUi extends Application {
 		metricCombo.getItems().add("Deckard");
 		metricCombo.getItems().add("JPlag");
 		metricCombo.getItems().add("Simian");
+		metricCombo.getItems().add("CCS");
 		metricCombo.getSelectionModel().selectFirst();
 		metricCombo.setStyle(singleLineComboBoxStyle());
 		metricCombo.valueProperty().addListener((observable, previous, selected) -> renderConfigurationSidebar());
 
+		decomposerCombo = new ComboBox<>();
+		decomposerCombo.getItems().add(WITH_IMPLICIT_SETUP_DECOMPOSER);
+		decomposerCombo.getItems().add(WITHOUT_IMPLICIT_SETUP_DECOMPOSER);
+		decomposerCombo.getSelectionModel().selectFirst();
+		decomposerCombo.setStyle(singleLineComboBoxStyle());
+
 		refactoringStrategyCombo = new ComboBox<>();
 		refactoringStrategyCombo.getItems().add(ISOLATING_IMPLICIT_SETUP_STRATEGY);
 		refactoringStrategyCombo.getItems().add(NON_ISOLATING_IMPLICIT_SETUP_STRATEGY);
+		refactoringStrategyCombo.getItems().add(DELEGATED_SETUP_STRATEGY);
 		refactoringStrategyCombo.getSelectionModel().selectFirst();
 		refactoringStrategyCombo.setStyle(singleLineComboBoxStyle());
 
@@ -231,6 +251,8 @@ public final class ModernRozaUi extends Application {
 		deckardSimilarityInput = metricConfigurationInput(String.valueOf(DeckardMeasurementConfiguration.DEFAULT_SIMILARITY));
 		jplagSensitivityInput = metricConfigurationInput(String.valueOf(JplagMeasurementConfiguration.DEFAULT_SENSITIVITY));
 		simianThresholdInput = metricConfigurationInput(String.valueOf(SimianMeasurementConfiguration.DEFAULT_THRESHOLD));
+		ccsMinimumLengthInput = metricConfigurationInput("1");
+		sepMaximumMethodSizeInput = metricConfigurationInput("");
 
 		sourceTestCombo = testCaseComboBox();
 		targetTestCombo = testCaseComboBox();
@@ -455,6 +477,19 @@ public final class ModernRozaUi extends Application {
 				refactoringStrategyHelpEntries());
 	}
 
+	private void showDecomposerHelpDialog() {
+		showConfigurationHelpDialog(
+				"Decomposers",
+				"Decomposition decides which statements of a test are compared and later rewritten. Delegated setup should use the decomposer that leaves implicit setup in the original class.",
+				List.of(
+						new ConfigurationHelpEntry(
+								WITH_IMPLICIT_SETUP_DECOMPOSER,
+								"Inlines fields and @Before statements into each test. This is the decomposer for implicit-setup refactoring."),
+						new ConfigurationHelpEntry(
+								WITHOUT_IMPLICIT_SETUP_DECOMPOSER,
+								"Keeps only the original test method body. Fields and @Before stay out of the comparison, so delegated setup extracts clones that exist in the tests themselves.")));
+	}
+
 	private void showLinkageMethodHelpDialog() {
 		showConfigurationHelpDialog(
 				"Linkage methods",
@@ -483,7 +518,10 @@ public final class ModernRozaUi extends Application {
 						"Creates one generated class per cluster, including clusters with a single test. Singleton tests receive their full decomposed body and lose the original class-level fixture."),
 				new ConfigurationHelpEntry(
 						NON_ISOLATING_IMPLICIT_SETUP_STRATEGY,
-						"Extracts implicit setup only for clusters with two or more tests. Tests that would become singleton classes stay in residual original classes, keeping the original fields, fixtures, helpers, and test method bodies."));
+						"Extracts implicit setup only for clusters with two or more tests. Tests that would become singleton classes stay in residual original classes, keeping the original fields, fixtures, helpers, and test method bodies."),
+				new ConfigurationHelpEntry(
+						DELEGATED_SETUP_STRATEGY,
+						"Keeps tests in their original classes and extracts shared contiguous arrange runs into static methods on one helper class per cluster. Requires the without-implicit-setup decomposer and pairs with CCS. Runs that would return two values, or whose live-in types disagree, are left in place."));
 	}
 
 	private List<ConfigurationHelpEntry> measurementMetricHelpEntries() {
@@ -499,7 +537,7 @@ public final class ModernRozaUi extends Application {
 						"Maximum Admissible Prefix. Can reorder arrange statements when dependencies allow, and searches matching choices for the longest admissible prefix instead of stopping at the first greedy fit. Search is limited to 50,000 states; if that limit is hit, the score uses the greedy result instead. Normalized with Dice. Useful when you care about finding the longest dependency-respecting shared prefix."),
 				new ConfigurationHelpEntry(
 						"SEP",
-						"Setup Extraction Potential. Same shared opening as LCCSS, but reports the raw count of matching statements instead of a normalized score. Ten shared statements beat two, even if the shorter pair looks proportionally closer under LCCSS. Useful when you care about how much setup you can actually extract."),
+						"Setup extraction potential. Same shared opening as LCCSS, then divides that prefix length by the size of the largest method so the score stays between 0 and 1. Longer shared prefixes still outrank shorter ones. Leave maximum method size empty to use the largest pre-assertion arrange in the current tests. Useful when you care about how much setup you can extract on a similarity scale."),
 				new ConfigurationHelpEntry(
 						"LCS",
 						"Longest Common Subsequence. Finds the longest stretch of arrange statements both tests have in common, keeping order but allowing gaps. Unlike LCCSS, a match in the middle still counts. Normalized with Dice. Useful when you care about similar arrange code even when it is not a clean prefix match."),
@@ -511,7 +549,10 @@ public final class ModernRozaUi extends Application {
 						"External program similarity detector. Turns each arrange projection into tokens and looks for long matching runs between the two using Greedy String Tiling. Róża reads the directional coverage from JPlag's HTML report. Sensitivity sets the minimum run length. Useful when you care about token-level overlap from an external similarity tool."),
 				new ConfigurationHelpEntry(
 						"Simian",
-						"External duplicate-code detector. Finds identical blocks of consecutive lines above a minimum size. Róża runs it on arrange projections and scores how much of the source arrange falls inside blocks reported as duplicates with the target. Threshold is the minimum block size in lines. Useful when you care about exact duplicate lines from an external duplicate-code detector."));
+						"External duplicate-code detector. Finds identical blocks of consecutive lines above a minimum size. Róża runs it on arrange projections and scores how much of the source arrange falls inside blocks reported as duplicates with the target. Threshold is the minimum block size in lines. Useful when you care about exact duplicate lines from an external duplicate-code detector."),
+				new ConfigurationHelpEntry(
+						"CCS",
+						"Contiguous common statements. Scores how much extractable identical arrange two tests share as a contiguous run, even in the middle of the test. Dice-normalized. A run stops when extracting it would return two values or the live-in types disagree. Minimum length defaults to 1. Useful when you intend to extract delegated setup helpers."));
 	}
 
 	private List<ConfigurationHelpEntry> linkageMethodHelpEntries() {
@@ -681,8 +722,7 @@ public final class ModernRozaUi extends Application {
 		outputFolderButton.setOnAction(event -> chooseOutputFolder());
 
 		Label selectedFolder = body(outputFolderText());
-		VBox configuration = new VBox(SPACING_X, outputFolderButton, selectedFolder);
-		return configuration;
+		return new VBox(SPACING_4X, new VBox(SPACING_X, outputFolderButton, selectedFolder));
 	}
 
 	private VBox parsingConfiguration() {
@@ -690,7 +730,12 @@ public final class ModernRozaUi extends Application {
 	}
 
 	private VBox decompositionConfiguration() {
-		return new VBox(SPACING_X);
+		VBox decomposerBlock = new VBox(SPACING_X);
+		decomposerCombo.setMaxWidth(Double.MAX_VALUE);
+		decomposerBlock.getChildren().addAll(
+				configurationTitleRow("Decomposer", this::showDecomposerHelpDialog),
+				decomposerCombo);
+		return decomposerBlock;
 	}
 
 	private VBox measurementConfiguration() {
@@ -718,6 +763,12 @@ public final class ModernRozaUi extends Application {
 			VBox simianFields = new VBox(SPACING_X);
 			simianFields.getChildren().add(configurationInput("Threshold", simianThresholdInput));
 			configuration.getChildren().add(simianFields);
+		}
+		if ("CCS".equals(metricCombo.getSelectionModel().getSelectedItem())) {
+			configuration.getChildren().add(configurationInput("Minimum length", ccsMinimumLengthInput));
+		}
+		if ("SEP".equals(metricCombo.getSelectionModel().getSelectedItem())) {
+			configuration.getChildren().add(configurationInput("Maximum method size", sepMaximumMethodSizeInput));
 		}
 		return configuration;
 	}
@@ -1050,6 +1101,7 @@ public final class ModernRozaUi extends Application {
 		decompositionError = null;
 		selectedDecomposedTestCase = null;
 		selectedParsedTestClass = null;
+		selectedParsedHelperClass = null;
 		selectedClassDetailsTab = "Summary";
 		selectedParsedTestMethod = null;
 		selectedParsedFixture = null;
@@ -1084,6 +1136,7 @@ public final class ModernRozaUi extends Application {
 	private void clearRefactoringResults() {
 		refactoredTestClasses = null;
 		selectedRefactoredTestClass = null;
+		selectedRefactoredHelperClass = null;
 		refactoringError = null;
 		writingError = null;
 	}
@@ -1147,7 +1200,9 @@ public final class ModernRozaUi extends Application {
 
 	private void runDecomposition() {
 		try {
-			TestCaseDecomposer decomposer = new DefaultTestCaseDecomposer();
+			TestCaseDecomposer decomposer = WITHOUT_IMPLICIT_SETUP_DECOMPOSER.equals(decomposerCombo.getSelectionModel().getSelectedItem())
+					? new WithoutImplicitSetupTestCaseDecomposer()
+					: new DefaultTestCaseDecomposer();
 			decomposedTestCases = decomposer.decompose(parsedTestClasses);
 			decompositionError = null;
 			clearMeasurementResults();
@@ -1213,18 +1268,30 @@ public final class ModernRozaUi extends Application {
 
 	private void refactor(TestCaseClusters clusters) {
 		try {
-			refactoredTestClasses = selectedTestClassRefactorer().refactor(clusters);
-			selectedRefactoredTestClass = refactoredTestClasses.testClasses().isEmpty() ? null : refactoredTestClasses.testClasses().get(0);
+			refactoredTestClasses = selectedTestClassRefactorer().refactor(clusters).plusExistingHelpers(parsedTestClasses);
+			selectedRefactoredTestClass = firstRefactoredTestClass();
+			selectedRefactoredHelperClass = firstRefactoredHelperClass();
 			refactoringError = null;
 			writingError = null;
 			pipelineState.runSelectedStage();
 		} catch (RuntimeException exception) {
 			refactoredTestClasses = null;
 			selectedRefactoredTestClass = null;
+			selectedRefactoredHelperClass = null;
 			refactoringError = exception.getMessage() != null ? exception.getMessage() : exception.toString();
 			writingError = null;
 		}
 		render();
+	}
+
+	private TestClass firstRefactoredTestClass() {
+		List<TestClass> testClasses = orderedRefactoredTestClasses();
+		return testClasses.isEmpty() ? null : testClasses.get(0);
+	}
+
+	private TestClass firstRefactoredHelperClass() {
+		List<TestClass> helpers = orderedRefactoredHelperClasses();
+		return helpers.isEmpty() ? null : helpers.get(0);
 	}
 
 	private void runWriting() {
@@ -1248,6 +1315,9 @@ public final class ModernRozaUi extends Application {
 	}
 
 	private TestClassRefactorer selectedTestClassRefactorer() {
+		if (DELEGATED_SETUP_STRATEGY.equals(refactoringStrategyCombo.getSelectionModel().getSelectedItem())) {
+			return new DelegatedSetupTestClassRefactorer(ccsMinimumLength());
+		}
 		if (NON_ISOLATING_IMPLICIT_SETUP_STRATEGY.equals(refactoringStrategyCombo.getSelectionModel().getSelectedItem())) {
 			return new NonIsolatingImplicitSetupTestClassRefactorer();
 		}
@@ -1262,7 +1332,7 @@ public final class ModernRozaUi extends Application {
 			return new MaxAdmissiblePrefixSimilarityMeasurer();
 		}
 		if ("SEP".equals(metricCombo.getSelectionModel().getSelectedItem())) {
-			return new SetupExtractionPotentialTestCaseSimilarityMeasurer();
+			return selectedSepMeasurer();
 		}
 		if ("Deckard".equals(metricCombo.getSelectionModel().getSelectedItem())) {
 			return new DeckardTestCaseSimilarityMeasurer(deckardConfiguration());
@@ -1273,10 +1343,49 @@ public final class ModernRozaUi extends Application {
 		if ("Simian".equals(metricCombo.getSelectionModel().getSelectedItem())) {
 			return new SimianTestCaseSimilarityMeasurer(simianConfiguration());
 		}
+		if ("CCS".equals(metricCombo.getSelectionModel().getSelectedItem())) {
+			return new ContiguousCommonStatementsSimilarityMeasurer(ccsMinimumLength());
+		}
 		if ("LCS".equals(metricCombo.getSelectionModel().getSelectedItem())) {
 			return new LcsTestCaseSimilarityMeasurer();
 		}
 		return new LccssTestCaseSimilarityMeasurer();
+	}
+
+	private TestCaseSimilarityMeasurer selectedSepMeasurer() {
+		Integer maximumMethodSize = sepMaximumMethodSize();
+		if (maximumMethodSize == null) {
+			return new SetupExtractionPotentialTestCaseSimilarityMeasurer();
+		}
+		return new SetupExtractionPotentialTestCaseSimilarityMeasurer(maximumMethodSize);
+	}
+
+	private Integer sepMaximumMethodSize() {
+		String text = sepMaximumMethodSizeInput.getText().trim();
+		if (text.isEmpty()) {
+			return null;
+		}
+		try {
+			int maximumMethodSize = Integer.parseInt(text);
+			if (maximumMethodSize < 1) {
+				throw new IllegalArgumentException("SEP maximum method size must be at least 1.");
+			}
+			return maximumMethodSize;
+		} catch (NumberFormatException exception) {
+			throw new IllegalArgumentException("SEP maximum method size must be an integer.", exception);
+		}
+	}
+
+	private int ccsMinimumLength() {
+		try {
+			int minimumLength = Integer.parseInt(ccsMinimumLengthInput.getText().trim());
+			if (minimumLength < 1) {
+				throw new IllegalArgumentException("CCS minimum length must be at least 1.");
+			}
+			return minimumLength;
+		} catch (NumberFormatException exception) {
+			throw new IllegalArgumentException("CCS minimum length must be an integer.", exception);
+		}
 	}
 
 	private DeckardMeasurementConfiguration deckardConfiguration() {
@@ -1432,7 +1541,7 @@ public final class ModernRozaUi extends Application {
 				error.setStyle(error.getStyle() + "-fx-text-fill: #991b1b;");
 				writingColumn.getChildren().add(error);
 			}
-			HBox writingView = refactoredTestClassesView();
+			TabPane writingView = refactoredClassesView();
 			writingColumn.getChildren().add(writingView);
 			contentArea.getChildren().add(writingColumn);
 			VBox.setVgrow(writingView, Priority.ALWAYS);
@@ -1456,7 +1565,8 @@ public final class ModernRozaUi extends Application {
 						List.of("Test classes", formatNumber(testClassCount())),
 						List.of("Tests", formatNumber(totalTestCount())),
 						List.of("Tests with violations", formatNumber(excludedTestCount())),
-						List.of("Accepted tests", formatNumber(acceptedTestCount())))));
+						List.of("Accepted tests", formatNumber(acceptedTestCount())),
+						List.of("Helper files", formatNumber(helperFileCount())))));
 		return summary;
 	}
 
@@ -1628,7 +1738,11 @@ public final class ModernRozaUi extends Application {
 	}
 
 	private long testClassCount() {
-		return parsedTestClasses.testClasses().size();
+		return parsedTestClassesOnly().size();
+	}
+
+	private long helperFileCount() {
+		return parsedHelperClasses().size();
 	}
 
 	private long totalTestCount() {
@@ -1636,9 +1750,11 @@ public final class ModernRozaUi extends Application {
 	}
 
 	private long classViolationCount() {
+		Set<String> helperNames = parsedHelperClasses().stream().map(TestClass::qualifiedName).collect(Collectors.toSet());
 		return parsedTestClasses.violations().stream()
 				.filter(violation -> violation.scope() == ViolationScope.TEST_CLASS)
 				.map(TestCodeViolation::testClassName)
+				.filter(name -> !helperNames.contains(name))
 				.distinct()
 				.count();
 	}
@@ -1713,18 +1829,35 @@ public final class ModernRozaUi extends Application {
 	private void initializeDecompositionSelection() {
 		if (parsedTestClasses == null) {
 			selectedParsedTestClass = null;
+			selectedParsedHelperClass = null;
 			selectedParsedTestMethod = null;
 			selectedParsedFixture = null;
 			selectedClassViolation = null;
 			selectedViolation = null;
 			return;
 		}
-		selectedParsedTestClass = parsedTestClasses.testClasses().isEmpty() ? null : parsedTestClasses.testClasses().get(0);
+		List<TestClass> testClasses = parsedTestClassesOnly();
+		List<TestClass> helperClasses = parsedHelperClasses();
+		selectedParsedTestClass = testClasses.isEmpty() ? null : testClasses.get(0);
+		selectedParsedHelperClass = helperClasses.isEmpty() ? null : helperClasses.get(0);
 		selectedClassDetailsTab = "Summary";
 		selectedParsedTestMethod = null;
 		selectedParsedFixture = null;
 		selectedClassViolation = null;
-		selectedViolation = parsedTestClasses.violations().isEmpty() ? null : parsedTestClasses.violations().get(0);
+		List<TestCodeViolation> violations = orderedDecompositionViolations();
+		selectedViolation = violations.isEmpty() ? null : violations.get(0);
+	}
+
+	private List<TestClass> parsedTestClassesOnly() {
+		return orderedByPackageAndName(parsedTestClasses.testClasses().stream()
+				.filter(testClass -> !testClass.isHelperClass())
+				.collect(Collectors.toList()));
+	}
+
+	private List<TestClass> parsedHelperClasses() {
+		return orderedByPackageAndFileName(parsedTestClasses.testClasses().stream()
+				.filter(TestClass::isHelperClass)
+				.collect(Collectors.toList()));
 	}
 
 	private TabPane decompositionContentTabs() {
@@ -1733,15 +1866,16 @@ public final class ModernRozaUi extends Application {
 		tabPane.setMaxWidth(Double.MAX_VALUE);
 		tabPane.setMaxHeight(Double.MAX_VALUE);
 
-		Tab classesTab = new Tab("Classes", decompositionClassesView());
+		Tab classesTab = new Tab("Test classes", decompositionClassesView());
+		Tab helpersTab = new Tab("Helper classes", decompositionHelpersView());
 		Tab violationsTab = new Tab("Violations", decompositionViolationsView());
-		tabPane.getTabs().addAll(classesTab, violationsTab);
+		tabPane.getTabs().addAll(classesTab, helpersTab, violationsTab);
 		return tabPane;
 	}
 
 	private HBox decompositionClassesView() {
 		ListView<TestClass> classList = new ListView<>();
-		classList.getItems().addAll(parsedTestClasses.testClasses());
+		classList.getItems().addAll(parsedTestClassesOnly());
 		configureLargeList(classList);
 		classList.setCellFactory(list -> new ListCell<>() {
 			@Override
@@ -1774,6 +1908,46 @@ public final class ModernRozaUi extends Application {
 		HBox.setHgrow(row, Priority.ALWAYS);
 		decompositionClassesRow = row;
 		return row;
+	}
+
+	private HBox decompositionHelpersView() {
+		ListView<TestClass> classList = new ListView<>();
+		classList.getItems().addAll(parsedHelperClasses());
+		configureLargeList(classList);
+		classList.setCellFactory(list -> new ListCell<>() {
+			@Override
+			protected void updateItem(TestClass item, boolean empty) {
+				super.updateItem(item, empty);
+				setText(empty || item == null ? null : item.qualifiedName());
+			}
+		});
+		if (selectedParsedHelperClass != null) {
+			classList.getSelectionModel().select(selectedParsedHelperClass);
+		}
+
+		TextArea codeArea = monospaceTextArea(helperClassCode(selectedParsedHelperClass));
+		HBox.setHgrow(codeArea, Priority.ALWAYS);
+		codeArea.setMaxWidth(Double.MAX_VALUE);
+		codeArea.setMaxHeight(Double.MAX_VALUE);
+		classList.getSelectionModel().selectedItemProperty().addListener((observable, previous, selected) -> {
+			selectedParsedHelperClass = selected;
+			codeArea.setText(helperClassCode(selected));
+		});
+
+		HBox row = new HBox(SPACING_4X);
+		row.setMaxWidth(Double.MAX_VALUE);
+		row.setMaxHeight(Double.MAX_VALUE);
+		row.getChildren().addAll(classList, codeArea);
+		HBox.setHgrow(classList, Priority.NEVER);
+		HBox.setHgrow(row, Priority.ALWAYS);
+		return row;
+	}
+
+	private String helperClassCode(TestClass helperClass) {
+		if (helperClass == null || loadedCodeFiles == null) {
+			return "";
+		}
+		return violationContextExtractor.extractClassCode(loadedCodeFiles, helperClass.qualifiedName()).orElse("");
 	}
 
 	private void refreshDecompositionClassDetails() {
@@ -1890,7 +2064,7 @@ public final class ModernRozaUi extends Application {
 	}
 
 	private HBox classSetupsView(TestClass testClass) {
-		List<FixtureMethod> setups = setupMethodsInClass(testClass);
+		List<FixtureMethod> setups = orderedByNaturalName(setupMethodsInClass(testClass), FixtureMethod::name);
 		ListView<FixtureMethod> setupList = new ListView<>();
 		setupList.getItems().addAll(setups);
 		configureSmallList(setupList);
@@ -1954,8 +2128,9 @@ public final class ModernRozaUi extends Application {
 	}
 
 	private HBox classTestsView(TestClass testClass) {
+		List<TestMethod> tests = orderedByNaturalName(testClass.testMethods(), TestMethod::name);
 		ListView<TestMethod> testList = new ListView<>();
-		testList.getItems().addAll(testClass.testMethods());
+		testList.getItems().addAll(tests);
 		configureSmallList(testList);
 		testList.setCellFactory(list -> new ListCell<>() {
 			@Override
@@ -1965,7 +2140,7 @@ public final class ModernRozaUi extends Application {
 			}
 		});
 
-		TestMethod selectedTestMethod = resolveSelectedTestMethod(testClass);
+		TestMethod selectedTestMethod = resolveSelectedTestMethod(tests);
 		selectedParsedTestMethod = selectedTestMethod;
 		if (selectedTestMethod != null) {
 			testList.getSelectionModel().select(selectedTestMethod);
@@ -2026,15 +2201,15 @@ public final class ModernRozaUi extends Application {
 		listView.setMaxWidth(width);
 	}
 
-	private TestMethod resolveSelectedTestMethod(TestClass testClass) {
+	private TestMethod resolveSelectedTestMethod(List<TestMethod> tests) {
 		if (selectedParsedTestMethod != null) {
-			for (TestMethod testMethod : testClass.testMethods()) {
+			for (TestMethod testMethod : tests) {
 				if (testMethod == selectedParsedTestMethod) {
 					return testMethod;
 				}
 			}
 		}
-		return testClass.testMethods().isEmpty() ? null : testClass.testMethods().get(0);
+		return tests.isEmpty() ? null : tests.get(0);
 	}
 
 	private TestCodeViolation resolveClassViolationSelection(List<TestCodeViolation> violations) {
@@ -2045,7 +2220,7 @@ public final class ModernRozaUi extends Application {
 	}
 
 	private List<TestCodeViolation> violationsForClass(TestClass testClass) {
-		return parsedTestClasses.violations()
+		return orderedDecompositionViolations()
 				.stream()
 				.filter(violation -> violation.testClassName().equals(testClass.qualifiedName()))
 				.collect(Collectors.toList());
@@ -2059,7 +2234,16 @@ public final class ModernRozaUi extends Application {
 	}
 
 	private HBox decompositionViolationsView() {
-		return violationInspectionView(parsedTestClasses.violations(), selectedViolation, violation -> selectedViolation = violation);
+		return violationInspectionView(orderedDecompositionViolations(), selectedViolation, violation -> selectedViolation = violation);
+	}
+
+	private List<TestCodeViolation> orderedDecompositionViolations() {
+		return parsedTestClasses.violations().stream()
+				.sorted(Comparator
+						.comparing(TestCodeViolation::description, NaturalNameOrder.INSTANCE)
+						.thenComparing(TestCodeViolation::testClassName, NaturalNameOrder.INSTANCE)
+						.thenComparing(violation -> violation.testMethodName().orElse(""), NaturalNameOrder.INSTANCE))
+				.collect(Collectors.toList());
 	}
 
 	private HBox violationInspectionView(List<TestCodeViolation> violations, TestCodeViolation selectedViolation, Consumer<TestCodeViolation> onSelectionChanged) {
@@ -2140,7 +2324,7 @@ public final class ModernRozaUi extends Application {
 
 	private HBox loadedFilesView() {
 		ListView<CodeFile> fileList = new ListView<>();
-		fileList.getItems().addAll(loadedCodeFiles.codeFiles());
+		fileList.getItems().addAll(orderedLoadedCodeFiles());
 		fileList.setCellFactory(list -> new ListCell<>() {
 			@Override
 			protected void updateItem(CodeFile item, boolean empty) {
@@ -2186,7 +2370,7 @@ public final class ModernRozaUi extends Application {
 
 	private HBox decomposedTestsView() {
 		ListView<TestCase> testList = new ListView<>();
-		testList.getItems().addAll(decomposedTestCases.testCases());
+		testList.getItems().addAll(orderedDecomposedTestCases());
 		testList.setCellFactory(list -> new ListCell<>() {
 			@Override
 			protected void updateItem(TestCase item, boolean empty) {
@@ -2197,6 +2381,10 @@ public final class ModernRozaUi extends Application {
 		configureLargeList(testList);
 		if (selectedDecomposedTestCase != null) {
 			testList.getSelectionModel().select(selectedDecomposedTestCase);
+			int selectedIndex = testList.getSelectionModel().getSelectedIndex();
+			if (selectedIndex >= 0) {
+				Platform.runLater(() -> testList.scrollTo(selectedIndex));
+			}
 		}
 		testList.getSelectionModel().selectedItemProperty().addListener((observable, previous, selected) -> {
 			selectedDecomposedTestCase = selected;
@@ -2504,8 +2692,7 @@ public final class ModernRozaUi extends Application {
 		String emphasis = mergeEmphasis ? MERGED_CLUSTER_BLOCK_EMPHASIS : "";
 		block.setStyle(FONT_FAMILY + palette + emphasis);
 		formationSimilarity.ifPresent(similarity -> {
-			String scoreName = setupExtractionPotentialSelected() ? "Setup extraction potential" : "Similarity";
-			Label similarityLine = body(scoreName + ": " + formatMeasurementScore(similarity));
+			Label similarityLine = body("Similarity: " + formatMeasurementScore(similarity));
 			similarityLine.setMaxWidth(Region.USE_PREF_SIZE);
 			similarityLine.setStyle(similarityLine.getStyle() + "-fx-font-size: 11px; -fx-text-fill: #6b7280;");
 			block.getChildren().add(similarityLine);
@@ -2520,9 +2707,101 @@ public final class ModernRozaUi extends Application {
 		return block;
 	}
 
-	private HBox refactoredTestClassesView() {
+	private TabPane refactoredClassesView() {
+		TabPane tabPane = new TabPane();
+		tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
+		tabPane.setMaxWidth(Double.MAX_VALUE);
+		tabPane.setMaxHeight(Double.MAX_VALUE);
+		Tab testsTab = new Tab("Test classes", writingClassListView(
+				orderedRefactoredTestClasses(),
+				selectedRefactoredTestClass,
+				selected -> selectedRefactoredTestClass = selected,
+				this::renderRefactoredTestClassCode));
+		Tab helpersTab = new Tab("Helpers classes", writingClassListView(
+				orderedRefactoredHelperClasses(),
+				selectedRefactoredHelperClass,
+				selected -> selectedRefactoredHelperClass = selected,
+				this::renderRefactoredHelperClassCode));
+		tabPane.getTabs().addAll(testsTab, helpersTab);
+		return tabPane;
+	}
+
+	private List<TestClass> orderedRefactoredTestClasses() {
+		return orderedByNaturalName(refactoredTestClasses.testClasses());
+	}
+
+	private List<TestClass> orderedRefactoredHelperClasses() {
+		return orderedByNaturalName(refactoredTestClasses.helperClasses());
+	}
+
+	private List<CodeFile> orderedLoadedCodeFiles() {
+		return loadedCodeFiles.codeFiles().stream()
+				.sorted(Comparator.comparing(CodeFile::source, NaturalNameOrder.PATH))
+				.collect(Collectors.toList());
+	}
+
+	private List<TestCase> orderedDecomposedTestCases() {
+		return orderedByNaturalName(decomposedTestCases.testCases(), TestCase::name);
+	}
+
+	private List<TestClass> orderedByPackageAndName(List<TestClass> classes) {
+		return classes.stream()
+				.sorted(Comparator
+						.comparing((TestClass testClass) -> testClass.packageName().orElse(""), NaturalNameOrder.INSTANCE)
+						.thenComparing(TestClass::name, NaturalNameOrder.INSTANCE))
+				.collect(Collectors.toList());
+	}
+
+	private List<TestClass> orderedByPackageAndFileName(List<TestClass> classes) {
+		return classes.stream()
+				.sorted(Comparator
+						.comparing((TestClass testClass) -> testClass.packageName().orElse(""), NaturalNameOrder.INSTANCE)
+						.thenComparing(this::helperFileName, NaturalNameOrder.INSTANCE))
+				.collect(Collectors.toList());
+	}
+
+	private String helperFileName(TestClass helperClass) {
+		return matchingHelperFileName(helperClass).orElse(helperClass.name());
+	}
+
+	private Optional<String> matchingHelperFileName(TestClass helperClass) {
+		if (loadedCodeFiles == null) {
+			return Optional.empty();
+		}
+		String packagePath = helperClass.packageName().orElse("").replace('.', '/');
+		String className = helperClass.name();
+		for (CodeFile file : loadedCodeFiles.codeFiles()) {
+			String source = file.source().replace('\\', '/');
+			int separator = source.lastIndexOf('/');
+			String directory = separator < 0 ? "" : source.substring(0, separator);
+			String fileName = separator < 0 ? source : source.substring(separator + 1);
+			if (!fileName.startsWith(className + ".") && !fileName.equals(className)) {
+				continue;
+			}
+			if (packagePath.isEmpty() ? directory.isEmpty() : directory.equals(packagePath) || directory.endsWith("/" + packagePath)) {
+				return Optional.of(fileName);
+			}
+		}
+		return Optional.empty();
+	}
+
+	private List<TestClass> orderedByNaturalName(List<TestClass> classes) {
+		return orderedByNaturalName(classes, TestClass::name);
+	}
+
+	private <T> List<T> orderedByNaturalName(List<T> items, Function<T, String> name) {
+		return items.stream()
+				.sorted(Comparator.comparing(name, NaturalNameOrder.INSTANCE))
+				.collect(Collectors.toList());
+	}
+
+	private HBox writingClassListView(
+			List<TestClass> classes,
+			TestClass selected,
+			Consumer<TestClass> onSelect,
+			Function<TestClass, String> renderer) {
 		ListView<TestClass> classList = new ListView<>();
-		classList.getItems().addAll(refactoredTestClasses.testClasses());
+		classList.getItems().addAll(classes);
 		configureLargeList(classList);
 		classList.setCellFactory(list -> new ListCell<>() {
 			@Override
@@ -2531,18 +2810,18 @@ public final class ModernRozaUi extends Application {
 				setText(empty || item == null ? null : item.name());
 			}
 		});
-		if (selectedRefactoredTestClass != null) {
-			classList.getSelectionModel().select(selectedRefactoredTestClass);
+		if (selected != null) {
+			classList.getSelectionModel().select(selected);
 		}
 
-		TextArea codeArea = new TextArea(renderSelectedRefactoredTestClassCode());
+		TextArea codeArea = new TextArea(renderer.apply(selected));
 		codeArea.setEditable(false);
 		codeArea.setWrapText(false);
 		codeArea.setStyle(FONT_FAMILY + "-fx-font-family: 'Monospaced'; -fx-font-size: 13px;");
 		HBox.setHgrow(codeArea, Priority.ALWAYS);
-		classList.getSelectionModel().selectedItemProperty().addListener((observable, previous, selected) -> {
-			selectedRefactoredTestClass = selected;
-			codeArea.setText(renderSelectedRefactoredTestClassCode());
+		classList.getSelectionModel().selectedItemProperty().addListener((observable, previous, next) -> {
+			onSelect.accept(next);
+			codeArea.setText(renderer.apply(next));
 		});
 
 		HBox row = new HBox(SPACING_4X);
@@ -2552,10 +2831,18 @@ public final class ModernRozaUi extends Application {
 		return row;
 	}
 
-	private String renderSelectedRefactoredTestClassCode() {
-		return selectedRefactoredTestClass == null
-				? "Select a refactored test class to inspect its code."
-				: new JunitTestClassRenderer().render(selectedRefactoredTestClass);
+	private String renderRefactoredTestClassCode(TestClass testClass) {
+		if (testClass == null) {
+			return "Select a refactored test class to inspect its code.";
+		}
+		return new JunitTestClassRenderer().render(testClass.withoutPackage());
+	}
+
+	private String renderRefactoredHelperClassCode(TestClass helperClass) {
+		if (helperClass == null) {
+			return "Select a helper class to inspect its code.";
+		}
+		return new JunitTestClassRenderer().render(helperClass);
 	}
 
 	private HBox similaritySelectionControls() {
@@ -2712,12 +2999,8 @@ public final class ModernRozaUi extends Application {
 		return String.format(Locale.ROOT, "%.4f", similarity);
 	}
 
-	private boolean setupExtractionPotentialSelected() {
-		return "SEP".equals(metricCombo.getSelectionModel().getSelectedItem());
-	}
-
 	private String formatMeasurementScore(double score) {
-		return setupExtractionPotentialSelected() ? String.format(Locale.ROOT, "%.0f", score) : formatSimilarity(score);
+		return formatSimilarity(score);
 	}
 
 	private static String formatDuplicationRate(double rate) {

@@ -8,6 +8,7 @@ import br.ufsc.ine.leb.roza.core.modern.parsing.CodeAnnotation;
 import br.ufsc.ine.leb.roza.core.modern.parsing.CodeStatement;
 import br.ufsc.ine.leb.roza.core.modern.parsing.Field;
 import br.ufsc.ine.leb.roza.core.modern.parsing.FixtureMethod;
+import br.ufsc.ine.leb.roza.core.modern.parsing.HelperMethod;
 import br.ufsc.ine.leb.roza.core.modern.parsing.TestClass;
 import br.ufsc.ine.leb.roza.core.modern.parsing.TestMethod;
 
@@ -26,6 +27,7 @@ public final class JunitTestClassRenderer {
 		lines.add("public class " + testClass.name() + " {");
 		addFields(lines, testClass.fields());
 		addFixtures(lines, testClass.fixtures());
+		addHelpers(lines, testClass.helperMethods());
 		addTestMethods(lines, testClass.testMethods());
 		lines.add("}");
 		return String.join("\n", lines);
@@ -50,6 +52,17 @@ public final class JunitTestClassRenderer {
 	private void addFixtures(List<String> lines, List<FixtureMethod> fixtures) {
 		for (FixtureMethod fixture : fixtures) {
 			addMethod(lines, fixture.annotations(), fixture.name(), fixture.thrownExceptions(), fixture.body().statements());
+		}
+	}
+
+	private void addHelpers(List<String> lines, List<HelperMethod> helpers) {
+		for (HelperMethod helper : helpers) {
+			String modifiers = helper.modifiers().isEmpty() ? "public static " : String.join(" ", helper.modifiers()) + " ";
+			String parameters = String.join(", ", helper.parameters());
+			lines.add("\t" + modifiers + helper.returnType() + " " + helper.name() + "(" + parameters + ") {");
+			lines.addAll(helper.body().statements().stream().map(statement -> "\t\t" + statement.normalizedText()).collect(Collectors.toList()));
+			lines.add("\t}");
+			lines.add("");
 		}
 	}
 

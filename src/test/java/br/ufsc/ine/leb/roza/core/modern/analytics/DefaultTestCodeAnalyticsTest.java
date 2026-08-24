@@ -68,7 +68,7 @@ class DefaultTestCodeAnalyticsTest {
 						ViolationScope.TEST_METHOD,
 						"ExampleTest",
 						"parameterizedTest",
-						"Unsupported test method annotation: ParameterizedTest")));
+						"Test method annotation: ParameterizedTest")));
 		DecomposedTestCases accepted = new DecomposedTestCases(List.of(testCase("acceptedTest")));
 
 		TestCodeAnalyticsReport report = new DefaultTestCodeAnalytics().analyze(original, accepted, new RefactoredTestClasses(List.of()));
@@ -76,6 +76,43 @@ class DefaultTestCodeAnalyticsTest {
 		assertEquals(2, report.original().testMethods());
 		assertEquals(1, report.original().testMethodsWithoutViolations());
 		assertEquals(1, report.original().testMethodsWithViolations());
+	}
+
+	@Test
+	void shouldExcludeHelperClassesFromOriginalTestClassCountsAndStillCountTheirSetupStatements() {
+		TestClass example = new TestClass(
+				"ExampleTest",
+				List.of(),
+				List.of(),
+				List.of(),
+				List.of(new TestMethod(
+						"acceptedTest",
+						List.of(annotation("Test")),
+						new CodeBlock(List.of(
+								new CodeStatement("assertTrue(true);", "assertTrue(true);", true))))));
+		TestClass helper = new TestClass(
+				"Factory",
+				List.of(),
+				List.of(),
+				List.of(new HelperMethod(
+						List.of("public", "static"),
+						"void",
+						"login",
+						List.of(),
+						List.of(),
+						block("login();"))),
+				List.of());
+		ParsedTestClasses original = new ParsedTestClasses(List.of(example, helper), List.of());
+		DecomposedTestCases accepted = new DecomposedTestCases(List.of(testCase("acceptedTest")));
+		RefactoredTestClasses refactored = new RefactoredTestClasses(List.of(example), List.of(helper));
+
+		TestCodeAnalyticsReport report = new DefaultTestCodeAnalytics().analyze(original, accepted, refactored);
+
+		assertEquals(1, report.original().testClasses());
+		assertEquals(1, report.comparison().original().testClasses());
+		assertEquals(1, report.comparison().original().testMethods());
+		assertEquals(1, report.comparison().original().totalStatements());
+		assertEquals(0, report.comparison().original().duplicatedStatements());
 	}
 
 	private TestClass testClass(String name, int fields, int fixtures, String... tests) {

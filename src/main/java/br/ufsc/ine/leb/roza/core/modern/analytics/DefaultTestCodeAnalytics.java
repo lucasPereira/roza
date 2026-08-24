@@ -22,13 +22,25 @@ public final class DefaultTestCodeAnalytics implements TestCodeAnalytics {
 		OriginalTestCodeMetrics original = originalMetrics(originalTestClasses);
 		TestCodeMetricComparison comparison = new TestCodeMetricComparison(
 				TestClassMetricsCalculator.forEligibleSetupCode(originalTestClasses, acceptedTestCases),
-				metricsFor(refactoredTestClasses.testClasses()));
+				metricsFor(allClasses(refactoredTestClasses)));
 		return new TestCodeAnalyticsReport(original, comparison);
 	}
 
+	private List<TestClass> allClasses(RefactoredTestClasses refactoredTestClasses) {
+		List<TestClass> classes = new java.util.ArrayList<>(refactoredTestClasses.testClasses());
+		classes.addAll(refactoredTestClasses.helperClasses());
+		return classes;
+	}
+
 	private OriginalTestCodeMetrics originalMetrics(ParsedTestClasses parsedTestClasses) {
-		int testClasses = parsedTestClasses.testClasses().size();
-		int testClassesWithViolations = classesWithAnyViolation(parsedTestClasses).size();
+		List<TestClass> testClassesOnly = parsedTestClasses.testClasses().stream()
+				.filter(testClass -> !testClass.isHelperClass())
+				.collect(Collectors.toList());
+		int testClasses = testClassesOnly.size();
+		Set<String> testClassNames = testClassesOnly.stream().map(TestClass::qualifiedName).collect(Collectors.toSet());
+		int testClassesWithViolations = (int) classesWithAnyViolation(parsedTestClasses).stream()
+				.filter(testClassNames::contains)
+				.count();
 		TestCodeEligibilitySummary eligibilitySummary = new TestCodeEligibilitySummary(parsedTestClasses);
 		int testMethods = eligibilitySummary.totalTestCount();
 		int testMethodsWithoutViolations = eligibilitySummary.acceptedTestCount();

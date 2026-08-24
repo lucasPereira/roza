@@ -15,6 +15,10 @@ public final class AcceptedTestClassProjection {
 		TestCodeEligibility eligibility = new TestCodeEligibility(parsedTestClasses.violations());
 		List<TestClass> acceptedClasses = new ArrayList<>();
 		for (TestClass testClass : parsedTestClasses.testClasses()) {
+			if (testClass.isHelperClass()) {
+				acceptedClasses.add(testClass);
+				continue;
+			}
 			if (!eligibility.accepts(testClass)) {
 				continue;
 			}
