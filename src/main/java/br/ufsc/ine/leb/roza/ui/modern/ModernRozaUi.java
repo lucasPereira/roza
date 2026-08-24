@@ -221,14 +221,14 @@ public final class ModernRozaUi extends Application {
 
 		metricCombo = new ComboBox<>();
 		metricCombo.getItems().add("LCCSS");
+		metricCombo.getItems().add("CCS");
+		metricCombo.getItems().add("LCS");
 		metricCombo.getItems().add("GAP");
 		metricCombo.getItems().add("MAP");
 		metricCombo.getItems().add("SEP");
-		metricCombo.getItems().add("LCS");
-		metricCombo.getItems().add("Deckard");
 		metricCombo.getItems().add("JPlag");
 		metricCombo.getItems().add("Simian");
-		metricCombo.getItems().add("CCS");
+		metricCombo.getItems().add("Deckard");
 		metricCombo.getSelectionModel().selectFirst();
 		metricCombo.setStyle(singleLineComboBoxStyle());
 		metricCombo.valueProperty().addListener((observable, previous, selected) -> renderConfigurationSidebar());
@@ -530,6 +530,12 @@ public final class ModernRozaUi extends Application {
 						"LCCSS",
 						"Longest Common Contiguous Start Subsequence. Looks at how much setup code two tests share at the beginning, before either one starts asserting. The more statements match in order from the top, the higher the score. Normalized with Dice. Useful when you care about shared setup at the very start of each test."),
 				new ConfigurationHelpEntry(
+						"CCS",
+						"Contiguous common statements. Scores how much extractable identical arrange two tests share as a contiguous run, even in the middle of the test. Dice-normalized. A run stops when extracting it would return two values or the live-in types disagree. Minimum length defaults to 1. Useful when you intend to extract delegated setup helpers."),
+				new ConfigurationHelpEntry(
+						"LCS",
+						"Longest Common Subsequence. Finds the longest stretch of arrange statements both tests have in common, keeping order but allowing gaps. Unlike LCCSS, a match in the middle still counts. Normalized with Dice. Useful when you care about similar arrange code even when it is not a clean prefix match."),
+				new ConfigurationHelpEntry(
 						"GAP",
 						"Greedy Admissible Prefix. Like LCCSS, but willing to shuffle one test's arrange when dependencies allow, trying to line up with the other test's order as it goes. Fast, but may stop short of the longest prefix a deeper search could find. Normalized with Dice. Useful when you care about similarity despite reorderable arrange statements and want a fast answer."),
 				new ConfigurationHelpEntry(
@@ -539,20 +545,14 @@ public final class ModernRozaUi extends Application {
 						"SEP",
 						"Setup extraction potential. Same shared opening as LCCSS, then divides that prefix length by the size of the largest method so the score stays between 0 and 1. Longer shared prefixes still outrank shorter ones. Leave maximum method size empty to use the largest pre-assertion arrange in the current tests. Useful when you care about how much setup you can extract on a similarity scale."),
 				new ConfigurationHelpEntry(
-						"LCS",
-						"Longest Common Subsequence. Finds the longest stretch of arrange statements both tests have in common, keeping order but allowing gaps. Unlike LCCSS, a match in the middle still counts. Normalized with Dice. Useful when you care about similar arrange code even when it is not a clean prefix match."),
-				new ConfigurationHelpEntry(
-						"Deckard",
-						"External tree-based clone detector. Parses Java into syntax trees, fingerprints similar subtrees, and reports clones. Róża runs it on arrange projections and scores how much of the source arrange is covered by fragments that match the target. Useful when you care about structural similarity from an external clone detector."),
-				new ConfigurationHelpEntry(
 						"JPlag",
 						"External program similarity detector. Turns each arrange projection into tokens and looks for long matching runs between the two using Greedy String Tiling. Róża reads the directional coverage from JPlag's HTML report. Sensitivity sets the minimum run length. Useful when you care about token-level overlap from an external similarity tool."),
 				new ConfigurationHelpEntry(
 						"Simian",
 						"External duplicate-code detector. Finds identical blocks of consecutive lines above a minimum size. Róża runs it on arrange projections and scores how much of the source arrange falls inside blocks reported as duplicates with the target. Threshold is the minimum block size in lines. Useful when you care about exact duplicate lines from an external duplicate-code detector."),
 				new ConfigurationHelpEntry(
-						"CCS",
-						"Contiguous common statements. Scores how much extractable identical arrange two tests share as a contiguous run, even in the middle of the test. Dice-normalized. A run stops when extracting it would return two values or the live-in types disagree. Minimum length defaults to 1. Useful when you intend to extract delegated setup helpers."));
+						"Deckard",
+						"External tree-based clone detector. Parses Java into syntax trees, fingerprints similar subtrees, and reports clones. Róża runs it on arrange projections and scores how much of the source arrange is covered by fragments that match the target. Useful when you care about structural similarity from an external clone detector."));
 	}
 
 	private List<ConfigurationHelpEntry> linkageMethodHelpEntries() {

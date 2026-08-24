@@ -200,7 +200,7 @@ The first modern UI slice uses JavaFX 17.x while the project remains on Java 11.
 - DEC-083: The modern UI loading stage defaults its source folder to Róża's own test source directory.
 - DEC-084: The modern UI `Clustering` ranked score list is intentionally narrow to prioritize code comparison space.
 - DEC-085: Modern LCS uses the same pre-assertion projection as LCCSS and computes Dice-style similarity from the longest common subsequence size.
-- DEC-086: The modern UI `Measurement` metric dropdown offers LCCSS by default and GAP, MAP, SEP, LCS, Deckard, JPlag, Simian, and CCS as alternatives.
+- DEC-086: The modern UI `Measurement` metric dropdown offers LCCSS by default, then CCS, LCS, GAP, MAP, SEP, JPlag, Simian, and Deckard.
 - DEC-080: Default decomposition turns supported `@Before` assignments to parsed fields into initialized local declarations at the assignment position.
 - DEC-087: Modern Deckard integration is gated by actual Deckard execution. On this machine, the local script fails because `python` is not available, while the existing Docker script executes successfully.
 - DEC-088: Modern Deckard clone-report parsing uses a conservative same-cluster and same-`NODE_KIND`/`TBID`/`TEID` interpretation instead of the legacy Cartesian product across all cluster entries.

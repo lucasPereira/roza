@@ -433,7 +433,7 @@ Acceptance criteria:
 - AC-202: The modern UI `Decomposition` center shows a summary with the number of classes with class-level violations, tests with method-level violations, tests excluded by violations, and accepted tests.
 - AC-203: After decomposition, the modern UI `Measurement` center shows all decomposed tests and the code for the selected test.
 - AC-359: Returning to the modern UI `Measurement` center keeps the previously selected decomposed test selected and scrolls the test list so that selection remains visible.
-- AC-205: The modern UI `Measurement` configuration exposes a metric dropdown with `LCCSS` selected by default and GAP, MAP, SEP, LCS, Deckard, JPlag, Simian, and CCS as alternatives.
+- AC-205: The modern UI `Measurement` configuration exposes a metric dropdown with `LCCSS` selected by default, then CCS, LCS, GAP, MAP, SEP, JPlag, Simian, and Deckard.
 - AC-206: Triggering `Measure` in the modern UI uses the selected similarity measurer and advances to `Clustering` when measurement succeeds.
 - AC-207: The modern UI `Clustering` center shows source and target test selectors.
 - AC-208: The modern UI `Clustering` center shows a ranked source-target similarity pair list.
