@@ -17,3 +17,39 @@
 [submodule "external-projects/jfreechart"]
 	path = external-projects/jfreechart
 	url = https://github.com/jfree/jfreechart.git
+[submodule "external-projects/cobertura"]
+	path = external-projects/cobertura
+	url = https://github.com/cobertura/cobertura.git
+[submodule "external-projects/commons-lang"]
+	path = external-projects/commons-lang
+	url = https://github.com/apache/commons-lang.git
+[submodule "external-projects/couchdb-lucene"]
+	path = external-projects/couchdb-lucene
+	url = https://github.com/rnewson/couchdb-lucene.git
+[submodule "external-projects/ektorp"]
+	path = external-projects/ektorp
+	url = https://github.com/helun/Ektorp.git
+[submodule "external-projects/gson"]
+	path = external-projects/gson
+	url = https://github.com/google/gson.git
+[submodule "external-projects/java-hamcrest"]
+	path = external-projects/java-hamcrest
+	url = https://github.com/hamcrest/JavaHamcrest.git
+[submodule "external-projects/javaparser"]
+	path = external-projects/javaparser
+	url = https://github.com/javaparser/javaparser.git
+[submodule "external-projects/joda-money"]
+	path = external-projects/joda-money
+	url = https://github.com/JodaOrg/joda-money.git
+[submodule "external-projects/junit4"]
+	path = external-projects/junit4
+	url = https://github.com/junit-team/junit4.git
+[submodule "external-projects/picon"]
+	path = external-projects/picon
+	url = https://github.com/douglashiura/picon.git
+[submodule "external-projects/rest-assured"]
+	path = external-projects/rest-assured
+	url = https://github.com/rest-assured/rest-assured.git
+[submodule "external-projects/selenium"]
+	path = external-projects/selenium
+	url = https://github.com/SeleniumHQ/selenium.git
