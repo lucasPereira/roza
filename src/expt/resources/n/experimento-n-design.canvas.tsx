@@ -97,7 +97,7 @@ export default function ExperimentoNDesign() {
         <Stat value="22" label="Sujeitos (17 libs + 4 SAAS + Róża)" />
         <Stat value="8" label="Linhas por sujeito (original + 7 variantes)" />
         <Stat value="176" label="Linhas no CSV" />
-        <Stat value="16g" label="Heap no Gradle" />
+        <Stat value="32g" label="Heap no Gradle" />
       </Grid>
 
       <Callout tone="info" title="Pergunta">
@@ -592,7 +592,10 @@ export default function ExperimentoNDesign() {
           <CardHeader>Execução</CardHeader>
           <CardBody>
             <Text>
-              <Code>./gradlew runExperimentN</Code> com heap 16g.
+              <Code>./gradlew runExperimentN</Code> apaga{" "}
+              <Code>experiment-results/n/</Code> e roda todos os sujeitos, com
+              heap 32g. <Code>./gradlew runExperimentNMissing</Code> passa{" "}
+              <Code>--missing-only</Code>: mantém o CSV e roda só os incompletos.
             </Text>
           </CardBody>
         </Card>

@@ -120,4 +120,4 @@ Experiment `n` compares implicit setup, residual implicit setup, delegated setup
 
 **Input.** `src/expt/resources/n/experimento-n-design.canvas.tsx` holds the locked design. Subject roots live under `external-projects/` and `src/test/java`.
 
-**Procedure.** `./gradlew runExperimentN` (heap 16g) writes `experiment-results/n/comparison.csv`, three grouped-bar SVGs, and the thesis tables as CSV in the same folder. Statistics (Wilcoxon, Friedman, Holm, medians, IQR, improved/worsened/tied) are computed in the same run.
+**Procedure.** `./gradlew runExperimentN` (heap 32g) wipes `experiment-results/n/` and runs every subject from scratch. `./gradlew runExperimentNMissing` passes `--missing-only`: it keeps `comparison.csv` and reruns only subjects that still lack all eight variants. Each run writes `comparison.csv`, `skipped.csv` (project, variant, reason), three grouped-bar SVGs, and the thesis tables as CSV in the same folder. Statistics (Wilcoxon, Friedman, Holm, medians, IQR, improved/worsened/tied) are computed in the same run.

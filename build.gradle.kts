@@ -227,9 +227,17 @@ registerExperimentTask(
 
 registerExperimentTask(
     "runExperimentN",
-    "Runs experiment n, which compares implicit, residual, and delegated setup across external projects and Róża.",
+    "Runs experiment n from scratch: wipes experiment-results/n and compares implicit, residual, and delegated setup across every subject.",
     "br.ufsc.ine.leb.roza.expt.n.Experiment",
-    maxHeapSize = "16g",
+    maxHeapSize = "32g",
+)
+
+registerExperimentTask(
+    "runExperimentNMissing",
+    "Resumes experiment n with --missing-only: keeps comparison.csv and runs only subjects that still lack all eight variants.",
+    "br.ufsc.ine.leb.roza.expt.n.Experiment",
+    experimentArgs = listOf("--missing-only"),
+    maxHeapSize = "32g",
 )
 
 spotless {

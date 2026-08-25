@@ -1,3 +1,1 @@
-project;reason
-javaparser;java.lang.OutOfMemoryError: Java heap space
-saas+teste;java.lang.OutOfMemoryError: Java heap space
+project;variant;reason

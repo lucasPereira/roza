@@ -1,12 +1,16 @@
 package br.ufsc.ine.leb.roza.expt.n;
 
+import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import br.ufsc.ine.leb.roza.core.legacy.utils.CommaSeparatedValues;
+import br.ufsc.ine.leb.roza.core.legacy.utils.FileUtils;
 import br.ufsc.ine.leb.roza.core.legacy.utils.FolderUtils;
 import br.ufsc.ine.leb.roza.core.modern.analytics.RefactoringLevelRanker;
 import br.ufsc.ine.leb.roza.core.modern.analytics.TestClassMetrics;
@@ -46,20 +50,47 @@ public final class Experiment {
 	private static final int VARIANT_COUNT = ThesisTables.VARIANTS.size();
 
 	public static void main(String[] args) {
+		ExperimentOptions options = ExperimentOptions.parse(args);
 		long startedAt = System.currentTimeMillis();
-		RESULTS.createEmptyFolder();
-		List<Subjects.Subject> subjects = Subjects.all();
+		List<ResultRow> rows;
+		if (options.missingOnly()) {
+			if (!comparisonFile().isFile()) {
+				throw new IllegalStateException("Cannot use --missing-only without " + comparisonFile().getPath());
+			}
+			rows = ExperimentResume.parseComparison(new FileUtils().readContetAsString(comparisonFile()));
+		} else {
+			RESULTS.createEmptyFolder();
+			rows = new ArrayList<>();
+		}
+		List<Subjects.Subject> subjects = options.subjects(Subjects.all(), rows);
 		ExperimentProgress progress = new ExperimentProgress(subjects.size(), VARIANT_COUNT);
-		System.out.printf(Locale.ROOT, "Experiment n: %d subjects × %d variants. Gradle's bar is this JavaExec task, not the experiment.%n", subjects.size(), VARIANT_COUNT);
-		List<ResultRow> rows = new ArrayList<>();
-		CommaSeparatedValues skipped = new CommaSeparatedValues();
-		skipped.addLine("project", "reason");
+		if (options.missingOnly()) {
+			System.out.printf(
+					Locale.ROOT,
+					"Experiment n missing-only: %s%n",
+					subjects.isEmpty()
+							? "nothing missing"
+							: subjects.stream().map(Subjects.Subject::name).collect(Collectors.joining(", ")));
+		}
+		System.out.printf(
+				Locale.ROOT,
+				"Experiment n: %d subjects × %d variants. Gradle's bar is this JavaExec task, not the experiment.%n",
+				subjects.size(),
+				VARIANT_COUNT);
+		CommaSeparatedValues skipped = newSkipped();
 		for (Subjects.Subject subject : subjects) {
-			List<Path> folders = subject.existingFolders();
-			if (folders.isEmpty()) {
-				skipped.addLine(subject.name(), "no test folders");
+			if (ExperimentResume.subjectComplete(rows, subject.name())) {
 				progress.beginSubject(subject.name(), 0);
 				progress.abandonSubject();
+				System.out.printf(Locale.ROOT, "[%s] already complete, skipping%n", subject.name());
+				continue;
+			}
+			List<Path> folders = subject.existingFolders();
+			if (folders.isEmpty()) {
+				skipped.addLine(subject.name(), "*", "no test folders");
+				progress.beginSubject(subject.name(), 0);
+				progress.abandonSubject();
+				persist(rows, skipped);
 				continue;
 			}
 			ParsedTestClasses original;
@@ -67,25 +98,22 @@ public final class Experiment {
 				original = parse(folders);
 			} catch (RuntimeException exception) {
 				progress.beginSubject(subject.name(), 0);
-				skip(subject.name(), exception, skipped, progress, rows);
+				skipSubject(subject.name(), exception, skipped, progress, rows);
 				continue;
 			}
 			int tests = original.testClasses().stream().mapToInt(testClass -> testClass.testMethods().size()).sum();
 			if (tests == 0) {
-				skipped.addLine(subject.name(), "no parseable tests");
+				skipped.addLine(subject.name(), "*", "no parseable tests");
 				progress.beginSubject(subject.name(), 0);
 				progress.abandonSubject();
+				persist(rows, skipped);
 				continue;
 			}
 			RefactoredTestClasses originalSuite = new RefactoredTestClasses(original.testClasses());
-			rows.add(row(subject.name(), "original", originalSuite, originalSuite));
+			ExperimentResume.upsert(rows, row(subject.name(), "original", originalSuite, originalSuite));
 			progress.beginSubject(subject.name(), tests);
-			try {
-				runSubject(subject, original, rows, progress);
-			} catch (Throwable throwable) {
-				skip(subject.name(), throwable, skipped, progress, rows);
-				continue;
-			}
+			persist(rows, skipped);
+			runSubject(subject, original, rows, skipped, progress);
 			persist(rows, skipped);
 		}
 		writeComparison(rows);
@@ -103,21 +131,146 @@ public final class Experiment {
 			Subjects.Subject subject,
 			ParsedTestClasses original,
 			List<ResultRow> rows,
+			CommaSeparatedValues skipped,
 			ExperimentProgress progress) {
-		StrategyResult implicit = best("implicit", original, new DefaultTestCaseDecomposer(true), new LccssTestCaseSimilarityMeasurer(), new ImplicitSetupTestClassRefactorer(), progress);
-		rows.add(row(subject.name(), "implicit", originalSuite(original), implicit.refactored));
-		StrategyResult residual = best("residual-implicit", original, new DefaultTestCaseDecomposer(true), new LccssTestCaseSimilarityMeasurer(), new ResidualImplicitSetupTestClassRefactorer(), progress);
-		rows.add(row(subject.name(), "residual-implicit", originalSuite(original), residual.refactored));
-		StrategyResult delegated = best("delegated", original, new WithoutImplicitSetupTestCaseDecomposer(true), new ContiguousCommonStatementsSimilarityMeasurer(), new DelegatedSetupTestClassRefactorer(), progress);
-		rows.add(row(subject.name(), "delegated", originalSuite(original), delegated.refactored));
-		StrategyResult implicitDelegated = best("implicit+delegated", asParsed(implicit.refactored), new WithoutImplicitSetupTestCaseDecomposer(true), new ContiguousCommonStatementsSimilarityMeasurer(), new DelegatedSetupTestClassRefactorer(), progress);
-		rows.add(row(subject.name(), "implicit+delegated", originalSuite(original), implicitDelegated.refactored));
-		StrategyResult delegatedImplicit = best("delegated+implicit", asParsed(delegated.refactored), new DefaultTestCaseDecomposer(true), new LccssTestCaseSimilarityMeasurer(), new ImplicitSetupTestClassRefactorer(), progress);
-		rows.add(row(subject.name(), "delegated+implicit", originalSuite(original), delegatedImplicit.refactored));
-		StrategyResult residualDelegated = best("residual+delegated", asParsed(residual.refactored), new WithoutImplicitSetupTestCaseDecomposer(true), new ContiguousCommonStatementsSimilarityMeasurer(), new DelegatedSetupTestClassRefactorer(), progress);
-		rows.add(row(subject.name(), "residual+delegated", originalSuite(original), residualDelegated.refactored));
-		StrategyResult delegatedResidual = best("delegated+residual-implicit", asParsed(delegated.refactored), new DefaultTestCaseDecomposer(true), new LccssTestCaseSimilarityMeasurer(), new ResidualImplicitSetupTestClassRefactorer(), progress);
-		rows.add(row(subject.name(), "delegated+residual-implicit", originalSuite(original), delegatedResidual.refactored));
+		Set<String> needed = ExperimentResume.neededVariants(ExperimentResume.variants(rows, subject.name()));
+		StrategyResult implicit = runVariant(
+				"implicit",
+				needed,
+				() -> original,
+				new DefaultTestCaseDecomposer(true),
+				new LccssTestCaseSimilarityMeasurer(),
+				new ImplicitSetupTestClassRefactorer(),
+				subject,
+				original,
+				rows,
+				skipped,
+				progress);
+		StrategyResult residual = runVariant(
+				"residual-implicit",
+				needed,
+				() -> original,
+				new DefaultTestCaseDecomposer(true),
+				new LccssTestCaseSimilarityMeasurer(),
+				new ResidualImplicitSetupTestClassRefactorer(),
+				subject,
+				original,
+				rows,
+				skipped,
+				progress);
+		StrategyResult delegated = runVariant(
+				"delegated",
+				needed,
+				() -> original,
+				new WithoutImplicitSetupTestCaseDecomposer(true),
+				new ContiguousCommonStatementsSimilarityMeasurer(),
+				new DelegatedSetupTestClassRefactorer(),
+				subject,
+				original,
+				rows,
+				skipped,
+				progress);
+		runVariant(
+				"implicit+delegated",
+				needed,
+				() -> parsedOrNull(implicit),
+				new WithoutImplicitSetupTestCaseDecomposer(true),
+				new ContiguousCommonStatementsSimilarityMeasurer(),
+				new DelegatedSetupTestClassRefactorer(),
+				subject,
+				original,
+				rows,
+				skipped,
+				progress);
+		runVariant(
+				"delegated+implicit",
+				needed,
+				() -> parsedOrNull(delegated),
+				new DefaultTestCaseDecomposer(true),
+				new LccssTestCaseSimilarityMeasurer(),
+				new ImplicitSetupTestClassRefactorer(),
+				subject,
+				original,
+				rows,
+				skipped,
+				progress);
+		runVariant(
+				"residual+delegated",
+				needed,
+				() -> parsedOrNull(residual),
+				new WithoutImplicitSetupTestCaseDecomposer(true),
+				new ContiguousCommonStatementsSimilarityMeasurer(),
+				new DelegatedSetupTestClassRefactorer(),
+				subject,
+				original,
+				rows,
+				skipped,
+				progress);
+		runVariant(
+				"delegated+residual-implicit",
+				needed,
+				() -> parsedOrNull(delegated),
+				new DefaultTestCaseDecomposer(true),
+				new LccssTestCaseSimilarityMeasurer(),
+				new ResidualImplicitSetupTestClassRefactorer(),
+				subject,
+				original,
+				rows,
+				skipped,
+				progress);
+	}
+
+	private static StrategyResult runVariant(
+			String variant,
+			Set<String> needed,
+			Supplier<ParsedTestClasses> input,
+			TestCaseDecomposer decomposer,
+			TestCaseSimilarityMeasurer measurer,
+			TestClassRefactorer refactorer,
+			Subjects.Subject subject,
+			ParsedTestClasses original,
+			List<ResultRow> rows,
+			CommaSeparatedValues skipped,
+			ExperimentProgress progress) {
+		if (!needed.contains(variant)) {
+			progress.alreadyDone(variant);
+			return null;
+		}
+		ParsedTestClasses parsed = input.get();
+		if (parsed == null) {
+			String reason = "prerequisite missing";
+			skipped.addLine(subject.name(), variant, reason);
+			progress.skipUnrun(variant, reason);
+			persist(rows, skipped);
+			return null;
+		}
+		StrategyResult result;
+		try {
+			result = best(variant, parsed, decomposer, measurer, refactorer, progress);
+		} catch (Throwable throwable) {
+			if (throwable instanceof Error && !(throwable instanceof OutOfMemoryError)) {
+				throw (Error) throwable;
+			}
+			String reason = throwable.toString();
+			skipped.addLine(subject.name(), variant, reason);
+			progress.failVariant(reason);
+			System.err.printf(Locale.ROOT, "[%s] %s skipped: %s%n", subject.name(), variant, reason);
+			try {
+				persist(rows, skipped);
+			} catch (Throwable ignored) {
+			}
+			if (throwable instanceof OutOfMemoryError) {
+				System.gc();
+			}
+			return null;
+		}
+		ExperimentResume.upsert(rows, row(subject.name(), variant, originalSuite(original), result.refactored));
+		persist(rows, skipped);
+		return result;
+	}
+
+	private static ParsedTestClasses parsedOrNull(StrategyResult result) {
+		return result == null ? null : asParsed(result.refactored);
 	}
 
 	private static StrategyResult best(
@@ -153,14 +306,14 @@ public final class Experiment {
 		return clusters -> refactorer.refactor(clusters).plusExistingHelpers(parsed);
 	}
 
-	private static void skip(
+	private static void skipSubject(
 			String project,
 			Throwable throwable,
 			CommaSeparatedValues skipped,
 			ExperimentProgress progress,
 			List<ResultRow> rows) {
 		String reason = throwable.toString();
-		skipped.addLine(project, reason);
+		skipped.addLine(project, "*", reason);
 		System.err.printf(Locale.ROOT, "[%s] skipped: %s%n", project, reason);
 		progress.abandonSubject();
 		try {
@@ -170,6 +323,16 @@ public final class Experiment {
 		if (throwable instanceof OutOfMemoryError) {
 			System.gc();
 		}
+	}
+
+	private static File comparisonFile() {
+		return new File(RESULTS.getBaseFolder(), "comparison.csv");
+	}
+
+	private static CommaSeparatedValues newSkipped() {
+		CommaSeparatedValues skipped = new CommaSeparatedValues();
+		skipped.addLine("project", "variant", "reason");
+		return skipped;
 	}
 
 	private static void persist(List<ResultRow> rows, CommaSeparatedValues skipped) {
@@ -226,7 +389,7 @@ public final class Experiment {
 				"duplicated_statements",
 				"duplication_rate",
 				"duplication_difference_percentage");
-		for (ResultRow row : rows) {
+		for (ResultRow row : ExperimentResume.ordered(rows, Subjects.all().stream().map(Subjects.Subject::name).collect(Collectors.toList()))) {
 			csv.addLine(
 					row.project,
 					row.variant,

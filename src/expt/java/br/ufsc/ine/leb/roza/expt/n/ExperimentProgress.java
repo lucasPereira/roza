@@ -69,6 +69,28 @@ final class ExperimentProgress {
 		stageFraction = 0;
 	}
 
+	void alreadyDone(String variantName) {
+		variant = variantName;
+		inVariant = false;
+		emit(String.format(Locale.ROOT, "[%s] %s already complete | total %.1f%%", project, variantName, totalPercent()), true);
+		completedVariants++;
+	}
+
+	void failVariant(String reason) {
+		emit(String.format(Locale.ROOT, "[%s] %s skipped: %s | total %.1f%%", project, variant, reason, totalPercent()), true);
+		completedVariants++;
+		inVariant = false;
+		stage = "";
+		stageFraction = 0;
+	}
+
+	void skipUnrun(String variantName, String reason) {
+		variant = variantName;
+		inVariant = false;
+		emit(String.format(Locale.ROOT, "[%s] %s skipped: %s | total %.1f%%", project, variantName, reason, totalPercent()), true);
+		completedVariants++;
+	}
+
 	void abandonSubject() {
 		inVariant = false;
 		completedVariants = subjectStart + variantCount;
