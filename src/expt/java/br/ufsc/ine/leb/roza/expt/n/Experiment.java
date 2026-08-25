@@ -27,11 +27,14 @@ import br.ufsc.ine.leb.roza.core.modern.loading.LoadedCodeFiles;
 import br.ufsc.ine.leb.roza.core.modern.measurement.ContiguousCommonStatementsSimilarityMeasurer;
 import br.ufsc.ine.leb.roza.core.modern.measurement.LccssTestCaseSimilarityMeasurer;
 import br.ufsc.ine.leb.roza.core.modern.measurement.TestCaseSimilarityMeasurer;
+import br.ufsc.ine.leb.roza.core.modern.clustering.TestCaseCluster;
+import br.ufsc.ine.leb.roza.core.modern.decomposition.TestCase;
 import br.ufsc.ine.leb.roza.core.modern.parsing.JunitTestClassParser;
 import br.ufsc.ine.leb.roza.core.modern.parsing.ParsedTestClasses;
 import br.ufsc.ine.leb.roza.core.modern.parsing.TestClass;
 import br.ufsc.ine.leb.roza.core.modern.refactoring.DelegatedSetupTestClassRefactorer;
 import br.ufsc.ine.leb.roza.core.modern.refactoring.ImplicitSetupTestClassRefactorer;
+import br.ufsc.ine.leb.roza.core.modern.refactoring.RankingSetupContributor;
 import br.ufsc.ine.leb.roza.core.modern.refactoring.RefactoredTestClasses;
 import br.ufsc.ine.leb.roza.core.modern.refactoring.ResidualImplicitSetupTestClassRefactorer;
 import br.ufsc.ine.leb.roza.core.modern.refactoring.TestClassRefactorer;
@@ -63,9 +66,8 @@ public final class Experiment {
 			try {
 				original = parse(folders);
 			} catch (RuntimeException exception) {
-				skipped.addLine(subject.name(), exception.getMessage() == null ? exception.toString() : exception.getMessage());
 				progress.beginSubject(subject.name(), 0);
-				progress.abandonSubject();
+				skip(subject.name(), exception, skipped, progress, rows);
 				continue;
 			}
 			int tests = original.testClasses().stream().mapToInt(testClass -> testClass.testMethods().size()).sum();
@@ -80,14 +82,19 @@ public final class Experiment {
 			progress.beginSubject(subject.name(), tests);
 			try {
 				runSubject(subject, original, rows, progress);
-			} catch (RuntimeException exception) {
-				skipped.addLine(subject.name(), exception.getMessage() == null ? exception.toString() : exception.getMessage());
-				progress.abandonSubject();
+			} catch (Throwable throwable) {
+				skip(subject.name(), throwable, skipped, progress, rows);
+				continue;
 			}
+			persist(rows, skipped);
 		}
 		writeComparison(rows);
-		writeCharts(rows);
-		writeThesisTables(rows);
+		try {
+			writeCharts(rows);
+			writeThesisTables(rows);
+		} catch (RuntimeException exception) {
+			System.err.println("Could not write charts or thesis tables: " + exception);
+		}
 		RESULTS.writeContetAsString("skipped.csv", skipped.getContent());
 		System.out.printf("Experiment n finished. Results: %s. Total time: %.1fs%n", RESULTS.getBaseFolder(), (System.currentTimeMillis() - startedAt) / 1000.0);
 	}
@@ -121,7 +128,7 @@ public final class Experiment {
 			TestClassRefactorer refactorer,
 			ExperimentProgress progress) {
 		progress.beginVariant(variant);
-		TestClassRefactorer preservingHelpers = clusters -> refactorer.refactor(clusters).plusExistingHelpers(parsed);
+		TestClassRefactorer preservingHelpers = withExistingHelpers(refactorer, parsed);
 		DecomposedTestCases testCases = decomposer.decompose(parsed);
 		if (testCases.testCases().isEmpty()) {
 			progress.finishVariant();
@@ -137,6 +144,37 @@ public final class Experiment {
 		StrategyResult result = new StrategyResult(preservingHelpers.refactor(new TestCaseClusters(best.clusters())));
 		progress.finishVariant();
 		return result;
+	}
+
+	static TestClassRefactorer withExistingHelpers(TestClassRefactorer refactorer, ParsedTestClasses parsed) {
+		if (refactorer instanceof RankingSetupContributor) {
+			return new HelperPreservingRankingRefactorer(refactorer, (RankingSetupContributor) refactorer, parsed);
+		}
+		return clusters -> refactorer.refactor(clusters).plusExistingHelpers(parsed);
+	}
+
+	private static void skip(
+			String project,
+			Throwable throwable,
+			CommaSeparatedValues skipped,
+			ExperimentProgress progress,
+			List<ResultRow> rows) {
+		String reason = throwable.toString();
+		skipped.addLine(project, reason);
+		System.err.printf(Locale.ROOT, "[%s] skipped: %s%n", project, reason);
+		progress.abandonSubject();
+		try {
+			persist(rows, skipped);
+		} catch (Throwable ignored) {
+		}
+		if (throwable instanceof OutOfMemoryError) {
+			System.gc();
+		}
+	}
+
+	private static void persist(List<ResultRow> rows, CommaSeparatedValues skipped) {
+		writeComparison(rows);
+		RESULTS.writeContetAsString("skipped.csv", skipped.getContent());
 	}
 
 	private static ParsedTestClasses parse(List<Path> folders) {
@@ -258,6 +296,55 @@ public final class Experiment {
 
 	private static String formatRate(double value) {
 		return String.format(Locale.ROOT, "%.1f", value);
+	}
+
+	private static final class HelperPreservingRankingRefactorer implements TestClassRefactorer, RankingSetupContributor {
+
+		private final TestClassRefactorer refactorer;
+		private final RankingSetupContributor contributor;
+		private final ParsedTestClasses parsed;
+
+		private HelperPreservingRankingRefactorer(
+				TestClassRefactorer refactorer,
+				RankingSetupContributor contributor,
+				ParsedTestClasses parsed) {
+			this.refactorer = refactorer;
+			this.contributor = contributor;
+			this.parsed = parsed;
+		}
+
+		@Override
+		public RefactoredTestClasses refactor(TestCaseClusters clusters) {
+			return refactorer.refactor(clusters).plusExistingHelpers(parsed);
+		}
+
+		@Override
+		public List<TestClass> sharedRankingClasses(List<TestCase> tests) {
+			List<TestClass> classes = new ArrayList<>(contributor.sharedRankingClasses(tests));
+			List<String> names = classes.stream().map(TestClass::qualifiedName).collect(Collectors.toList());
+			for (TestClass helper : parsed.testClasses()) {
+				if (helper.isHelperClass() && !names.contains(helper.qualifiedName())) {
+					classes.add(helper);
+					names.add(helper.qualifiedName());
+				}
+			}
+			return classes;
+		}
+
+		@Override
+		public List<TestClass> clusterRankingClasses(TestCaseCluster cluster) {
+			return contributor.clusterRankingClasses(cluster);
+		}
+
+		@Override
+		public boolean countsResidualSourceSetupWhileSingletonsRemain() {
+			return contributor.countsResidualSourceSetupWhileSingletonsRemain();
+		}
+
+		@Override
+		public TestClass residualSourceSetupClass(TestClass source) {
+			return contributor.residualSourceSetupClass(source);
+		}
 	}
 
 	private static final class StrategyResult {
