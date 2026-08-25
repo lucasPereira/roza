@@ -1,0 +1,8 @@
+Variante;W;p;Mediana da diferença;IQR da diferença;Mediana da %;IQR da %;Melhorou;Piorou;Empatou
+implicit;7.500;0.0002724;185.0;13.25 a 564.5;188.1;35.44 a 300.1;3;17;2
+residual-implicit;32.50;0.006788;13.00;0.000 a 95.25;26.12;0.000 a 55.55;5;15;2
+delegated;0.000;0.1797;0.000;0.000 a 0.000;0.000;0.000 a 0.000;2;0;19
+implicit+delegated;7.500;0.0004290;182.0;8.000 a 617.0;200.0;53.33 a 306.0;3;16;2
+delegated+implicit;8.000;0.0004628;185.0;8.000 a 430.0;196.8;35.71 a 299.7;2;17;2
+residual+delegated;17.50;0.003055;13.00;0.000 a 83.75;30.95;0.000 a 58.11;4;14;2
+delegated+residual-implicit;19.00;0.003774;10.50;0.000 a 74.50;28.88;0.000 a 57.63;4;14;2
