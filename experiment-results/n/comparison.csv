@@ -53,6 +53,7 @@ javaparser;residual-implicit;636;238;839;729;14749;6888;46.7;-8.5
 javaparser;delegated;518;80;424;1796;15612;6764;43.3;-10.1
 javaparser;implicit+delegated;1865;305;662;1674;15340;6503;42.4;-13.6
 javaparser;delegated+implicit;1571;271;500;1796;15747;6842;43.4;-9.1
+javaparser;delegated+residual-implicit;633;235;782;1796;15247;6316;41.4;-16.1
 jfreechart;original;350;23;125;189;8563;4145;48.4;0.0
 jfreechart;implicit;967;346;599;189;7107;2553;35.9;-38.4
 jfreechart;residual-implicit;575;354;661;189;6980;2443;35.0;-41.1

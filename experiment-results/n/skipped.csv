@@ -1,1 +1,7 @@
 project;variant;reason
+javaparser;residual+delegated;java.lang.OutOfMemoryError: Java heap space
+saas+teste;delegated;java.lang.OutOfMemoryError: Java heap space: failed reallocation of scalar replaced objects
+saas+teste;implicit+delegated;java.lang.OutOfMemoryError: Java heap space
+saas+teste;delegated+implicit;prerequisite missing
+saas+teste;residual+delegated;java.lang.OutOfMemoryError: Java heap space
+saas+teste;delegated+residual-implicit;prerequisite missing
