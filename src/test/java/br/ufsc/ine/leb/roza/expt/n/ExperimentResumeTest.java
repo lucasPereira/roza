@@ -24,7 +24,7 @@ class ExperimentResumeTest {
 				"delegated",
 				"implicit+delegated",
 				"delegated+implicit"));
-		assertEquals(Set.of("residual-implicit", "residual+delegated", "delegated", "delegated+residual-implicit"), needed);
+		assertEquals(Set.of("residual-implicit", "residual-implicit+delegated", "delegated", "delegated+residual-implicit"), needed);
 	}
 
 	@Test
@@ -36,7 +36,7 @@ class ExperimentResumeTest {
 				"delegated",
 				"implicit+delegated",
 				"delegated+implicit",
-				"residual+delegated",
+				"residual-implicit+delegated",
 				"delegated+residual-implicit"), needed);
 	}
 
@@ -50,7 +50,7 @@ class ExperimentResumeTest {
 				row("roza", "delegated"),
 				row("roza", "implicit+delegated"),
 				row("roza", "delegated+implicit"),
-				row("roza", "residual+delegated"),
+				row("roza", "residual-implicit+delegated"),
 				row("roza", "delegated+residual-implicit")), "roza"));
 		assertFalse(ExperimentResume.subjectComplete(List.of(row("roza", "original")), "roza"));
 	}

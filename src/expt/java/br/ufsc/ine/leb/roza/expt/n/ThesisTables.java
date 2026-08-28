@@ -16,7 +16,7 @@ final class ThesisTables {
 			"delegated",
 			"implicit+delegated",
 			"delegated+implicit",
-			"residual+delegated",
+			"residual-implicit+delegated",
 			"delegated+residual-implicit");
 
 	static final List<String> TREATMENTS;
@@ -31,7 +31,7 @@ final class ThesisTables {
 	static final List<String[]> COMPOSITION_PAIRS = List.of(
 			new String[] { "implicit+delegated", "implicit" },
 			new String[] { "delegated+implicit", "delegated" },
-			new String[] { "residual+delegated", "residual-implicit" },
+			new String[] { "residual-implicit+delegated", "residual-implicit" },
 			new String[] { "delegated+residual-implicit", "delegated" });
 
 	private ThesisTables() {

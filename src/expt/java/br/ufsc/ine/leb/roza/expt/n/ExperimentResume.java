@@ -14,7 +14,7 @@ final class ExperimentResume {
 	private static final Map<String, String> PREREQUISITE = Map.of(
 			"implicit+delegated", "implicit",
 			"delegated+implicit", "delegated",
-			"residual+delegated", "residual-implicit",
+			"residual-implicit+delegated", "residual-implicit",
 			"delegated+residual-implicit", "delegated");
 
 	private ExperimentResume() {

@@ -196,7 +196,7 @@ public final class Experiment {
 				skipped,
 				progress);
 		runVariant(
-				"residual+delegated",
+				"residual-implicit+delegated",
 				needed,
 				() -> parsedOrNull(residual),
 				new WithoutImplicitSetupTestCaseDecomposer(true),

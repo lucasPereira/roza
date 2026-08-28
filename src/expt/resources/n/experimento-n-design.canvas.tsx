@@ -21,7 +21,7 @@ const VARIANTS = [
   "delegated",
   "implicit+delegated",
   "delegated+implicit",
-  "residual+delegated",
+  "residual-implicit+delegated",
   "delegated+residual-implicit",
 ] as const;
 
@@ -40,7 +40,7 @@ const PAIRWISE_ROWS: string[][] = VARIANTS.flatMap((a, i) =>
 const COMPOSITION_PAIRS = [
   "implicit+delegated vs implicit",
   "delegated+implicit vs delegated",
-  "residual+delegated vs residual-implicit",
+  "residual-implicit+delegated vs residual-implicit",
   "delegated+residual-implicit vs delegated",
 ];
 
@@ -197,7 +197,7 @@ export default function ExperimentoNDesign() {
               "Implicit no resultado",
             ],
             [
-              "residual+delegated",
+              "residual-implicit+delegated",
               "com, depois sem",
               "LCCSS, depois CCS (mín. 2)",
               "Residual implicit",
@@ -403,7 +403,7 @@ export default function ExperimentoNDesign() {
             ],
             [
               "Wilcoxon da composição vs a primeira sozinha",
-              "Quatro pares: implicit+delegated vs implicit; delegated+implicit vs delegated; residual+delegated vs residual; delegated+residual-implicit vs delegated",
+              "Quatro pares: implicit+delegated vs implicit; delegated+implicit vs delegated; residual-implicit+delegated vs residual-implicit; delegated+residual-implicit vs delegated",
               "4 p-valores e 4 medianas em sentenças.",
             ],
             [
