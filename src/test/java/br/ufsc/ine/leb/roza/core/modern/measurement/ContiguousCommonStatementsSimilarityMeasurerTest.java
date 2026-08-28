@@ -17,7 +17,7 @@ class ContiguousCommonStatementsSimilarityMeasurerTest {
 
 	@Test
 	void shouldScoreAOneStatementRunInTheMiddle() {
-		TestCaseSimilarityMatrix matrix = new ContiguousCommonStatementsSimilarityMeasurer().measure(testCases(
+		TestCaseSimilarityMatrix matrix = new ContiguousCommonStatementsSimilarityMeasurer(1).measure(testCases(
 				testCase("alpha", statement("createUser();"), statement("login();"), assertion("assertTrue(true);")),
 				testCase("beta", statement("deleteUser();"), statement("login();"), assertion("assertFalse(false);"))));
 
@@ -26,7 +26,7 @@ class ContiguousCommonStatementsSimilarityMeasurerTest {
 
 	@Test
 	void shouldStopWhenASecondLiveOutAppears() {
-		TestCaseSimilarityMatrix matrix = new ContiguousCommonStatementsSimilarityMeasurer().measure(testCases(
+		TestCaseSimilarityMatrix matrix = new ContiguousCommonStatementsSimilarityMeasurer(1).measure(testCases(
 				testCase("alpha", statement("Sut first = new Sut();"), statement("Sut second = new Sut();"), assertion("assertEquals(first, second);")),
 				testCase("beta", statement("Sut first = new Sut();"), statement("Sut second = new Sut();"), assertion("assertNotSame(first, second);"))));
 
@@ -37,7 +37,7 @@ class ContiguousCommonStatementsSimilarityMeasurerTest {
 	void shouldIgnoreARunWhenLiveInTypesDiffer() {
 		TestClass sutSource = new TestClass("SutTest", List.of(new Field(List.of(), "Sut", "sut", java.util.Optional.empty())), List.of(), List.of(), List.of());
 		TestClass otherSource = new TestClass("OtherTest", List.of(new Field(List.of(), "Other", "sut", java.util.Optional.empty())), List.of(), List.of(), List.of());
-		TestCaseSimilarityMatrix matrix = new ContiguousCommonStatementsSimilarityMeasurer().measure(new DecomposedTestCases(List.of(
+		TestCaseSimilarityMatrix matrix = new ContiguousCommonStatementsSimilarityMeasurer(1).measure(new DecomposedTestCases(List.of(
 				new TestCase("alpha", new CodeBlock(List.of(statement("sut.save(1);"), statement("sut.save(2);"))), sutSource, List.of()),
 				new TestCase("beta", new CodeBlock(List.of(statement("sut.save(1);"), statement("sut.save(2);"))), otherSource, List.of()))));
 

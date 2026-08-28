@@ -48,6 +48,7 @@ public final class Experiment {
 
 	private static final FolderUtils RESULTS = new FolderUtils("experiment-results/n");
 	private static final int VARIANT_COUNT = ThesisTables.VARIANTS.size();
+	private static final int CCS_MINIMUM_LENGTH = 2;
 
 	public static void main(String[] args) {
 		ExperimentOptions options = ExperimentOptions.parse(args);
@@ -163,7 +164,7 @@ public final class Experiment {
 				needed,
 				() -> original,
 				new WithoutImplicitSetupTestCaseDecomposer(true),
-				new ContiguousCommonStatementsSimilarityMeasurer(),
+				new ContiguousCommonStatementsSimilarityMeasurer(CCS_MINIMUM_LENGTH),
 				new DelegatedSetupTestClassRefactorer(),
 				subject,
 				original,
@@ -175,7 +176,7 @@ public final class Experiment {
 				needed,
 				() -> parsedOrNull(implicit),
 				new WithoutImplicitSetupTestCaseDecomposer(true),
-				new ContiguousCommonStatementsSimilarityMeasurer(),
+				new ContiguousCommonStatementsSimilarityMeasurer(CCS_MINIMUM_LENGTH),
 				new DelegatedSetupTestClassRefactorer(),
 				subject,
 				original,
@@ -199,7 +200,7 @@ public final class Experiment {
 				needed,
 				() -> parsedOrNull(residual),
 				new WithoutImplicitSetupTestCaseDecomposer(true),
-				new ContiguousCommonStatementsSimilarityMeasurer(),
+				new ContiguousCommonStatementsSimilarityMeasurer(CCS_MINIMUM_LENGTH),
 				new DelegatedSetupTestClassRefactorer(),
 				subject,
 				original,

@@ -63,13 +63,13 @@ public final class Experiment {
 				"delegated-setup",
 				original,
 				new WithoutImplicitSetupTestCaseDecomposer(),
-				new ContiguousCommonStatementsSimilarityMeasurer(),
+				new ContiguousCommonStatementsSimilarityMeasurer(1),
 				new DelegatedSetupTestClassRefactorer());
 		StrategyResult implicitThenDelegated = bestLevel(
 				"implicit-then-delegated",
 				asParsed(implicit.refactored()),
 				new WithoutImplicitSetupTestCaseDecomposer(),
-				new ContiguousCommonStatementsSimilarityMeasurer(),
+				new ContiguousCommonStatementsSimilarityMeasurer(1),
 				new DelegatedSetupTestClassRefactorer());
 		StrategyResult delegatedThenImplicit = bestLevel(
 				"delegated-then-implicit",

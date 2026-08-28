@@ -116,7 +116,7 @@ Experiment `m` is a small end-to-end use case on a five-test bookstore suite wri
 
 ## `n`: multi-project comparison of implicit, residual, and delegated setup
 
-Experiment `n` compares implicit setup, residual implicit setup, delegated setup, and the sequential compositions of those strategies on every subject under `external-projects/` plus Róża's own tests. Each library is one subject even when it has several test modules; only SAAS is split (`saas+teste`, `saas+teste+moodle`, `saas+teste+selenium`, `saas+teste+service`). Decomposition ignores parser violations so every parseable test enters the pipeline. Clustering uses LCCSS or CCS with single linkage, a stable test-order tie break, and the full hierarchy; each variant keeps the level with the lowest duplicated setup statements.
+Experiment `n` compares implicit setup, residual implicit setup, delegated setup, and the sequential compositions of those strategies on every subject under `external-projects/` plus Róża's own tests. Each library is one subject even when it has several test modules; only SAAS is split (`saas+teste`, `saas+teste+moodle`, `saas+teste+selenium`, `saas+teste+service`). Decomposition ignores parser violations so every parseable test enters the pipeline. Clustering uses LCCSS or CCS (minimum run length 2) with single linkage, a stable test-order tie break, and the full hierarchy; each variant keeps the level with the lowest duplicated setup statements.
 
 **Input.** `src/expt/resources/n/experimento-n-design.canvas.tsx` holds the locked design. Subject roots live under `external-projects/` and `src/test/java`.
 

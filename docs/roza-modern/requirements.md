@@ -248,7 +248,7 @@ Acceptance criteria:
 - AC-337: CCS uses exact normalized statement text and does not treat renamed or non-contiguous clones as matches.
 - AC-338: CCS treats a run as extractable only when live-in names have the same type across the pair and the run has at most one live-out.
 - AC-339: CCS applies Dice normalization `(2 * matchSize) / (sourceArrangeSize + targetArrangeSize)` over the pre-assertion arrange projections.
-- AC-340: CCS rejects a minimum length smaller than 1; the default minimum length is 1.
+- AC-340: CCS rejects a minimum length smaller than 1. Callers must pass the minimum length; there is no default.
 - AC-218: LCS measurement uses the same pre-assertion projection as LCCSS, stopping at the first `CodeStatement.isAssertion()` statement.
 - AC-219: LCS compares the projected statement lists by counting the longest common subsequence while preserving statement order.
 - AC-220: LCS score is `(2 * commonSubsequenceSize) / (sourceProjectionSize + targetProjectionSize)`.
@@ -654,7 +654,6 @@ public final class LcsTestCaseSimilarityMeasurer implements TestCaseSimilarityMe
 }
 
 public final class ContiguousCommonStatementsSimilarityMeasurer implements TestCaseSimilarityMeasurer {
-	public ContiguousCommonStatementsSimilarityMeasurer();
 	public ContiguousCommonStatementsSimilarityMeasurer(int minimumLength);
 	public TestCaseSimilarityMatrix measure(DecomposedTestCases testCases);
 }

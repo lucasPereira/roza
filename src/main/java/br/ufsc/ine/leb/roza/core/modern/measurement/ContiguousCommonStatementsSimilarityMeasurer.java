@@ -12,10 +12,6 @@ public final class ContiguousCommonStatementsSimilarityMeasurer implements TestC
 
 	private final int minimumLength;
 
-	public ContiguousCommonStatementsSimilarityMeasurer() {
-		this(1);
-	}
-
 	public ContiguousCommonStatementsSimilarityMeasurer(int minimumLength) {
 		if (minimumLength < 1) {
 			throw new IllegalArgumentException("CCS minimum length must be at least 1.");
