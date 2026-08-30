@@ -285,20 +285,35 @@ export default function ExperimentoNDesign() {
       <Stack gap={10}>
         <H2>Gráficos</H2>
         <Text>
-          Três SVG gerados na execução. No eixo X, o projeto. Em cada projeto,
-          uma barra por variante.
+          Cinco SVG gerados na execução. Os três gráficos de barras preservam a
+          comparação por projeto. O boxplot resume a distribuição entre
+          projetos, e o mapa de calor mantém cada projeto visível em uma forma
+          mais compacta.
         </Text>
         <Table
-          headers={["Arquivo", "Eixo Y"]}
+          headers={["Arquivo", "Leitura"]}
           rows={[
             ["duplicated-statements.svg", "Sentenças duplicadas"],
             ["duplication-rate.svg", "Taxa de duplicação (%)"],
             [
-              "duplication-difference-percentage.svg",
-              "Porcentagem de diferença na duplicação vs original",
+              "duplication-reduction-percentage.svg",
+              "Porcentagem de redução da duplicação vs original",
+            ],
+            [
+              "duplication-reduction-distribution.svg",
+              "Boxplot, mediana, IQR e um ponto por projeto",
+            ],
+            [
+              "duplication-reduction-heatmap.svg",
+              "Projetos nas linhas, variantes nas colunas e redução nas células",
             ],
           ]}
         />
+        <Text tone="secondary" size="small">
+          Nos três gráficos de redução, a fórmula é{" "}
+          <Code>(original − variante) / original × 100</Code>. Valor positivo
+          significa menos sentenças duplicadas.
+        </Text>
       </Stack>
 
       <Stack gap={10}>
@@ -581,7 +596,7 @@ export default function ExperimentoNDesign() {
           <CardHeader>Saída</CardHeader>
           <CardBody>
             <Text>
-              <Code>experiment-results/n/comparison.csv</Code>, os três SVG e,
+              <Code>experiment-results/n/comparison.csv</Code>, os cinco SVG e,
               na mesma execução, os CSV das tabelas da tese em{" "}
               <Code>experiment-results/n/</Code>, junto com o CSV de comparação
               e os SVG.
@@ -597,7 +612,7 @@ export default function ExperimentoNDesign() {
               heap 32g. <Code>./gradlew runExperimentNMissing</Code> passa{" "}
               <Code>--missing-only</Code>: mantém o CSV e roda só os incompletos.{" "}
               <Code>./gradlew runExperimentNCharts</Code> passa{" "}
-              <Code>--charts-only</Code>: redesenha os três SVG a partir do{" "}
+              <Code>--charts-only</Code>: redesenha os cinco SVG a partir do{" "}
               <Code>comparison.csv</Code> já gravado, sem rodar o pipeline.
             </Text>
           </CardBody>

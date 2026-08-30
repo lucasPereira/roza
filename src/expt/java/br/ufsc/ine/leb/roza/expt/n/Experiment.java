@@ -416,6 +416,11 @@ public final class Experiment {
 
 	private static void writeCharts(List<ResultRow> rows) {
 		List<String> projects = rows.stream().map(row -> row.project).distinct().collect(Collectors.toList());
+		List<List<Double>> reductions = series(
+				rows,
+				projects,
+				ThesisTables.VARIANTS,
+				row -> row.duplicationDifferencePercentage == null ? Double.NaN : -row.duplicationDifferencePercentage);
 		RESULTS.writeContetAsString(
 				"duplicated-statements.svg",
 				GroupedBarChart.svg("Sentenças duplicadas", "Sentenças duplicadas", projects, ThesisTables.TREATMENTS, series(rows, projects, ThesisTables.TREATMENTS, row -> (double) row.duplicatedStatements), false));
@@ -423,8 +428,14 @@ public final class Experiment {
 				"duplication-rate.svg",
 				GroupedBarChart.svg("Taxa de duplicação", "Taxa de duplicação (%)", projects, ThesisTables.TREATMENTS, series(rows, projects, ThesisTables.TREATMENTS, row -> row.duplicationRate), true));
 		RESULTS.writeContetAsString(
-				"duplication-difference-percentage.svg",
-				GroupedBarChart.svg("Porcentagem de diferença na duplicação", "Porcentagem de diferença (%)", projects, ThesisTables.VARIANTS, series(rows, projects, ThesisTables.VARIANTS, row -> row.duplicationDifferencePercentage == null ? Double.NaN : row.duplicationDifferencePercentage), false));
+				"duplication-reduction-percentage.svg",
+				GroupedBarChart.svg("Porcentagem de redução da duplicação", "Redução da duplicação (%)", projects, ThesisTables.VARIANTS, reductions, false));
+		RESULTS.writeContetAsString(
+				"duplication-reduction-distribution.svg",
+				DuplicationReductionDistributionChart.svg(projects, ThesisTables.VARIANTS, reductions));
+		RESULTS.writeContetAsString(
+				"duplication-reduction-heatmap.svg",
+				DuplicationReductionHeatmap.svg(projects, ThesisTables.VARIANTS, reductions));
 	}
 
 	private static List<List<Double>> series(
