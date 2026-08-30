@@ -1,4 +1,4 @@
-Variante;W;p;Mediana da diferença;IQR da diferença;Mediana da %;IQR da %;Melhorou;Piorou;Empatou
+variant;w;p;median_difference;iqr_difference;median_percentage;iqr_percentage;improved;worsened;tied
 implicit;42.00;0.03292;17.50;0.000 a 98.25;226.4;0.000 a 570.7;4;15;3
 residual-implicit;27.00;0.003589;20.00;5.500 a 115.8;193.8;9.722 a 595.1;3;17;2
 delegated;0.000;0.1797;0.000;0.000 a 0.000;0.000;0.000 a 0.000;2;0;19

@@ -1,4 +1,4 @@
-Par;W;p (Holm);Mediana da diferença;IQR da diferença;Mediana da %;IQR da %;Melhorou;Piorou;Empatou
+pair;w;p_holm;median_difference;iqr_difference;median_percentage;iqr_percentage;improved;worsened;tied
 implicit vs residual-implicit;0.000;0.002936;-20.00;-144.5 a -4.750;-3.388;-5.700 a -0.6399;18;0;4
 implicit vs delegated;107.5;0.7809;-4.000;-33.00 a 27.00;-1.267;-8.098 a 10.23;12;9;0
 implicit vs implicit+delegated;0.000;0.002633;-96.00;-166.0 a -28.00;-10.13;-11.84 a -5.484;19;0;2

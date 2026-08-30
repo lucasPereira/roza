@@ -33,6 +33,24 @@ class ExtractableArrangeRunsTest {
 	}
 
 	@Test
+	void shouldSelectTheSameRunsAsMaterializingEveryWindow() {
+		List<List<TestCase>> suites = List.of(
+				List.of(
+						testCase("alpha", "createUser();", "login();", "assertTrue(true);"),
+						testCase("beta", "deleteUser();", "login();", "assertFalse(false);"),
+						testCase("gamma", "assertEquals(1, 1);")),
+				List.of(
+						testCase("one", "open();", "fill();", "submit();", "assertTrue(true);"),
+						testCase("two", "open();", "fill();", "submit();", "assertFalse(false);"),
+						testCase("three", "open();", "cancel();", "assertEquals(1, 1);"),
+						testCase("four", "reset();", "fill();", "submit();", "assertNotNull(this);")));
+		for (List<TestCase> suite : suites) {
+			assertEquals(describe(ExtractableArrangeRuns.nWayMaterializingAllWindows(suite, 1), suite.size()), describe(ExtractableArrangeRuns.nWay(suite, 1), suite.size()));
+			assertEquals(describe(ExtractableArrangeRuns.nWayMaterializingAllWindows(suite, 2), suite.size()), describe(ExtractableArrangeRuns.nWay(suite, 2), suite.size()));
+		}
+	}
+
+	@Test
 	void shouldFinishNWayWithoutReparsingEveryWindow() {
 		List<TestCase> testCases = new ArrayList<>();
 		for (int testIndex = 0; testIndex < 20; testIndex++) {
@@ -45,6 +63,17 @@ class ExtractableArrangeRunsTest {
 		}
 
 		assertTimeout(Duration.ofSeconds(5), () -> ExtractableArrangeRuns.nWay(testCases, 1));
+	}
+
+	private static List<String> describe(List<ExtractableArrangeRun> runs, int testCount) {
+		return runs.stream().map(run -> {
+			List<String> statements = run.statements().stream().map(CodeStatement::normalizedText).collect(Collectors.toList());
+			List<Integer> starts = new ArrayList<>();
+			for (int testIndex = 0; testIndex < testCount; testIndex++) {
+				starts.add(run.startFor(testIndex));
+			}
+			return statements + " @ " + starts;
+		}).collect(Collectors.toList());
 	}
 
 	private TestCase testCase(String name, String... statements) {

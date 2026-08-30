@@ -41,16 +41,16 @@ final class ThesisTables {
 		Map<String, Map<String, ResultRow>> byProject = index(rows);
 		CommaSeparatedValues csv = new CommaSeparatedValues();
 		csv.addLine(
-				"Variante",
-				"W",
+				"variant",
+				"w",
 				"p",
-				"Mediana da diferença",
-				"IQR da diferença",
-				"Mediana da %",
-				"IQR da %",
-				"Melhorou",
-				"Piorou",
-				"Empatou");
+				"median_difference",
+				"iqr_difference",
+				"median_percentage",
+				"iqr_percentage",
+				"improved",
+				"worsened",
+				"tied");
 		for (String variant : VARIANTS) {
 			List<Double> baseline = new ArrayList<>();
 			List<Double> treatment = new ArrayList<>();
@@ -84,7 +84,7 @@ final class ThesisTables {
 		double[][] matrix = treatmentMatrix(rows, row -> row.duplicatedStatements, TREATMENTS);
 		NonparametricTests.FriedmanResult result = NonparametricTests.friedman(matrix);
 		CommaSeparatedValues csv = new CommaSeparatedValues();
-		csv.addLine("χ²", "gl", "p");
+		csv.addLine("chi_squared", "df", "p");
 		csv.addLine(DescriptiveStats.formatNumber(result.chiSquared), result.degreesOfFreedom, DescriptiveStats.formatP(result.p));
 		return csv.getContent();
 	}
@@ -109,16 +109,16 @@ final class ThesisTables {
 		double[] adjusted = NonparametricTests.holm(rawP);
 		CommaSeparatedValues csv = new CommaSeparatedValues();
 		csv.addLine(
-				"Par",
-				"W",
-				"p (Holm)",
-				"Mediana da diferença",
-				"IQR da diferença",
-				"Mediana da %",
-				"IQR da %",
-				"Melhorou",
-				"Piorou",
-				"Empatou");
+				"pair",
+				"w",
+				"p_holm",
+				"median_difference",
+				"iqr_difference",
+				"median_percentage",
+				"iqr_percentage",
+				"improved",
+				"worsened",
+				"tied");
 		for (int index = 0; index < prepared.size(); index++) {
 			String label = (String) prepared.get(index)[0];
 			PairSummary summary = (PairSummary) prepared.get(index)[1];
@@ -129,7 +129,7 @@ final class ThesisTables {
 
 	static String medians(List<ResultRow> rows) {
 		CommaSeparatedValues csv = new CommaSeparatedValues();
-		csv.addLine("Tratamento", "Mediana das sentenças duplicadas", "IQR");
+		csv.addLine("treatment", "median_duplicated_statements", "iqr");
 		for (String treatment : TREATMENTS) {
 			List<Double> values = new ArrayList<>();
 			for (ResultRow row : rows) {
@@ -146,16 +146,16 @@ final class ThesisTables {
 		Map<String, Map<String, ResultRow>> byProject = index(rows);
 		CommaSeparatedValues csv = new CommaSeparatedValues();
 		csv.addLine(
-				"Par",
-				"W",
+				"pair",
+				"w",
 				"p",
-				"Mediana da diferença",
-				"IQR da diferença",
-				"Mediana da %",
-				"IQR da %",
-				"Melhorou",
-				"Piorou",
-				"Empatou");
+				"median_difference",
+				"iqr_difference",
+				"median_percentage",
+				"iqr_percentage",
+				"improved",
+				"worsened",
+				"tied");
 		for (String[] pair : COMPOSITION_PAIRS) {
 			PairSummary summary = pairSummary(byProject, pair[1], pair[0]);
 			csv.addLine(pairRow(pair[0] + " vs " + pair[1], summary, summary.wilcoxon.p));

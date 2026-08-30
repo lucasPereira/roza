@@ -240,6 +240,13 @@ registerExperimentTask(
     maxHeapSize = "32g",
 )
 
+registerExperimentTask(
+    "runExperimentNCharts",
+    "Rewrites experiment n SVGs from the existing comparison.csv with --charts-only, without running the pipeline.",
+    "br.ufsc.ine.leb.roza.expt.n.Experiment",
+    experimentArgs = listOf("--charts-only"),
+)
+
 spotless {
     java {
         target("src/main/java/**/*.java", "src/test/java/**/*.java", "src/expt/java/**/*.java")

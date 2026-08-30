@@ -1,4 +1,4 @@
-Tratamento;Mediana das sentenças duplicadas;IQR
+treatment;median_duplicated_statements;iqr
 original;1162;312.0 a 3866
 implicit;948.5;290.5 a 2570
 residual-implicit;931.5;279.3 a 2451

@@ -76,7 +76,6 @@
 	<rect x="570" y="333" width="7" height="77" fill="#059669"/>
 	<rect x="578" y="336" width="7" height="74" fill="#7c3ed"/>
 	<rect x="586" y="332" width="7" height="78" fill="#dc2626"/>
-	<rect x="594" y="410" width="7" height="0" fill="#0891b2"/>
 	<rect x="602" y="338" width="7" height="72" fill="#7c3aed"/>
 	<text x="578" y="426" text-anchor="end" font-family="Helvetica, Arial, sans-serif" font-size="10" fill="#111827" transform="rotate(-40 578 426)">javaparser</text>
 	<rect x="624" y="363" width="7" height="47" fill="#6b7280"/>
@@ -178,42 +177,37 @@
 	<rect x="1452" y="360" width="7" height="50" fill="#0891b2"/>
 	<rect x="1460" y="360" width="7" height="50" fill="#7c3aed"/>
 	<text x="1436" y="426" text-anchor="end" font-family="Helvetica, Arial, sans-serif" font-size="10" fill="#111827" transform="rotate(-40 1436 426)">selenium</text>
-	<rect x="1482" y="408" width="7" height="2" fill="#6b7280"/>
-	<rect x="1490" y="408" width="7" height="2" fill="#2563eb"/>
-	<rect x="1498" y="408" width="7" height="2" fill="#d97706"/>
-	<rect x="1506" y="409" width="7" height="1" fill="#059669"/>
-	<rect x="1514" y="409" width="7" height="1" fill="#7c3ed"/>
-	<rect x="1522" y="409" width="7" height="1" fill="#dc2626"/>
-	<rect x="1530" y="409" width="7" height="1" fill="#0891b2"/>
-	<rect x="1538" y="409" width="7" height="1" fill="#7c3aed"/>
-	<text x="1514" y="426" text-anchor="end" font-family="Helvetica, Arial, sans-serif" font-size="10" fill="#111827" transform="rotate(-40 1514 426)">saas+teste+moodle</text>
-	<rect x="1560" y="140" width="7" height="270" fill="#6b7280"/>
-	<rect x="1568" y="132" width="7" height="278" fill="#2563eb"/>
-	<rect x="1576" y="148" width="7" height="262" fill="#d97706"/>
-	<rect x="1584" y="188" width="7" height="222" fill="#059669"/>
-	<rect x="1592" y="183" width="7" height="227" fill="#7c3ed"/>
-	<rect x="1600" y="183" width="7" height="227" fill="#dc2626"/>
-	<rect x="1608" y="196" width="7" height="214" fill="#0891b2"/>
-	<rect x="1616" y="194" width="7" height="216" fill="#7c3aed"/>
-	<text x="1592" y="426" text-anchor="end" font-family="Helvetica, Arial, sans-serif" font-size="10" fill="#111827" transform="rotate(-40 1592 426)">saas+teste+selenium</text>
-	<rect x="1638" y="396" width="7" height="14" fill="#6b7280"/>
-	<rect x="1646" y="397" width="7" height="13" fill="#2563eb"/>
-	<rect x="1654" y="397" width="7" height="13" fill="#d97706"/>
-	<rect x="1662" y="398" width="7" height="12" fill="#059669"/>
-	<rect x="1670" y="399" width="7" height="11" fill="#7c3ed"/>
-	<rect x="1678" y="399" width="7" height="11" fill="#dc2626"/>
-	<rect x="1686" y="399" width="7" height="11" fill="#0891b2"/>
-	<rect x="1694" y="399" width="7" height="11" fill="#7c3aed"/>
-	<text x="1670" y="426" text-anchor="end" font-family="Helvetica, Arial, sans-serif" font-size="10" fill="#111827" transform="rotate(-40 1670 426)">saas+teste+service</text>
-	<rect x="1716" y="99" width="7" height="311" fill="#6b7280"/>
-	<rect x="1724" y="88" width="7" height="322" fill="#2563eb"/>
-	<rect x="1732" y="111" width="7" height="299" fill="#d97706"/>
-	<rect x="1740" y="410" width="7" height="0" fill="#059669"/>
-	<rect x="1748" y="410" width="7" height="0" fill="#7c3ed"/>
-	<rect x="1756" y="410" width="7" height="0" fill="#dc2626"/>
-	<rect x="1764" y="410" width="7" height="0" fill="#0891b2"/>
-	<rect x="1772" y="410" width="7" height="0" fill="#7c3aed"/>
-	<text x="1748" y="426" text-anchor="end" font-family="Helvetica, Arial, sans-serif" font-size="10" fill="#111827" transform="rotate(-40 1748 426)">saas+teste</text>
+	<rect x="1482" y="99" width="7" height="311" fill="#6b7280"/>
+	<rect x="1490" y="88" width="7" height="322" fill="#2563eb"/>
+	<rect x="1498" y="111" width="7" height="299" fill="#d97706"/>
+	<text x="1514" y="426" text-anchor="end" font-family="Helvetica, Arial, sans-serif" font-size="10" fill="#111827" transform="rotate(-40 1514 426)">saas+teste</text>
+	<rect x="1560" y="408" width="7" height="2" fill="#6b7280"/>
+	<rect x="1568" y="408" width="7" height="2" fill="#2563eb"/>
+	<rect x="1576" y="408" width="7" height="2" fill="#d97706"/>
+	<rect x="1584" y="409" width="7" height="1" fill="#059669"/>
+	<rect x="1592" y="409" width="7" height="1" fill="#7c3ed"/>
+	<rect x="1600" y="409" width="7" height="1" fill="#dc2626"/>
+	<rect x="1608" y="409" width="7" height="1" fill="#0891b2"/>
+	<rect x="1616" y="409" width="7" height="1" fill="#7c3aed"/>
+	<text x="1592" y="426" text-anchor="end" font-family="Helvetica, Arial, sans-serif" font-size="10" fill="#111827" transform="rotate(-40 1592 426)">saas+teste+moodle</text>
+	<rect x="1638" y="140" width="7" height="270" fill="#6b7280"/>
+	<rect x="1646" y="132" width="7" height="278" fill="#2563eb"/>
+	<rect x="1654" y="148" width="7" height="262" fill="#d97706"/>
+	<rect x="1662" y="188" width="7" height="222" fill="#059669"/>
+	<rect x="1670" y="183" width="7" height="227" fill="#7c3ed"/>
+	<rect x="1678" y="183" width="7" height="227" fill="#dc2626"/>
+	<rect x="1686" y="196" width="7" height="214" fill="#0891b2"/>
+	<rect x="1694" y="194" width="7" height="216" fill="#7c3aed"/>
+	<text x="1670" y="426" text-anchor="end" font-family="Helvetica, Arial, sans-serif" font-size="10" fill="#111827" transform="rotate(-40 1670 426)">saas+teste+selenium</text>
+	<rect x="1716" y="396" width="7" height="14" fill="#6b7280"/>
+	<rect x="1724" y="397" width="7" height="13" fill="#2563eb"/>
+	<rect x="1732" y="397" width="7" height="13" fill="#d97706"/>
+	<rect x="1740" y="398" width="7" height="12" fill="#059669"/>
+	<rect x="1748" y="399" width="7" height="11" fill="#7c3ed"/>
+	<rect x="1756" y="399" width="7" height="11" fill="#dc2626"/>
+	<rect x="1764" y="399" width="7" height="11" fill="#0891b2"/>
+	<rect x="1772" y="399" width="7" height="11" fill="#7c3aed"/>
+	<text x="1748" y="426" text-anchor="end" font-family="Helvetica, Arial, sans-serif" font-size="10" fill="#111827" transform="rotate(-40 1748 426)">saas+teste+service</text>
 	<rect x="72" y="498" width="10" height="10" fill="#6b7280"/>
 	<text x="86" y="507" font-family="Helvetica, Arial, sans-serif" font-size="10" fill="#111827">original</text>
 	<rect x="138" y="498" width="10" height="10" fill="#2563eb"/>
@@ -228,6 +222,6 @@
 	<text x="536" y="507" font-family="Helvetica, Arial, sans-serif" font-size="10" fill="#111827">delegated+implicit</text>
 	<rect x="648" y="498" width="10" height="10" fill="#0891b2"/>
 	<text x="662" y="507" font-family="Helvetica, Arial, sans-serif" font-size="10" fill="#111827">residual-implicit+delegated</text>
-	<rect x="774" y="498" width="10" height="10" fill="#7c3aed"/>
-	<text x="788" y="507" font-family="Helvetica, Arial, sans-serif" font-size="10" fill="#111827">delegated+residual-implicit</text>
+	<rect x="828" y="498" width="10" height="10" fill="#7c3aed"/>
+	<text x="842" y="507" font-family="Helvetica, Arial, sans-serif" font-size="10" fill="#111827">delegated+residual-implicit</text>
 </svg>

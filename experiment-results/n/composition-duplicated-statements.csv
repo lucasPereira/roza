@@ -1,4 +1,4 @@
-Par;W;p;Mediana da diferença;IQR da diferença;Mediana da %;IQR da %;Melhorou;Piorou;Empatou
+pair;w;p;median_difference;iqr_difference;median_percentage;iqr_percentage;improved;worsened;tied
 implicit+delegated vs implicit;0.000;0.0001316;-96.00;-166.0 a -28.00;-10.13;-11.84 a -5.484;19;0;2
 delegated+implicit vs delegated;40.00;0.02686;-27.00;-85.00 a -15.00;-6.667;-16.98 a -1.661;16;3;2
 residual-implicit+delegated vs residual-implicit;0.000;0.0001961;-71.00;-124.5 a -21.50;-9.161;-11.35 a -5.274;18;0;2

@@ -32,10 +32,37 @@ public final class ExtractableArrangeRuns {
 		if (testCases.size() < 2 || minimumLength < 1) {
 			return List.of();
 		}
-		List<List<Optional<StatementDependencyAnalyzer.Analysis>>> analysesByTest = new ArrayList<>();
+		List<List<Optional<StatementDependencyAnalyzer.Analysis>>> analysesByTest = analysesByTest(testCases, session);
+		List<List<CodeStatement>> arranges = new ArrayList<>();
+		int maxLength = 0;
 		for (TestCase testCase : testCases) {
-			analysesByTest.add(session.analysesByMethod.computeIfAbsent(methodId(testCase), id -> analyses(testCase.body().statements())));
+			List<CodeStatement> arrange = ArrangeProjection.arrangeStatements(testCase);
+			arranges.add(arrange);
+			maxLength = Math.max(maxLength, arrange.size());
 		}
+		List<ExtractableArrangeRun> selected = new ArrayList<>();
+		for (int length = maxLength; length >= minimumLength; length--) {
+			List<ExtractableArrangeRun> candidates = candidatesFromWindows(
+					testCases,
+					session,
+					analysesByTest,
+					windowsOfLength(arranges, length));
+			candidates.sort(Comparator.comparingInt(run -> -run.participantCount()));
+			for (ExtractableArrangeRun candidate : candidates) {
+				if (selected.stream().noneMatch(existing -> overlapsAnyTest(existing, candidate, testCases.size()))) {
+					selected.add(candidate);
+				}
+			}
+		}
+		return List.copyOf(selected);
+	}
+
+	static List<ExtractableArrangeRun> nWayMaterializingAllWindows(List<TestCase> testCases, int minimumLength) {
+		if (testCases.size() < 2 || minimumLength < 1) {
+			return List.of();
+		}
+		Session session = new Session();
+		List<List<Optional<StatementDependencyAnalyzer.Analysis>>> analysesByTest = analysesByTest(testCases, session);
 		Map<List<String>, List<Window>> windowsByText = new LinkedHashMap<>();
 		for (int testIndex = 0; testIndex < testCases.size(); testIndex++) {
 			List<CodeStatement> arrange = ArrangeProjection.arrangeStatements(testCases.get(testIndex));
@@ -47,6 +74,45 @@ public final class ExtractableArrangeRuns {
 				}
 			}
 		}
+		List<ExtractableArrangeRun> candidates = candidatesFromWindows(testCases, session, analysesByTest, windowsByText);
+		candidates.sort(Comparator
+				.comparingInt(ExtractableArrangeRun::length).reversed()
+				.thenComparingInt(run -> -run.participantCount()));
+		List<ExtractableArrangeRun> selected = new ArrayList<>();
+		for (ExtractableArrangeRun candidate : candidates) {
+			if (selected.stream().noneMatch(existing -> overlapsAnyTest(existing, candidate, testCases.size()))) {
+				selected.add(candidate);
+			}
+		}
+		return List.copyOf(selected);
+	}
+
+	private static List<List<Optional<StatementDependencyAnalyzer.Analysis>>> analysesByTest(List<TestCase> testCases, Session session) {
+		List<List<Optional<StatementDependencyAnalyzer.Analysis>>> analysesByTest = new ArrayList<>();
+		for (TestCase testCase : testCases) {
+			analysesByTest.add(session.analysesByMethod.computeIfAbsent(methodId(testCase), id -> analyses(testCase.body().statements())));
+		}
+		return analysesByTest;
+	}
+
+	private static Map<List<String>, List<Window>> windowsOfLength(List<List<CodeStatement>> arranges, int length) {
+		Map<List<String>, List<Window>> windowsByText = new LinkedHashMap<>();
+		for (int testIndex = 0; testIndex < arranges.size(); testIndex++) {
+			List<CodeStatement> arrange = arranges.get(testIndex);
+			for (int start = 0; start + length <= arrange.size(); start++) {
+				List<CodeStatement> window = List.copyOf(arrange.subList(start, start + length));
+				List<String> texts = window.stream().map(CodeStatement::normalizedText).collect(Collectors.toList());
+				windowsByText.computeIfAbsent(texts, key -> new ArrayList<>()).add(new Window(testIndex, start, window));
+			}
+		}
+		return windowsByText;
+	}
+
+	private static List<ExtractableArrangeRun> candidatesFromWindows(
+			List<TestCase> testCases,
+			Session session,
+			List<List<Optional<StatementDependencyAnalyzer.Analysis>>> analysesByTest,
+			Map<List<String>, List<Window>> windowsByText) {
 		List<ExtractableArrangeRun> candidates = new ArrayList<>();
 		for (List<Window> windows : windowsByText.values()) {
 			if (windows.stream().map(window -> window.testIndex).distinct().count() < 2) {
@@ -70,16 +136,7 @@ public final class ExtractableArrangeRuns {
 			}
 			sharedRun(testCases.size(), occurrences).ifPresent(candidates::add);
 		}
-		candidates.sort(Comparator
-				.comparingInt(ExtractableArrangeRun::length).reversed()
-				.thenComparingInt(run -> -run.participantCount()));
-		List<ExtractableArrangeRun> selected = new ArrayList<>();
-		for (ExtractableArrangeRun candidate : candidates) {
-			if (selected.stream().noneMatch(existing -> overlapsAnyTest(existing, candidate, testCases.size()))) {
-				selected.add(candidate);
-			}
-		}
-		return List.copyOf(selected);
+		return candidates;
 	}
 
 	public static Optional<Extractability> extractable(TestCase testCase, int start, int length) {

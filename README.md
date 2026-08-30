@@ -33,6 +33,14 @@ Run an experiment with its Gradle task:
 ./gradlew runExperimentF
 ./gradlew runExperimentG
 ./gradlew runExperimentH
+./gradlew runExperimentI
+./gradlew runExperimentJ
+./gradlew runExperimentK
+./gradlew runExperimentL
+./gradlew runExperimentM
+./gradlew runExperimentN
+./gradlew runExperimentNMissing
+./gradlew runExperimentNCharts
 ```
 
 ## Deckard

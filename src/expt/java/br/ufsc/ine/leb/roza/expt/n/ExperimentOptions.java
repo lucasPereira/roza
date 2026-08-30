@@ -8,13 +8,19 @@ import br.ufsc.ine.leb.roza.expt.n.ThesisTables.ResultRow;
 final class ExperimentOptions {
 
 	private final boolean missingOnly;
+	private final boolean chartsOnly;
 
-	private ExperimentOptions(boolean missingOnly) {
+	private ExperimentOptions(boolean missingOnly, boolean chartsOnly) {
 		this.missingOnly = missingOnly;
+		this.chartsOnly = chartsOnly;
 	}
 
 	boolean missingOnly() {
 		return missingOnly;
+	}
+
+	boolean chartsOnly() {
+		return chartsOnly;
 	}
 
 	List<Subjects.Subject> subjects(List<Subjects.Subject> all, List<ResultRow> rows) {
@@ -32,17 +38,23 @@ final class ExperimentOptions {
 
 	static ExperimentOptions parse(String[] args) {
 		boolean missingOnly = false;
+		boolean chartsOnly = false;
 		for (String argument : args) {
 			if ("--missing-only".equals(argument)) {
 				missingOnly = true;
+			} else if ("--charts-only".equals(argument)) {
+				chartsOnly = true;
 			} else {
 				throw new IllegalArgumentException(usage("Unknown argument: " + argument));
 			}
 		}
-		return new ExperimentOptions(missingOnly);
+		if (missingOnly && chartsOnly) {
+			throw new IllegalArgumentException(usage("Cannot combine --missing-only and --charts-only"));
+		}
+		return new ExperimentOptions(missingOnly, chartsOnly);
 	}
 
 	private static String usage(String message) {
-		return message + ". Usage: [--missing-only]";
+		return message + ". Usage: [--missing-only | --charts-only]";
 	}
 }

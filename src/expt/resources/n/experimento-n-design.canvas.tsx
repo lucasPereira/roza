@@ -595,7 +595,10 @@ export default function ExperimentoNDesign() {
               <Code>./gradlew runExperimentN</Code> apaga{" "}
               <Code>experiment-results/n/</Code> e roda todos os sujeitos, com
               heap 32g. <Code>./gradlew runExperimentNMissing</Code> passa{" "}
-              <Code>--missing-only</Code>: mantém o CSV e roda só os incompletos.
+              <Code>--missing-only</Code>: mantém o CSV e roda só os incompletos.{" "}
+              <Code>./gradlew runExperimentNCharts</Code> passa{" "}
+              <Code>--charts-only</Code>: redesenha os três SVG a partir do{" "}
+              <Code>comparison.csv</Code> já gravado, sem rodar o pipeline.
             </Text>
           </CardBody>
         </Card>

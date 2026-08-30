@@ -52,6 +52,14 @@ public final class Experiment {
 
 	public static void main(String[] args) {
 		ExperimentOptions options = ExperimentOptions.parse(args);
+		if (options.chartsOnly()) {
+			if (!comparisonFile().isFile()) {
+				throw new IllegalStateException("Cannot use --charts-only without " + comparisonFile().getPath());
+			}
+			writeCharts(ExperimentResume.parseComparison(new FileUtils().readContetAsString(comparisonFile())));
+			System.out.printf("Rewrote experiment n charts from %s%n", comparisonFile().getPath());
+			return;
+		}
 		long startedAt = System.currentTimeMillis();
 		List<ResultRow> rows;
 		if (options.missingOnly()) {
@@ -165,7 +173,7 @@ public final class Experiment {
 				() -> original,
 				new WithoutImplicitSetupTestCaseDecomposer(true),
 				new ContiguousCommonStatementsSimilarityMeasurer(CCS_MINIMUM_LENGTH),
-				new DelegatedSetupTestClassRefactorer(),
+				new DelegatedSetupTestClassRefactorer(CCS_MINIMUM_LENGTH),
 				subject,
 				original,
 				rows,
@@ -177,7 +185,7 @@ public final class Experiment {
 				() -> parsedOrNull(implicit),
 				new WithoutImplicitSetupTestCaseDecomposer(true),
 				new ContiguousCommonStatementsSimilarityMeasurer(CCS_MINIMUM_LENGTH),
-				new DelegatedSetupTestClassRefactorer(),
+				new DelegatedSetupTestClassRefactorer(CCS_MINIMUM_LENGTH),
 				subject,
 				original,
 				rows,
@@ -201,7 +209,7 @@ public final class Experiment {
 				() -> parsedOrNull(residual),
 				new WithoutImplicitSetupTestCaseDecomposer(true),
 				new ContiguousCommonStatementsSimilarityMeasurer(CCS_MINIMUM_LENGTH),
-				new DelegatedSetupTestClassRefactorer(),
+				new DelegatedSetupTestClassRefactorer(CCS_MINIMUM_LENGTH),
 				subject,
 				original,
 				rows,
@@ -410,18 +418,22 @@ public final class Experiment {
 		List<String> projects = rows.stream().map(row -> row.project).distinct().collect(Collectors.toList());
 		RESULTS.writeContetAsString(
 				"duplicated-statements.svg",
-				GroupedBarChart.svg("Sentenças duplicadas", "Sentenças duplicadas", projects, ThesisTables.TREATMENTS, series(rows, projects, row -> (double) row.duplicatedStatements), false));
+				GroupedBarChart.svg("Sentenças duplicadas", "Sentenças duplicadas", projects, ThesisTables.TREATMENTS, series(rows, projects, ThesisTables.TREATMENTS, row -> (double) row.duplicatedStatements), false));
 		RESULTS.writeContetAsString(
 				"duplication-rate.svg",
-				GroupedBarChart.svg("Taxa de duplicação", "Taxa de duplicação (%)", projects, ThesisTables.TREATMENTS, series(rows, projects, row -> row.duplicationRate), true));
+				GroupedBarChart.svg("Taxa de duplicação", "Taxa de duplicação (%)", projects, ThesisTables.TREATMENTS, series(rows, projects, ThesisTables.TREATMENTS, row -> row.duplicationRate), true));
 		RESULTS.writeContetAsString(
 				"duplication-difference-percentage.svg",
-				GroupedBarChart.svg("Porcentagem de diferença na duplicação", "Porcentagem de diferença (%)", projects, ThesisTables.TREATMENTS, series(rows, projects, row -> row.duplicationDifferencePercentage == null ? Double.NaN : row.duplicationDifferencePercentage), false));
+				GroupedBarChart.svg("Porcentagem de diferença na duplicação", "Porcentagem de diferença (%)", projects, ThesisTables.VARIANTS, series(rows, projects, ThesisTables.VARIANTS, row -> row.duplicationDifferencePercentage == null ? Double.NaN : row.duplicationDifferencePercentage), false));
 	}
 
-	private static List<List<Double>> series(List<ResultRow> rows, List<String> projects, java.util.function.Function<ResultRow, Double> metric) {
+	private static List<List<Double>> series(
+			List<ResultRow> rows,
+			List<String> projects,
+			List<String> treatments,
+			java.util.function.Function<ResultRow, Double> metric) {
 		List<List<Double>> values = new ArrayList<>();
-		for (String treatment : ThesisTables.TREATMENTS) {
+		for (String treatment : treatments) {
 			List<Double> series = new ArrayList<>();
 			for (String project : projects) {
 				ResultRow match = rows.stream().filter(row -> row.project.equals(project) && row.variant.equals(treatment)).findFirst().orElse(null);
