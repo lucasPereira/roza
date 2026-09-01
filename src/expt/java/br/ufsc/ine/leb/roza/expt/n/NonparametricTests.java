@@ -5,6 +5,9 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
+import br.ufsc.ine.leb.roza.core.legacy.utils.ShapiroWilkNormalityTest;
+import br.ufsc.ine.leb.roza.core.legacy.utils.ShapiroWilkNormalityTest.NormalityTestResult;
+
 final class NonparametricTests {
 
 	private NonparametricTests() {
@@ -19,6 +22,26 @@ final class NonparametricTests {
 			differences.add(treatment.get(index) - baseline.get(index));
 		}
 		return wilcoxonDifferences(differences);
+	}
+
+	static ShapiroResult shapiroWilk(List<Double> sample) {
+		if (sample.size() < 3) {
+			return new ShapiroResult(Double.NaN, Double.NaN, false);
+		}
+		double[] values = new double[sample.size()];
+		double minimum = sample.get(0);
+		double maximum = sample.get(0);
+		for (int index = 0; index < sample.size(); index++) {
+			double value = sample.get(index);
+			values[index] = value;
+			minimum = Math.min(minimum, value);
+			maximum = Math.max(maximum, value);
+		}
+		if (minimum == maximum) {
+			return new ShapiroResult(Double.NaN, Double.NaN, false);
+		}
+		NormalityTestResult result = new ShapiroWilkNormalityTest().test(values);
+		return new ShapiroResult(result.getTestStatistic(), result.getPValue(), result.isNormal());
 	}
 
 	static WilcoxonResult wilcoxonDifferences(List<Double> differences) {
@@ -223,6 +246,19 @@ final class NonparametricTests {
 		WilcoxonResult(double w, double p) {
 			this.w = w;
 			this.p = p;
+		}
+	}
+
+	static final class ShapiroResult {
+
+		final double w;
+		final double p;
+		final boolean normal;
+
+		ShapiroResult(double w, double p, boolean normal) {
+			this.w = w;
+			this.p = p;
+			this.normal = normal;
 		}
 	}
 

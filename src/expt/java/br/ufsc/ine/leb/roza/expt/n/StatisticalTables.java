@@ -8,7 +8,7 @@ import java.util.function.ToDoubleFunction;
 
 import br.ufsc.ine.leb.roza.core.legacy.utils.CommaSeparatedValues;
 
-final class ThesisTables {
+final class StatisticalTables {
 
 	static final List<String> VARIANTS = List.of(
 			"implicit",
@@ -34,10 +34,10 @@ final class ThesisTables {
 			new String[] { "residual-implicit+delegated", "residual-implicit" },
 			new String[] { "delegated+residual-implicit", "delegated" });
 
-	private ThesisTables() {
+	private StatisticalTables() {
 	}
 
-	static String vsOriginal(List<ResultRow> rows, String metricName, ToDoubleFunction<ResultRow> metric, boolean includeRelativePercent) {
+	static String vsOriginal(List<ResultRow> rows, ToDoubleFunction<ResultRow> metric) {
 		Map<String, Map<String, ResultRow>> byProject = index(rows);
 		CommaSeparatedValues csv = new CommaSeparatedValues();
 		csv.addLine(
@@ -45,12 +45,14 @@ final class ThesisTables {
 				"w",
 				"p",
 				"median_difference",
-				"iqr_difference",
+				"q1_difference",
+				"q3_difference",
 				"median_percentage",
-				"iqr_percentage",
-				"improved",
-				"worsened",
-				"tied");
+				"q1_percentage",
+				"q3_percentage",
+				"increased",
+				"decreased",
+				"unchanged");
 		for (String variant : VARIANTS) {
 			List<Double> baseline = new ArrayList<>();
 			List<Double> treatment = new ArrayList<>();
@@ -65,18 +67,22 @@ final class ThesisTables {
 				double right = metric.applyAsDouble(current);
 				baseline.add(left);
 				treatment.add(right);
-				if (includeRelativePercent && left != 0.0) {
-					percents.add((right - left) / left * 100.0);
-				} else if (includeRelativePercent) {
-					percents.add(Double.NaN);
-				} else if (left != 0.0) {
-					percents.add((right - left) / left * 100.0);
-				} else {
-					percents.add(Double.NaN);
-				}
+				percents.add(left == 0.0 ? Double.NaN : (right - left) / left * 100.0);
 			}
 			csv.addLine(variantRow(variant, baseline, treatment, percents));
 		}
+		return csv.getContent();
+	}
+
+	static String shapiro(List<ResultRow> rows) {
+		CommaSeparatedValues csv = new CommaSeparatedValues();
+		csv.addLine("metric", "variant", "n", "w", "p", "normal");
+		appendShapiro(csv, rows, "duplicated_statements", row -> row.duplicatedStatements);
+		appendShapiro(csv, rows, "test_classes", row -> row.testClasses);
+		appendShapiro(csv, rows, "setup_methods", row -> row.setupMethods);
+		appendShapiro(csv, rows, "attributes", row -> row.attributes);
+		appendShapiro(csv, rows, "helper_methods", row -> row.helperMethods);
+		appendShapiro(csv, rows, "total_statements", row -> row.totalStatements);
 		return csv.getContent();
 	}
 
@@ -113,12 +119,14 @@ final class ThesisTables {
 				"w",
 				"p_holm",
 				"median_difference",
-				"iqr_difference",
+				"q1_difference",
+				"q3_difference",
 				"median_percentage",
-				"iqr_percentage",
-				"improved",
-				"worsened",
-				"tied");
+				"q1_percentage",
+				"q3_percentage",
+				"increased",
+				"decreased",
+				"unchanged");
 		for (int index = 0; index < prepared.size(); index++) {
 			String label = (String) prepared.get(index)[0];
 			PairSummary summary = (PairSummary) prepared.get(index)[1];
@@ -129,7 +137,7 @@ final class ThesisTables {
 
 	static String medians(List<ResultRow> rows) {
 		CommaSeparatedValues csv = new CommaSeparatedValues();
-		csv.addLine("treatment", "median_duplicated_statements", "iqr");
+		csv.addLine("treatment", "median_duplicated_statements", "q1", "q3");
 		for (String treatment : TREATMENTS) {
 			List<Double> values = new ArrayList<>();
 			for (ResultRow row : rows) {
@@ -137,7 +145,11 @@ final class ThesisTables {
 					values.add((double) row.duplicatedStatements);
 				}
 			}
-			csv.addLine(treatment, DescriptiveStats.formatNumber(DescriptiveStats.median(values)), DescriptiveStats.iqrRange(values));
+			csv.addLine(
+					treatment,
+					DescriptiveStats.formatNumber(DescriptiveStats.median(values)),
+					DescriptiveStats.q1(values),
+					DescriptiveStats.q3(values));
 		}
 		return csv.getContent();
 	}
@@ -150,17 +162,46 @@ final class ThesisTables {
 				"w",
 				"p",
 				"median_difference",
-				"iqr_difference",
+				"q1_difference",
+				"q3_difference",
 				"median_percentage",
-				"iqr_percentage",
-				"improved",
-				"worsened",
-				"tied");
+				"q1_percentage",
+				"q3_percentage",
+				"increased",
+				"decreased",
+				"unchanged");
 		for (String[] pair : COMPOSITION_PAIRS) {
 			PairSummary summary = pairSummary(byProject, pair[1], pair[0]);
 			csv.addLine(pairRow(pair[0] + " vs " + pair[1], summary, summary.wilcoxon.p));
 		}
 		return csv.getContent();
+	}
+
+	private static void appendShapiro(
+			CommaSeparatedValues csv,
+			List<ResultRow> rows,
+			String metric,
+			ToDoubleFunction<ResultRow> values) {
+		Map<String, Map<String, ResultRow>> byProject = index(rows);
+		for (String variant : VARIANTS) {
+			List<Double> differences = new ArrayList<>();
+			for (Map<String, ResultRow> project : byProject.values()) {
+				ResultRow original = project.get("original");
+				ResultRow current = project.get(variant);
+				if (original == null || current == null) {
+					continue;
+				}
+				differences.add(values.applyAsDouble(current) - values.applyAsDouble(original));
+			}
+			NonparametricTests.ShapiroResult result = NonparametricTests.shapiroWilk(differences);
+			csv.addLine(
+					metric,
+					variant,
+					differences.size(),
+					DescriptiveStats.formatNumber(result.w),
+					DescriptiveStats.formatP(result.p),
+					Double.isNaN(result.p) ? "" : (result.normal ? "yes" : "no"));
+		}
 	}
 
 	private static Object[] variantRow(String variant, List<Double> baseline, List<Double> treatment, List<Double> percents) {
@@ -176,12 +217,14 @@ final class ThesisTables {
 				DescriptiveStats.formatNumber(wilcoxon.w),
 				DescriptiveStats.formatP(wilcoxon.p),
 				DescriptiveStats.formatNumber(DescriptiveStats.median(differences)),
-				DescriptiveStats.iqrRange(differences),
+				DescriptiveStats.q1(differences),
+				DescriptiveStats.q3(differences),
 				finitePercents.isEmpty() ? "" : DescriptiveStats.formatNumber(DescriptiveStats.median(finitePercents)),
-				DescriptiveStats.iqrRange(finitePercents),
-				counts.improved,
-				counts.worsened,
-				counts.tied
+				DescriptiveStats.q1(finitePercents),
+				DescriptiveStats.q3(finitePercents),
+				counts.increased,
+				counts.decreased,
+				counts.unchanged
 		};
 	}
 
@@ -191,12 +234,14 @@ final class ThesisTables {
 				DescriptiveStats.formatNumber(summary.wilcoxon.w),
 				DescriptiveStats.formatP(p),
 				DescriptiveStats.formatNumber(DescriptiveStats.median(summary.differences)),
-				DescriptiveStats.iqrRange(summary.differences),
+				DescriptiveStats.q1(summary.differences),
+				DescriptiveStats.q3(summary.differences),
 				summary.percents.isEmpty() ? "" : DescriptiveStats.formatNumber(DescriptiveStats.median(summary.percents)),
-				DescriptiveStats.iqrRange(summary.percents),
-				summary.counts.improved,
-				summary.counts.worsened,
-				summary.counts.tied
+				DescriptiveStats.q1(summary.percents),
+				DescriptiveStats.q3(summary.percents),
+				summary.counts.increased,
+				summary.counts.decreased,
+				summary.counts.unchanged
 		};
 	}
 
@@ -291,35 +336,29 @@ final class ThesisTables {
 		final String project;
 		final String variant;
 		final int testClasses;
-		final int setups;
+		final int setupMethods;
 		final int attributes;
 		final int helperMethods;
 		final int totalStatements;
 		final int duplicatedStatements;
-		final double duplicationRate;
-		final Double duplicationDifferencePercentage;
 
 		ResultRow(
 				String project,
 				String variant,
 				int testClasses,
-				int setups,
+				int setupMethods,
 				int attributes,
 				int helperMethods,
 				int totalStatements,
-				int duplicatedStatements,
-				double duplicationRate,
-				Double duplicationDifferencePercentage) {
+				int duplicatedStatements) {
 			this.project = project;
 			this.variant = variant;
 			this.testClasses = testClasses;
-			this.setups = setups;
+			this.setupMethods = setupMethods;
 			this.attributes = attributes;
 			this.helperMethods = helperMethods;
 			this.totalStatements = totalStatements;
 			this.duplicatedStatements = duplicatedStatements;
-			this.duplicationRate = duplicationRate;
-			this.duplicationDifferencePercentage = duplicationDifferencePercentage;
 		}
 	}
 }

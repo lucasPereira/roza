@@ -40,7 +40,7 @@ Run an experiment with its Gradle task:
 ./gradlew runExperimentM
 ./gradlew runExperimentN
 ./gradlew runExperimentNMissing
-./gradlew runExperimentNCharts
+./gradlew runExperimentNFromComparison
 ```
 
 ## Deckard

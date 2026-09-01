@@ -1,9 +1,9 @@
-treatment;median_duplicated_statements;iqr
-original;1162;312.0 a 3866
-implicit;948.5;290.5 a 2570
-residual-implicit;931.5;279.3 a 2451
-delegated;905.0;268.0 a 2820
-implicit+delegated;696.0;241.0 a 2321
-delegated+implicit;703.0;241.0 a 2449
-residual-implicit+delegated;606.0;225.8 a 1563
-delegated+residual-implicit;693.0;234.0 a 2384
+treatment;median_duplicated_statements;q1;q3
+original;1162;312.0;3866
+implicit;948.5;290.5;2570
+residual-implicit;931.5;279.3;2451
+delegated;982.5;308.5;3288
+implicit+delegated;839.0;282.5;2410
+delegated+implicit;846.5;282.3;2478
+residual-implicit+delegated;818.5;275.8;2322
+delegated+residual-implicit;825.5;275.8;2392

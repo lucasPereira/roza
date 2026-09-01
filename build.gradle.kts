@@ -241,10 +241,10 @@ registerExperimentTask(
 )
 
 registerExperimentTask(
-    "runExperimentNCharts",
-    "Rewrites experiment n SVGs from the existing comparison.csv with --charts-only, without running the pipeline.",
+    "runExperimentNFromComparison",
+    "Regenerates every derived experiment n file (SVGs and statistical CSVs) from comparison.csv, without rerunning the pipeline or changing that file.",
     "br.ufsc.ine.leb.roza.expt.n.Experiment",
-    experimentArgs = listOf("--charts-only"),
+    experimentArgs = listOf("--from-comparison"),
 )
 
 spotless {

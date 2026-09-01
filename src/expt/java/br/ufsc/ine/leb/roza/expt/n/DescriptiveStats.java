@@ -34,11 +34,12 @@ final class DescriptiveStats {
 		return sorted.get(lower) * (1.0 - weight) + sorted.get(upper) * weight;
 	}
 
-	static String iqrRange(List<Double> values) {
-		if (values.size() < 2) {
-			return "";
-		}
-		return formatNumber(quantile(values, 0.25)) + " a " + formatNumber(quantile(values, 0.75));
+	static String q1(List<Double> values) {
+		return values.size() < 2 ? "" : formatNumber(quantile(values, 0.25));
+	}
+
+	static String q3(List<Double> values) {
+		return values.size() < 2 ? "" : formatNumber(quantile(values, 0.75));
 	}
 
 	static String formatNumber(double value) {
@@ -56,31 +57,31 @@ final class DescriptiveStats {
 	}
 
 	static Counts counts(List<Double> differences) {
-		int improved = 0;
-		int worsened = 0;
-		int tied = 0;
+		int increased = 0;
+		int decreased = 0;
+		int unchanged = 0;
 		for (double difference : differences) {
-			if (difference < 0) {
-				improved++;
-			} else if (difference > 0) {
-				worsened++;
+			if (difference > 0) {
+				increased++;
+			} else if (difference < 0) {
+				decreased++;
 			} else {
-				tied++;
+				unchanged++;
 			}
 		}
-		return new Counts(improved, worsened, tied);
+		return new Counts(increased, decreased, unchanged);
 	}
 
 	static final class Counts {
 
-		final int improved;
-		final int worsened;
-		final int tied;
+		final int increased;
+		final int decreased;
+		final int unchanged;
 
-		Counts(int improved, int worsened, int tied) {
-			this.improved = improved;
-			this.worsened = worsened;
-			this.tied = tied;
+		Counts(int increased, int decreased, int unchanged) {
+			this.increased = increased;
+			this.decreased = decreased;
+			this.unchanged = unchanged;
 		}
 	}
 

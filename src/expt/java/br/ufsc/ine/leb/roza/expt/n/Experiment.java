@@ -5,6 +5,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -42,22 +43,24 @@ import br.ufsc.ine.leb.roza.core.modern.refactoring.RankingSetupContributor;
 import br.ufsc.ine.leb.roza.core.modern.refactoring.RefactoredTestClasses;
 import br.ufsc.ine.leb.roza.core.modern.refactoring.ResidualImplicitSetupTestClassRefactorer;
 import br.ufsc.ine.leb.roza.core.modern.refactoring.TestClassRefactorer;
-import br.ufsc.ine.leb.roza.expt.n.ThesisTables.ResultRow;
+import br.ufsc.ine.leb.roza.expt.n.StatisticalTables.ResultRow;
 
 public final class Experiment {
 
 	private static final FolderUtils RESULTS = new FolderUtils("experiment-results/n");
-	private static final int VARIANT_COUNT = ThesisTables.VARIANTS.size();
+	private static final int VARIANT_COUNT = StatisticalTables.VARIANTS.size();
 	private static final int CCS_MINIMUM_LENGTH = 2;
 
 	public static void main(String[] args) {
 		ExperimentOptions options = ExperimentOptions.parse(args);
-		if (options.chartsOnly()) {
+		if (options.fromComparison()) {
 			if (!comparisonFile().isFile()) {
-				throw new IllegalStateException("Cannot use --charts-only without " + comparisonFile().getPath());
+				throw new IllegalStateException("Cannot use --from-comparison without " + comparisonFile().getPath());
 			}
-			writeCharts(ExperimentResume.parseComparison(new FileUtils().readContetAsString(comparisonFile())));
-			System.out.printf("Rewrote experiment n charts from %s%n", comparisonFile().getPath());
+			List<ResultRow> rows = ExperimentResume.parseComparison(new FileUtils().readContetAsString(comparisonFile()));
+			writeCharts(rows);
+			writeTables(rows);
+			System.out.printf("Rewrote experiment n derived files from %s%n", comparisonFile().getPath());
 			return;
 		}
 		long startedAt = System.currentTimeMillis();
@@ -119,7 +122,7 @@ public final class Experiment {
 				continue;
 			}
 			RefactoredTestClasses originalSuite = new RefactoredTestClasses(original.testClasses());
-			ExperimentResume.upsert(rows, row(subject.name(), "original", originalSuite, originalSuite));
+			ExperimentResume.upsert(rows, row(subject.name(), "original", originalSuite));
 			progress.beginSubject(subject.name(), tests);
 			persist(rows, skipped);
 			runSubject(subject, original, rows, skipped, progress);
@@ -128,9 +131,9 @@ public final class Experiment {
 		writeComparison(rows);
 		try {
 			writeCharts(rows);
-			writeThesisTables(rows);
+			writeTables(rows);
 		} catch (RuntimeException exception) {
-			System.err.println("Could not write charts or thesis tables: " + exception);
+			System.err.println("Could not write charts or tables: " + exception);
 		}
 		RESULTS.writeContetAsString("skipped.csv", skipped.getContent());
 		System.out.printf("Experiment n finished. Results: %s. Total time: %.1fs%n", RESULTS.getBaseFolder(), (System.currentTimeMillis() - startedAt) / 1000.0);
@@ -151,7 +154,6 @@ public final class Experiment {
 				new LccssTestCaseSimilarityMeasurer(),
 				new ImplicitSetupTestClassRefactorer(),
 				subject,
-				original,
 				rows,
 				skipped,
 				progress);
@@ -163,7 +165,6 @@ public final class Experiment {
 				new LccssTestCaseSimilarityMeasurer(),
 				new ResidualImplicitSetupTestClassRefactorer(),
 				subject,
-				original,
 				rows,
 				skipped,
 				progress);
@@ -175,7 +176,6 @@ public final class Experiment {
 				new ContiguousCommonStatementsSimilarityMeasurer(CCS_MINIMUM_LENGTH),
 				new DelegatedSetupTestClassRefactorer(CCS_MINIMUM_LENGTH),
 				subject,
-				original,
 				rows,
 				skipped,
 				progress);
@@ -187,7 +187,6 @@ public final class Experiment {
 				new ContiguousCommonStatementsSimilarityMeasurer(CCS_MINIMUM_LENGTH),
 				new DelegatedSetupTestClassRefactorer(CCS_MINIMUM_LENGTH),
 				subject,
-				original,
 				rows,
 				skipped,
 				progress);
@@ -199,7 +198,6 @@ public final class Experiment {
 				new LccssTestCaseSimilarityMeasurer(),
 				new ImplicitSetupTestClassRefactorer(),
 				subject,
-				original,
 				rows,
 				skipped,
 				progress);
@@ -211,7 +209,6 @@ public final class Experiment {
 				new ContiguousCommonStatementsSimilarityMeasurer(CCS_MINIMUM_LENGTH),
 				new DelegatedSetupTestClassRefactorer(CCS_MINIMUM_LENGTH),
 				subject,
-				original,
 				rows,
 				skipped,
 				progress);
@@ -223,7 +220,6 @@ public final class Experiment {
 				new LccssTestCaseSimilarityMeasurer(),
 				new ResidualImplicitSetupTestClassRefactorer(),
 				subject,
-				original,
 				rows,
 				skipped,
 				progress);
@@ -237,7 +233,6 @@ public final class Experiment {
 			TestCaseSimilarityMeasurer measurer,
 			TestClassRefactorer refactorer,
 			Subjects.Subject subject,
-			ParsedTestClasses original,
 			List<ResultRow> rows,
 			CommaSeparatedValues skipped,
 			ExperimentProgress progress) {
@@ -273,7 +268,7 @@ public final class Experiment {
 			}
 			return null;
 		}
-		ExperimentResume.upsert(rows, row(subject.name(), variant, originalSuite(original), result.refactored));
+		ExperimentResume.upsert(rows, row(subject.name(), variant, result.refactored));
 		persist(rows, skipped);
 		return result;
 	}
@@ -358,20 +353,9 @@ public final class Experiment {
 		return new ParsedTestClasses(allClasses(refactored));
 	}
 
-	private static RefactoredTestClasses originalSuite(ParsedTestClasses parsed) {
-		return new RefactoredTestClasses(parsed.testClasses());
-	}
-
-	private static ResultRow row(String project, String variant, RefactoredTestClasses original, RefactoredTestClasses current) {
+	private static ResultRow row(String project, String variant, RefactoredTestClasses current) {
 		TestClassMetrics metrics = metricsOf(current);
 		int helpers = allClasses(current).stream().mapToInt(testClass -> testClass.helperMethods().size()).sum();
-		int originalDuplicated = metricsOf(original).duplicatedStatements();
-		Double percent = originalDuplicated == 0 || "original".equals(variant)
-				? ("original".equals(variant) ? 0.0 : null)
-				: (metrics.duplicatedStatements() - originalDuplicated) * 100.0 / originalDuplicated;
-		if ("original".equals(variant)) {
-			percent = 0.0;
-		}
 		return new ResultRow(
 				project,
 				variant,
@@ -380,9 +364,7 @@ public final class Experiment {
 				metrics.attributes(),
 				helpers,
 				metrics.totalStatements(),
-				metrics.duplicatedStatements(),
-				metrics.duplicationRate() * 100.0,
-				percent);
+				metrics.duplicatedStatements());
 	}
 
 	private static void writeComparison(List<ResultRow> rows) {
@@ -391,51 +373,43 @@ public final class Experiment {
 				"project",
 				"variant",
 				"test_classes",
-				"setups",
+				"setup_methods",
 				"attributes",
 				"helper_methods",
 				"total_statements",
-				"duplicated_statements",
-				"duplication_rate",
-				"duplication_difference_percentage");
+				"duplicated_statements");
 		for (ResultRow row : ExperimentResume.ordered(rows, Subjects.all().stream().map(Subjects.Subject::name).collect(Collectors.toList()))) {
 			csv.addLine(
 					row.project,
 					row.variant,
 					row.testClasses,
-					row.setups,
+					row.setupMethods,
 					row.attributes,
 					row.helperMethods,
 					row.totalStatements,
-					row.duplicatedStatements,
-					formatRate(row.duplicationRate),
-					row.duplicationDifferencePercentage == null ? "" : formatRate(row.duplicationDifferencePercentage));
+					row.duplicatedStatements);
 		}
 		RESULTS.writeContetAsString("comparison.csv", csv.getContent());
 	}
 
 	private static void writeCharts(List<ResultRow> rows) {
 		List<String> projects = rows.stream().map(row -> row.project).distinct().collect(Collectors.toList());
-		List<List<Double>> reductions = series(
-				rows,
-				projects,
-				ThesisTables.VARIANTS,
-				row -> row.duplicationDifferencePercentage == null ? Double.NaN : -row.duplicationDifferencePercentage);
+		Map<String, Integer> originalDuplicated = rows.stream()
+				.filter(row -> "original".equals(row.variant))
+				.collect(Collectors.toMap(row -> row.project, row -> row.duplicatedStatements, (left, right) -> left));
+		List<List<Double>> variations = series(rows, projects, StatisticalTables.VARIANTS, row -> {
+			Integer baseline = originalDuplicated.get(row.project);
+			if (baseline == null || baseline == 0) {
+				return Double.NaN;
+			}
+			return (row.duplicatedStatements - baseline) * 100.0 / baseline;
+		});
 		RESULTS.writeContetAsString(
-				"duplicated-statements.svg",
-				GroupedBarChart.svg("Sentenças duplicadas", "Sentenças duplicadas", projects, ThesisTables.TREATMENTS, series(rows, projects, ThesisTables.TREATMENTS, row -> (double) row.duplicatedStatements), false));
+				"duplication-variation-distribution.svg",
+				DuplicationVariationDistributionChart.svg(projects, StatisticalTables.VARIANTS, variations));
 		RESULTS.writeContetAsString(
-				"duplication-rate.svg",
-				GroupedBarChart.svg("Taxa de duplicação", "Taxa de duplicação (%)", projects, ThesisTables.TREATMENTS, series(rows, projects, ThesisTables.TREATMENTS, row -> row.duplicationRate), true));
-		RESULTS.writeContetAsString(
-				"duplication-reduction-percentage.svg",
-				GroupedBarChart.svg("Porcentagem de redução da duplicação", "Redução da duplicação (%)", projects, ThesisTables.VARIANTS, reductions, false));
-		RESULTS.writeContetAsString(
-				"duplication-reduction-distribution.svg",
-				DuplicationReductionDistributionChart.svg(projects, ThesisTables.VARIANTS, reductions));
-		RESULTS.writeContetAsString(
-				"duplication-reduction-heatmap.svg",
-				DuplicationReductionHeatmap.svg(projects, ThesisTables.VARIANTS, reductions));
+				"duplication-variation-heatmap.svg",
+				DuplicationVariationHeatmap.svg(projects, StatisticalTables.VARIANTS, variations));
 	}
 
 	private static List<List<Double>> series(
@@ -455,20 +429,21 @@ public final class Experiment {
 		return values;
 	}
 
-	private static void writeThesisTables(List<ResultRow> rows) {
+	private static void writeTables(List<ResultRow> rows) {
 		if (rows.isEmpty()) {
 			return;
 		}
-		RESULTS.writeContetAsString("vs-original-duplicated-statements.csv", ThesisTables.vsOriginal(rows, "duplicated_statements", row -> row.duplicatedStatements, true));
-		RESULTS.writeContetAsString("vs-original-test-classes.csv", ThesisTables.vsOriginal(rows, "test_classes", row -> row.testClasses, true));
-		RESULTS.writeContetAsString("vs-original-setups.csv", ThesisTables.vsOriginal(rows, "setups", row -> row.setups, true));
-		RESULTS.writeContetAsString("vs-original-attributes.csv", ThesisTables.vsOriginal(rows, "attributes", row -> row.attributes, true));
-		RESULTS.writeContetAsString("vs-original-helper-methods.csv", ThesisTables.vsOriginal(rows, "helper_methods", row -> row.helperMethods, true));
-		RESULTS.writeContetAsString("vs-original-total-statements.csv", ThesisTables.vsOriginal(rows, "total_statements", row -> row.totalStatements, true));
-		RESULTS.writeContetAsString("friedman-duplicated-statements.csv", ThesisTables.friedman(rows));
-		RESULTS.writeContetAsString("pairwise-duplicated-statements.csv", ThesisTables.pairwise(rows));
-		RESULTS.writeContetAsString("medians-duplicated-statements.csv", ThesisTables.medians(rows));
-		RESULTS.writeContetAsString("composition-duplicated-statements.csv", ThesisTables.composition(rows));
+		RESULTS.writeContetAsString("shapiro-vs-original.csv", StatisticalTables.shapiro(rows));
+		RESULTS.writeContetAsString("vs-original-duplicated-statements.csv", StatisticalTables.vsOriginal(rows, row -> row.duplicatedStatements));
+		RESULTS.writeContetAsString("vs-original-test-classes.csv", StatisticalTables.vsOriginal(rows, row -> row.testClasses));
+		RESULTS.writeContetAsString("vs-original-setup-methods.csv", StatisticalTables.vsOriginal(rows, row -> row.setupMethods));
+		RESULTS.writeContetAsString("vs-original-attributes.csv", StatisticalTables.vsOriginal(rows, row -> row.attributes));
+		RESULTS.writeContetAsString("vs-original-helper-methods.csv", StatisticalTables.vsOriginal(rows, row -> row.helperMethods));
+		RESULTS.writeContetAsString("vs-original-total-statements.csv", StatisticalTables.vsOriginal(rows, row -> row.totalStatements));
+		RESULTS.writeContetAsString("friedman-duplicated-statements.csv", StatisticalTables.friedman(rows));
+		RESULTS.writeContetAsString("pairwise-duplicated-statements.csv", StatisticalTables.pairwise(rows));
+		RESULTS.writeContetAsString("medians-duplicated-statements.csv", StatisticalTables.medians(rows));
+		RESULTS.writeContetAsString("composition-duplicated-statements.csv", StatisticalTables.composition(rows));
 	}
 
 	private static TestClassMetrics metricsOf(RefactoredTestClasses refactored) {
@@ -479,10 +454,6 @@ public final class Experiment {
 		List<TestClass> classes = new ArrayList<>(refactored.testClasses());
 		classes.addAll(refactored.helperClasses());
 		return classes;
-	}
-
-	private static String formatRate(double value) {
-		return String.format(Locale.ROOT, "%.1f", value);
 	}
 
 	private static final class HelperPreservingRankingRefactorer implements TestClassRefactorer, RankingSetupContributor {

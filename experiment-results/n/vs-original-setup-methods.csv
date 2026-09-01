@@ -1,0 +1,8 @@
+variant;w;p;median_difference;q1_difference;q3_difference;median_percentage;q1_percentage;q3_percentage;increased;decreased;unchanged
+implicit;42.00;0.03292;17.50;0.000;98.25;226.4;0.000;570.7;15;4;3
+residual-implicit;27.00;0.003589;20.00;5.500;115.8;193.8;9.722;595.1;17;3;2
+delegated;0.000;0.1797;0.000;0.000;0.000;0.000;0.000;0.000;0;2;20
+implicit+delegated;42.00;0.03292;17.50;0.000;98.25;226.4;0.000;570.7;15;4;3
+delegated+implicit;41.50;0.03130;17.50;0.000;96.50;228.6;0.000;551.2;15;4;3
+residual-implicit+delegated;27.00;0.003589;20.00;5.500;115.8;193.8;9.722;595.1;17;3;2
+delegated+residual-implicit;24.00;0.002491;17.50;5.000;113.5;188.9;6.944;578.0;17;3;2

@@ -15,66 +15,1142 @@ import {
   Text,
 } from "cursor/canvas";
 
-const VARIANTS = [
-  "implicit",
-  "residual-implicit",
-  "delegated",
-  "implicit+delegated",
-  "delegated+implicit",
-  "residual-implicit+delegated",
-  "delegated+residual-implicit",
-] as const;
-
-const TREATMENTS = ["original", ...VARIANTS] as const;
-
-const DASH = "—";
-
-function dashedRow(label: string, cells: number): string[] {
-  return [label, ...Array.from({ length: cells }, () => DASH)];
-}
-
-const PAIRWISE_ROWS: string[][] = VARIANTS.flatMap((a, i) =>
-  VARIANTS.slice(i + 1).map((b) => dashedRow(`${a} vs ${b}`, 9)),
-);
-
-const COMPOSITION_PAIRS = [
-  "implicit+delegated vs implicit",
-  "delegated+implicit vs delegated",
-  "residual-implicit+delegated vs residual-implicit",
-  "delegated+residual-implicit vs delegated",
-];
-
-const VS_ORIGINAL_HEADERS = [
+const VS_HEADERS = [
   "Variante",
   "W",
   "p",
   "Mediana da diferença",
-  "IQR da diferença",
+  "Q1 da diferença",
+  "Q3 da diferença",
   "Mediana da %",
-  "IQR da %",
-  "Melhorou",
-  "Piorou",
-  "Empatou",
-];
+  "Q1 da %",
+  "Q3 da %",
+  "Aumentou",
+  "Diminuiu",
+  "Igual"
+] as string[];
 
-function MetricWilcoxonTable({
+const PAIR_HEADERS = [
+  "Par",
+  "W",
+  "p (Holm)",
+  "Mediana da diferença",
+  "Q1 da diferença",
+  "Q3 da diferença",
+  "Mediana da %",
+  "Q1 da %",
+  "Q3 da %",
+  "Aumentou",
+  "Diminuiu",
+  "Igual"
+] as string[];
+
+const COMP_HEADERS = [
+  "Par",
+  "W",
+  "p",
+  "Mediana da diferença",
+  "Q1 da diferença",
+  "Q3 da diferença",
+  "Mediana da %",
+  "Q1 da %",
+  "Q3 da %",
+  "Aumentou",
+  "Diminuiu",
+  "Igual"
+] as string[];
+
+const SHAPIRO_HEADERS = [
+  "Métrica",
+  "Variante",
+  "n",
+  "W",
+  "p",
+  "Normal (α = 0.05)",
+] as string[];
+
+const SHAPIRO = [
+  ["duplicated_statements", "implicit", "22", "0.8377", "0.002071", "não"],
+  ["duplicated_statements", "residual-implicit", "22", "0.7751", "0.0002090", "não"],
+  ["duplicated_statements", "delegated", "22", "0.4931", "1.133e-07", "não"],
+  ["duplicated_statements", "implicit+delegated", "22", "0.6928", "1.587e-05", "não"],
+  ["duplicated_statements", "delegated+implicit", "22", "0.6585", "6.066e-06", "não"],
+  ["duplicated_statements", "residual-implicit+delegated", "22", "0.6525", "5.158e-06", "não"],
+  ["duplicated_statements", "delegated+residual-implicit", "22", "0.6503", "4.855e-06", "não"],
+  ["test_classes", "implicit", "22", "0.7733", "0.0001970", "não"],
+  ["test_classes", "residual-implicit", "22", "0.8562", "0.004385", "não"],
+  ["test_classes", "delegated", "22", "0.2810", "2.098e-09", "não"],
+  ["test_classes", "implicit+delegated", "22", "0.7733", "0.0001970", "não"],
+  ["test_classes", "delegated+implicit", "22", "0.7870", "0.0003153", "não"],
+  ["test_classes", "residual-implicit+delegated", "22", "0.8562", "0.004385", "não"],
+  ["test_classes", "delegated+residual-implicit", "22", "0.8298", "0.001520", "não"],
+  ["setup_methods", "implicit", "22", "0.9015", "0.03181", "não"],
+  ["setup_methods", "residual-implicit", "22", "0.8601", "0.005156", "não"],
+  ["setup_methods", "delegated", "22", "0.3333", "4.989e-09", "não"],
+  ["setup_methods", "implicit+delegated", "22", "0.9015", "0.03181", "não"],
+  ["setup_methods", "delegated+implicit", "22", "0.8986", "0.02785", "não"],
+  ["setup_methods", "residual-implicit+delegated", "22", "0.8601", "0.005156", "não"],
+  ["setup_methods", "delegated+residual-implicit", "22", "0.8404", "0.002305", "não"],
+  ["attributes", "implicit", "22", "0.5368", "2.971e-07", "não"],
+  ["attributes", "residual-implicit", "22", "0.8211", "0.001091", "não"],
+  ["attributes", "delegated", "22", "0.3011", "2.870e-09", "não"],
+  ["attributes", "implicit+delegated", "22", "0.5368", "2.971e-07", "não"],
+  ["attributes", "delegated+implicit", "22", "0.4898", "1.057e-07", "não"],
+  ["attributes", "residual-implicit+delegated", "22", "0.8211", "0.001091", "não"],
+  ["attributes", "delegated+residual-implicit", "22", "0.8850", "0.01508", "não"],
+  ["helper_methods", "implicit", "22", "0.2215", "1.353e-09", "não"],
+  ["helper_methods", "residual-implicit", "22", "0.2215", "1.353e-09", "não"],
+  ["helper_methods", "delegated", "22", "0.5857", "9.336e-07", "não"],
+  ["helper_methods", "implicit+delegated", "22", "0.5567", "4.691e-07", "não"],
+  ["helper_methods", "delegated+implicit", "22", "0.5857", "9.336e-07", "não"],
+  ["helper_methods", "residual-implicit+delegated", "22", "0.5387", "3.098e-07", "não"],
+  ["helper_methods", "delegated+residual-implicit", "22", "0.5857", "9.336e-07", "não"],
+  ["total_statements", "implicit", "22", "0.8195", "0.001029", "não"],
+  ["total_statements", "residual-implicit", "22", "0.7792", "0.0002404", "não"],
+  ["total_statements", "delegated", "22", "0.4748", "7.692e-08", "não"],
+  ["total_statements", "implicit+delegated", "22", "0.7172", "3.270e-05", "não"],
+  ["total_statements", "delegated+implicit", "22", "0.6753", "9.658e-06", "não"],
+  ["total_statements", "residual-implicit+delegated", "22", "0.6542", "5.394e-06", "não"],
+  ["total_statements", "delegated+residual-implicit", "22", "0.6467", "4.412e-06", "não"],
+] as string[][];
+
+const VS_DUPLICATED = [
+  [
+    "implicit",
+    "46.00",
+    "0.02759",
+    "-42.50",
+    "-228.0",
+    "-11.00",
+    "-6.514",
+    "-17.57",
+    "-2.560",
+    "3",
+    "17",
+    "2"
+  ],
+  [
+    "residual-implicit",
+    "0.000",
+    "8.845e-05",
+    "-94.50",
+    "-582.8",
+    "-35.00",
+    "-11.04",
+    "-20.50",
+    "-5.428",
+    "0",
+    "20",
+    "2"
+  ],
+  [
+    "delegated",
+    "0.000",
+    "8.857e-05",
+    "-120.0",
+    "-251.3",
+    "-33.25",
+    "-10.73",
+    "-16.55",
+    "-6.320",
+    "0",
+    "20",
+    "2"
+  ],
+  [
+    "implicit+delegated",
+    "0.000",
+    "4.010e-05",
+    "-170.0",
+    "-714.8",
+    "-34.25",
+    "-17.47",
+    "-23.94",
+    "-14.01",
+    "0",
+    "22",
+    "0"
+  ],
+  [
+    "delegated+implicit",
+    "3.000",
+    "6.085e-05",
+    "-165.5",
+    "-597.0",
+    "-34.25",
+    "-17.38",
+    "-23.81",
+    "-10.13",
+    "1",
+    "21",
+    "0"
+  ],
+  [
+    "residual-implicit+delegated",
+    "0.000",
+    "4.010e-05",
+    "-186.5",
+    "-913.0",
+    "-57.25",
+    "-20.86",
+    "-25.64",
+    "-16.40",
+    "0",
+    "22",
+    "0"
+  ],
+  [
+    "delegated+residual-implicit",
+    "0.000",
+    "4.010e-05",
+    "-188.5",
+    "-728.0",
+    "-55.00",
+    "-19.86",
+    "-25.04",
+    "-14.90",
+    "0",
+    "22",
+    "0"
+  ]
+] as string[][];
+
+const VS_CLASSES = [
+  [
+    "implicit",
+    "7.500",
+    "0.0002724",
+    "185.0",
+    "13.25",
+    "564.5",
+    "188.1",
+    "35.44",
+    "300.1",
+    "17",
+    "3",
+    "2"
+  ],
+  [
+    "residual-implicit",
+    "32.50",
+    "0.006788",
+    "13.00",
+    "0.000",
+    "95.25",
+    "26.12",
+    "0.000",
+    "55.55",
+    "15",
+    "5",
+    "2"
+  ],
+  [
+    "delegated",
+    "0.000",
+    "0.1797",
+    "0.000",
+    "0.000",
+    "0.000",
+    "0.000",
+    "0.000",
+    "0.000",
+    "0",
+    "2",
+    "20"
+  ],
+  [
+    "implicit+delegated",
+    "7.500",
+    "0.0002724",
+    "185.0",
+    "13.25",
+    "564.5",
+    "188.1",
+    "35.44",
+    "300.1",
+    "17",
+    "3",
+    "2"
+  ],
+  [
+    "delegated+implicit",
+    "7.000",
+    "0.0003976",
+    "184.0",
+    "10.25",
+    "416.0",
+    "180.8",
+    "29.62",
+    "288.8",
+    "17",
+    "2",
+    "3"
+  ],
+  [
+    "residual-implicit+delegated",
+    "32.50",
+    "0.006788",
+    "13.00",
+    "0.000",
+    "95.25",
+    "26.12",
+    "0.000",
+    "55.55",
+    "15",
+    "5",
+    "2"
+  ],
+  [
+    "delegated+residual-implicit",
+    "32.50",
+    "0.006792",
+    "10.50",
+    "0.000",
+    "93.25",
+    "22.72",
+    "0.000",
+    "56.46",
+    "15",
+    "5",
+    "2"
+  ]
+] as string[][];
+
+const VS_SETUPS = [
+  [
+    "implicit",
+    "42.00",
+    "0.03292",
+    "17.50",
+    "0.000",
+    "98.25",
+    "226.4",
+    "0.000",
+    "570.7",
+    "15",
+    "4",
+    "3"
+  ],
+  [
+    "residual-implicit",
+    "27.00",
+    "0.003589",
+    "20.00",
+    "5.500",
+    "115.8",
+    "193.8",
+    "9.722",
+    "595.1",
+    "17",
+    "3",
+    "2"
+  ],
+  [
+    "delegated",
+    "0.000",
+    "0.1797",
+    "0.000",
+    "0.000",
+    "0.000",
+    "0.000",
+    "0.000",
+    "0.000",
+    "0",
+    "2",
+    "20"
+  ],
+  [
+    "implicit+delegated",
+    "42.00",
+    "0.03292",
+    "17.50",
+    "0.000",
+    "98.25",
+    "226.4",
+    "0.000",
+    "570.7",
+    "15",
+    "4",
+    "3"
+  ],
+  [
+    "delegated+implicit",
+    "41.50",
+    "0.03130",
+    "17.50",
+    "0.000",
+    "96.50",
+    "228.6",
+    "0.000",
+    "551.2",
+    "15",
+    "4",
+    "3"
+  ],
+  [
+    "residual-implicit+delegated",
+    "27.00",
+    "0.003589",
+    "20.00",
+    "5.500",
+    "115.8",
+    "193.8",
+    "9.722",
+    "595.1",
+    "17",
+    "3",
+    "2"
+  ],
+  [
+    "delegated+residual-implicit",
+    "24.00",
+    "0.002491",
+    "17.50",
+    "5.000",
+    "113.5",
+    "188.9",
+    "6.944",
+    "578.0",
+    "17",
+    "3",
+    "2"
+  ]
+] as string[][];
+
+const VS_ATTRIBUTES = [
+  [
+    "implicit",
+    "83.00",
+    "0.4114",
+    "8.000",
+    "-24.75",
+    "68.00",
+    "22.64",
+    "-14.59",
+    "48.67",
+    "13",
+    "7",
+    "2"
+  ],
+  [
+    "residual-implicit",
+    "39.00",
+    "0.01373",
+    "48.00",
+    "4.250",
+    "163.3",
+    "28.30",
+    "2.703",
+    "96.95",
+    "17",
+    "3",
+    "2"
+  ],
+  [
+    "delegated",
+    "0.000",
+    "0.1797",
+    "0.000",
+    "0.000",
+    "0.000",
+    "0.000",
+    "0.000",
+    "0.000",
+    "0",
+    "2",
+    "20"
+  ],
+  [
+    "implicit+delegated",
+    "83.00",
+    "0.4114",
+    "8.000",
+    "-24.75",
+    "68.00",
+    "22.64",
+    "-14.59",
+    "48.67",
+    "13",
+    "7",
+    "2"
+  ],
+  [
+    "delegated+implicit",
+    "87.00",
+    "0.5016",
+    "6.000",
+    "-24.75",
+    "51.75",
+    "13.27",
+    "-14.59",
+    "28.57",
+    "13",
+    "7",
+    "2"
+  ],
+  [
+    "residual-implicit+delegated",
+    "39.00",
+    "0.01373",
+    "48.00",
+    "4.250",
+    "163.3",
+    "28.30",
+    "2.703",
+    "96.95",
+    "17",
+    "3",
+    "2"
+  ],
+  [
+    "delegated+residual-implicit",
+    "35.00",
+    "0.008962",
+    "38.00",
+    "4.750",
+    "159.8",
+    "24.22",
+    "4.865",
+    "84.51",
+    "17",
+    "3",
+    "2"
+  ]
+] as string[][];
+
+const VS_HELPERS = [
+  [
+    "implicit",
+    "0.000",
+    "0.3173",
+    "0.000",
+    "0.000",
+    "0.000",
+    "0.000",
+    "0.000",
+    "0.000",
+    "0",
+    "1",
+    "21"
+  ],
+  [
+    "residual-implicit",
+    "0.000",
+    "0.3173",
+    "0.000",
+    "0.000",
+    "0.000",
+    "0.000",
+    "0.000",
+    "0.000",
+    "0",
+    "1",
+    "21"
+  ],
+  [
+    "delegated",
+    "3.500",
+    "0.0001507",
+    "27.00",
+    "7.250",
+    "83.00",
+    "24.76",
+    "8.634",
+    "66.16",
+    "19",
+    "1",
+    "2"
+  ],
+  [
+    "implicit+delegated",
+    "10.00",
+    "0.0003898",
+    "19.50",
+    "7.000",
+    "93.25",
+    "20.32",
+    "10.63",
+    "49.42",
+    "19",
+    "1",
+    "2"
+  ],
+  [
+    "delegated+implicit",
+    "3.500",
+    "0.0001507",
+    "27.00",
+    "7.250",
+    "83.00",
+    "24.76",
+    "8.634",
+    "66.16",
+    "19",
+    "1",
+    "2"
+  ],
+  [
+    "residual-implicit+delegated",
+    "10.00",
+    "0.0003893",
+    "19.50",
+    "7.000",
+    "81.00",
+    "18.94",
+    "8.207",
+    "44.93",
+    "19",
+    "1",
+    "2"
+  ],
+  [
+    "delegated+residual-implicit",
+    "3.500",
+    "0.0001507",
+    "27.00",
+    "7.250",
+    "83.00",
+    "24.76",
+    "8.634",
+    "66.16",
+    "19",
+    "1",
+    "2"
+  ]
+] as string[][];
+
+const VS_TOTAL = [
+  [
+    "implicit",
+    "57.00",
+    "0.04200",
+    "-49.50",
+    "-83.00",
+    "-2.000",
+    "-2.275",
+    "-4.583",
+    "-0.09796",
+    "5",
+    "16",
+    "1"
+  ],
+  [
+    "residual-implicit",
+    "0.000",
+    "8.845e-05",
+    "-88.50",
+    "-572.8",
+    "-28.75",
+    "-3.776",
+    "-6.003",
+    "-2.187",
+    "0",
+    "20",
+    "2"
+  ],
+  [
+    "delegated",
+    "0.000",
+    "8.857e-05",
+    "-93.00",
+    "-215.5",
+    "-20.25",
+    "-3.155",
+    "-4.991",
+    "-1.373",
+    "0",
+    "20",
+    "2"
+  ],
+  [
+    "implicit+delegated",
+    "8.000",
+    "0.0001195",
+    "-148.5",
+    "-570.3",
+    "-23.75",
+    "-5.855",
+    "-8.707",
+    "-3.390",
+    "1",
+    "21",
+    "0"
+  ],
+  [
+    "delegated+implicit",
+    "10.00",
+    "0.0001554",
+    "-142.5",
+    "-443.3",
+    "-23.75",
+    "-5.459",
+    "-8.946",
+    "-2.422",
+    "2",
+    "20",
+    "0"
+  ],
+  [
+    "residual-implicit+delegated",
+    "0.000",
+    "4.005e-05",
+    "-159.5",
+    "-760.3",
+    "-43.75",
+    "-6.787",
+    "-10.54",
+    "-5.693",
+    "0",
+    "22",
+    "0"
+  ],
+  [
+    "delegated+residual-implicit",
+    "0.000",
+    "4.005e-05",
+    "-159.0",
+    "-628.3",
+    "-40.25",
+    "-5.830",
+    "-10.26",
+    "-5.078",
+    "0",
+    "22",
+    "0"
+  ]
+] as string[][];
+
+const FRIEDMAN = [
+  [
+    "114.5",
+    "7",
+    "4.877e-13"
+  ]
+] as string[][];
+
+const PAIRWISE = [
+  [
+    "implicit vs residual-implicit",
+    "0.000",
+    "0.002545",
+    "-20.00",
+    "-144.5",
+    "-4.750",
+    "-3.388",
+    "-5.700",
+    "-0.6399",
+    "0",
+    "18",
+    "4"
+  ],
+  [
+    "implicit vs delegated",
+    "105.0",
+    "0.9703",
+    "-8.000",
+    "-50.25",
+    "24.50",
+    "-1.446",
+    "-8.144",
+    "10.05",
+    "8",
+    "14",
+    "0"
+  ],
+  [
+    "implicit vs implicit+delegated",
+    "0.000",
+    "0.001678",
+    "-100.5",
+    "-220.0",
+    "-28.25",
+    "-10.17",
+    "-11.98",
+    "-5.825",
+    "0",
+    "20",
+    "2"
+  ],
+  [
+    "implicit vs delegated+implicit",
+    "0.000",
+    "0.001678",
+    "-88.50",
+    "-124.8",
+    "-28.25",
+    "-8.852",
+    "-11.31",
+    "-4.335",
+    "0",
+    "20",
+    "2"
+  ],
+  [
+    "implicit vs residual-implicit+delegated",
+    "0.000",
+    "0.001251",
+    "-105.0",
+    "-318.8",
+    "-33.25",
+    "-13.34",
+    "-17.56",
+    "-8.813",
+    "0",
+    "21",
+    "1"
+  ],
+  [
+    "implicit vs delegated+residual-implicit",
+    "0.000",
+    "0.001251",
+    "-103.5",
+    "-271.8",
+    "-35.00",
+    "-11.30",
+    "-16.40",
+    "-8.607",
+    "0",
+    "21",
+    "1"
+  ],
+  [
+    "residual-implicit vs delegated",
+    "103.5",
+    "0.9703",
+    "-0.5000",
+    "-28.50",
+    "150.3",
+    "-0.1106",
+    "-4.909",
+    "14.73",
+    "10",
+    "11",
+    "1"
+  ],
+  [
+    "residual-implicit vs implicit+delegated",
+    "12.50",
+    "0.003432",
+    "-39.00",
+    "-120.5",
+    "-6.000",
+    "-4.744",
+    "-9.698",
+    "-0.9800",
+    "3",
+    "18",
+    "1"
+  ],
+  [
+    "residual-implicit vs delegated+implicit",
+    "45.50",
+    "0.08979",
+    "-28.50",
+    "-85.50",
+    "-0.5000",
+    "-3.725",
+    "-9.819",
+    "-0.1205",
+    "5",
+    "16",
+    "1"
+  ],
+  [
+    "residual-implicit vs residual-implicit+delegated",
+    "0.000",
+    "0.001678",
+    "-97.00",
+    "-195.0",
+    "-25.00",
+    "-9.413",
+    "-11.61",
+    "-5.857",
+    "0",
+    "20",
+    "2"
+  ],
+  [
+    "residual-implicit vs delegated+residual-implicit",
+    "0.000",
+    "0.001678",
+    "-59.00",
+    "-125.3",
+    "-27.75",
+    "-8.517",
+    "-10.86",
+    "-4.633",
+    "0",
+    "20",
+    "2"
+  ],
+  [
+    "delegated vs implicit+delegated",
+    "46.00",
+    "0.1104",
+    "-33.50",
+    "-279.3",
+    "-11.00",
+    "-7.850",
+    "-17.38",
+    "-3.647",
+    "3",
+    "17",
+    "2"
+  ],
+  [
+    "delegated vs delegated+implicit",
+    "47.00",
+    "0.1104",
+    "-26.00",
+    "-161.8",
+    "-9.500",
+    "-5.523",
+    "-15.80",
+    "-0.9149",
+    "3",
+    "17",
+    "2"
+  ],
+  [
+    "delegated vs residual-implicit+delegated",
+    "0.000",
+    "0.001678",
+    "-72.50",
+    "-473.8",
+    "-30.25",
+    "-10.54",
+    "-20.09",
+    "-5.959",
+    "0",
+    "20",
+    "2"
+  ],
+  [
+    "delegated vs delegated+residual-implicit",
+    "0.000",
+    "0.001678",
+    "-70.50",
+    "-445.5",
+    "-30.25",
+    "-9.545",
+    "-18.71",
+    "-5.746",
+    "0",
+    "20",
+    "2"
+  ],
+  [
+    "implicit+delegated vs delegated+implicit",
+    "22.50",
+    "0.09298",
+    "2.000",
+    "0.000",
+    "39.50",
+    "0.3827",
+    "0.000",
+    "1.669",
+    "13",
+    "3",
+    "6"
+  ],
+  [
+    "implicit+delegated vs residual-implicit+delegated",
+    "0.000",
+    "0.002545",
+    "-18.50",
+    "-114.3",
+    "-4.000",
+    "-3.148",
+    "-3.964",
+    "-0.7093",
+    "0",
+    "18",
+    "4"
+  ],
+  [
+    "implicit+delegated vs delegated+residual-implicit",
+    "13.00",
+    "0.02115",
+    "-12.00",
+    "-46.75",
+    "0.000",
+    "-1.931",
+    "-3.193",
+    "0.000",
+    "2",
+    "15",
+    "5"
+  ],
+  [
+    "delegated+implicit vs residual-implicit+delegated",
+    "8.000",
+    "0.004171",
+    "-17.00",
+    "-169.3",
+    "-3.250",
+    "-3.384",
+    "-6.604",
+    "-0.9341",
+    "1",
+    "18",
+    "3"
+  ],
+  [
+    "delegated+implicit vs delegated+residual-implicit",
+    "1.000",
+    "0.002557",
+    "-15.50",
+    "-101.0",
+    "-7.250",
+    "-2.905",
+    "-4.470",
+    "-0.8829",
+    "1",
+    "17",
+    "4"
+  ],
+  [
+    "residual-implicit+delegated vs delegated+residual-implicit",
+    "15.00",
+    "0.04281",
+    "2.500",
+    "0.000",
+    "34.25",
+    "0.5621",
+    "0.000",
+    "1.438",
+    "14",
+    "2",
+    "6"
+  ]
+] as string[][];
+
+const MEDIANS = [
+  [
+    "original",
+    "1162",
+    "312.0",
+    "3866"
+  ],
+  [
+    "implicit",
+    "948.5",
+    "290.5",
+    "2570"
+  ],
+  [
+    "residual-implicit",
+    "931.5",
+    "279.3",
+    "2451"
+  ],
+  [
+    "delegated",
+    "982.5",
+    "308.5",
+    "3288"
+  ],
+  [
+    "implicit+delegated",
+    "839.0",
+    "282.5",
+    "2410"
+  ],
+  [
+    "delegated+implicit",
+    "846.5",
+    "282.3",
+    "2478"
+  ],
+  [
+    "residual-implicit+delegated",
+    "818.5",
+    "275.8",
+    "2322"
+  ],
+  [
+    "delegated+residual-implicit",
+    "825.5",
+    "275.8",
+    "2392"
+  ]
+] as string[][];
+
+const COMPOSITION = [
+  [
+    "implicit+delegated vs implicit",
+    "0.000",
+    "8.832e-05",
+    "-100.5",
+    "-220.0",
+    "-28.25",
+    "-10.17",
+    "-11.98",
+    "-5.825",
+    "0",
+    "20",
+    "2"
+  ],
+  [
+    "delegated+implicit vs delegated",
+    "47.00",
+    "0.03031",
+    "-26.00",
+    "-161.8",
+    "-9.500",
+    "-5.523",
+    "-15.80",
+    "-0.9149",
+    "3",
+    "17",
+    "2"
+  ],
+  [
+    "residual-implicit+delegated vs residual-implicit",
+    "0.000",
+    "8.832e-05",
+    "-97.00",
+    "-195.0",
+    "-25.00",
+    "-9.413",
+    "-11.61",
+    "-5.857",
+    "0",
+    "20",
+    "2"
+  ],
+  [
+    "delegated+residual-implicit vs delegated",
+    "0.000",
+    "8.845e-05",
+    "-70.50",
+    "-445.5",
+    "-30.25",
+    "-9.545",
+    "-18.71",
+    "-5.746",
+    "0",
+    "20",
+    "2"
+  ]
+] as string[][];
+
+
+function MetricTable({
   titulo,
   coluna,
+  rows,
 }: {
   titulo: string;
   coluna: string;
+  rows: string[][];
 }) {
   return (
     <Stack gap={6}>
       <Text weight="semibold">
         {titulo} (<Code>{coluna}</Code>)
       </Text>
-      <Table
-        striped
-        stickyHeader
-        headers={VS_ORIGINAL_HEADERS}
-        rows={VARIANTS.map((name) => dashedRow(name, 9))}
-      />
+      <Table striped stickyHeader headers={VS_HEADERS} rows={rows} />
     </Stack>
   );
 }
@@ -246,11 +1322,9 @@ export default function ExperimentoNDesign() {
       <Stack gap={10}>
         <H2>CSV</H2>
         <Text>
-          Uma linha por projeto e variante. A porcentagem de diferença na
-          duplicação compara com o original daquele projeto:{" "}
-          <Code>(duplicadas da variante − duplicadas do original) / duplicadas do original × 100</Code>.
-          Número negativo significa que a duplicação caiu. Se o original não
-          tiver duplicação, a célula fica vazia.
+          Uma linha por projeto e variante. Contagens observadas da suíte: as
+          porcentagens contra o original, entre pares e na composição saem de{" "}
+          <Code>duplicated_statements</Code> na hora das tabelas e dos gráficos.
         </Text>
         <Table
           striped
@@ -259,7 +1333,7 @@ export default function ExperimentoNDesign() {
             ["project", "Nome do sujeito"],
             ["variant", "original e as sete estratégias"],
             ["test_classes", "Quantas classes de teste"],
-            ["setups", "Quantos métodos de configuração"],
+            ["setup_methods", "Quantos métodos de configuração"],
             ["attributes", "Quantos atributos"],
             [
               "helper_methods",
@@ -267,11 +1341,6 @@ export default function ExperimentoNDesign() {
             ],
             ["total_statements", "Quantas sentenças de configuração"],
             ["duplicated_statements", "Quantas dessas sentenças estão repetidas"],
-            ["duplication_rate", "duplicadas dividido pelo total, em %"],
-            [
-              "duplication_difference_percentage",
-              "Quanto a duplicação mudou em relação ao original, em %",
-            ],
           ]}
         />
         <Text tone="secondary" size="small">
@@ -285,33 +1354,26 @@ export default function ExperimentoNDesign() {
       <Stack gap={10}>
         <H2>Gráficos</H2>
         <Text>
-          Cinco SVG gerados na execução. Os três gráficos de barras preservam a
-          comparação por projeto. O boxplot resume a distribuição entre
+          Dois SVG gerados na execução. O boxplot resume a distribuição entre
           projetos, e o mapa de calor mantém cada projeto visível em uma forma
           mais compacta.
         </Text>
         <Table
           headers={["Arquivo", "Leitura"]}
           rows={[
-            ["duplicated-statements.svg", "Sentenças duplicadas"],
-            ["duplication-rate.svg", "Taxa de duplicação (%)"],
             [
-              "duplication-reduction-percentage.svg",
-              "Porcentagem de redução da duplicação vs original",
-            ],
-            [
-              "duplication-reduction-distribution.svg",
+              "duplication-variation-distribution.svg",
               "Boxplot, mediana, IQR e um ponto por projeto",
             ],
             [
-              "duplication-reduction-heatmap.svg",
-              "Projetos nas linhas, variantes nas colunas e redução nas células",
+              "duplication-variation-heatmap.svg",
+              "Projetos nas linhas, variantes nas colunas e variação nas células",
             ],
           ]}
         />
         <Text tone="secondary" size="small">
-          Nos três gráficos de redução, a fórmula é{" "}
-          <Code>(original − variante) / original × 100</Code>. Valor positivo
+          Nos dois gráficos, a fórmula é{" "}
+          <Code>(variante − original) / original × 100</Code>. Valor negativo
           significa menos sentenças duplicadas.
         </Text>
       </Stack>
@@ -319,52 +1381,36 @@ export default function ExperimentoNDesign() {
       <Stack gap={10}>
         <H2>Estatística: o que cada teste devolve</H2>
         <Text>
-          Primeiro o experimento aplica o teste de Shapiro-Wilk às diferenças
-          entre cada variante e o original, nos 22 projetos, para identificar se
-          essas diferenças seguem uma distribuição gaussiana. O teste publicado
-          nas sete métricas é o Wilcoxon, de cada variante contra o original,
-          mesmo quando alguma variante passar no Shapiro. Isso evita misturar t
-          e Wilcoxon na mesma tabela. O Wilcoxon permite dizer se houve
-          diferença entre a versão original e a refatorada e, se sim, quanto de
-          diferença. Também se conta em quantos projetos o valor aumentou,
-          diminuiu ou ficou igual. A porcentagem de diferença na duplicação
-          permite quantificar quanto a duplicação mudou em relação ao original.
-          A próxima etapa é comparar o original e as sete variantes. Aplica-se
-          o teste de Friedman nas sentenças duplicadas para ver se existem
-          diferenças entre eles. Se existir, compara-se par a par as sete
-          variantes com Wilcoxon e correção de Holm para ver qual é melhor
-          entre cada par. O original não entra nesses pares: já foi comparado
-          com cada variante na etapa anterior. A porcentagem de diferença na
-          duplicação de um versus o outro permite
-          quantificar quanto a duplicação mudou entre o par. Também se conta em
-          quantos projetos um melhorou, piorou ou empatou em relação ao outro. A
-          melhor é
-          a de menor mediana de sentenças duplicadas, desde que os pares
-          mostrem que essa vantagem não é ruído. Por fim, nas composições, o
-          Wilcoxon compara a suíte depois das duas refatorações com a suíte
-          depois só da primeira, para ver se a segunda refatoração melhorou ou
-          piorou. A porcentagem de diferença na duplicação da refatorada 1
-          versus a refatorada 2 permite quantificar quanto a duplicação mudou
-          nessa passagem.
+          Shapiro–Wilk entra como diagnóstico nas 22 diferenças (variante −
+          original) de cada métrica e cada variante, com α = 0,05. Amostra
+          constante deixa W e p vazios. O teste publicado é o Wilcoxon pareado,
+          escolhido a priori: 22 pares (um por sujeito), métricas de contagem,
+          zeros e assimetria. Não se troca para t de Student, mesmo se o Shapiro
+          não rejeitar. Wilcoxon contra o original roda nas
+          seis colunas numéricas do CSV. Cada variante é um teste separado: 7
+          p-valores por coluna. Conta-se em quantos projetos o valor aumentou,
+          diminuiu ou ficou igual. A porcentagem é descritiva, não entra no
+          teste:{" "}
+          <Code>(variante − original) / original × 100</Code>. Q1 e Q3 são os
+          quartis das 22 diferenças (e das 22 porcentagens).
         </Text>
         <Text>
-          Nada disso vira uma porcentagem sozinha. Porcentagem é descritiva.
-          Contra o original, usa-se a coluna{" "}
-          <Code>duplication_difference_percentage</Code>. Na composição, a
-          porcentagem é da refatorada 1 versus a refatorada 2:{" "}
-          <Code>(duplicadas da 2 − duplicadas da 1) / duplicadas da 1 × 100</Code>
-          . Nos pares do ranking, a mesma fórmula, um versus o outro. Teste de
-          hipótese devolve sobretudo um p-valor. Wilcoxon contra o
-          original roda nas sete colunas numéricas do CSV, não só em
-          sentenças duplicadas. Em cada coluna, cada variante é um teste
-          separado: 7 p-valores por coluna.
+          Depois compara-se o original e as sete variantes nas sentenças
+          duplicadas com Friedman. Se houver diferença, Wilcoxon com Holm nos
+          21 pares entre variantes. A melhor é a de menor mediana de
+          sentenças duplicadas, desde que o par com Holm distinga. Nas
+          composições, Wilcoxon compara a suíte depois das duas refatorações
+          com a suíte depois só da primeira. A % da composição é{" "}
+          <Code>(duplicadas da 2 − duplicadas da 1) / duplicadas da 1 × 100</Code>.
         </Text>
-        <Callout tone="info" title="Exemplo: Wilcoxon em duplicated_statements">
-          Para a variante implicit, há 22 pares (original vs implicit, um por
-          projeto). O Wilcoxon desses 22 pares devolve: um p-valor, a estatística
-          W, e a mediana das 22 diferenças (em sentenças, não em %). Repete isso
-          para as outras 6 variantes. Essa coluna sozinha: 7 p-valores e 7
-          medianas. O mesmo pacote se repete nas outras seis colunas.
+        <Callout tone="info" title="Exemplo: Shapiro e Wilcoxon em duplicated_statements">
+          Para a variante implicit, há 22 diferenças (implicit − original, um por
+          projeto). O Shapiro–Wilk dessas 22 diferenças devolve W e p; se p for
+          menor que 0,05, a coluna Normal fica “não”. O Wilcoxon desses 22 pares
+          devolve: um p-valor, a estatística W, e a mediana das 22 diferenças
+          (em sentenças, não em %). Repete isso para as outras 6 variantes. Essa
+          coluna sozinha: 7 Shapiro e 7 Wilcoxon. O mesmo pacote se repete nas
+          outras cinco colunas.
         </Callout>
         <Table
           striped
@@ -372,24 +1418,24 @@ export default function ExperimentoNDesign() {
           headers={["Procedimento", "Sobre o quê", "O que você anota"]}
           rows={[
             [
-              "Shapiro–Wilk",
-              "As 22 diferenças (variante − original), em cada uma das 7 colunas",
-              "7 p-valores por coluna, um por variante. Não sai mediana nem %. Se qualquer variante daquela coluna tiver p pequeno, Wilcoxon vale para as sete variantes daquela coluna.",
+              "Shapiro–Wilk vs original",
+              "As 6 colunas, nas 22 diferenças (variante − original)",
+              "42 linhas (6 métricas × 7 variantes). Cada linha: n, W, p e se a amostra passa em α = 0,05. Amostra constante: W e p vazios. Não troca o teste publicado.",
             ],
             [
               "Wilcoxon vs original",
-              "As 7 colunas: test_classes, setups, attributes, helper_methods, total_statements, duplicated_statements, duplication_rate",
-              "7 linhas por coluna (uma por variante). Cada linha: p-valor, W, mediana da diferença na unidade da coluna. Não é %. duplication_difference_percentage fica de fora: no original é sempre 0.",
+              "As 6 colunas: test_classes, setup_methods, attributes, helper_methods, total_statements, duplicated_statements",
+              "7 linhas por coluna (uma por variante). Cada linha: p-valor, W, mediana, Q1 e Q3 da diferença na unidade da coluna. Não é %.",
             ],
             [
-              "Melhorou / piorou / empatou",
-              "duplicated_statements",
-              "7 trios de inteiros, um por variante. Exemplo implicit: 14 melhoraram, 5 pioraram, 3 empataram. Sem p-valor.",
+              "Aumentou / diminuiu / igual",
+              "Cada métrica vs original",
+              "7 trios de inteiros, um por variante. Exemplo implicit em duplicated_statements: 3 aumentaram, 17 diminuíram, 2 iguais.",
             ],
             [
-              "Mediana e IQR da porcentagem de diferença",
-              "duplication_difference_percentage",
-              "7 pares de números em %, um por variante. Exemplo implicit: mediana −18,4%, IQR −31 a −4. Sem p-valor (no original essa coluna é 0).",
+              "Mediana, Q1 e Q3 da porcentagem",
+              "duplicated_statements vs original: (variante − original) / original × 100",
+              "7 trios em %. Se o original não tiver duplicação, a célula fica vazia.",
             ],
             [
               "Friedman",
@@ -399,169 +1445,113 @@ export default function ExperimentoNDesign() {
             [
               "Wilcoxon entre pares, com Holm",
               "duplicated_statements, só se o Friedman der p pequeno",
-              "Até 21 p-valores ajustados (7×6/2). Só entre variantes. Contra o original fica na tabela anterior.",
+              "21 p-valores ajustados (7×6/2). Só entre variantes. Contra o original fica na tabela anterior.",
             ],
             [
-              "Mediana e IQR da porcentagem de diferença em cada par",
+              "Mediana, Q1 e Q3 da % em cada par",
               "Mesmos pares: (duplicadas de B − duplicadas de A) / duplicadas de A × 100",
-              "Até 21 pares de números em %. A é a base do par. Se A não tiver duplicação, a célula fica vazia.",
-            ],
-            [
-              "Melhorou / piorou / empatou por par",
-              "duplicated_statements nos mesmos pares",
-              "Até 21 trios. B melhorou se tiver menos duplicadas que A. Exemplo implicit vs delegated: 12 / 7 / 3. Sem p-valor.",
+              "21 trios em %. A é a base do par. Se A não tiver duplicação, a célula fica vazia.",
             ],
             [
               "Qual é a melhor",
               "Mediana de duplicated_statements nos 22 projetos, original e 7 variantes",
-              "A de menor mediana. Se dois não diferirem no par com Holm, empatam. Sem p-valor extra.",
+              "A de menor mediana. Se dois não diferirem no par com Holm, empatam.",
             ],
             [
               "Wilcoxon da composição vs a primeira sozinha",
-              "Quatro pares: implicit+delegated vs implicit; delegated+implicit vs delegated; residual-implicit+delegated vs residual-implicit; delegated+residual-implicit vs delegated",
-              "4 p-valores e 4 medianas em sentenças.",
-            ],
-            [
-              "Mediana e IQR da porcentagem de diferença na composição",
-              "Porcentagem da refatorada 1 versus a refatorada 2, nos mesmos quatro pares",
-              "4 pares de números em %. Fórmula: (duplicadas da 2 − duplicadas da 1) / duplicadas da 1 × 100. Se a primeira não tiver duplicação, a célula fica vazia.",
-            ],
-            [
-              "Melhorou / piorou / empatou na composição",
-              "duplicated_statements, refatorada 2 versus refatorada 1",
-              "4 trios. A segunda melhorou se tiver menos duplicadas que a primeira. Sem p-valor.",
+              "Quatro pares planejados",
+              "4 p-valores e 4 medianas em sentenças, com Q1 e Q3.",
             ],
           ]}
         />
         <Text>
-          Resumo: Wilcoxon contra o original nas sete colunas. Sentenças
-          duplicadas e taxa são o efeito; classes, setups, atributos, métodos
-          helper e total de sentenças são o custo. A porcentagem de diferença
-          contra o original não entra no Wilcoxon: mediana e IQR por variante.
-          Friedman (e os pares com Holm) fica só em duplicated_statements, agora
-          com o original e as sete variantes: a melhor é a de menor mediana. Em
-          cada par entra também a porcentagem de diferença na duplicação, com a
-          mesma fórmula da composição. Na composição, Wilcoxon e porcentagem de
-          diferença usam a refatorada 1 versus a refatorada 2.
+          Resumo: Shapiro–Wilk nas seis colunas (diagnóstico). Wilcoxon contra o
+          original nas seis colunas (teste publicado). Sentenças duplicadas são
+          o efeito; classes, métodos de configuração, atributos, métodos helper e
+          total de sentenças são o custo. Friedman e os pares com Holm ficam só
+          em duplicated_statements.
         </Text>
       </Stack>
 
       <Divider />
 
       <Stack gap={16}>
-        <H2>Tabelas da tese</H2>
+        <H2>Tabelas de resultado</H2>
         <Text>
-          Tabelas do capítulo de resultados. Depois de gravar{" "}
-          <Code>comparison.csv</Code>, o próprio experimento calcula Wilcoxon,
-          Friedman, Holm, medianas, IQR e melhorou/piorou/empatou e escreve um
-          CSV por tabela em <Code>experiment-results/n/</Code>, junto com o
-          CSV de comparação e os SVG. Não há
-          passo extra em R. Células com travessão neste canvas são o molde;
-          a execução preenche. Número negativo significa queda de duplicação
-          (ou da métrica). Shapiro–Wilk fica no método, em uma frase, não em
-          tabela.
+          Depois de gravar <Code>comparison.csv</Code>, o experimento calcula
+          Shapiro–Wilk, Wilcoxon, Friedman, Holm, medianas, Q1, Q3 e
+          aumentou/diminuiu/igual e grava um CSV por tabela em{" "}
+          <Code>experiment-results/n/</Code>. Números abaixo saem desses CSV.
+          Número negativo na diferença de duplicação significa queda.
         </Text>
+        <Text tone="secondary" size="small">
+          Fonte: <Code>experiment-results/n/*.csv</Code>, 22 sujeitos.
+        </Text>
+
+        <Stack gap={8}>
+          <H3>Shapiro–Wilk das diferenças vs original</H3>
+          <Text tone="secondary" size="small">
+            Diagnóstico de normalidade nas 22 diferenças (variante − original),
+            α = 0,05. As 42 combinações rejeitam normalidade. O teste publicado
+            continua sendo o Wilcoxon. Fonte:{" "}
+            <Code>shapiro-vs-original.csv</Code>.
+          </Text>
+          <Table striped stickyHeader headers={SHAPIRO_HEADERS} rows={SHAPIRO} />
+        </Stack>
 
         <Stack gap={8}>
           <H3>Comparação com o original: sentenças duplicadas</H3>
           <Text tone="secondary" size="small">
-            Wilcoxon pareado, 22 projetos. A porcentagem é descritiva, não entra
-            no teste. Melhorou = menos sentenças duplicadas que o original.
+            Wilcoxon pareado. Diminuiu = menos sentenças duplicadas que o
+            original.
           </Text>
-          <Table
-            striped
-            stickyHeader
-            headers={VS_ORIGINAL_HEADERS}
-            rows={VARIANTS.map((name) => dashedRow(name, 9))}
-          />
+          <Table striped stickyHeader headers={VS_HEADERS} rows={VS_DUPLICATED} />
         </Stack>
 
         <Stack gap={8}>
           <H3>Comparação com o original: demais métricas</H3>
           <Text tone="secondary" size="small">
-            Mesmas colunas da tabela de sentenças duplicadas, uma tabela por
-            métrica. Wilcoxon no valor da métrica. Melhorou = a métrica ficou
-            menor que no original. Mediana e IQR da diferença estão nas 22
-            diferenças (variante − original). Mediana e IQR da % usam
-            (variante − original) / original × 100 nessa coluna. Se o original
-            for zero, a % fica vazia. A taxa de duplicação (
-            <Code>duplication_rate</Code>) não entra: a mediana da % na tabela
-            de sentenças duplicadas já é a mudança relativa das duplicadas. A
-            taxa (duplicadas / total) continua no CSV e no SVG, se precisar
-            conferir se o volume de sentenças mudou a proporção.
+            Wilcoxon no valor da métrica. Mediana, Q1 e Q3 da diferença estão
+            nas 22 diferenças (variante − original). A % usa (variante −
+            original) / original × 100. Se o original for zero, a % fica vazia.
           </Text>
-          <MetricWilcoxonTable
-            titulo="Classes de teste"
-            coluna="test_classes"
-          />
-          <MetricWilcoxonTable titulo="Setups" coluna="setups" />
-          <MetricWilcoxonTable titulo="Atributos" coluna="attributes" />
-          <MetricWilcoxonTable
-            titulo="Métodos helper"
-            coluna="helper_methods"
-          />
-          <MetricWilcoxonTable
-            titulo="Sentenças de configuração"
-            coluna="total_statements"
-          />
+          <MetricTable titulo="Classes de teste" coluna="test_classes" rows={VS_CLASSES} />
+          <MetricTable titulo="Métodos de configuração" coluna="setup_methods" rows={VS_SETUPS} />
+          <MetricTable titulo="Atributos" coluna="attributes" rows={VS_ATTRIBUTES} />
+          <MetricTable titulo="Métodos helper" coluna="helper_methods" rows={VS_HELPERS} />
+          <MetricTable titulo="Sentenças de configuração" coluna="total_statements" rows={VS_TOTAL} />
         </Stack>
 
         <Stack gap={8}>
           <H3>Friedman nas sentenças duplicadas</H3>
           <Text tone="secondary" size="small">
-            Original e as sete variantes, 22 projetos. Um teste só. Se p não for
-            pequeno, as tabelas de pares e de medianas não entram no texto.
+            Original e as sete variantes, 22 projetos. Um teste só.
           </Text>
-          <Table
-            headers={["χ²", "gl", "p"]}
-            rows={[[DASH, "7", DASH]]}
-          />
+          <Table headers={["χ²", "gl", "p"]} rows={FRIEDMAN} />
         </Stack>
 
         <Stack gap={8}>
           <H3>Comparações par a par nas sentenças duplicadas</H3>
           <Text tone="secondary" size="small">
             Wilcoxon com Holm, só entre as sete variantes (21 pares). A é a
-            base da porcentagem: (B − A) / A × 100. B melhorou = menos
-            duplicadas que A. Contra o original não entra: já está na primeira
-            tabela.
+            base da porcentagem: (B − A) / A × 100. B diminuiu = menos
+            duplicadas que A.
           </Text>
-          <Table
-            striped
-            stickyHeader
-            headers={[
-              "Par",
-              "W",
-              "p (Holm)",
-              "Mediana da diferença",
-              "IQR da diferença",
-              "Mediana da %",
-              "IQR da %",
-              "Melhorou",
-              "Piorou",
-              "Empatou",
-            ]}
-            rows={PAIRWISE_ROWS}
-          />
+          <Table striped stickyHeader headers={PAIR_HEADERS} rows={PAIRWISE} />
         </Stack>
 
         <Stack gap={8}>
           <H3>Medianas de sentenças duplicadas</H3>
           <Text tone="secondary" size="small">
-            Só entra no texto se o Friedman e os pares com Holm derem p
-            pequeno. Aqui a mediana não é a da diferença. É a mediana das 22
-            contas de <Code>duplicated_statements</Code> de cada tratamento,
-            o volume típico de duplicação, não o quanto mudou. Quem tem a menor
-            mediana chegou com menos duplicação no projeto típico. Se implicit
-            tiver mediana 40 e delegated 42, implicit “ganha” no número. Só
-            declare isso se o par implicit vs delegated com Holm tiver p
-            pequeno. Se o par não distinguir, os dois empatam no texto, mesmo
-            com medianas diferentes.
+            Mediana, Q1 e Q3 das 22 contas de <Code>duplicated_statements</Code>{" "}
+            de cada tratamento. Quem tem a menor mediana chegou com menos
+            duplicação no projeto típico. Só declare isso se o par com Holm
+            tiver p pequeno.
           </Text>
           <Table
             striped
-            headers={["Tratamento", "Mediana das sentenças duplicadas", "IQR"]}
-            rows={TREATMENTS.map((name) => dashedRow(name, 2))}
+            headers={["Tratamento", "Mediana", "Q1", "Q3"]}
+            rows={MEDIANS}
           />
         </Stack>
 
@@ -569,25 +1559,9 @@ export default function ExperimentoNDesign() {
           <H3>Segunda refatoração em relação à primeira</H3>
           <Text tone="secondary" size="small">
             Wilcoxon sem Holm (quatro comparações planejadas). Porcentagem:
-            (duplicadas da 2 − duplicadas da 1) / duplicadas da 1 × 100. A
-            segunda melhorou = menos duplicadas que a primeira.
+            (duplicadas da 2 − duplicadas da 1) / duplicadas da 1 × 100.
           </Text>
-          <Table
-            striped
-            headers={[
-              "Par",
-              "W",
-              "p",
-              "Mediana da diferença",
-              "IQR da diferença",
-              "Mediana da %",
-              "IQR da %",
-              "Melhorou",
-              "Piorou",
-              "Empatou",
-            ]}
-            rows={COMPOSITION_PAIRS.map((name) => dashedRow(name, 9))}
-          />
+          <Table striped headers={COMP_HEADERS} rows={COMPOSITION} />
         </Stack>
       </Stack>
 
@@ -596,10 +1570,9 @@ export default function ExperimentoNDesign() {
           <CardHeader>Saída</CardHeader>
           <CardBody>
             <Text>
-              <Code>experiment-results/n/comparison.csv</Code>, os cinco SVG e,
-              na mesma execução, os CSV das tabelas da tese em{" "}
-              <Code>experiment-results/n/</Code>, junto com o CSV de comparação
-              e os SVG.
+              <Code>experiment-results/n/comparison.csv</Code>, os dois SVG e os
+              CSV estatísticos na mesma pasta, inclusive{" "}
+              <Code>shapiro-vs-original.csv</Code>.
             </Text>
           </CardBody>
         </Card>
@@ -611,9 +1584,10 @@ export default function ExperimentoNDesign() {
               <Code>experiment-results/n/</Code> e roda todos os sujeitos, com
               heap 32g. <Code>./gradlew runExperimentNMissing</Code> passa{" "}
               <Code>--missing-only</Code>: mantém o CSV e roda só os incompletos.{" "}
-              <Code>./gradlew runExperimentNCharts</Code> passa{" "}
-              <Code>--charts-only</Code>: redesenha os cinco SVG a partir do{" "}
-              <Code>comparison.csv</Code> já gravado, sem rodar o pipeline.
+              <Code>./gradlew runExperimentNFromComparison</Code> passa{" "}
+              <Code>--from-comparison</Code>: regenera os dois SVG e os CSV
+              estatísticos a partir do <Code>comparison.csv</Code> já gravado,
+              sem rodar o pipeline e sem alterar esse arquivo.
             </Text>
           </CardBody>
         </Card>

@@ -1,8 +1,8 @@
-variant;w;p;median_difference;iqr_difference;median_percentage;iqr_percentage;improved;worsened;tied
-implicit;7.500;0.0002724;185.0;13.25 a 564.5;188.1;35.44 a 300.1;3;17;2
-residual-implicit;32.50;0.006788;13.00;0.000 a 95.25;26.12;0.000 a 55.55;5;15;2
-delegated;0.000;0.1797;0.000;0.000 a 0.000;0.000;0.000 a 0.000;2;0;19
-implicit+delegated;7.500;0.0004290;182.0;8.000 a 617.0;200.0;53.33 a 306.0;3;16;2
-delegated+implicit;8.000;0.0004628;185.0;8.000 a 430.0;196.8;35.71 a 299.7;2;17;2
-residual-implicit+delegated;17.50;0.003055;13.00;0.000 a 83.75;30.95;0.000 a 58.11;4;14;2
-delegated+residual-implicit;19.00;0.002223;12.00;0.000 a 91.00;24.43;0.000 a 57.22;4;15;2
+variant;w;p;median_difference;q1_difference;q3_difference;median_percentage;q1_percentage;q3_percentage;increased;decreased;unchanged
+implicit;7.500;0.0002724;185.0;13.25;564.5;188.1;35.44;300.1;17;3;2
+residual-implicit;32.50;0.006788;13.00;0.000;95.25;26.12;0.000;55.55;15;5;2
+delegated;0.000;0.1797;0.000;0.000;0.000;0.000;0.000;0.000;0;2;20
+implicit+delegated;7.500;0.0002724;185.0;13.25;564.5;188.1;35.44;300.1;17;3;2
+delegated+implicit;7.000;0.0003976;184.0;10.25;416.0;180.8;29.62;288.8;17;2;3
+residual-implicit+delegated;32.50;0.006788;13.00;0.000;95.25;26.12;0.000;55.55;15;5;2
+delegated+residual-implicit;32.50;0.006792;10.50;0.000;93.25;22.72;0.000;56.46;15;5;2

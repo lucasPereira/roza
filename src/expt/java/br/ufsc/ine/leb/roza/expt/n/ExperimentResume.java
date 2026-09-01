@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import br.ufsc.ine.leb.roza.expt.n.ThesisTables.ResultRow;
+import br.ufsc.ine.leb.roza.expt.n.StatisticalTables.ResultRow;
 
 final class ExperimentResume {
 
@@ -31,11 +31,11 @@ final class ExperimentResume {
 	}
 
 	static boolean subjectComplete(List<ResultRow> rows, String project) {
-		return variants(rows, project).containsAll(ThesisTables.TREATMENTS);
+		return variants(rows, project).containsAll(StatisticalTables.TREATMENTS);
 	}
 
 	static Set<String> neededVariants(Set<String> present) {
-		Set<String> missing = new LinkedHashSet<>(ThesisTables.VARIANTS);
+		Set<String> missing = new LinkedHashSet<>(StatisticalTables.VARIANTS);
 		missing.removeAll(present);
 		Set<String> needed = new LinkedHashSet<>();
 		for (String variant : missing) {
@@ -96,7 +96,7 @@ final class ExperimentResume {
 		if (byVariant == null) {
 			return;
 		}
-		for (String treatment : ThesisTables.TREATMENTS) {
+		for (String treatment : StatisticalTables.TREATMENTS) {
 			ResultRow row = byVariant.get(treatment);
 			if (row != null) {
 				ordered.add(row);
@@ -106,8 +106,8 @@ final class ExperimentResume {
 
 	private static ResultRow parseRow(String line) {
 		String[] columns = line.split(";", -1);
-		if (columns.length != 10) {
-			throw new IllegalArgumentException("Expected 10 columns in comparison.csv, got " + columns.length + ": " + line);
+		if (columns.length != 8) {
+			throw new IllegalArgumentException("Expected 8 columns in comparison.csv, got " + columns.length + ": " + line);
 		}
 		return new ResultRow(
 				columns[0],
@@ -117,8 +117,6 @@ final class ExperimentResume {
 				Integer.parseInt(columns[4]),
 				Integer.parseInt(columns[5]),
 				Integer.parseInt(columns[6]),
-				Integer.parseInt(columns[7]),
-				Double.parseDouble(columns[8]),
-				columns[9].isEmpty() ? null : Double.parseDouble(columns[9]));
+				Integer.parseInt(columns[7]));
 	}
 }

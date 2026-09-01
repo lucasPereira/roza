@@ -1,5 +1,5 @@
-pair;w;p;median_difference;iqr_difference;median_percentage;iqr_percentage;improved;worsened;tied
-implicit+delegated vs implicit;0.000;0.0001316;-96.00;-166.0 a -28.00;-10.13;-11.84 a -5.484;19;0;2
-delegated+implicit vs delegated;40.00;0.02686;-27.00;-85.00 a -15.00;-6.667;-16.98 a -1.661;16;3;2
-residual-implicit+delegated vs residual-implicit;0.000;0.0001961;-71.00;-124.5 a -21.50;-9.161;-11.35 a -5.274;18;0;2
-delegated+residual-implicit vs delegated;0.000;0.0001316;-45.00;-425.0 a -29.00;-9.608;-19.85 a -6.623;19;0;2
+pair;w;p;median_difference;q1_difference;q3_difference;median_percentage;q1_percentage;q3_percentage;increased;decreased;unchanged
+implicit+delegated vs implicit;0.000;8.832e-05;-100.5;-220.0;-28.25;-10.17;-11.98;-5.825;0;20;2
+delegated+implicit vs delegated;47.00;0.03031;-26.00;-161.8;-9.500;-5.523;-15.80;-0.9149;3;17;2
+residual-implicit+delegated vs residual-implicit;0.000;8.832e-05;-97.00;-195.0;-25.00;-9.413;-11.61;-5.857;0;20;2
+delegated+residual-implicit vs delegated;0.000;8.845e-05;-70.50;-445.5;-30.25;-9.545;-18.71;-5.746;0;20;2

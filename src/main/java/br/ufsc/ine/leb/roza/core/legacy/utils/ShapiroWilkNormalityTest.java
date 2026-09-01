@@ -71,27 +71,57 @@ public class ShapiroWilkNormalityTest {
 		return new NormalityTestResult(w, pValue, alpha, isNormal);
 	}
 
+	private static final double[] C1 = { 0.0, 0.221157, -0.147981, -2.07119, 4.434685, -2.706056 };
+	private static final double[] C2 = { 0.0, 0.042981, -0.293762, -1.752461, 5.682633, -3.582633 };
+
 	private double[] shapiroCoefficients(int n) {
 		int m = n / 2;
 		double[] a = new double[m];
-
-		// Expected values of normal order statistics (Blom approximation)
+		if (n == 3) {
+			a[0] = Math.sqrt(0.5);
+			return a;
+		}
 		double[] expected = new double[m];
-		double sumsq = 0.0;
+		double summ2 = 0.0;
+		double an25 = n + 0.25;
 		for (int i = 0; i < m; i++) {
-			int k = i + 1;
-			double p = (k - 0.375) / (n + 0.25);
-			double z = inverseNormalCDF(p);
-			expected[i] = z;
-			sumsq += z * z;
+			expected[i] = inverseNormalCDF((i + 1 - 0.375) / an25);
+			summ2 += expected[i] * expected[i];
 		}
-
-		double denom = Math.sqrt(sumsq);
-		for (int i = 0; i < m; i++) {
-			a[i] = expected[i] / denom;
+		summ2 *= 2.0;
+		double ssumm2 = Math.sqrt(summ2);
+		double rsn = 1.0 / Math.sqrt(n);
+		double a1 = poly(C1, rsn) - expected[0] / ssumm2;
+		if (n > 5) {
+			double a2 = -expected[1] / ssumm2 + poly(C2, rsn);
+			double fac = Math.sqrt(
+					(summ2 - 2.0 * expected[0] * expected[0] - 2.0 * expected[1] * expected[1])
+							/ (1.0 - 2.0 * a1 * a1 - 2.0 * a2 * a2));
+			a[0] = a1;
+			a[1] = a2;
+			for (int i = 2; i < m; i++) {
+				a[i] = expected[i] / -fac;
+			}
+		} else {
+			double fac = Math.sqrt((summ2 - 2.0 * expected[0] * expected[0]) / (1.0 - 2.0 * a1 * a1));
+			a[0] = a1;
+			for (int i = 1; i < m; i++) {
+				a[i] = expected[i] / -fac;
+			}
 		}
-
 		return a;
+	}
+
+	private static double poly(double[] coefficients, double x) {
+		double value = coefficients[0];
+		if (coefficients.length == 1) {
+			return value;
+		}
+		double nested = x * coefficients[coefficients.length - 1];
+		for (int index = coefficients.length - 2; index > 0; index--) {
+			nested = (nested + coefficients[index]) * x;
+		}
+		return value + nested;
 	}
 
 	private double shapiroPValueApprox(double w, int n) {
