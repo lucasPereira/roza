@@ -68,20 +68,12 @@ final class Subjects {
 						"metrics/metrics-model/src/test/java"),
 				folders("couchdb-lucene", external.resolve("couchdb-lucene"), "src/test/java"),
 				folders("picon", external.resolve("picon"), "test"),
-				folders("selenium", external.resolve("selenium"), "java/test"),
-				saas("saas+teste"),
-				saas("saas+teste+moodle"),
-				saas("saas+teste+selenium"),
-				saas("saas+teste+service"));
+				folders("selenium", external.resolve("selenium"), "java/test"));
 	}
 
 	private static Subject folders(String name, Path project, String... relative) {
 		List<Path> folders = Stream.of(relative).map(project::resolve).collect(Collectors.toList());
 		return new Subject(name, folders);
-	}
-
-	private static Subject saas(String module) {
-		return new Subject(module, List.of(Path.of("external-projects/saas-unificado").resolve(module)));
 	}
 
 	static final class Subject {

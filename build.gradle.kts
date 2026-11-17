@@ -234,7 +234,7 @@ registerExperimentTask(
 
 registerExperimentTask(
     "runExperimentNMissing",
-    "Resumes experiment n with --missing-only: keeps comparison.csv and runs only subjects that still lack all eight variants.",
+    "Resumes experiment n with --missing-only: keeps primary CSVs and runs only subjects that still lack all eight variants.",
     "br.ufsc.ine.leb.roza.expt.n.Experiment",
     experimentArgs = listOf("--missing-only"),
     maxHeapSize = "32g",
@@ -242,7 +242,7 @@ registerExperimentTask(
 
 registerExperimentTask(
     "runExperimentNFromComparison",
-    "Regenerates every derived experiment n file (SVGs and statistical CSVs) from comparison.csv, without rerunning the pipeline or changing that file.",
+    "Regenerates experiment n SVGs and statistical CSVs from comparison.csv while preserving primary CSVs.",
     "br.ufsc.ine.leb.roza.expt.n.Experiment",
     experimentArgs = listOf("--from-comparison"),
 )

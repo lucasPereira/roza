@@ -70,147 +70,441 @@ const SHAPIRO_HEADERS = [
 ] as string[];
 
 const SHAPIRO = [
-  ["duplicated_statements", "implicit", "22", "0.8377", "0.002071", "não"],
-  ["duplicated_statements", "residual-implicit", "22", "0.7751", "0.0002090", "não"],
-  ["duplicated_statements", "delegated", "22", "0.4931", "1.133e-07", "não"],
-  ["duplicated_statements", "implicit+delegated", "22", "0.6928", "1.587e-05", "não"],
-  ["duplicated_statements", "delegated+implicit", "22", "0.6585", "6.066e-06", "não"],
-  ["duplicated_statements", "residual-implicit+delegated", "22", "0.6525", "5.158e-06", "não"],
-  ["duplicated_statements", "delegated+residual-implicit", "22", "0.6503", "4.855e-06", "não"],
-  ["test_classes", "implicit", "22", "0.7733", "0.0001970", "não"],
-  ["test_classes", "residual-implicit", "22", "0.8562", "0.004385", "não"],
-  ["test_classes", "delegated", "22", "0.2810", "2.098e-09", "não"],
-  ["test_classes", "implicit+delegated", "22", "0.7733", "0.0001970", "não"],
-  ["test_classes", "delegated+implicit", "22", "0.7870", "0.0003153", "não"],
-  ["test_classes", "residual-implicit+delegated", "22", "0.8562", "0.004385", "não"],
-  ["test_classes", "delegated+residual-implicit", "22", "0.8298", "0.001520", "não"],
-  ["setup_methods", "implicit", "22", "0.9015", "0.03181", "não"],
-  ["setup_methods", "residual-implicit", "22", "0.8601", "0.005156", "não"],
-  ["setup_methods", "delegated", "22", "0.3333", "4.989e-09", "não"],
-  ["setup_methods", "implicit+delegated", "22", "0.9015", "0.03181", "não"],
-  ["setup_methods", "delegated+implicit", "22", "0.8986", "0.02785", "não"],
-  ["setup_methods", "residual-implicit+delegated", "22", "0.8601", "0.005156", "não"],
-  ["setup_methods", "delegated+residual-implicit", "22", "0.8404", "0.002305", "não"],
-  ["attributes", "implicit", "22", "0.5368", "2.971e-07", "não"],
-  ["attributes", "residual-implicit", "22", "0.8211", "0.001091", "não"],
-  ["attributes", "delegated", "22", "0.3011", "2.870e-09", "não"],
-  ["attributes", "implicit+delegated", "22", "0.5368", "2.971e-07", "não"],
-  ["attributes", "delegated+implicit", "22", "0.4898", "1.057e-07", "não"],
-  ["attributes", "residual-implicit+delegated", "22", "0.8211", "0.001091", "não"],
-  ["attributes", "delegated+residual-implicit", "22", "0.8850", "0.01508", "não"],
-  ["helper_methods", "implicit", "22", "0.2215", "1.353e-09", "não"],
-  ["helper_methods", "residual-implicit", "22", "0.2215", "1.353e-09", "não"],
-  ["helper_methods", "delegated", "22", "0.5857", "9.336e-07", "não"],
-  ["helper_methods", "implicit+delegated", "22", "0.5567", "4.691e-07", "não"],
-  ["helper_methods", "delegated+implicit", "22", "0.5857", "9.336e-07", "não"],
-  ["helper_methods", "residual-implicit+delegated", "22", "0.5387", "3.098e-07", "não"],
-  ["helper_methods", "delegated+residual-implicit", "22", "0.5857", "9.336e-07", "não"],
-  ["total_statements", "implicit", "22", "0.8195", "0.001029", "não"],
-  ["total_statements", "residual-implicit", "22", "0.7792", "0.0002404", "não"],
-  ["total_statements", "delegated", "22", "0.4748", "7.692e-08", "não"],
-  ["total_statements", "implicit+delegated", "22", "0.7172", "3.270e-05", "não"],
-  ["total_statements", "delegated+implicit", "22", "0.6753", "9.658e-06", "não"],
-  ["total_statements", "residual-implicit+delegated", "22", "0.6542", "5.394e-06", "não"],
-  ["total_statements", "delegated+residual-implicit", "22", "0.6467", "4.412e-06", "não"],
+  [
+    "duplicated_statements",
+    "implicit",
+    "18",
+    "0.7070",
+    "9.630e-05",
+    "não"
+  ],
+  [
+    "duplicated_statements",
+    "residual-implicit",
+    "18",
+    "0.7264",
+    "0.0001647",
+    "não"
+  ],
+  [
+    "duplicated_statements",
+    "delegated",
+    "18",
+    "0.7629",
+    "0.0004758",
+    "não"
+  ],
+  [
+    "duplicated_statements",
+    "implicit+delegated",
+    "18",
+    "0.7704",
+    "0.0005975",
+    "não"
+  ],
+  [
+    "duplicated_statements",
+    "delegated+implicit",
+    "18",
+    "0.7566",
+    "0.0003945",
+    "não"
+  ],
+  [
+    "duplicated_statements",
+    "residual-implicit+delegated",
+    "18",
+    "0.7852",
+    "0.0009448",
+    "não"
+  ],
+  [
+    "duplicated_statements",
+    "delegated+residual-implicit",
+    "18",
+    "0.7807",
+    "0.0008221",
+    "não"
+  ],
+  [
+    "test_classes",
+    "implicit",
+    "18",
+    "0.7991",
+    "0.001477",
+    "não"
+  ],
+  [
+    "test_classes",
+    "residual-implicit",
+    "18",
+    "0.7818",
+    "0.0008504",
+    "não"
+  ],
+  [
+    "test_classes",
+    "delegated",
+    "18",
+    "0.3193",
+    "3.059e-08",
+    "não"
+  ],
+  [
+    "test_classes",
+    "implicit+delegated",
+    "18",
+    "0.7991",
+    "0.001477",
+    "não"
+  ],
+  [
+    "test_classes",
+    "delegated+implicit",
+    "18",
+    "0.8051",
+    "0.001795",
+    "não"
+  ],
+  [
+    "test_classes",
+    "residual-implicit+delegated",
+    "18",
+    "0.7818",
+    "0.0008504",
+    "não"
+  ],
+  [
+    "test_classes",
+    "delegated+residual-implicit",
+    "18",
+    "0.7848",
+    "0.0009325",
+    "não"
+  ],
+  [
+    "setup_methods",
+    "implicit",
+    "18",
+    "0.8146",
+    "0.002457",
+    "não"
+  ],
+  [
+    "setup_methods",
+    "residual-implicit",
+    "18",
+    "0.8091",
+    "0.002045",
+    "não"
+  ],
+  [
+    "setup_methods",
+    "delegated",
+    "18",
+    "0.3772",
+    "8.141e-08",
+    "não"
+  ],
+  [
+    "setup_methods",
+    "implicit+delegated",
+    "18",
+    "0.8146",
+    "0.002457",
+    "não"
+  ],
+  [
+    "setup_methods",
+    "delegated+implicit",
+    "18",
+    "0.8182",
+    "0.002775",
+    "não"
+  ],
+  [
+    "setup_methods",
+    "residual-implicit+delegated",
+    "18",
+    "0.8091",
+    "0.002045",
+    "não"
+  ],
+  [
+    "setup_methods",
+    "delegated+residual-implicit",
+    "18",
+    "0.8106",
+    "0.002150",
+    "não"
+  ],
+  [
+    "attributes",
+    "implicit",
+    "18",
+    "0.8179",
+    "0.002752",
+    "não"
+  ],
+  [
+    "attributes",
+    "residual-implicit",
+    "18",
+    "0.7710",
+    "0.0006075",
+    "não"
+  ],
+  [
+    "attributes",
+    "delegated",
+    "18",
+    "0.3418",
+    "4.440e-08",
+    "não"
+  ],
+  [
+    "attributes",
+    "implicit+delegated",
+    "18",
+    "0.8179",
+    "0.002752",
+    "não"
+  ],
+  [
+    "attributes",
+    "delegated+implicit",
+    "18",
+    "0.8359",
+    "0.005110",
+    "não"
+  ],
+  [
+    "attributes",
+    "residual-implicit+delegated",
+    "18",
+    "0.7710",
+    "0.0006075",
+    "não"
+  ],
+  [
+    "attributes",
+    "delegated+residual-implicit",
+    "18",
+    "0.7724",
+    "0.0006342",
+    "não"
+  ],
+  [
+    "helper_methods",
+    "implicit",
+    "18",
+    "0.2527",
+    "1.058e-08",
+    "não"
+  ],
+  [
+    "helper_methods",
+    "residual-implicit",
+    "18",
+    "0.2527",
+    "1.058e-08",
+    "não"
+  ],
+  [
+    "helper_methods",
+    "delegated",
+    "18",
+    "0.7868",
+    "0.0009956",
+    "não"
+  ],
+  [
+    "helper_methods",
+    "implicit+delegated",
+    "18",
+    "0.8216",
+    "0.003114",
+    "não"
+  ],
+  [
+    "helper_methods",
+    "delegated+implicit",
+    "18",
+    "0.7868",
+    "0.0009956",
+    "não"
+  ],
+  [
+    "helper_methods",
+    "residual-implicit+delegated",
+    "18",
+    "0.8122",
+    "0.002273",
+    "não"
+  ],
+  [
+    "helper_methods",
+    "delegated+residual-implicit",
+    "18",
+    "0.7868",
+    "0.0009956",
+    "não"
+  ],
+  [
+    "total_statements",
+    "implicit",
+    "18",
+    "0.6949",
+    "6.964e-05",
+    "não"
+  ],
+  [
+    "total_statements",
+    "residual-implicit",
+    "18",
+    "0.7326",
+    "0.0001960",
+    "não"
+  ],
+  [
+    "total_statements",
+    "delegated",
+    "18",
+    "0.7589",
+    "0.0004223",
+    "não"
+  ],
+  [
+    "total_statements",
+    "implicit+delegated",
+    "18",
+    "0.7673",
+    "0.0005431",
+    "não"
+  ],
+  [
+    "total_statements",
+    "delegated+implicit",
+    "18",
+    "0.7449",
+    "0.0002795",
+    "não"
+  ],
+  [
+    "total_statements",
+    "residual-implicit+delegated",
+    "18",
+    "0.7862",
+    "0.0009753",
+    "não"
+  ],
+  [
+    "total_statements",
+    "delegated+residual-implicit",
+    "18",
+    "0.7816",
+    "0.0008436",
+    "não"
+  ]
 ] as string[][];
 
 const VS_DUPLICATED = [
   [
     "implicit",
-    "46.00",
-    "0.02759",
-    "-42.50",
-    "-228.0",
-    "-11.00",
-    "-6.514",
-    "-17.57",
-    "-2.560",
-    "3",
-    "17",
-    "2"
+    "10.00",
+    "0.001642",
+    "-62.50",
+    "-311.8",
+    "-18.50",
+    "-9.187",
+    "-19.63",
+    "-3.880",
+    "1",
+    "16",
+    "1"
   ],
   [
     "residual-implicit",
     "0.000",
-    "8.845e-05",
-    "-94.50",
-    "-582.8",
+    "0.0002925",
+    "-64.00",
+    "-569.5",
     "-35.00",
-    "-11.04",
-    "-20.50",
-    "-5.428",
+    "-12.18",
+    "-22.67",
+    "-7.389",
     "0",
-    "20",
-    "2"
+    "17",
+    "1"
   ],
   [
     "delegated",
     "0.000",
-    "8.857e-05",
-    "-120.0",
-    "-251.3",
-    "-33.25",
+    "0.0004378",
+    "-109.5",
+    "-211.3",
+    "-30.25",
     "-10.73",
-    "-16.55",
-    "-6.320",
+    "-14.76",
+    "-6.013",
     "0",
-    "20",
+    "16",
     "2"
   ],
   [
     "implicit+delegated",
     "0.000",
-    "4.010e-05",
-    "-170.0",
-    "-714.8",
-    "-34.25",
-    "-17.47",
-    "-23.94",
+    "0.0001964",
+    "-130.0",
+    "-583.8",
+    "-32.75",
+    "-18.58",
+    "-27.25",
     "-14.01",
     "0",
-    "22",
+    "18",
     "0"
   ],
   [
     "delegated+implicit",
     "3.000",
-    "6.085e-05",
-    "-165.5",
-    "-597.0",
-    "-34.25",
-    "-17.38",
-    "-23.81",
+    "0.0003270",
+    "-126.5",
+    "-517.5",
+    "-32.75",
+    "-17.85",
+    "-26.16",
     "-10.13",
     "1",
-    "21",
+    "17",
     "0"
   ],
   [
     "residual-implicit+delegated",
     "0.000",
-    "4.010e-05",
-    "-186.5",
-    "-913.0",
+    "0.0001964",
+    "-148.0",
+    "-654.8",
     "-57.25",
-    "-20.86",
-    "-25.64",
+    "-21.55",
+    "-29.89",
     "-16.40",
     "0",
-    "22",
+    "18",
     "0"
   ],
   [
     "delegated+residual-implicit",
     "0.000",
-    "4.010e-05",
-    "-188.5",
-    "-728.0",
+    "0.0001964",
+    "-149.5",
+    "-630.5",
     "-55.00",
-    "-19.86",
-    "-25.04",
+    "-20.28",
+    "-28.43",
     "-14.90",
     "0",
-    "22",
+    "18",
     "0"
   ]
 ] as string[][];
@@ -218,31 +512,31 @@ const VS_DUPLICATED = [
 const VS_CLASSES = [
   [
     "implicit",
-    "7.500",
-    "0.0002724",
-    "185.0",
-    "13.25",
-    "564.5",
-    "188.1",
-    "35.44",
-    "300.1",
-    "17",
-    "3",
-    "2"
+    "1.000",
+    "0.0003515",
+    "189.5",
+    "43.50",
+    "789.5",
+    "245.5",
+    "150.2",
+    "309.3",
+    "16",
+    "1",
+    "1"
   ],
   [
     "residual-implicit",
-    "32.50",
-    "0.006788",
-    "13.00",
-    "0.000",
-    "95.25",
-    "26.12",
-    "0.000",
-    "55.55",
+    "3.000",
+    "0.0005017",
+    "23.50",
+    "8.250",
+    "113.0",
+    "40.20",
+    "20.02",
+    "59.37",
     "15",
-    "5",
-    "2"
+    "2",
+    "1"
   ],
   [
     "delegated",
@@ -256,94 +550,94 @@ const VS_CLASSES = [
     "0.000",
     "0",
     "2",
-    "20"
+    "16"
   ],
   [
     "implicit+delegated",
-    "7.500",
-    "0.0002724",
-    "185.0",
-    "13.25",
-    "564.5",
-    "188.1",
-    "35.44",
-    "300.1",
-    "17",
-    "3",
-    "2"
+    "1.000",
+    "0.0003515",
+    "189.5",
+    "43.50",
+    "789.5",
+    "245.5",
+    "150.2",
+    "309.3",
+    "16",
+    "1",
+    "1"
   ],
   [
     "delegated+implicit",
-    "7.000",
-    "0.0003976",
-    "184.0",
-    "10.25",
-    "416.0",
-    "180.8",
-    "29.62",
-    "288.8",
-    "17",
-    "2",
-    "3"
+    "1.000",
+    "0.0003509",
+    "188.0",
+    "33.75",
+    "744.5",
+    "239.5",
+    "121.9",
+    "292.9",
+    "16",
+    "1",
+    "1"
   ],
   [
     "residual-implicit+delegated",
-    "32.50",
-    "0.006788",
-    "13.00",
-    "0.000",
-    "95.25",
-    "26.12",
-    "0.000",
-    "55.55",
+    "3.000",
+    "0.0005017",
+    "23.50",
+    "8.250",
+    "113.0",
+    "40.20",
+    "20.02",
+    "59.37",
     "15",
-    "5",
-    "2"
+    "2",
+    "1"
   ],
   [
     "delegated+residual-implicit",
-    "32.50",
-    "0.006792",
-    "10.50",
-    "0.000",
-    "93.25",
-    "22.72",
-    "0.000",
-    "56.46",
+    "4.500",
+    "0.0006524",
+    "22.50",
+    "5.000",
+    "109.0",
+    "40.20",
+    "7.120",
+    "58.51",
     "15",
-    "5",
-    "2"
+    "2",
+    "1"
   ]
 ] as string[][];
 
 const VS_SETUPS = [
   [
     "implicit",
+    "6.000",
+    "0.001344",
     "42.00",
-    "0.03292",
-    "17.50",
-    "0.000",
-    "98.25",
-    "226.4",
-    "0.000",
-    "570.7",
+    "8.250",
+    "182.5",
+    "276.5",
+    "53.85",
+    "588.9",
     "15",
-    "4",
-    "3"
+    "1",
+    "2"
   ],
   [
     "residual-implicit",
-    "27.00",
-    "0.003589",
-    "20.00",
-    "5.500",
-    "115.8",
-    "193.8",
-    "9.722",
-    "595.1",
+    "0.000",
+    "0.0002925",
+    "41.00",
+    "13.00",
+    "149.0",
+    "328.6",
+    "112.5",
+    "650.0",
     "17",
-    "3",
-    "2"
+    "0",
+    "1"
   ],
   [
     "delegated",
@@ -357,94 +651,94 @@ const VS_SETUPS = [
     "0.000",
     "0",
     "2",
-    "20"
+    "16"
   ],
   [
     "implicit+delegated",
+    "6.000",
+    "0.001344",
     "42.00",
-    "0.03292",
-    "17.50",
-    "0.000",
-    "98.25",
-    "226.4",
-    "0.000",
-    "570.7",
+    "8.250",
+    "182.5",
+    "276.5",
+    "53.85",
+    "588.9",
     "15",
-    "4",
-    "3"
+    "1",
+    "2"
   ],
   [
     "delegated+implicit",
-    "41.50",
-    "0.03130",
-    "17.50",
-    "0.000",
-    "96.50",
-    "228.6",
-    "0.000",
-    "551.2",
+    "5.000",
+    "0.001123",
+    "42.50",
+    "8.250",
+    "173.3",
+    "266.7",
+    "53.85",
+    "566.7",
     "15",
-    "4",
-    "3"
+    "1",
+    "2"
   ],
   [
     "residual-implicit+delegated",
-    "27.00",
-    "0.003589",
-    "20.00",
-    "5.500",
-    "115.8",
-    "193.8",
-    "9.722",
-    "595.1",
+    "0.000",
+    "0.0002925",
+    "41.00",
+    "13.00",
+    "149.0",
+    "328.6",
+    "112.5",
+    "650.0",
     "17",
-    "3",
-    "2"
+    "0",
+    "1"
   ],
   [
     "delegated+residual-implicit",
-    "24.00",
-    "0.002491",
-    "17.50",
-    "5.000",
-    "113.5",
-    "188.9",
-    "6.944",
-    "578.0",
+    "0.000",
+    "0.0002919",
+    "44.50",
+    "13.00",
+    "145.0",
+    "335.7",
+    "112.5",
+    "650.0",
     "17",
-    "3",
-    "2"
+    "0",
+    "1"
   ]
 ] as string[][];
 
 const VS_ATTRIBUTES = [
   [
     "implicit",
-    "83.00",
-    "0.4114",
-    "8.000",
-    "-24.75",
-    "68.00",
-    "22.64",
-    "-14.59",
-    "48.67",
+    "32.00",
+    "0.03513",
+    "19.00",
+    "0.7500",
+    "194.5",
+    "28.57",
+    "0.000",
+    "55.40",
     "13",
-    "7",
-    "2"
+    "4",
+    "1"
   ],
   [
     "residual-implicit",
-    "39.00",
-    "0.01373",
-    "48.00",
-    "4.250",
-    "163.3",
-    "28.30",
-    "2.703",
-    "96.95",
+    "0.000",
+    "0.0002925",
+    "64.00",
+    "14.25",
+    "349.0",
+    "67.37",
+    "15.38",
+    "106.0",
     "17",
-    "3",
-    "2"
+    "0",
+    "1"
   ],
   [
     "delegated",
@@ -458,63 +752,63 @@ const VS_ATTRIBUTES = [
     "0.000",
     "0",
     "2",
-    "20"
+    "16"
   ],
   [
     "implicit+delegated",
-    "83.00",
-    "0.4114",
-    "8.000",
-    "-24.75",
-    "68.00",
-    "22.64",
-    "-14.59",
-    "48.67",
+    "32.00",
+    "0.03513",
+    "19.00",
+    "0.7500",
+    "194.5",
+    "28.57",
+    "0.000",
+    "55.40",
     "13",
-    "7",
-    "2"
+    "4",
+    "1"
   ],
   [
     "delegated+implicit",
-    "87.00",
-    "0.5016",
-    "6.000",
-    "-24.75",
-    "51.75",
-    "13.27",
-    "-14.59",
-    "28.57",
+    "35.00",
+    "0.04947",
+    "12.50",
+    "0.7500",
+    "104.3",
+    "22.77",
+    "0.000",
+    "38.00",
     "13",
-    "7",
-    "2"
+    "4",
+    "1"
   ],
   [
     "residual-implicit+delegated",
-    "39.00",
-    "0.01373",
-    "48.00",
-    "4.250",
-    "163.3",
-    "28.30",
-    "2.703",
-    "96.95",
+    "0.000",
+    "0.0002925",
+    "64.00",
+    "14.25",
+    "349.0",
+    "67.37",
+    "15.38",
+    "106.0",
     "17",
-    "3",
-    "2"
+    "0",
+    "1"
   ],
   [
     "delegated+residual-implicit",
-    "35.00",
-    "0.008962",
-    "38.00",
-    "4.750",
-    "159.8",
-    "24.22",
-    "4.865",
-    "84.51",
+    "0.000",
+    "0.0002925",
+    "43.00",
+    "11.00",
+    "290.5",
+    "55.62",
+    "17.95",
+    "85.71",
     "17",
-    "3",
-    "2"
+    "0",
+    "1"
   ]
 ] as string[][];
 
@@ -531,7 +825,7 @@ const VS_HELPERS = [
     "0.000",
     "0",
     "1",
-    "21"
+    "17"
   ],
   [
     "residual-implicit",
@@ -545,75 +839,75 @@ const VS_HELPERS = [
     "0.000",
     "0",
     "1",
-    "21"
+    "17"
   ],
   [
     "delegated",
-    "3.500",
-    "0.0001507",
-    "27.00",
-    "7.250",
-    "83.00",
-    "24.76",
-    "8.634",
-    "66.16",
-    "19",
+    "3.000",
+    "0.0007748",
+    "24.50",
+    "6.500",
+    "82.75",
+    "18.43",
+    "5.465",
+    "32.80",
+    "15",
     "1",
     "2"
   ],
   [
     "implicit+delegated",
-    "10.00",
-    "0.0003898",
-    "19.50",
-    "7.000",
-    "93.25",
-    "20.32",
-    "10.63",
-    "49.42",
-    "19",
+    "8.000",
+    "0.001915",
+    "15.50",
+    "6.250",
+    "69.25",
+    "14.11",
+    "6.431",
+    "30.67",
+    "15",
     "1",
     "2"
   ],
   [
     "delegated+implicit",
-    "3.500",
-    "0.0001507",
-    "27.00",
-    "7.250",
-    "83.00",
-    "24.76",
-    "8.634",
-    "66.16",
-    "19",
+    "3.000",
+    "0.0007748",
+    "24.50",
+    "6.500",
+    "82.75",
+    "18.43",
+    "5.465",
+    "32.80",
+    "15",
     "1",
     "2"
   ],
   [
     "residual-implicit+delegated",
-    "10.00",
-    "0.0003893",
-    "19.50",
-    "7.000",
-    "81.00",
-    "18.94",
-    "8.207",
-    "44.93",
-    "19",
+    "8.000",
+    "0.001912",
+    "15.50",
+    "6.250",
+    "56.00",
+    "13.87",
+    "5.598",
+    "23.62",
+    "15",
     "1",
     "2"
   ],
   [
     "delegated+residual-implicit",
-    "3.500",
-    "0.0001507",
-    "27.00",
-    "7.250",
-    "83.00",
-    "24.76",
-    "8.634",
-    "66.16",
-    "19",
+    "3.000",
+    "0.0007748",
+    "24.50",
+    "6.500",
+    "82.75",
+    "18.43",
+    "5.465",
+    "32.80",
+    "15",
     "1",
     "2"
   ]
@@ -622,109 +916,109 @@ const VS_HELPERS = [
 const VS_TOTAL = [
   [
     "implicit",
-    "57.00",
-    "0.04200",
-    "-49.50",
-    "-83.00",
-    "-2.000",
-    "-2.275",
-    "-4.583",
-    "-0.09796",
-    "5",
-    "16",
-    "1"
+    "18.00",
+    "0.003282",
+    "-56.00",
+    "-246.5",
+    "-14.75",
+    "-2.435",
+    "-6.039",
+    "-0.7079",
+    "3",
+    "15",
+    "0"
   ],
   [
     "residual-implicit",
     "0.000",
-    "8.845e-05",
-    "-88.50",
-    "-572.8",
+    "0.0002925",
+    "-61.00",
+    "-536.8",
     "-28.75",
-    "-3.776",
-    "-6.003",
-    "-2.187",
+    "-4.192",
+    "-7.149",
+    "-2.284",
     "0",
-    "20",
-    "2"
+    "17",
+    "1"
   ],
   [
     "delegated",
     "0.000",
-    "8.857e-05",
-    "-93.00",
-    "-215.5",
-    "-20.25",
-    "-3.155",
-    "-4.991",
-    "-1.373",
+    "0.0004378",
+    "-88.00",
+    "-166.8",
+    "-17.25",
+    "-3.012",
+    "-3.431",
+    "-1.292",
     "0",
-    "20",
+    "16",
     "2"
   ],
   [
     "implicit+delegated",
-    "8.000",
-    "0.0001195",
-    "-148.5",
-    "-570.3",
-    "-23.75",
-    "-5.855",
-    "-8.707",
-    "-3.390",
+    "7.000",
+    "0.0006292",
+    "-112.5",
+    "-480.8",
+    "-22.25",
+    "-5.413",
+    "-7.788",
+    "-2.549",
     "1",
-    "21",
+    "17",
     "0"
   ],
   [
     "delegated+implicit",
-    "10.00",
-    "0.0001554",
-    "-142.5",
-    "-443.3",
-    "-23.75",
-    "-5.459",
-    "-8.946",
-    "-2.422",
+    "9.000",
+    "0.0008635",
+    "-105.0",
+    "-405.3",
+    "-22.25",
+    "-5.122",
+    "-6.876",
+    "-2.243",
     "2",
-    "20",
+    "16",
     "0"
   ],
   [
     "residual-implicit+delegated",
     "0.000",
-    "4.005e-05",
-    "-159.5",
-    "-760.3",
+    "0.0001964",
+    "-127.5",
+    "-629.8",
     "-43.75",
-    "-6.787",
-    "-10.54",
-    "-5.693",
+    "-6.400",
+    "-9.104",
+    "-4.869",
     "0",
-    "22",
+    "18",
     "0"
   ],
   [
     "delegated+residual-implicit",
     "0.000",
-    "4.005e-05",
-    "-159.0",
-    "-628.3",
+    "0.0001964",
+    "-131.0",
+    "-580.8",
     "-40.25",
-    "-5.830",
-    "-10.26",
-    "-5.078",
+    "-5.761",
+    "-8.150",
+    "-4.383",
     "0",
-    "22",
+    "18",
     "0"
   ]
 ] as string[][];
 
 const FRIEDMAN = [
   [
-    "114.5",
+    "95.82",
     "7",
-    "4.877e-13"
+    "4.923e-13"
   ]
 ] as string[][];
 
@@ -732,347 +1026,347 @@ const PAIRWISE = [
   [
     "implicit vs residual-implicit",
     "0.000",
-    "0.002545",
+    "0.008493",
     "-20.00",
-    "-144.5",
+    "-119.0",
     "-4.750",
     "-3.388",
-    "-5.700",
-    "-0.6399",
+    "-4.629",
+    "-1.197",
     "0",
-    "18",
-    "4"
+    "15",
+    "3"
   ],
   [
     "implicit vs delegated",
-    "105.0",
-    "0.9703",
-    "-8.000",
-    "-50.25",
-    "24.50",
-    "-1.446",
-    "-8.144",
-    "10.05",
+    "78.00",
+    "0.7439",
+    "-3.000",
+    "-19.00",
+    "108.8",
+    "-0.5997",
+    "-6.558",
+    "10.96",
     "8",
-    "14",
+    "10",
     "0"
   ],
   [
     "implicit vs implicit+delegated",
     "0.000",
-    "0.001678",
-    "-100.5",
-    "-220.0",
-    "-28.25",
+    "0.007409",
+    "-72.00",
+    "-159.0",
+    "-17.50",
     "-10.17",
-    "-11.98",
-    "-5.825",
+    "-11.89",
+    "-5.273",
     "0",
-    "20",
+    "16",
     "2"
   ],
   [
     "implicit vs delegated+implicit",
     "0.000",
-    "0.001678",
-    "-88.50",
-    "-124.8",
-    "-28.25",
-    "-8.852",
-    "-11.31",
-    "-4.335",
+    "0.007409",
+    "-69.00",
+    "-117.3",
+    "-27.25",
+    "-7.721",
+    "-11.03",
+    "-4.051",
     "0",
-    "20",
+    "16",
     "2"
   ],
   [
     "implicit vs residual-implicit+delegated",
     "0.000",
-    "0.001251",
-    "-105.0",
-    "-318.8",
-    "-33.25",
-    "-13.34",
-    "-17.56",
-    "-8.813",
+    "0.006142",
+    "-74.50",
+    "-278.3",
+    "-29.50",
+    "-12.57",
+    "-15.35",
+    "-8.599",
     "0",
-    "21",
+    "17",
     "1"
   ],
   [
     "implicit vs delegated+residual-implicit",
     "0.000",
-    "0.001251",
-    "-103.5",
-    "-271.8",
-    "-35.00",
-    "-11.30",
-    "-16.40",
-    "-8.607",
+    "0.006142",
+    "-78.00",
+    "-178.0",
+    "-30.50",
+    "-10.71",
+    "-14.38",
+    "-7.418",
     "0",
-    "21",
+    "17",
     "1"
   ],
   [
     "residual-implicit vs delegated",
-    "103.5",
-    "0.9703",
-    "-0.5000",
-    "-28.50",
-    "150.3",
-    "-0.1106",
-    "-4.909",
-    "14.73",
+    "41.50",
+    "0.2925",
+    "10.50",
+    "-4.250",
+    "268.5",
+    "2.373",
+    "-1.568",
+    "14.92",
     "10",
-    "11",
+    "7",
     "1"
   ],
   [
     "residual-implicit vs implicit+delegated",
     "12.50",
-    "0.003432",
-    "-39.00",
-    "-120.5",
-    "-6.000",
-    "-4.744",
-    "-9.698",
-    "-0.9800",
+    "0.01712",
+    "-20.50",
+    "-92.75",
+    "-2.750",
+    "-4.124",
+    "-8.152",
+    "-0.4837",
     "3",
-    "18",
+    "14",
     "1"
   ],
   [
     "residual-implicit vs delegated+implicit",
-    "45.50",
-    "0.08979",
-    "-28.50",
-    "-85.50",
-    "-0.5000",
-    "-3.725",
-    "-9.819",
-    "-0.1205",
+    "42.00",
+    "0.2925",
+    "-10.00",
+    "-58.00",
+    "4.500",
+    "-2.762",
+    "-7.410",
+    "0.1842",
     "5",
-    "16",
+    "12",
     "1"
   ],
   [
     "residual-implicit vs residual-implicit+delegated",
     "0.000",
-    "0.001678",
-    "-97.00",
-    "-195.0",
-    "-25.00",
-    "-9.413",
-    "-11.61",
-    "-5.857",
+    "0.007409",
+    "-71.00",
+    "-132.0",
+    "-16.50",
+    "-8.769",
+    "-10.65",
+    "-4.471",
     "0",
-    "20",
+    "16",
     "2"
   ],
   [
     "residual-implicit vs delegated+residual-implicit",
     "0.000",
-    "0.001678",
-    "-59.00",
-    "-125.3",
-    "-27.75",
-    "-8.517",
-    "-10.86",
-    "-4.633",
+    "0.007409",
+    "-52.00",
+    "-115.8",
+    "-22.50",
+    "-7.792",
+    "-9.800",
+    "-3.603",
     "0",
-    "20",
+    "16",
     "2"
   ],
   [
     "delegated vs implicit+delegated",
-    "46.00",
-    "0.1104",
-    "-33.50",
-    "-279.3",
-    "-11.00",
-    "-7.850",
-    "-17.38",
-    "-3.647",
-    "3",
-    "17",
-    "2"
+    "10.00",
+    "0.01609",
+    "-42.00",
+    "-345.5",
+    "-17.50",
+    "-9.838",
+    "-18.96",
+    "-4.038",
+    "1",
+    "16",
+    "1"
   ],
   [
     "delegated vs delegated+implicit",
-    "47.00",
-    "0.1104",
-    "-26.00",
-    "-161.8",
-    "-9.500",
-    "-5.523",
-    "-15.80",
-    "-0.9149",
-    "3",
-    "17",
-    "2"
+    "11.00",
+    "0.01609",
+    "-29.50",
+    "-234.8",
+    "-17.00",
+    "-8.338",
+    "-18.34",
+    "-3.790",
+    "1",
+    "16",
+    "1"
   ],
   [
     "delegated vs residual-implicit+delegated",
     "0.000",
-    "0.001678",
-    "-72.50",
-    "-473.8",
+    "0.006142",
+    "-44.50",
+    "-447.0",
     "-30.25",
-    "-10.54",
-    "-20.09",
-    "-5.959",
+    "-11.86",
+    "-21.43",
+    "-6.817",
     "0",
-    "20",
-    "2"
+    "17",
+    "1"
   ],
   [
     "delegated vs delegated+residual-implicit",
     "0.000",
-    "0.001678",
-    "-70.50",
-    "-445.5",
+    "0.006142",
+    "-42.00",
+    "-422.8",
     "-30.25",
-    "-9.545",
-    "-18.71",
-    "-5.746",
+    "-9.933",
+    "-20.45",
+    "-6.723",
     "0",
-    "20",
-    "2"
+    "17",
+    "1"
   ],
   [
     "implicit+delegated vs delegated+implicit",
-    "22.50",
-    "0.09298",
-    "2.000",
+    "9.500",
+    "0.06593",
+    "4.500",
     "0.000",
     "39.50",
-    "0.3827",
+    "0.5498",
     "0.000",
-    "1.669",
-    "13",
-    "3",
-    "6"
+    "1.908",
+    "11",
+    "2",
+    "5"
   ],
   [
     "implicit+delegated vs residual-implicit+delegated",
     "0.000",
-    "0.002545",
+    "0.008493",
     "-18.50",
-    "-114.3",
+    "-88.00",
     "-4.000",
     "-3.148",
-    "-3.964",
-    "-0.7093",
+    "-3.908",
+    "-1.238",
     "0",
-    "18",
-    "4"
+    "15",
+    "3"
   ],
   [
     "implicit+delegated vs delegated+residual-implicit",
-    "13.00",
-    "0.02115",
+    "12.00",
+    "0.06593",
     "-12.00",
-    "-46.75",
+    "-41.25",
     "0.000",
     "-1.931",
-    "-3.193",
+    "-2.905",
     "0.000",
     "2",
-    "15",
-    "5"
+    "12",
+    "4"
   ],
   [
     "delegated+implicit vs residual-implicit+delegated",
-    "8.000",
-    "0.004171",
+    "7.000",
+    "0.01609",
     "-17.00",
-    "-169.3",
+    "-138.3",
     "-3.250",
     "-3.384",
     "-6.604",
-    "-0.9341",
+    "-1.136",
     "1",
-    "18",
-    "3"
+    "15",
+    "2"
   ],
   [
     "delegated+implicit vs delegated+residual-implicit",
     "1.000",
-    "0.002557",
+    "0.008836",
     "-15.50",
-    "-101.0",
+    "-85.25",
     "-7.250",
     "-2.905",
-    "-4.470",
-    "-0.8829",
+    "-3.690",
+    "-1.350",
     "1",
-    "17",
-    "4"
+    "14",
+    "3"
   ],
   [
     "residual-implicit+delegated vs delegated+residual-implicit",
-    "15.00",
-    "0.04281",
+    "13.00",
+    "0.09235",
     "2.500",
     "0.000",
-    "34.25",
+    "27.75",
     "0.5621",
     "0.000",
     "1.438",
-    "14",
+    "11",
     "2",
-    "6"
+    "5"
   ]
 ] as string[][];
 
 const MEDIANS = [
   [
     "original",
-    "1162",
+    "974.0",
     "312.0",
-    "3866"
+    "2686"
   ],
   [
     "implicit",
-    "948.5",
+    "672.0",
     "290.5",
-    "2570"
+    "2324"
   ],
   [
     "residual-implicit",
-    "931.5",
+    "660.0",
     "279.3",
-    "2451"
+    "2198"
   ],
   [
     "delegated",
-    "982.5",
+    "820.5",
     "308.5",
-    "3288"
+    "2482"
   ],
   [
     "implicit+delegated",
-    "839.0",
+    "617.0",
     "282.5",
-    "2410"
+    "2104"
   ],
   [
     "delegated+implicit",
-    "846.5",
+    "611.5",
     "282.3",
-    "2478"
+    "2217"
   ],
   [
     "residual-implicit+delegated",
-    "818.5",
+    "606.0",
     "275.8",
-    "2322"
+    "2005"
   ],
   [
     "delegated+residual-implicit",
-    "825.5",
+    "598.0",
     "275.8",
-    "2392"
+    "2122"
   ]
 ] as string[][];
 
@@ -1080,58 +1374,58 @@ const COMPOSITION = [
   [
     "implicit+delegated vs implicit",
     "0.000",
-    "8.832e-05",
-    "-100.5",
-    "-220.0",
-    "-28.25",
+    "0.0004358",
+    "-72.00",
+    "-159.0",
+    "-17.50",
     "-10.17",
-    "-11.98",
-    "-5.825",
+    "-11.89",
+    "-5.273",
     "0",
-    "20",
+    "16",
     "2"
   ],
   [
     "delegated+implicit vs delegated",
-    "47.00",
-    "0.03031",
-    "-26.00",
-    "-161.8",
-    "-9.500",
-    "-5.523",
-    "-15.80",
-    "-0.9149",
-    "3",
-    "17",
-    "2"
+    "11.00",
+    "0.001920",
+    "-29.50",
+    "-234.8",
+    "-17.00",
+    "-8.338",
+    "-18.34",
+    "-3.790",
+    "1",
+    "16",
+    "1"
   ],
   [
     "residual-implicit+delegated vs residual-implicit",
     "0.000",
-    "8.832e-05",
-    "-97.00",
-    "-195.0",
-    "-25.00",
-    "-9.413",
-    "-11.61",
-    "-5.857",
+    "0.0004358",
+    "-71.00",
+    "-132.0",
+    "-16.50",
+    "-8.769",
+    "-10.65",
+    "-4.471",
     "0",
-    "20",
+    "16",
     "2"
   ],
   [
     "delegated+residual-implicit vs delegated",
     "0.000",
-    "8.845e-05",
-    "-70.50",
-    "-445.5",
+    "0.0002925",
+    "-42.00",
+    "-422.8",
     "-30.25",
-    "-9.545",
-    "-18.71",
-    "-5.746",
+    "-9.933",
+    "-20.45",
+    "-6.723",
     "0",
-    "20",
-    "2"
+    "17",
+    "1"
   ]
 ] as string[][];
 
@@ -1162,17 +1456,16 @@ export default function ExperimentoNDesign() {
         <H1>Experimento n: refatoração multi-projeto</H1>
         <Text tone="secondary">
           Comparar configuração implícita, residual e delegada, e as composições
-          das duas primeiras com a delegada, em todos os projetos de{" "}
-          <Code>external-projects/</Code> mais o Róża. Cada projeto gera uma
-          linha por variante no CSV. Só o SAAS entra partido: cada projeto de
-          teste é um sujeito.
+          das duas primeiras com a delegada, em 17 bibliotecas selecionadas de{" "}
+          <Code>external-projects/</Code> mais o Róża. Cada sujeito gera uma linha
+          por variante no CSV.
         </Text>
       </Stack>
 
       <Grid columns={4} gap={16}>
-        <Stat value="22" label="Sujeitos (17 libs + 4 SAAS + Róża)" />
+        <Stat value="18" label="Sujeitos (17 libs + Róża)" />
         <Stat value="8" label="Linhas por sujeito (original + 7 variantes)" />
-        <Stat value="176" label="Linhas no CSV" />
+        <Stat value="144" label="Linhas no CSV" />
         <Stat value="32g" label="Heap no Gradle" />
       </Grid>
 
@@ -1185,8 +1478,8 @@ export default function ExperimentoNDesign() {
       <Stack gap={10}>
         <H2>Sujeitos</H2>
         <Text>
-          Bibliotecas com vários módulos de teste entram como um sujeito só: o
-          loader recebe todas as pastas de teste. Só o SAAS parte.
+          Quem tem várias pastas de teste entra como um sujeito só: o loader
+          recebe todas elas.
         </Text>
         <Table
           striped
@@ -1211,15 +1504,10 @@ export default function ExperimentoNDesign() {
             ["couchdb-lucene", "src/test/java", "Uma pasta"],
             ["picon", "test/", "Layout Eclipse"],
             ["selenium", "java/test", "Layout Bazel"],
-            ["saas+teste", "módulo, recursivo", "Projeto de teste SAAS"],
-            ["saas+teste+moodle", "módulo, recursivo", "Projeto de teste SAAS"],
-            ["saas+teste+selenium", "módulo, recursivo", "Projeto de teste SAAS"],
-            ["saas+teste+service", "módulo, recursivo", "Projeto de teste SAAS"],
           ]}
         />
         <Text tone="secondary" size="small">
-          Fora: <Code>saas</Code> e <Code>saas+util</Code>. Se um sujeito não
-          tiver nenhum teste parseável, registra e segue.
+          Se um sujeito não tiver nenhum teste parseável, registra e segue.
         </Text>
       </Stack>
 
@@ -1313,7 +1601,7 @@ export default function ExperimentoNDesign() {
         />
         <Text tone="secondary" size="small">
           Log: porcentagem da variante atual e porcentagem do experimento
-          inteiro, por exemplo <Code>[saas+teste] implicit 42% | total 18%</Code>.
+          inteiro, por exemplo <Code>[selenium] implicit 42% | total 18%</Code>.
         </Text>
       </Stack>
 
@@ -1381,10 +1669,10 @@ export default function ExperimentoNDesign() {
       <Stack gap={10}>
         <H2>Estatística: o que cada teste devolve</H2>
         <Text>
-          Shapiro–Wilk entra como diagnóstico nas 22 diferenças (variante −
+          Shapiro–Wilk entra como diagnóstico nas 18 diferenças (variante −
           original) de cada métrica e cada variante, com α = 0,05. Amostra
           constante deixa W e p vazios. O teste publicado é o Wilcoxon pareado,
-          escolhido a priori: 22 pares (um por sujeito), métricas de contagem,
+          escolhido a priori: 18 pares (um por sujeito), métricas de contagem,
           zeros e assimetria. Não se troca para t de Student, mesmo se o Shapiro
           não rejeitar. Wilcoxon contra o original roda nas
           seis colunas numéricas do CSV. Cada variante é um teste separado: 7
@@ -1392,7 +1680,7 @@ export default function ExperimentoNDesign() {
           diminuiu ou ficou igual. A porcentagem é descritiva, não entra no
           teste:{" "}
           <Code>(variante − original) / original × 100</Code>. Q1 e Q3 são os
-          quartis das 22 diferenças (e das 22 porcentagens).
+          quartis das 18 diferenças (e das 18 porcentagens).
         </Text>
         <Text>
           Depois compara-se o original e as sete variantes nas sentenças
@@ -1404,10 +1692,10 @@ export default function ExperimentoNDesign() {
           <Code>(duplicadas da 2 − duplicadas da 1) / duplicadas da 1 × 100</Code>.
         </Text>
         <Callout tone="info" title="Exemplo: Shapiro e Wilcoxon em duplicated_statements">
-          Para a variante implicit, há 22 diferenças (implicit − original, um por
-          projeto). O Shapiro–Wilk dessas 22 diferenças devolve W e p; se p for
-          menor que 0,05, a coluna Normal fica “não”. O Wilcoxon desses 22 pares
-          devolve: um p-valor, a estatística W, e a mediana das 22 diferenças
+          Para a variante implicit, há 18 diferenças (implicit − original, um por
+          projeto). O Shapiro–Wilk dessas 18 diferenças devolve W e p; se p for
+          menor que 0,05, a coluna Normal fica “não”. O Wilcoxon desses 18 pares
+          devolve: um p-valor, a estatística W, e a mediana das 18 diferenças
           (em sentenças, não em %). Repete isso para as outras 6 variantes. Essa
           coluna sozinha: 7 Shapiro e 7 Wilcoxon. O mesmo pacote se repete nas
           outras cinco colunas.
@@ -1419,7 +1707,7 @@ export default function ExperimentoNDesign() {
           rows={[
             [
               "Shapiro–Wilk vs original",
-              "As 6 colunas, nas 22 diferenças (variante − original)",
+              "As 6 colunas, nas 18 diferenças (variante − original)",
               "42 linhas (6 métricas × 7 variantes). Cada linha: n, W, p e se a amostra passa em α = 0,05. Amostra constante: W e p vazios. Não troca o teste publicado.",
             ],
             [
@@ -1430,7 +1718,7 @@ export default function ExperimentoNDesign() {
             [
               "Aumentou / diminuiu / igual",
               "Cada métrica vs original",
-              "7 trios de inteiros, um por variante. Exemplo implicit em duplicated_statements: 3 aumentaram, 17 diminuíram, 2 iguais.",
+              "7 trios de inteiros, um por variante. Exemplo implicit em duplicated_statements: 1 aumentou, 16 diminuíram, 1 ficou igual.",
             ],
             [
               "Mediana, Q1 e Q3 da porcentagem",
@@ -1439,7 +1727,7 @@ export default function ExperimentoNDesign() {
             ],
             [
               "Friedman",
-              "duplicated_statements do original e das 7 variantes nos 22 projetos",
+              "duplicated_statements do original e das 7 variantes nos 18 projetos",
               "1 p-valor e 1 χ². Só diz se os oito não são todos iguais. Não nomeia o melhor.",
             ],
             [
@@ -1454,7 +1742,7 @@ export default function ExperimentoNDesign() {
             ],
             [
               "Qual é a melhor",
-              "Mediana de duplicated_statements nos 22 projetos, original e 7 variantes",
+              "Mediana de duplicated_statements nos 18 projetos, original e 7 variantes",
               "A de menor mediana. Se dois não diferirem no par com Holm, empatam.",
             ],
             [
@@ -1485,13 +1773,13 @@ export default function ExperimentoNDesign() {
           Número negativo na diferença de duplicação significa queda.
         </Text>
         <Text tone="secondary" size="small">
-          Fonte: <Code>experiment-results/n/*.csv</Code>, 22 sujeitos.
+          Fonte: <Code>experiment-results/n/*.csv</Code>, 18 sujeitos.
         </Text>
 
         <Stack gap={8}>
           <H3>Shapiro–Wilk das diferenças vs original</H3>
           <Text tone="secondary" size="small">
-            Diagnóstico de normalidade nas 22 diferenças (variante − original),
+            Diagnóstico de normalidade nas 18 diferenças (variante − original),
             α = 0,05. As 42 combinações rejeitam normalidade. O teste publicado
             continua sendo o Wilcoxon. Fonte:{" "}
             <Code>shapiro-vs-original.csv</Code>.
@@ -1512,7 +1800,7 @@ export default function ExperimentoNDesign() {
           <H3>Comparação com o original: demais métricas</H3>
           <Text tone="secondary" size="small">
             Wilcoxon no valor da métrica. Mediana, Q1 e Q3 da diferença estão
-            nas 22 diferenças (variante − original). A % usa (variante −
+            nas 18 diferenças (variante − original). A % usa (variante −
             original) / original × 100. Se o original for zero, a % fica vazia.
           </Text>
           <MetricTable titulo="Classes de teste" coluna="test_classes" rows={VS_CLASSES} />
@@ -1525,7 +1813,7 @@ export default function ExperimentoNDesign() {
         <Stack gap={8}>
           <H3>Friedman nas sentenças duplicadas</H3>
           <Text tone="secondary" size="small">
-            Original e as sete variantes, 22 projetos. Um teste só.
+            Original e as sete variantes, 18 projetos. Um teste só.
           </Text>
           <Table headers={["χ²", "gl", "p"]} rows={FRIEDMAN} />
         </Stack>
@@ -1543,7 +1831,7 @@ export default function ExperimentoNDesign() {
         <Stack gap={8}>
           <H3>Medianas de sentenças duplicadas</H3>
           <Text tone="secondary" size="small">
-            Mediana, Q1 e Q3 das 22 contas de <Code>duplicated_statements</Code>{" "}
+            Mediana, Q1 e Q3 das 18 contas de <Code>duplicated_statements</Code>{" "}
             de cada tratamento. Quem tem a menor mediana chegou com menos
             duplicação no projeto típico. Só declare isso se o par com Holm
             tiver p pequeno.
@@ -1570,9 +1858,10 @@ export default function ExperimentoNDesign() {
           <CardHeader>Saída</CardHeader>
           <CardBody>
             <Text>
-              <Code>experiment-results/n/comparison.csv</Code>, os dois SVG e os
-              CSV estatísticos na mesma pasta, inclusive{" "}
-              <Code>shapiro-vs-original.csv</Code>.
+              Os CSV primários <Code>comparison.csv</Code> e{" "}
+              <Code>original-tests.csv</Code>, o relatório <Code>skipped.csv</Code>,
+              os dois SVG e os CSV estatísticos ficam em{" "}
+              <Code>experiment-results/n/</Code>.
             </Text>
           </CardBody>
         </Card>
@@ -1583,11 +1872,13 @@ export default function ExperimentoNDesign() {
               <Code>./gradlew runExperimentN</Code> apaga{" "}
               <Code>experiment-results/n/</Code> e roda todos os sujeitos, com
               heap 32g. <Code>./gradlew runExperimentNMissing</Code> passa{" "}
-              <Code>--missing-only</Code>: mantém o CSV e roda só os incompletos.{" "}
+              <Code>--missing-only</Code>: mantém os CSV primários e roda só os
+              incompletos; cada sujeito retido precisa ter sua contagem em{" "}
+              <Code>original-tests.csv</Code>.{" "}
               <Code>./gradlew runExperimentNFromComparison</Code> passa{" "}
               <Code>--from-comparison</Code>: regenera os dois SVG e os CSV
               estatísticos a partir do <Code>comparison.csv</Code> já gravado,
-              sem rodar o pipeline e sem alterar esse arquivo.
+              sem rodar o pipeline nem alterar os CSV primários.
             </Text>
           </CardBody>
         </Card>

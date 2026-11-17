@@ -1,9 +1,9 @@
 treatment;median_duplicated_statements;q1;q3
-original;1162;312.0;3866
-implicit;948.5;290.5;2570
-residual-implicit;931.5;279.3;2451
-delegated;982.5;308.5;3288
-implicit+delegated;839.0;282.5;2410
-delegated+implicit;846.5;282.3;2478
-residual-implicit+delegated;818.5;275.8;2322
-delegated+residual-implicit;825.5;275.8;2392
+original;974.0;312.0;2686
+implicit;672.0;290.5;2324
+residual-implicit;660.0;279.3;2198
+delegated;820.5;308.5;2482
+implicit+delegated;617.0;282.5;2104
+delegated+implicit;611.5;282.3;2217
+residual-implicit+delegated;606.0;275.8;2005
+delegated+residual-implicit;598.0;275.8;2122

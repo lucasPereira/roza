@@ -55,15 +55,8 @@ final class ExperimentResume {
 			index.computeIfAbsent(row.project, key -> new LinkedHashMap<>()).put(row.variant, row);
 		}
 		List<ResultRow> ordered = new ArrayList<>();
-		Set<String> seen = new LinkedHashSet<>();
 		for (String project : projects) {
 			appendProject(index.get(project), ordered);
-			seen.add(project);
-		}
-		for (String project : index.keySet()) {
-			if (!seen.contains(project)) {
-				appendProject(index.get(project), ordered);
-			}
 		}
 		return ordered;
 	}

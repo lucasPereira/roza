@@ -3,6 +3,7 @@ package br.ufsc.ine.leb.roza.expt.n;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -48,6 +49,7 @@ import br.ufsc.ine.leb.roza.expt.n.StatisticalTables.ResultRow;
 public final class Experiment {
 
 	private static final FolderUtils RESULTS = new FolderUtils("experiment-results/n");
+	private static final Map<String, Integer> ORIGINAL_TEST_METHODS = new LinkedHashMap<>();
 	private static final int VARIANT_COUNT = StatisticalTables.VARIANTS.size();
 	private static final int CCS_MINIMUM_LENGTH = 2;
 
@@ -113,7 +115,7 @@ public final class Experiment {
 				skipSubject(subject.name(), exception, skipped, progress, rows);
 				continue;
 			}
-			int tests = original.testClasses().stream().mapToInt(testClass -> testClass.testMethods().size()).sum();
+			int tests = testMethods(original);
 			if (tests == 0) {
 				skipped.addLine(subject.name(), "*", "no parseable tests");
 				progress.beginSubject(subject.name(), 0);
@@ -122,6 +124,7 @@ public final class Experiment {
 				continue;
 			}
 			RefactoredTestClasses originalSuite = new RefactoredTestClasses(original.testClasses());
+			ORIGINAL_TEST_METHODS.put(subject.name(), tests);
 			ExperimentResume.upsert(rows, row(subject.name(), "original", originalSuite));
 			progress.beginSubject(subject.name(), tests);
 			persist(rows, skipped);
@@ -329,6 +332,59 @@ public final class Experiment {
 		}
 	}
 
+	private static void writeOriginalTests(List<ResultRow> rows) {
+		Map<String, Integer> counts = readOriginalTests();
+		counts.putAll(ORIGINAL_TEST_METHODS);
+		CommaSeparatedValues csv = new CommaSeparatedValues();
+		csv.addLine("project", "test_methods");
+		for (Subjects.Subject subject : Subjects.all()) {
+			boolean listed = currentRows(rows).stream()
+					.anyMatch(row -> subject.name().equals(row.project) && "original".equals(row.variant));
+			if (!listed) {
+				continue;
+			}
+			Integer tests = counts.get(subject.name());
+			if (tests == null) {
+				throw new IllegalStateException(
+						"Missing test-method count for " + subject.name()
+								+ " in original-tests.csv; cannot combine saved comparison rows with current source counts");
+			}
+			csv.addLine(subject.name(), tests);
+		}
+		RESULTS.writeContetAsString("original-tests.csv", csv.getContent());
+	}
+
+	private static Map<String, Integer> readOriginalTests() {
+		File file = new File(RESULTS.getBaseFolder(), "original-tests.csv");
+		Map<String, Integer> counts = new LinkedHashMap<>();
+		if (!file.isFile()) {
+			return counts;
+		}
+		String[] lines = new FileUtils().readContetAsString(file).split("\\R");
+		for (int index = 1; index < lines.length; index++) {
+			String line = lines[index].trim();
+			if (line.isEmpty()) {
+				continue;
+			}
+			String[] columns = line.split(";", -1);
+			if (columns.length != 2) {
+				throw new IllegalArgumentException("Expected 2 columns in original-tests.csv, got " + columns.length + ": " + line);
+			}
+			counts.put(columns[0], Integer.parseInt(columns[1]));
+		}
+		return counts;
+	}
+
+	private static int testMethods(ParsedTestClasses parsed) {
+		return parsed.testClasses().stream().mapToInt(testClass -> testClass.testMethods().size()).sum();
+	}
+
+	private static List<ResultRow> currentRows(List<ResultRow> rows) {
+		return ExperimentResume.ordered(
+				rows,
+				Subjects.all().stream().map(Subjects.Subject::name).collect(Collectors.toList()));
+	}
+
 	private static File comparisonFile() {
 		return new File(RESULTS.getBaseFolder(), "comparison.csv");
 	}
@@ -378,7 +434,7 @@ public final class Experiment {
 				"helper_methods",
 				"total_statements",
 				"duplicated_statements");
-		for (ResultRow row : ExperimentResume.ordered(rows, Subjects.all().stream().map(Subjects.Subject::name).collect(Collectors.toList()))) {
+		for (ResultRow row : currentRows(rows)) {
 			csv.addLine(
 					row.project,
 					row.variant,
@@ -390,9 +446,11 @@ public final class Experiment {
 					row.duplicatedStatements);
 		}
 		RESULTS.writeContetAsString("comparison.csv", csv.getContent());
+		writeOriginalTests(rows);
 	}
 
 	private static void writeCharts(List<ResultRow> rows) {
+		rows = currentRows(rows);
 		List<String> projects = rows.stream().map(row -> row.project).distinct().collect(Collectors.toList());
 		Map<String, Integer> originalDuplicated = rows.stream()
 				.filter(row -> "original".equals(row.variant))
@@ -430,6 +488,7 @@ public final class Experiment {
 	}
 
 	private static void writeTables(List<ResultRow> rows) {
+		rows = currentRows(rows);
 		if (rows.isEmpty()) {
 			return;
 		}
